@@ -1,0 +1,29 @@
+{
+  "annotations": {
+    "changelogDate": "20260128152742"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "nombre",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "maxlength"],
+      "fieldValidateRulesMaxlength": "20"
+    },
+    {
+      "fieldName": "simbolo",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "10"
+    },
+    {
+      "fieldName": "activo",
+      "fieldType": "Boolean"
+    }
+  ],
+  "name": "UnidadMedida",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

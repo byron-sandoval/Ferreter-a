@@ -1,0 +1,45 @@
+{
+  "annotations": {
+    "changelogDate": "20260128152754"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "cantidad",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required", "min"],
+      "fieldValidateRulesMin": "0.01"
+    },
+    {
+      "fieldName": "costoUnitario",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required", "min"],
+      "fieldValidateRulesMin": "0"
+    },
+    {
+      "fieldName": "monto",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required", "min"],
+      "fieldValidateRulesMin": "0"
+    }
+  ],
+  "name": "DetalleIngreso",
+  "relationships": [
+    {
+      "otherEntityName": "articulo",
+      "relationshipName": "articulo",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "ingreso",
+      "otherEntityRelationshipName": "detalles",
+      "relationshipName": "ingreso",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

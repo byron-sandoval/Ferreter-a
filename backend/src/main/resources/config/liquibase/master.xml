@@ -12,7 +12,30 @@
     <property name="timeType" value="time(6)" dbms="postgresql"/>
 
     <include file="config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152741_added_entity_Empresa.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152742_added_entity_UnidadMedida.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152743_added_entity_NumeracionFactura.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152744_added_entity_Categoria.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152745_added_entity_Articulo.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152746_added_entity_HistorialPrecio.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152747_added_entity_Vendedor.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152748_added_entity_Cliente.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152749_added_entity_Proveedor.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152750_added_entity_Moneda.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152751_added_entity_Venta.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152752_added_entity_DetalleVenta.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152753_added_entity_Ingreso.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152754_added_entity_DetalleIngreso.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152755_added_entity_Devolucion.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
+    <include file="config/liquibase/changelog/20260128152744_added_entity_constraints_Categoria.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152745_added_entity_constraints_Articulo.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152746_added_entity_constraints_HistorialPrecio.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152751_added_entity_constraints_Venta.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152752_added_entity_constraints_DetalleVenta.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152753_added_entity_constraints_Ingreso.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152754_added_entity_constraints_DetalleIngreso.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260128152755_added_entity_constraints_Devolucion.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

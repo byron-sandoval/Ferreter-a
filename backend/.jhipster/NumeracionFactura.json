@@ -1,0 +1,28 @@
+{
+  "annotations": {
+    "changelogDate": "20260128152743"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "serie",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "maxlength"],
+      "fieldValidateRulesMaxlength": "10"
+    },
+    {
+      "fieldName": "correlativoActual",
+      "fieldType": "Long",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "activo",
+      "fieldType": "Boolean"
+    }
+  ],
+  "name": "NumeracionFactura",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

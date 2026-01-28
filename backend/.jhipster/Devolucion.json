@@ -1,0 +1,35 @@
+{
+  "annotations": {
+    "changelogDate": "20260128152755"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "fecha",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "motivo",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "255"
+    },
+    {
+      "fieldName": "total",
+      "fieldType": "BigDecimal"
+    }
+  ],
+  "name": "Devolucion",
+  "relationships": [
+    {
+      "otherEntityName": "venta",
+      "relationshipName": "venta",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

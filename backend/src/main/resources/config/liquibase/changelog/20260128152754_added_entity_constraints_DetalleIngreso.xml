@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <!--
+        Added the constraints for entity DetalleIngreso.
+    -->
+    <changeSet id="20260128152754-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="articulo_id"
+                                 baseTableName="detalle_ingreso"
+                                 constraintName="fk_detalle_ingreso__articulo_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="articulo"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="ingreso_id"
+                                 baseTableName="detalle_ingreso"
+                                 constraintName="fk_detalle_ingreso__ingreso_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="ingreso"
+                                 />
+    </changeSet>
+</databaseChangeLog>

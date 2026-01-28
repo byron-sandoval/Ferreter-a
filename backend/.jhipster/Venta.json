@@ -1,0 +1,100 @@
+{
+  "annotations": {
+    "changelogDate": "20260128152751"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "fecha",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "noFactura",
+      "fieldType": "Long",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "subtotal",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "iva",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "total",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "totalEnMonedaBase",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "metodoPago",
+      "fieldType": "MetodoPagoEnum",
+      "fieldTypeDocumentation": "SISTEMA DE INVENTARIO Y FACTURACIÓN DE FERRETERÍA",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "EFECTIVO,TARJETA_STRIPE,TRANSFERENCIA"
+    },
+    {
+      "fieldName": "stripeId",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "esContado",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "tipoCambioVenta",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "anulada",
+      "fieldType": "Boolean"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "Venta",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "detalleVenta",
+      "otherEntityRelationshipName": "venta",
+      "relationshipName": "detalles",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "cliente",
+      "relationshipName": "cliente",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "vendedor",
+      "relationshipName": "vendedor",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "moneda",
+      "relationshipName": "moneda",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "numeracionFactura",
+      "relationshipName": "numeracion",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}
