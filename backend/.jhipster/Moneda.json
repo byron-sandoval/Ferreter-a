@@ -1,0 +1,28 @@
+{
+  "annotations": {
+    "changelogDate": "20260128152750"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "nombre",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "simbolo",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "tipoCambio",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "name": "Moneda",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

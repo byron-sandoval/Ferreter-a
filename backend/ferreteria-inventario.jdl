@@ -1,0 +1,177 @@
+/**
+ * SISTEMA DE INVENTARIO Y FACTURACIÓN DE FERRETERÍA
+ */
+
+// ENUMS
+
+enum MetodoPagoEnum {
+    EFECTIVO, TARJETA_STRIPE, TRANSFERENCIA
+}
+
+enum Genero {
+    MASCULINO, FEMENINO
+}
+
+// CONFIGURACIÓN GENERAL
+
+entity Empresa {
+    nombre String required maxlength(100),
+    ruc String required unique maxlength(20),
+    regimenFiscal String required,
+    direccion String required maxlength(255),
+    telefono String maxlength(20),
+    correo String maxlength(100),
+    logo ImageBlob,
+    eslogan String maxlength(150)
+}
+
+entity UnidadMedida {
+    nombre String required maxlength(20),
+    simbolo String maxlength(10),
+    activo Boolean
+}
+
+entity NumeracionFactura {
+    serie String required maxlength(10),
+    correlativoActual Long required,
+    activo Boolean
+}
+
+// CATÁLOGOS
+
+entity Categoria {
+    nombre String required maxlength(50),
+    descripcion String maxlength(100),
+    imagen ImageBlob,
+    activo Boolean
+}
+
+entity Articulo {
+    codigo String required unique,
+    nombre String required maxlength(50),
+    descripcion String maxlength(150),
+    existencia BigDecimal required min(0),
+    existenciaMinima BigDecimal required min(0),
+    precio BigDecimal required min(0),
+    costo BigDecimal required min(0),
+    imagen ImageBlob,
+    activo Boolean
+}
+
+entity HistorialPrecio {
+    precioAnterior BigDecimal required,
+    precioNuevo BigDecimal required,
+    fecha Instant required,
+    motivo String maxlength(100)
+}
+
+// ACTORES
+
+entity Vendedor {
+    idKeycloak String required unique,
+    cedula String required unique maxlength(20),
+    nombre String required maxlength(50),
+    apellido String maxlength(50),
+    telefono String maxlength(15),
+    activo Boolean
+}
+
+entity Cliente {
+    cedula String required unique maxlength(16),
+    nombre String required maxlength(50),
+    genero Genero,
+    direccion String maxlength(150),
+    telefono String maxlength(15),
+    saldo BigDecimal,
+    activo Boolean
+}
+
+entity Proveedor {
+    nombre String required maxlength(100),
+    direccion String maxlength(250),
+    telefono String maxlength(20),
+    email String maxlength(100),
+    activo Boolean
+}
+
+// FINANZAS
+
+entity Moneda {
+    nombre String required,
+    simbolo String required,
+    tipoCambio BigDecimal required
+}
+
+// TRANSACCIONES
+
+entity Venta {
+    fecha Instant required,
+    noFactura Long required unique,
+    subtotal BigDecimal required,
+    iva BigDecimal required,
+    total BigDecimal required,
+    totalEnMonedaBase BigDecimal,
+    metodoPago MetodoPagoEnum required,
+    stripeId String,
+    esContado Boolean required,
+    tipoCambioVenta BigDecimal,
+    anulada Boolean
+}
+
+entity DetalleVenta {
+    cantidad BigDecimal required min(0.01),
+    precioVenta BigDecimal required min(0),
+    descuento BigDecimal min(0),
+    monto BigDecimal required min(0)
+}
+
+entity Ingreso {
+    fecha Instant required,
+    noDocumento String required,
+    total BigDecimal required,
+    observaciones String maxlength(255),
+    activo Boolean
+}
+
+entity DetalleIngreso {
+    cantidad BigDecimal required min(0.01),
+    costoUnitario BigDecimal required min(0),
+    monto BigDecimal required min(0)
+}
+
+entity Devolucion {
+    fecha Instant required,
+    motivo String maxlength(255),
+    total BigDecimal
+}
+
+// RELACIONES
+
+relationship ManyToOne {
+    Categoria{padre} to Categoria,
+    Articulo{categoria} to Categoria,
+    Articulo{unidadMedida} to UnidadMedida,
+    HistorialPrecio{articulo} to Articulo,
+    Venta{cliente} to Cliente,
+    Venta{vendedor} to Vendedor,
+    Venta{moneda} to Moneda,
+    Venta{numeracion} to NumeracionFactura,
+    Ingreso{vendedor} to Vendedor,
+    Ingreso{proveedor} to Proveedor,
+    DetalleVenta{articulo} to Articulo,
+    DetalleIngreso{articulo} to Articulo,
+    Devolucion{venta} to Venta
+}
+
+relationship OneToMany {
+    Venta{detalles} to DetalleVenta{venta},
+    Ingreso{detalles} to DetalleIngreso{ingreso}
+}
+
+// CONFIGURACIÓN JHIPSTER
+
+dto * with mapstruct
+service * with serviceImpl
+paginate Articulo, Categoria, Cliente, Venta, Ingreso, Proveedor, Vendedor with pagination
+filter Articulo, Venta, Ingreso, Cliente
+
