@@ -1,0 +1,22 @@
+{
+  "generator-jhipster": {
+    "baseName": "FerroNica",
+    "clientFramework": "react",
+    "clientTestFrameworks": [],
+    "clientTheme": "materia",
+    "clientThemeVariant": "primary",
+    "creationTimestamp": 1769381275061,
+    "enableTranslation": true,
+    "entities": [],
+    "jhipsterVersion": "8.11.0",
+    "languages": ["es", "en"],
+    "microfrontend": null,
+    "microfrontends": [],
+    "monorepository": true,
+    "nativeLanguage": "es",
+    "skipCommitHook": true,
+    "skipServer": true,
+    "testFrameworks": [],
+    "withAdminUi": true
+  }
+}

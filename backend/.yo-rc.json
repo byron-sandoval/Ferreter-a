@@ -1,0 +1,30 @@
+{
+  "generator-jhipster": {
+    "applicationType": "monolith",
+    "authenticationType": "oauth2",
+    "baseName": "FerroNica",
+    "buildTool": "maven",
+    "cacheProvider": "no",
+    "creationTimestamp": 1769544356773,
+    "databaseType": "sql",
+    "devDatabaseType": "postgresql",
+    "enableHibernateCache": null,
+    "enableSwaggerCodegen": true,
+    "enableTranslation": false,
+    "entities": [],
+    "feignClient": null,
+    "jhipsterVersion": "8.11.0",
+    "monorepository": true,
+    "nativeLanguage": "es",
+    "packageName": "com.ferronica.app",
+    "prodDatabaseType": "postgresql",
+    "reactive": false,
+    "serverPort": null,
+    "serviceDiscoveryType": null,
+    "skipClient": true,
+    "skipCommitHook": true,
+    "skipUserManagement": true,
+    "syncUserWithIdp": false,
+    "testFrameworks": []
+  }
+}
