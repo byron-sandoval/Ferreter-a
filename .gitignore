@@ -1,0 +1,29 @@
+# OS junk
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# General
+*.log
+tmp/
+temp/
+
+# Node (if any node commands are run in root)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Java/Maven (if any build artifacts end up in root)
+target/
+*.class
+
+# Environment variables
+.env
+.env.local
