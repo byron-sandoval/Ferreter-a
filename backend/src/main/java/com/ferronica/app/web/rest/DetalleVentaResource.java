@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -37,7 +38,8 @@ public class DetalleVentaResource {
 
     private final DetalleVentaRepository detalleVentaRepository;
 
-    public DetalleVentaResource(DetalleVentaService detalleVentaService, DetalleVentaRepository detalleVentaRepository) {
+    public DetalleVentaResource(DetalleVentaService detalleVentaService,
+            DetalleVentaRepository detalleVentaRepository) {
         this.detalleVentaService = detalleVentaService;
         this.detalleVentaRepository = detalleVentaRepository;
     }
@@ -46,37 +48,44 @@ public class DetalleVentaResource {
      * {@code POST  /detalle-ventas} : Create a new detalleVenta.
      *
      * @param detalleVentaDTO the detalleVentaDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new detalleVentaDTO, or with status {@code 400 (Bad Request)} if the detalleVenta has already an ID.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with
+     *         body the new detalleVentaDTO, or with status
+     *         {@code 400 (Bad Request)} if the detalleVenta has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_VENDEDOR')")
     @PostMapping("")
     public ResponseEntity<DetalleVentaDTO> createDetalleVenta(@Valid @RequestBody DetalleVentaDTO detalleVentaDTO)
-        throws URISyntaxException {
+            throws URISyntaxException {
         LOG.debug("REST request to save DetalleVenta : {}", detalleVentaDTO);
         if (detalleVentaDTO.getId() != null) {
             throw new BadRequestAlertException("A new detalleVenta cannot already have an ID", ENTITY_NAME, "idexists");
         }
         detalleVentaDTO = detalleVentaService.save(detalleVentaDTO);
         return ResponseEntity.created(new URI("/api/detalle-ventas/" + detalleVentaDTO.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, detalleVentaDTO.getId().toString()))
-            .body(detalleVentaDTO);
+                .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME,
+                        detalleVentaDTO.getId().toString()))
+                .body(detalleVentaDTO);
     }
 
     /**
      * {@code PUT  /detalle-ventas/:id} : Updates an existing detalleVenta.
      *
-     * @param id the id of the detalleVentaDTO to save.
+     * @param id              the id of the detalleVentaDTO to save.
      * @param detalleVentaDTO the detalleVentaDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated detalleVentaDTO,
-     * or with status {@code 400 (Bad Request)} if the detalleVentaDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the detalleVentaDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated detalleVentaDTO,
+     *         or with status {@code 400 (Bad Request)} if the detalleVentaDTO is
+     *         not valid,
+     *         or with status {@code 500 (Internal Server Error)} if the
+     *         detalleVentaDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<DetalleVentaDTO> updateDetalleVenta(
-        @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody DetalleVentaDTO detalleVentaDTO
-    ) throws URISyntaxException {
+            @PathVariable(value = "id", required = false) final Long id,
+            @Valid @RequestBody DetalleVentaDTO detalleVentaDTO) throws URISyntaxException {
         LOG.debug("REST request to update DetalleVenta : {}, {}", id, detalleVentaDTO);
         if (detalleVentaDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -91,26 +100,32 @@ public class DetalleVentaResource {
 
         detalleVentaDTO = detalleVentaService.update(detalleVentaDTO);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, detalleVentaDTO.getId().toString()))
-            .body(detalleVentaDTO);
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME,
+                        detalleVentaDTO.getId().toString()))
+                .body(detalleVentaDTO);
     }
 
     /**
-     * {@code PATCH  /detalle-ventas/:id} : Partial updates given fields of an existing detalleVenta, field will ignore if it is null
+     * {@code PATCH  /detalle-ventas/:id} : Partial updates given fields of an
+     * existing detalleVenta, field will ignore if it is null
      *
-     * @param id the id of the detalleVentaDTO to save.
+     * @param id              the id of the detalleVentaDTO to save.
      * @param detalleVentaDTO the detalleVentaDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated detalleVentaDTO,
-     * or with status {@code 400 (Bad Request)} if the detalleVentaDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the detalleVentaDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the detalleVentaDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated detalleVentaDTO,
+     *         or with status {@code 400 (Bad Request)} if the detalleVentaDTO is
+     *         not valid,
+     *         or with status {@code 404 (Not Found)} if the detalleVentaDTO is not
+     *         found,
+     *         or with status {@code 500 (Internal Server Error)} if the
+     *         detalleVentaDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<DetalleVentaDTO> partialUpdateDetalleVenta(
-        @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody DetalleVentaDTO detalleVentaDTO
-    ) throws URISyntaxException {
+            @PathVariable(value = "id", required = false) final Long id,
+            @NotNull @RequestBody DetalleVentaDTO detalleVentaDTO) throws URISyntaxException {
         LOG.debug("REST request to partial update DetalleVenta partially : {}, {}", id, detalleVentaDTO);
         if (detalleVentaDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -126,16 +141,18 @@ public class DetalleVentaResource {
         Optional<DetalleVentaDTO> result = detalleVentaService.partialUpdate(detalleVentaDTO);
 
         return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, detalleVentaDTO.getId().toString())
-        );
+                result,
+                HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME,
+                        detalleVentaDTO.getId().toString()));
     }
 
     /**
      * {@code GET  /detalle-ventas} : get all the detalleVentas.
      *
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of detalleVentas in body.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
+     *         of detalleVentas in body.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
     @GetMapping("")
     public List<DetalleVentaDTO> getAllDetalleVentas() {
         LOG.debug("REST request to get all DetalleVentas");
@@ -146,8 +163,10 @@ public class DetalleVentaResource {
      * {@code GET  /detalle-ventas/:id} : get the "id" detalleVenta.
      *
      * @param id the id of the detalleVentaDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the detalleVentaDTO, or with status {@code 404 (Not Found)}.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the detalleVentaDTO, or with status {@code 404 (Not Found)}.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
     @GetMapping("/{id}")
     public ResponseEntity<DetalleVentaDTO> getDetalleVenta(@PathVariable("id") Long id) {
         LOG.debug("REST request to get DetalleVenta : {}", id);
@@ -161,12 +180,13 @@ public class DetalleVentaResource {
      * @param id the id of the detalleVentaDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDetalleVenta(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete DetalleVenta : {}", id);
         detalleVentaService.delete(id);
         return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-            .build();
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+                .build();
     }
 }

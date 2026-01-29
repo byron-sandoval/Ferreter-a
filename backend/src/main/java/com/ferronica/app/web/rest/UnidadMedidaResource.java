@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -37,7 +38,8 @@ public class UnidadMedidaResource {
 
     private final UnidadMedidaRepository unidadMedidaRepository;
 
-    public UnidadMedidaResource(UnidadMedidaService unidadMedidaService, UnidadMedidaRepository unidadMedidaRepository) {
+    public UnidadMedidaResource(UnidadMedidaService unidadMedidaService,
+            UnidadMedidaRepository unidadMedidaRepository) {
         this.unidadMedidaService = unidadMedidaService;
         this.unidadMedidaRepository = unidadMedidaRepository;
     }
@@ -46,37 +48,44 @@ public class UnidadMedidaResource {
      * {@code POST  /unidad-medidas} : Create a new unidadMedida.
      *
      * @param unidadMedidaDTO the unidadMedidaDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new unidadMedidaDTO, or with status {@code 400 (Bad Request)} if the unidadMedida has already an ID.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with
+     *         body the new unidadMedidaDTO, or with status
+     *         {@code 400 (Bad Request)} if the unidadMedida has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
     @PostMapping("")
     public ResponseEntity<UnidadMedidaDTO> createUnidadMedida(@Valid @RequestBody UnidadMedidaDTO unidadMedidaDTO)
-        throws URISyntaxException {
+            throws URISyntaxException {
         LOG.debug("REST request to save UnidadMedida : {}", unidadMedidaDTO);
         if (unidadMedidaDTO.getId() != null) {
             throw new BadRequestAlertException("A new unidadMedida cannot already have an ID", ENTITY_NAME, "idexists");
         }
         unidadMedidaDTO = unidadMedidaService.save(unidadMedidaDTO);
         return ResponseEntity.created(new URI("/api/unidad-medidas/" + unidadMedidaDTO.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, unidadMedidaDTO.getId().toString()))
-            .body(unidadMedidaDTO);
+                .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME,
+                        unidadMedidaDTO.getId().toString()))
+                .body(unidadMedidaDTO);
     }
 
     /**
      * {@code PUT  /unidad-medidas/:id} : Updates an existing unidadMedida.
      *
-     * @param id the id of the unidadMedidaDTO to save.
+     * @param id              the id of the unidadMedidaDTO to save.
      * @param unidadMedidaDTO the unidadMedidaDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated unidadMedidaDTO,
-     * or with status {@code 400 (Bad Request)} if the unidadMedidaDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the unidadMedidaDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated unidadMedidaDTO,
+     *         or with status {@code 400 (Bad Request)} if the unidadMedidaDTO is
+     *         not valid,
+     *         or with status {@code 500 (Internal Server Error)} if the
+     *         unidadMedidaDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
     @PutMapping("/{id}")
     public ResponseEntity<UnidadMedidaDTO> updateUnidadMedida(
-        @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody UnidadMedidaDTO unidadMedidaDTO
-    ) throws URISyntaxException {
+            @PathVariable(value = "id", required = false) final Long id,
+            @Valid @RequestBody UnidadMedidaDTO unidadMedidaDTO) throws URISyntaxException {
         LOG.debug("REST request to update UnidadMedida : {}, {}", id, unidadMedidaDTO);
         if (unidadMedidaDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -91,26 +100,32 @@ public class UnidadMedidaResource {
 
         unidadMedidaDTO = unidadMedidaService.update(unidadMedidaDTO);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, unidadMedidaDTO.getId().toString()))
-            .body(unidadMedidaDTO);
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME,
+                        unidadMedidaDTO.getId().toString()))
+                .body(unidadMedidaDTO);
     }
 
     /**
-     * {@code PATCH  /unidad-medidas/:id} : Partial updates given fields of an existing unidadMedida, field will ignore if it is null
+     * {@code PATCH  /unidad-medidas/:id} : Partial updates given fields of an
+     * existing unidadMedida, field will ignore if it is null
      *
-     * @param id the id of the unidadMedidaDTO to save.
+     * @param id              the id of the unidadMedidaDTO to save.
      * @param unidadMedidaDTO the unidadMedidaDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated unidadMedidaDTO,
-     * or with status {@code 400 (Bad Request)} if the unidadMedidaDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the unidadMedidaDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the unidadMedidaDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated unidadMedidaDTO,
+     *         or with status {@code 400 (Bad Request)} if the unidadMedidaDTO is
+     *         not valid,
+     *         or with status {@code 404 (Not Found)} if the unidadMedidaDTO is not
+     *         found,
+     *         or with status {@code 500 (Internal Server Error)} if the
+     *         unidadMedidaDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<UnidadMedidaDTO> partialUpdateUnidadMedida(
-        @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody UnidadMedidaDTO unidadMedidaDTO
-    ) throws URISyntaxException {
+            @PathVariable(value = "id", required = false) final Long id,
+            @NotNull @RequestBody UnidadMedidaDTO unidadMedidaDTO) throws URISyntaxException {
         LOG.debug("REST request to partial update UnidadMedida partially : {}, {}", id, unidadMedidaDTO);
         if (unidadMedidaDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -126,16 +141,18 @@ public class UnidadMedidaResource {
         Optional<UnidadMedidaDTO> result = unidadMedidaService.partialUpdate(unidadMedidaDTO);
 
         return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, unidadMedidaDTO.getId().toString())
-        );
+                result,
+                HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME,
+                        unidadMedidaDTO.getId().toString()));
     }
 
     /**
      * {@code GET  /unidad-medidas} : get all the unidadMedidas.
      *
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of unidadMedidas in body.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
+     *         of unidadMedidas in body.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
     @GetMapping("")
     public List<UnidadMedidaDTO> getAllUnidadMedidas() {
         LOG.debug("REST request to get all UnidadMedidas");
@@ -146,8 +163,10 @@ public class UnidadMedidaResource {
      * {@code GET  /unidad-medidas/:id} : get the "id" unidadMedida.
      *
      * @param id the id of the unidadMedidaDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the unidadMedidaDTO, or with status {@code 404 (Not Found)}.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the unidadMedidaDTO, or with status {@code 404 (Not Found)}.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
     @GetMapping("/{id}")
     public ResponseEntity<UnidadMedidaDTO> getUnidadMedida(@PathVariable("id") Long id) {
         LOG.debug("REST request to get UnidadMedida : {}", id);
@@ -161,12 +180,13 @@ public class UnidadMedidaResource {
      * @param id the id of the unidadMedidaDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUnidadMedida(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete UnidadMedida : {}", id);
         unidadMedidaService.delete(id);
         return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-            .build();
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+                .build();
     }
 }
