@@ -184,9 +184,8 @@ public class DetalleVentaResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDetalleVenta(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete DetalleVenta : {}", id);
-        detalleVentaService.delete(id);
-        return ResponseEntity.noContent()
-                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-                .build();
+        throw new BadRequestAlertException(
+                "Individual detail deletion is not allowed. Please annul the entire parent transaction.", ENTITY_NAME,
+                "deletionNotAllowed");
     }
 }

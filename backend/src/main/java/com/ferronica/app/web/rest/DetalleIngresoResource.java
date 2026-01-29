@@ -186,9 +186,8 @@ public class DetalleIngresoResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDetalleIngreso(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete DetalleIngreso : {}", id);
-        detalleIngresoService.delete(id);
-        return ResponseEntity.noContent()
-                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-                .build();
+        throw new BadRequestAlertException(
+                "Individual detail deletion is not allowed. Please annul the entire parent transaction.", ENTITY_NAME,
+                "deletionNotAllowed");
     }
 }
