@@ -50,14 +50,14 @@ public class VentaServiceImpl implements VentaService {
         LOG.debug("Request to partially update Venta : {}", ventaDTO);
 
         return ventaRepository
-            .findById(ventaDTO.getId())
-            .map(existingVenta -> {
-                ventaMapper.partialUpdate(existingVenta, ventaDTO);
+                .findById(ventaDTO.getId())
+                .map(existingVenta -> {
+                    ventaMapper.partialUpdate(existingVenta, ventaDTO);
 
-                return existingVenta;
-            })
-            .map(ventaRepository::save)
-            .map(ventaMapper::toDto);
+                    return existingVenta;
+                })
+                .map(ventaRepository::save)
+                .map(ventaMapper::toDto);
     }
 
     @Override
@@ -69,7 +69,10 @@ public class VentaServiceImpl implements VentaService {
 
     @Override
     public void delete(Long id) {
-        LOG.debug("Request to delete Venta : {}", id);
-        ventaRepository.deleteById(id);
+        LOG.debug("Request to delete Venta (Anulacion Logica) : {}", id);
+        ventaRepository.findById(id).ifPresent(venta -> {
+            venta.setAnulada(true);
+            ventaRepository.save(venta);
+        });
     }
 }

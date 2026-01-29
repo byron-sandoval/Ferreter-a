@@ -14,7 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service Implementation for managing {@link com.ferronica.app.domain.Proveedor}.
+ * Service Implementation for managing
+ * {@link com.ferronica.app.domain.Proveedor}.
  */
 @Service
 @Transactional
@@ -52,14 +53,14 @@ public class ProveedorServiceImpl implements ProveedorService {
         LOG.debug("Request to partially update Proveedor : {}", proveedorDTO);
 
         return proveedorRepository
-            .findById(proveedorDTO.getId())
-            .map(existingProveedor -> {
-                proveedorMapper.partialUpdate(existingProveedor, proveedorDTO);
+                .findById(proveedorDTO.getId())
+                .map(existingProveedor -> {
+                    proveedorMapper.partialUpdate(existingProveedor, proveedorDTO);
 
-                return existingProveedor;
-            })
-            .map(proveedorRepository::save)
-            .map(proveedorMapper::toDto);
+                    return existingProveedor;
+                })
+                .map(proveedorRepository::save)
+                .map(proveedorMapper::toDto);
     }
 
     @Override
@@ -78,7 +79,10 @@ public class ProveedorServiceImpl implements ProveedorService {
 
     @Override
     public void delete(Long id) {
-        LOG.debug("Request to delete Proveedor : {}", id);
-        proveedorRepository.deleteById(id);
+        LOG.debug("Request to delete Proveedor (Logical) : {}", id);
+        proveedorRepository.findById(id).ifPresent(proveedor -> {
+            proveedor.setActivo(false);
+            proveedorRepository.save(proveedor);
+        });
     }
 }

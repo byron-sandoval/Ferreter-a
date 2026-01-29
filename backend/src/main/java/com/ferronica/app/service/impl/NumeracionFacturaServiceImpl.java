@@ -15,7 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service Implementation for managing {@link com.ferronica.app.domain.NumeracionFactura}.
+ * Service Implementation for managing
+ * {@link com.ferronica.app.domain.NumeracionFactura}.
  */
 @Service
 @Transactional
@@ -28,9 +29,8 @@ public class NumeracionFacturaServiceImpl implements NumeracionFacturaService {
     private final NumeracionFacturaMapper numeracionFacturaMapper;
 
     public NumeracionFacturaServiceImpl(
-        NumeracionFacturaRepository numeracionFacturaRepository,
-        NumeracionFacturaMapper numeracionFacturaMapper
-    ) {
+            NumeracionFacturaRepository numeracionFacturaRepository,
+            NumeracionFacturaMapper numeracionFacturaMapper) {
         this.numeracionFacturaRepository = numeracionFacturaRepository;
         this.numeracionFacturaMapper = numeracionFacturaMapper;
     }
@@ -56,14 +56,14 @@ public class NumeracionFacturaServiceImpl implements NumeracionFacturaService {
         LOG.debug("Request to partially update NumeracionFactura : {}", numeracionFacturaDTO);
 
         return numeracionFacturaRepository
-            .findById(numeracionFacturaDTO.getId())
-            .map(existingNumeracionFactura -> {
-                numeracionFacturaMapper.partialUpdate(existingNumeracionFactura, numeracionFacturaDTO);
+                .findById(numeracionFacturaDTO.getId())
+                .map(existingNumeracionFactura -> {
+                    numeracionFacturaMapper.partialUpdate(existingNumeracionFactura, numeracionFacturaDTO);
 
-                return existingNumeracionFactura;
-            })
-            .map(numeracionFacturaRepository::save)
-            .map(numeracionFacturaMapper::toDto);
+                    return existingNumeracionFactura;
+                })
+                .map(numeracionFacturaRepository::save)
+                .map(numeracionFacturaMapper::toDto);
     }
 
     @Override
@@ -71,10 +71,10 @@ public class NumeracionFacturaServiceImpl implements NumeracionFacturaService {
     public List<NumeracionFacturaDTO> findAll() {
         LOG.debug("Request to get all NumeracionFacturas");
         return numeracionFacturaRepository
-            .findAll()
-            .stream()
-            .map(numeracionFacturaMapper::toDto)
-            .collect(Collectors.toCollection(LinkedList::new));
+                .findAll()
+                .stream()
+                .map(numeracionFacturaMapper::toDto)
+                .collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Override
@@ -86,7 +86,10 @@ public class NumeracionFacturaServiceImpl implements NumeracionFacturaService {
 
     @Override
     public void delete(Long id) {
-        LOG.debug("Request to delete NumeracionFactura : {}", id);
-        numeracionFacturaRepository.deleteById(id);
+        LOG.debug("Request to delete NumeracionFactura (Logical) : {}", id);
+        numeracionFacturaRepository.findById(id).ifPresent(numeracionFactura -> {
+            numeracionFactura.setActivo(false);
+            numeracionFacturaRepository.save(numeracionFactura);
+        });
     }
 }

@@ -14,7 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service Implementation for managing {@link com.ferronica.app.domain.Vendedor}.
+ * Service Implementation for managing
+ * {@link com.ferronica.app.domain.Vendedor}.
  */
 @Service
 @Transactional
@@ -52,14 +53,14 @@ public class VendedorServiceImpl implements VendedorService {
         LOG.debug("Request to partially update Vendedor : {}", vendedorDTO);
 
         return vendedorRepository
-            .findById(vendedorDTO.getId())
-            .map(existingVendedor -> {
-                vendedorMapper.partialUpdate(existingVendedor, vendedorDTO);
+                .findById(vendedorDTO.getId())
+                .map(existingVendedor -> {
+                    vendedorMapper.partialUpdate(existingVendedor, vendedorDTO);
 
-                return existingVendedor;
-            })
-            .map(vendedorRepository::save)
-            .map(vendedorMapper::toDto);
+                    return existingVendedor;
+                })
+                .map(vendedorRepository::save)
+                .map(vendedorMapper::toDto);
     }
 
     @Override
@@ -78,7 +79,10 @@ public class VendedorServiceImpl implements VendedorService {
 
     @Override
     public void delete(Long id) {
-        LOG.debug("Request to delete Vendedor : {}", id);
-        vendedorRepository.deleteById(id);
+        LOG.debug("Request to delete Vendedor (Logical) : {}", id);
+        vendedorRepository.findById(id).ifPresent(vendedor -> {
+            vendedor.setActivo(false);
+            vendedorRepository.save(vendedor);
+        });
     }
 }
