@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -46,36 +47,44 @@ public class DevolucionResource {
      * {@code POST  /devolucions} : Create a new devolucion.
      *
      * @param devolucionDTO the devolucionDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new devolucionDTO, or with status {@code 400 (Bad Request)} if the devolucion has already an ID.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with
+     *         body the new devolucionDTO, or with status {@code 400 (Bad Request)}
+     *         if the devolucion has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_VENDEDOR')")
     @PostMapping("")
-    public ResponseEntity<DevolucionDTO> createDevolucion(@Valid @RequestBody DevolucionDTO devolucionDTO) throws URISyntaxException {
+    public ResponseEntity<DevolucionDTO> createDevolucion(@Valid @RequestBody DevolucionDTO devolucionDTO)
+            throws URISyntaxException {
         LOG.debug("REST request to save Devolucion : {}", devolucionDTO);
         if (devolucionDTO.getId() != null) {
             throw new BadRequestAlertException("A new devolucion cannot already have an ID", ENTITY_NAME, "idexists");
         }
         devolucionDTO = devolucionService.save(devolucionDTO);
         return ResponseEntity.created(new URI("/api/devolucions/" + devolucionDTO.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, devolucionDTO.getId().toString()))
-            .body(devolucionDTO);
+                .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME,
+                        devolucionDTO.getId().toString()))
+                .body(devolucionDTO);
     }
 
     /**
      * {@code PUT  /devolucions/:id} : Updates an existing devolucion.
      *
-     * @param id the id of the devolucionDTO to save.
+     * @param id            the id of the devolucionDTO to save.
      * @param devolucionDTO the devolucionDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated devolucionDTO,
-     * or with status {@code 400 (Bad Request)} if the devolucionDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the devolucionDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated devolucionDTO,
+     *         or with status {@code 400 (Bad Request)} if the devolucionDTO is not
+     *         valid,
+     *         or with status {@code 500 (Internal Server Error)} if the
+     *         devolucionDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<DevolucionDTO> updateDevolucion(
-        @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody DevolucionDTO devolucionDTO
-    ) throws URISyntaxException {
+            @PathVariable(value = "id", required = false) final Long id,
+            @Valid @RequestBody DevolucionDTO devolucionDTO) throws URISyntaxException {
         LOG.debug("REST request to update Devolucion : {}, {}", id, devolucionDTO);
         if (devolucionDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -90,26 +99,32 @@ public class DevolucionResource {
 
         devolucionDTO = devolucionService.update(devolucionDTO);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, devolucionDTO.getId().toString()))
-            .body(devolucionDTO);
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME,
+                        devolucionDTO.getId().toString()))
+                .body(devolucionDTO);
     }
 
     /**
-     * {@code PATCH  /devolucions/:id} : Partial updates given fields of an existing devolucion, field will ignore if it is null
+     * {@code PATCH  /devolucions/:id} : Partial updates given fields of an existing
+     * devolucion, field will ignore if it is null
      *
-     * @param id the id of the devolucionDTO to save.
+     * @param id            the id of the devolucionDTO to save.
      * @param devolucionDTO the devolucionDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated devolucionDTO,
-     * or with status {@code 400 (Bad Request)} if the devolucionDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the devolucionDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the devolucionDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated devolucionDTO,
+     *         or with status {@code 400 (Bad Request)} if the devolucionDTO is not
+     *         valid,
+     *         or with status {@code 404 (Not Found)} if the devolucionDTO is not
+     *         found,
+     *         or with status {@code 500 (Internal Server Error)} if the
+     *         devolucionDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<DevolucionDTO> partialUpdateDevolucion(
-        @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody DevolucionDTO devolucionDTO
-    ) throws URISyntaxException {
+            @PathVariable(value = "id", required = false) final Long id,
+            @NotNull @RequestBody DevolucionDTO devolucionDTO) throws URISyntaxException {
         LOG.debug("REST request to partial update Devolucion partially : {}, {}", id, devolucionDTO);
         if (devolucionDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -125,16 +140,18 @@ public class DevolucionResource {
         Optional<DevolucionDTO> result = devolucionService.partialUpdate(devolucionDTO);
 
         return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, devolucionDTO.getId().toString())
-        );
+                result,
+                HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME,
+                        devolucionDTO.getId().toString()));
     }
 
     /**
      * {@code GET  /devolucions} : get all the devolucions.
      *
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of devolucions in body.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
+     *         of devolucions in body.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
     @GetMapping("")
     public List<DevolucionDTO> getAllDevolucions() {
         LOG.debug("REST request to get all Devolucions");
@@ -145,8 +162,10 @@ public class DevolucionResource {
      * {@code GET  /devolucions/:id} : get the "id" devolucion.
      *
      * @param id the id of the devolucionDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the devolucionDTO, or with status {@code 404 (Not Found)}.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the devolucionDTO, or with status {@code 404 (Not Found)}.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
     @GetMapping("/{id}")
     public ResponseEntity<DevolucionDTO> getDevolucion(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Devolucion : {}", id);
@@ -160,12 +179,13 @@ public class DevolucionResource {
      * @param id the id of the devolucionDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDevolucion(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Devolucion : {}", id);
         devolucionService.delete(id);
         return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-            .build();
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+                .build();
     }
 }

@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service Implementation for managing {@link com.ferronica.app.domain.Articulo}.
+ * Service Implementation for managing
+ * {@link com.ferronica.app.domain.Articulo}.
  */
 @Service
 @Transactional
@@ -50,14 +51,14 @@ public class ArticuloServiceImpl implements ArticuloService {
         LOG.debug("Request to partially update Articulo : {}", articuloDTO);
 
         return articuloRepository
-            .findById(articuloDTO.getId())
-            .map(existingArticulo -> {
-                articuloMapper.partialUpdate(existingArticulo, articuloDTO);
+                .findById(articuloDTO.getId())
+                .map(existingArticulo -> {
+                    articuloMapper.partialUpdate(existingArticulo, articuloDTO);
 
-                return existingArticulo;
-            })
-            .map(articuloRepository::save)
-            .map(articuloMapper::toDto);
+                    return existingArticulo;
+                })
+                .map(articuloRepository::save)
+                .map(articuloMapper::toDto);
     }
 
     @Override
@@ -69,7 +70,10 @@ public class ArticuloServiceImpl implements ArticuloService {
 
     @Override
     public void delete(Long id) {
-        LOG.debug("Request to delete Articulo : {}", id);
-        articuloRepository.deleteById(id);
+        LOG.debug("Request to delete Articulo (Logical) : {}", id);
+        articuloRepository.findById(id).ifPresent(articulo -> {
+            articulo.setActivo(false);
+            articuloRepository.save(articulo);
+        });
     }
 }

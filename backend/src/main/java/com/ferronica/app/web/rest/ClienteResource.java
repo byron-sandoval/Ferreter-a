@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -46,7 +47,8 @@ public class ClienteResource {
 
     private final ClienteQueryService clienteQueryService;
 
-    public ClienteResource(ClienteService clienteService, ClienteRepository clienteRepository, ClienteQueryService clienteQueryService) {
+    public ClienteResource(ClienteService clienteService, ClienteRepository clienteRepository,
+            ClienteQueryService clienteQueryService) {
         this.clienteService = clienteService;
         this.clienteRepository = clienteRepository;
         this.clienteQueryService = clienteQueryService;
@@ -56,36 +58,44 @@ public class ClienteResource {
      * {@code POST  /clientes} : Create a new cliente.
      *
      * @param clienteDTO the clienteDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new clienteDTO, or with status {@code 400 (Bad Request)} if the cliente has already an ID.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with
+     *         body the new clienteDTO, or with status {@code 400 (Bad Request)} if
+     *         the cliente has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_VENDEDOR')")
     @PostMapping("")
-    public ResponseEntity<ClienteDTO> createCliente(@Valid @RequestBody ClienteDTO clienteDTO) throws URISyntaxException {
+    public ResponseEntity<ClienteDTO> createCliente(@Valid @RequestBody ClienteDTO clienteDTO)
+            throws URISyntaxException {
         LOG.debug("REST request to save Cliente : {}", clienteDTO);
         if (clienteDTO.getId() != null) {
             throw new BadRequestAlertException("A new cliente cannot already have an ID", ENTITY_NAME, "idexists");
         }
         clienteDTO = clienteService.save(clienteDTO);
         return ResponseEntity.created(new URI("/api/clientes/" + clienteDTO.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, clienteDTO.getId().toString()))
-            .body(clienteDTO);
+                .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME,
+                        clienteDTO.getId().toString()))
+                .body(clienteDTO);
     }
 
     /**
      * {@code PUT  /clientes/:id} : Updates an existing cliente.
      *
-     * @param id the id of the clienteDTO to save.
+     * @param id         the id of the clienteDTO to save.
      * @param clienteDTO the clienteDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated clienteDTO,
-     * or with status {@code 400 (Bad Request)} if the clienteDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the clienteDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated clienteDTO,
+     *         or with status {@code 400 (Bad Request)} if the clienteDTO is not
+     *         valid,
+     *         or with status {@code 500 (Internal Server Error)} if the clienteDTO
+     *         couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ClienteDTO> updateCliente(
-        @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody ClienteDTO clienteDTO
-    ) throws URISyntaxException {
+            @PathVariable(value = "id", required = false) final Long id,
+            @Valid @RequestBody ClienteDTO clienteDTO) throws URISyntaxException {
         LOG.debug("REST request to update Cliente : {}, {}", id, clienteDTO);
         if (clienteDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -100,26 +110,32 @@ public class ClienteResource {
 
         clienteDTO = clienteService.update(clienteDTO);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, clienteDTO.getId().toString()))
-            .body(clienteDTO);
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME,
+                        clienteDTO.getId().toString()))
+                .body(clienteDTO);
     }
 
     /**
-     * {@code PATCH  /clientes/:id} : Partial updates given fields of an existing cliente, field will ignore if it is null
+     * {@code PATCH  /clientes/:id} : Partial updates given fields of an existing
+     * cliente, field will ignore if it is null
      *
-     * @param id the id of the clienteDTO to save.
+     * @param id         the id of the clienteDTO to save.
      * @param clienteDTO the clienteDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated clienteDTO,
-     * or with status {@code 400 (Bad Request)} if the clienteDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the clienteDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the clienteDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated clienteDTO,
+     *         or with status {@code 400 (Bad Request)} if the clienteDTO is not
+     *         valid,
+     *         or with status {@code 404 (Not Found)} if the clienteDTO is not
+     *         found,
+     *         or with status {@code 500 (Internal Server Error)} if the clienteDTO
+     *         couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<ClienteDTO> partialUpdateCliente(
-        @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody ClienteDTO clienteDTO
-    ) throws URISyntaxException {
+            @PathVariable(value = "id", required = false) final Long id,
+            @NotNull @RequestBody ClienteDTO clienteDTO) throws URISyntaxException {
         LOG.debug("REST request to partial update Cliente partially : {}, {}", id, clienteDTO);
         if (clienteDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -135,9 +151,8 @@ public class ClienteResource {
         Optional<ClienteDTO> result = clienteService.partialUpdate(clienteDTO);
 
         return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, clienteDTO.getId().toString())
-        );
+                result,
+                HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, clienteDTO.getId().toString()));
     }
 
     /**
@@ -145,17 +160,19 @@ public class ClienteResource {
      *
      * @param pageable the pagination information.
      * @param criteria the criteria which the requested entities should match.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of clientes in body.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
+     *         of clientes in body.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
     @GetMapping("")
     public ResponseEntity<List<ClienteDTO>> getAllClientes(
-        ClienteCriteria criteria,
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable
-    ) {
+            ClienteCriteria criteria,
+            @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         LOG.debug("REST request to get Clientes by criteria: {}", criteria);
 
         Page<ClienteDTO> page = clienteQueryService.findByCriteria(criteria, pageable);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        HttpHeaders headers = PaginationUtil
+                .generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
@@ -163,8 +180,10 @@ public class ClienteResource {
      * {@code GET  /clientes/count} : count all the clientes.
      *
      * @param criteria the criteria which the requested entities should match.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count
+     *         in body.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
     @GetMapping("/count")
     public ResponseEntity<Long> countClientes(ClienteCriteria criteria) {
         LOG.debug("REST request to count Clientes by criteria: {}", criteria);
@@ -175,8 +194,10 @@ public class ClienteResource {
      * {@code GET  /clientes/:id} : get the "id" cliente.
      *
      * @param id the id of the clienteDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the clienteDTO, or with status {@code 404 (Not Found)}.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the clienteDTO, or with status {@code 404 (Not Found)}.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
     @GetMapping("/{id}")
     public ResponseEntity<ClienteDTO> getCliente(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Cliente : {}", id);
@@ -190,12 +211,13 @@ public class ClienteResource {
      * @param id the id of the clienteDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCliente(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Cliente : {}", id);
         clienteService.delete(id);
         return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-            .build();
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+                .build();
     }
 }

@@ -15,7 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service Implementation for managing {@link com.ferronica.app.domain.DetalleVenta}.
+ * Service Implementation for managing
+ * {@link com.ferronica.app.domain.DetalleVenta}.
  */
 @Service
 @Transactional
@@ -27,17 +28,34 @@ public class DetalleVentaServiceImpl implements DetalleVentaService {
 
     private final DetalleVentaMapper detalleVentaMapper;
 
-    public DetalleVentaServiceImpl(DetalleVentaRepository detalleVentaRepository, DetalleVentaMapper detalleVentaMapper) {
+    private final com.ferronica.app.repository.ArticuloRepository articuloRepository;
+
+    public DetalleVentaServiceImpl(
+            DetalleVentaRepository detalleVentaRepository,
+            DetalleVentaMapper detalleVentaMapper,
+            com.ferronica.app.repository.ArticuloRepository articuloRepository) {
         this.detalleVentaRepository = detalleVentaRepository;
         this.detalleVentaMapper = detalleVentaMapper;
+        this.articuloRepository = articuloRepository;
     }
 
     @Override
     public DetalleVentaDTO save(DetalleVentaDTO detalleVentaDTO) {
         LOG.debug("Request to save DetalleVenta : {}", detalleVentaDTO);
-        DetalleVenta detalleVenta = detalleVentaMapper.toEntity(detalleVentaDTO);
-        detalleVenta = detalleVentaRepository.save(detalleVenta);
-        return detalleVentaMapper.toDto(detalleVenta);
+        final DetalleVenta detalleVenta = detalleVentaMapper.toEntity(detalleVentaDTO);
+
+        // Actualización de Inventario (Resta)
+        if (detalleVenta.getArticulo() != null) {
+            articuloRepository
+                    .findByIdWithLock(detalleVenta.getArticulo().getId())
+                    .ifPresent(articulo -> {
+                        articulo.setExistencia(articulo.getExistencia().subtract(detalleVenta.getCantidad()));
+                        articuloRepository.save(articulo);
+                    });
+        }
+
+        DetalleVenta savedDetalleVenta = detalleVentaRepository.save(detalleVenta);
+        return detalleVentaMapper.toDto(savedDetalleVenta);
     }
 
     @Override
@@ -53,21 +71,22 @@ public class DetalleVentaServiceImpl implements DetalleVentaService {
         LOG.debug("Request to partially update DetalleVenta : {}", detalleVentaDTO);
 
         return detalleVentaRepository
-            .findById(detalleVentaDTO.getId())
-            .map(existingDetalleVenta -> {
-                detalleVentaMapper.partialUpdate(existingDetalleVenta, detalleVentaDTO);
+                .findById(detalleVentaDTO.getId())
+                .map(existingDetalleVenta -> {
+                    detalleVentaMapper.partialUpdate(existingDetalleVenta, detalleVentaDTO);
 
-                return existingDetalleVenta;
-            })
-            .map(detalleVentaRepository::save)
-            .map(detalleVentaMapper::toDto);
+                    return existingDetalleVenta;
+                })
+                .map(detalleVentaRepository::save)
+                .map(detalleVentaMapper::toDto);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<DetalleVentaDTO> findAll() {
         LOG.debug("Request to get all DetalleVentas");
-        return detalleVentaRepository.findAll().stream().map(detalleVentaMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return detalleVentaRepository.findAll().stream().map(detalleVentaMapper::toDto)
+                .collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Override

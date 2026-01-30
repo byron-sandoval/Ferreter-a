@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -51,36 +52,44 @@ public class VendedorResource {
      * {@code POST  /vendedors} : Create a new vendedor.
      *
      * @param vendedorDTO the vendedorDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new vendedorDTO, or with status {@code 400 (Bad Request)} if the vendedor has already an ID.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with
+     *         body the new vendedorDTO, or with status {@code 400 (Bad Request)} if
+     *         the vendedor has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping("")
-    public ResponseEntity<VendedorDTO> createVendedor(@Valid @RequestBody VendedorDTO vendedorDTO) throws URISyntaxException {
+    public ResponseEntity<VendedorDTO> createVendedor(@Valid @RequestBody VendedorDTO vendedorDTO)
+            throws URISyntaxException {
         LOG.debug("REST request to save Vendedor : {}", vendedorDTO);
         if (vendedorDTO.getId() != null) {
             throw new BadRequestAlertException("A new vendedor cannot already have an ID", ENTITY_NAME, "idexists");
         }
         vendedorDTO = vendedorService.save(vendedorDTO);
         return ResponseEntity.created(new URI("/api/vendedors/" + vendedorDTO.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, vendedorDTO.getId().toString()))
-            .body(vendedorDTO);
+                .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME,
+                        vendedorDTO.getId().toString()))
+                .body(vendedorDTO);
     }
 
     /**
      * {@code PUT  /vendedors/:id} : Updates an existing vendedor.
      *
-     * @param id the id of the vendedorDTO to save.
+     * @param id          the id of the vendedorDTO to save.
      * @param vendedorDTO the vendedorDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated vendedorDTO,
-     * or with status {@code 400 (Bad Request)} if the vendedorDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the vendedorDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated vendedorDTO,
+     *         or with status {@code 400 (Bad Request)} if the vendedorDTO is not
+     *         valid,
+     *         or with status {@code 500 (Internal Server Error)} if the vendedorDTO
+     *         couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<VendedorDTO> updateVendedor(
-        @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody VendedorDTO vendedorDTO
-    ) throws URISyntaxException {
+            @PathVariable(value = "id", required = false) final Long id,
+            @Valid @RequestBody VendedorDTO vendedorDTO) throws URISyntaxException {
         LOG.debug("REST request to update Vendedor : {}, {}", id, vendedorDTO);
         if (vendedorDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -95,26 +104,32 @@ public class VendedorResource {
 
         vendedorDTO = vendedorService.update(vendedorDTO);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, vendedorDTO.getId().toString()))
-            .body(vendedorDTO);
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME,
+                        vendedorDTO.getId().toString()))
+                .body(vendedorDTO);
     }
 
     /**
-     * {@code PATCH  /vendedors/:id} : Partial updates given fields of an existing vendedor, field will ignore if it is null
+     * {@code PATCH  /vendedors/:id} : Partial updates given fields of an existing
+     * vendedor, field will ignore if it is null
      *
-     * @param id the id of the vendedorDTO to save.
+     * @param id          the id of the vendedorDTO to save.
      * @param vendedorDTO the vendedorDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated vendedorDTO,
-     * or with status {@code 400 (Bad Request)} if the vendedorDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the vendedorDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the vendedorDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated vendedorDTO,
+     *         or with status {@code 400 (Bad Request)} if the vendedorDTO is not
+     *         valid,
+     *         or with status {@code 404 (Not Found)} if the vendedorDTO is not
+     *         found,
+     *         or with status {@code 500 (Internal Server Error)} if the vendedorDTO
+     *         couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<VendedorDTO> partialUpdateVendedor(
-        @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody VendedorDTO vendedorDTO
-    ) throws URISyntaxException {
+            @PathVariable(value = "id", required = false) final Long id,
+            @NotNull @RequestBody VendedorDTO vendedorDTO) throws URISyntaxException {
         LOG.debug("REST request to partial update Vendedor partially : {}, {}", id, vendedorDTO);
         if (vendedorDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -130,22 +145,26 @@ public class VendedorResource {
         Optional<VendedorDTO> result = vendedorService.partialUpdate(vendedorDTO);
 
         return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, vendedorDTO.getId().toString())
-        );
+                result,
+                HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME,
+                        vendedorDTO.getId().toString()));
     }
 
     /**
      * {@code GET  /vendedors} : get all the vendedors.
      *
      * @param pageable the pagination information.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of vendedors in body.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
+     *         of vendedors in body.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
     @GetMapping("")
-    public ResponseEntity<List<VendedorDTO>> getAllVendedors(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+    public ResponseEntity<List<VendedorDTO>> getAllVendedors(
+            @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         LOG.debug("REST request to get a page of Vendedors");
         Page<VendedorDTO> page = vendedorService.findAll(pageable);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        HttpHeaders headers = PaginationUtil
+                .generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
@@ -153,8 +172,10 @@ public class VendedorResource {
      * {@code GET  /vendedors/:id} : get the "id" vendedor.
      *
      * @param id the id of the vendedorDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the vendedorDTO, or with status {@code 404 (Not Found)}.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the vendedorDTO, or with status {@code 404 (Not Found)}.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
     @GetMapping("/{id}")
     public ResponseEntity<VendedorDTO> getVendedor(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Vendedor : {}", id);
@@ -168,12 +189,13 @@ public class VendedorResource {
      * @param id the id of the vendedorDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteVendedor(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Vendedor : {}", id);
         vendedorService.delete(id);
         return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-            .build();
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+                .build();
     }
 }

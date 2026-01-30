@@ -50,14 +50,14 @@ public class ClienteServiceImpl implements ClienteService {
         LOG.debug("Request to partially update Cliente : {}", clienteDTO);
 
         return clienteRepository
-            .findById(clienteDTO.getId())
-            .map(existingCliente -> {
-                clienteMapper.partialUpdate(existingCliente, clienteDTO);
+                .findById(clienteDTO.getId())
+                .map(existingCliente -> {
+                    clienteMapper.partialUpdate(existingCliente, clienteDTO);
 
-                return existingCliente;
-            })
-            .map(clienteRepository::save)
-            .map(clienteMapper::toDto);
+                    return existingCliente;
+                })
+                .map(clienteRepository::save)
+                .map(clienteMapper::toDto);
     }
 
     @Override
@@ -69,7 +69,10 @@ public class ClienteServiceImpl implements ClienteService {
 
     @Override
     public void delete(Long id) {
-        LOG.debug("Request to delete Cliente : {}", id);
-        clienteRepository.deleteById(id);
+        LOG.debug("Request to delete Cliente (Logical) : {}", id);
+        clienteRepository.findById(id).ifPresent(cliente -> {
+            cliente.setActivo(false);
+            clienteRepository.save(cliente);
+        });
     }
 }

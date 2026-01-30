@@ -14,7 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service Implementation for managing {@link com.ferronica.app.domain.Categoria}.
+ * Service Implementation for managing
+ * {@link com.ferronica.app.domain.Categoria}.
  */
 @Service
 @Transactional
@@ -52,14 +53,14 @@ public class CategoriaServiceImpl implements CategoriaService {
         LOG.debug("Request to partially update Categoria : {}", categoriaDTO);
 
         return categoriaRepository
-            .findById(categoriaDTO.getId())
-            .map(existingCategoria -> {
-                categoriaMapper.partialUpdate(existingCategoria, categoriaDTO);
+                .findById(categoriaDTO.getId())
+                .map(existingCategoria -> {
+                    categoriaMapper.partialUpdate(existingCategoria, categoriaDTO);
 
-                return existingCategoria;
-            })
-            .map(categoriaRepository::save)
-            .map(categoriaMapper::toDto);
+                    return existingCategoria;
+                })
+                .map(categoriaRepository::save)
+                .map(categoriaMapper::toDto);
     }
 
     @Override
@@ -78,7 +79,10 @@ public class CategoriaServiceImpl implements CategoriaService {
 
     @Override
     public void delete(Long id) {
-        LOG.debug("Request to delete Categoria : {}", id);
-        categoriaRepository.deleteById(id);
+        LOG.debug("Request to delete Categoria (Logical) : {}", id);
+        categoriaRepository.findById(id).ifPresent(categoria -> {
+            categoria.setActivo(false);
+            categoriaRepository.save(categoria);
+        });
     }
 }

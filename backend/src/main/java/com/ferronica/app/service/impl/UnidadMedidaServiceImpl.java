@@ -15,7 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service Implementation for managing {@link com.ferronica.app.domain.UnidadMedida}.
+ * Service Implementation for managing
+ * {@link com.ferronica.app.domain.UnidadMedida}.
  */
 @Service
 @Transactional
@@ -27,7 +28,8 @@ public class UnidadMedidaServiceImpl implements UnidadMedidaService {
 
     private final UnidadMedidaMapper unidadMedidaMapper;
 
-    public UnidadMedidaServiceImpl(UnidadMedidaRepository unidadMedidaRepository, UnidadMedidaMapper unidadMedidaMapper) {
+    public UnidadMedidaServiceImpl(UnidadMedidaRepository unidadMedidaRepository,
+            UnidadMedidaMapper unidadMedidaMapper) {
         this.unidadMedidaRepository = unidadMedidaRepository;
         this.unidadMedidaMapper = unidadMedidaMapper;
     }
@@ -53,21 +55,22 @@ public class UnidadMedidaServiceImpl implements UnidadMedidaService {
         LOG.debug("Request to partially update UnidadMedida : {}", unidadMedidaDTO);
 
         return unidadMedidaRepository
-            .findById(unidadMedidaDTO.getId())
-            .map(existingUnidadMedida -> {
-                unidadMedidaMapper.partialUpdate(existingUnidadMedida, unidadMedidaDTO);
+                .findById(unidadMedidaDTO.getId())
+                .map(existingUnidadMedida -> {
+                    unidadMedidaMapper.partialUpdate(existingUnidadMedida, unidadMedidaDTO);
 
-                return existingUnidadMedida;
-            })
-            .map(unidadMedidaRepository::save)
-            .map(unidadMedidaMapper::toDto);
+                    return existingUnidadMedida;
+                })
+                .map(unidadMedidaRepository::save)
+                .map(unidadMedidaMapper::toDto);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<UnidadMedidaDTO> findAll() {
         LOG.debug("Request to get all UnidadMedidas");
-        return unidadMedidaRepository.findAll().stream().map(unidadMedidaMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return unidadMedidaRepository.findAll().stream().map(unidadMedidaMapper::toDto)
+                .collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Override
@@ -79,7 +82,10 @@ public class UnidadMedidaServiceImpl implements UnidadMedidaService {
 
     @Override
     public void delete(Long id) {
-        LOG.debug("Request to delete UnidadMedida : {}", id);
-        unidadMedidaRepository.deleteById(id);
+        LOG.debug("Request to delete UnidadMedida (Logical) : {}", id);
+        unidadMedidaRepository.findById(id).ifPresent(unidadMedida -> {
+            unidadMedida.setActivo(false);
+            unidadMedidaRepository.save(unidadMedida);
+        });
     }
 }

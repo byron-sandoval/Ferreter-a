@@ -33,6 +33,15 @@ public class IngresoServiceImpl implements IngresoService {
     public IngresoDTO save(IngresoDTO ingresoDTO) {
         LOG.debug("Request to save Ingreso : {}", ingresoDTO);
         Ingreso ingreso = ingresoMapper.toEntity(ingresoDTO);
+
+        // Automatización de Fecha
+        ingreso.setFecha(java.time.Instant.now());
+
+        // Estado inicial
+        if (ingreso.getActivo() == null) {
+            ingreso.setActivo(true);
+        }
+
         ingreso = ingresoRepository.save(ingreso);
         return ingresoMapper.toDto(ingreso);
     }
@@ -50,14 +59,14 @@ public class IngresoServiceImpl implements IngresoService {
         LOG.debug("Request to partially update Ingreso : {}", ingresoDTO);
 
         return ingresoRepository
-            .findById(ingresoDTO.getId())
-            .map(existingIngreso -> {
-                ingresoMapper.partialUpdate(existingIngreso, ingresoDTO);
+                .findById(ingresoDTO.getId())
+                .map(existingIngreso -> {
+                    ingresoMapper.partialUpdate(existingIngreso, ingresoDTO);
 
-                return existingIngreso;
-            })
-            .map(ingresoRepository::save)
-            .map(ingresoMapper::toDto);
+                    return existingIngreso;
+                })
+                .map(ingresoRepository::save)
+                .map(ingresoMapper::toDto);
     }
 
     @Override
@@ -69,7 +78,10 @@ public class IngresoServiceImpl implements IngresoService {
 
     @Override
     public void delete(Long id) {
-        LOG.debug("Request to delete Ingreso : {}", id);
-        ingresoRepository.deleteById(id);
+        LOG.debug("Request to delete Ingreso (Logical) : {}", id);
+        ingresoRepository.findById(id).ifPresent(ingreso -> {
+            ingreso.setActivo(false);
+            ingresoRepository.save(ingreso);
+        });
     }
 }

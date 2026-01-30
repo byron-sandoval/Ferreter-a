@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -51,36 +52,44 @@ public class CategoriaResource {
      * {@code POST  /categorias} : Create a new categoria.
      *
      * @param categoriaDTO the categoriaDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new categoriaDTO, or with status {@code 400 (Bad Request)} if the categoria has already an ID.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with
+     *         body the new categoriaDTO, or with status {@code 400 (Bad Request)}
+     *         if the categoria has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
     @PostMapping("")
-    public ResponseEntity<CategoriaDTO> createCategoria(@Valid @RequestBody CategoriaDTO categoriaDTO) throws URISyntaxException {
+    public ResponseEntity<CategoriaDTO> createCategoria(@Valid @RequestBody CategoriaDTO categoriaDTO)
+            throws URISyntaxException {
         LOG.debug("REST request to save Categoria : {}", categoriaDTO);
         if (categoriaDTO.getId() != null) {
             throw new BadRequestAlertException("A new categoria cannot already have an ID", ENTITY_NAME, "idexists");
         }
         categoriaDTO = categoriaService.save(categoriaDTO);
         return ResponseEntity.created(new URI("/api/categorias/" + categoriaDTO.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, categoriaDTO.getId().toString()))
-            .body(categoriaDTO);
+                .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME,
+                        categoriaDTO.getId().toString()))
+                .body(categoriaDTO);
     }
 
     /**
      * {@code PUT  /categorias/:id} : Updates an existing categoria.
      *
-     * @param id the id of the categoriaDTO to save.
+     * @param id           the id of the categoriaDTO to save.
      * @param categoriaDTO the categoriaDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated categoriaDTO,
-     * or with status {@code 400 (Bad Request)} if the categoriaDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the categoriaDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated categoriaDTO,
+     *         or with status {@code 400 (Bad Request)} if the categoriaDTO is not
+     *         valid,
+     *         or with status {@code 500 (Internal Server Error)} if the
+     *         categoriaDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
     @PutMapping("/{id}")
     public ResponseEntity<CategoriaDTO> updateCategoria(
-        @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody CategoriaDTO categoriaDTO
-    ) throws URISyntaxException {
+            @PathVariable(value = "id", required = false) final Long id,
+            @Valid @RequestBody CategoriaDTO categoriaDTO) throws URISyntaxException {
         LOG.debug("REST request to update Categoria : {}, {}", id, categoriaDTO);
         if (categoriaDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -95,26 +104,32 @@ public class CategoriaResource {
 
         categoriaDTO = categoriaService.update(categoriaDTO);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, categoriaDTO.getId().toString()))
-            .body(categoriaDTO);
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME,
+                        categoriaDTO.getId().toString()))
+                .body(categoriaDTO);
     }
 
     /**
-     * {@code PATCH  /categorias/:id} : Partial updates given fields of an existing categoria, field will ignore if it is null
+     * {@code PATCH  /categorias/:id} : Partial updates given fields of an existing
+     * categoria, field will ignore if it is null
      *
-     * @param id the id of the categoriaDTO to save.
+     * @param id           the id of the categoriaDTO to save.
      * @param categoriaDTO the categoriaDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated categoriaDTO,
-     * or with status {@code 400 (Bad Request)} if the categoriaDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the categoriaDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the categoriaDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated categoriaDTO,
+     *         or with status {@code 400 (Bad Request)} if the categoriaDTO is not
+     *         valid,
+     *         or with status {@code 404 (Not Found)} if the categoriaDTO is not
+     *         found,
+     *         or with status {@code 500 (Internal Server Error)} if the
+     *         categoriaDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<CategoriaDTO> partialUpdateCategoria(
-        @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody CategoriaDTO categoriaDTO
-    ) throws URISyntaxException {
+            @PathVariable(value = "id", required = false) final Long id,
+            @NotNull @RequestBody CategoriaDTO categoriaDTO) throws URISyntaxException {
         LOG.debug("REST request to partial update Categoria partially : {}, {}", id, categoriaDTO);
         if (categoriaDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -130,22 +145,26 @@ public class CategoriaResource {
         Optional<CategoriaDTO> result = categoriaService.partialUpdate(categoriaDTO);
 
         return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, categoriaDTO.getId().toString())
-        );
+                result,
+                HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME,
+                        categoriaDTO.getId().toString()));
     }
 
     /**
      * {@code GET  /categorias} : get all the categorias.
      *
      * @param pageable the pagination information.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of categorias in body.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
+     *         of categorias in body.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
     @GetMapping("")
-    public ResponseEntity<List<CategoriaDTO>> getAllCategorias(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+    public ResponseEntity<List<CategoriaDTO>> getAllCategorias(
+            @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         LOG.debug("REST request to get a page of Categorias");
         Page<CategoriaDTO> page = categoriaService.findAll(pageable);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        HttpHeaders headers = PaginationUtil
+                .generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
@@ -153,8 +172,10 @@ public class CategoriaResource {
      * {@code GET  /categorias/:id} : get the "id" categoria.
      *
      * @param id the id of the categoriaDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the categoriaDTO, or with status {@code 404 (Not Found)}.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the categoriaDTO, or with status {@code 404 (Not Found)}.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
     @GetMapping("/{id}")
     public ResponseEntity<CategoriaDTO> getCategoria(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Categoria : {}", id);
@@ -168,12 +189,13 @@ public class CategoriaResource {
      * @param id the id of the categoriaDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategoria(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Categoria : {}", id);
         categoriaService.delete(id);
         return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-            .build();
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+                .build();
     }
 }

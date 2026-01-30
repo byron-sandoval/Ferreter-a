@@ -15,12 +15,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
 /**
- * REST controller for managing {@link com.ferronica.app.domain.HistorialPrecio}.
+ * REST controller for managing
+ * {@link com.ferronica.app.domain.HistorialPrecio}.
  */
 @RestController
 @RequestMapping("/api/historial-precios")
@@ -37,7 +39,8 @@ public class HistorialPrecioResource {
 
     private final HistorialPrecioRepository historialPrecioRepository;
 
-    public HistorialPrecioResource(HistorialPrecioService historialPrecioService, HistorialPrecioRepository historialPrecioRepository) {
+    public HistorialPrecioResource(HistorialPrecioService historialPrecioService,
+            HistorialPrecioRepository historialPrecioRepository) {
         this.historialPrecioService = historialPrecioService;
         this.historialPrecioRepository = historialPrecioRepository;
     }
@@ -46,37 +49,46 @@ public class HistorialPrecioResource {
      * {@code POST  /historial-precios} : Create a new historialPrecio.
      *
      * @param historialPrecioDTO the historialPrecioDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new historialPrecioDTO, or with status {@code 400 (Bad Request)} if the historialPrecio has already an ID.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with
+     *         body the new historialPrecioDTO, or with status
+     *         {@code 400 (Bad Request)} if the historialPrecio has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping("")
-    public ResponseEntity<HistorialPrecioDTO> createHistorialPrecio(@Valid @RequestBody HistorialPrecioDTO historialPrecioDTO)
-        throws URISyntaxException {
+    public ResponseEntity<HistorialPrecioDTO> createHistorialPrecio(
+            @Valid @RequestBody HistorialPrecioDTO historialPrecioDTO)
+            throws URISyntaxException {
         LOG.debug("REST request to save HistorialPrecio : {}", historialPrecioDTO);
         if (historialPrecioDTO.getId() != null) {
-            throw new BadRequestAlertException("A new historialPrecio cannot already have an ID", ENTITY_NAME, "idexists");
+            throw new BadRequestAlertException("A new historialPrecio cannot already have an ID", ENTITY_NAME,
+                    "idexists");
         }
         historialPrecioDTO = historialPrecioService.save(historialPrecioDTO);
         return ResponseEntity.created(new URI("/api/historial-precios/" + historialPrecioDTO.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, historialPrecioDTO.getId().toString()))
-            .body(historialPrecioDTO);
+                .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME,
+                        historialPrecioDTO.getId().toString()))
+                .body(historialPrecioDTO);
     }
 
     /**
      * {@code PUT  /historial-precios/:id} : Updates an existing historialPrecio.
      *
-     * @param id the id of the historialPrecioDTO to save.
+     * @param id                 the id of the historialPrecioDTO to save.
      * @param historialPrecioDTO the historialPrecioDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated historialPrecioDTO,
-     * or with status {@code 400 (Bad Request)} if the historialPrecioDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the historialPrecioDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated historialPrecioDTO,
+     *         or with status {@code 400 (Bad Request)} if the historialPrecioDTO is
+     *         not valid,
+     *         or with status {@code 500 (Internal Server Error)} if the
+     *         historialPrecioDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<HistorialPrecioDTO> updateHistorialPrecio(
-        @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody HistorialPrecioDTO historialPrecioDTO
-    ) throws URISyntaxException {
+            @PathVariable(value = "id", required = false) final Long id,
+            @Valid @RequestBody HistorialPrecioDTO historialPrecioDTO) throws URISyntaxException {
         LOG.debug("REST request to update HistorialPrecio : {}, {}", id, historialPrecioDTO);
         if (historialPrecioDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -91,26 +103,32 @@ public class HistorialPrecioResource {
 
         historialPrecioDTO = historialPrecioService.update(historialPrecioDTO);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, historialPrecioDTO.getId().toString()))
-            .body(historialPrecioDTO);
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME,
+                        historialPrecioDTO.getId().toString()))
+                .body(historialPrecioDTO);
     }
 
     /**
-     * {@code PATCH  /historial-precios/:id} : Partial updates given fields of an existing historialPrecio, field will ignore if it is null
+     * {@code PATCH  /historial-precios/:id} : Partial updates given fields of an
+     * existing historialPrecio, field will ignore if it is null
      *
-     * @param id the id of the historialPrecioDTO to save.
+     * @param id                 the id of the historialPrecioDTO to save.
      * @param historialPrecioDTO the historialPrecioDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated historialPrecioDTO,
-     * or with status {@code 400 (Bad Request)} if the historialPrecioDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the historialPrecioDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the historialPrecioDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated historialPrecioDTO,
+     *         or with status {@code 400 (Bad Request)} if the historialPrecioDTO is
+     *         not valid,
+     *         or with status {@code 404 (Not Found)} if the historialPrecioDTO is
+     *         not found,
+     *         or with status {@code 500 (Internal Server Error)} if the
+     *         historialPrecioDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<HistorialPrecioDTO> partialUpdateHistorialPrecio(
-        @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody HistorialPrecioDTO historialPrecioDTO
-    ) throws URISyntaxException {
+            @PathVariable(value = "id", required = false) final Long id,
+            @NotNull @RequestBody HistorialPrecioDTO historialPrecioDTO) throws URISyntaxException {
         LOG.debug("REST request to partial update HistorialPrecio partially : {}, {}", id, historialPrecioDTO);
         if (historialPrecioDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -126,16 +144,18 @@ public class HistorialPrecioResource {
         Optional<HistorialPrecioDTO> result = historialPrecioService.partialUpdate(historialPrecioDTO);
 
         return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, historialPrecioDTO.getId().toString())
-        );
+                result,
+                HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME,
+                        historialPrecioDTO.getId().toString()));
     }
 
     /**
      * {@code GET  /historial-precios} : get all the historialPrecios.
      *
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of historialPrecios in body.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
+     *         of historialPrecios in body.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
     @GetMapping("")
     public List<HistorialPrecioDTO> getAllHistorialPrecios() {
         LOG.debug("REST request to get all HistorialPrecios");
@@ -146,8 +166,10 @@ public class HistorialPrecioResource {
      * {@code GET  /historial-precios/:id} : get the "id" historialPrecio.
      *
      * @param id the id of the historialPrecioDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the historialPrecioDTO, or with status {@code 404 (Not Found)}.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the historialPrecioDTO, or with status {@code 404 (Not Found)}.
      */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
     @GetMapping("/{id}")
     public ResponseEntity<HistorialPrecioDTO> getHistorialPrecio(@PathVariable("id") Long id) {
         LOG.debug("REST request to get HistorialPrecio : {}", id);
@@ -161,12 +183,13 @@ public class HistorialPrecioResource {
      * @param id the id of the historialPrecioDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteHistorialPrecio(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete HistorialPrecio : {}", id);
         historialPrecioService.delete(id);
         return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-            .build();
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+                .build();
     }
 }

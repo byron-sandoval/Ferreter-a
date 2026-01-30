@@ -14,7 +14,6 @@ public class DevolucionDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
     private Instant fecha;
 
     @Size(max = 255)
@@ -89,11 +88,11 @@ public class DevolucionDTO implements Serializable {
     @Override
     public String toString() {
         return "DevolucionDTO{" +
-            "id=" + getId() +
-            ", fecha='" + getFecha() + "'" +
-            ", motivo='" + getMotivo() + "'" +
-            ", total=" + getTotal() +
-            ", venta=" + getVenta() +
-            "}";
+                "id=" + getId() +
+                ", fecha='" + getFecha() + "'" +
+                ", motivo='" + getMotivo() + "'" +
+                ", total=" + getTotal() +
+                ", venta=" + getVenta() +
+                "}";
     }
 }
