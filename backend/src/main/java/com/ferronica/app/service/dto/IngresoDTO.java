@@ -14,7 +14,6 @@ public class IngresoDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
     private Instant fecha;
 
     @NotNull
@@ -121,14 +120,14 @@ public class IngresoDTO implements Serializable {
     @Override
     public String toString() {
         return "IngresoDTO{" +
-            "id=" + getId() +
-            ", fecha='" + getFecha() + "'" +
-            ", noDocumento='" + getNoDocumento() + "'" +
-            ", total=" + getTotal() +
-            ", observaciones='" + getObservaciones() + "'" +
-            ", activo='" + getActivo() + "'" +
-            ", vendedor=" + getVendedor() +
-            ", proveedor=" + getProveedor() +
-            "}";
+                "id=" + getId() +
+                ", fecha='" + getFecha() + "'" +
+                ", noDocumento='" + getNoDocumento() + "'" +
+                ", total=" + getTotal() +
+                ", observaciones='" + getObservaciones() + "'" +
+                ", activo='" + getActivo() + "'" +
+                ", vendedor=" + getVendedor() +
+                ", proveedor=" + getProveedor() +
+                "}";
     }
 }

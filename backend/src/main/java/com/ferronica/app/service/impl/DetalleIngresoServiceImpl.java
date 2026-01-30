@@ -15,7 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service Implementation for managing {@link com.ferronica.app.domain.DetalleIngreso}.
+ * Service Implementation for managing
+ * {@link com.ferronica.app.domain.DetalleIngreso}.
  */
 @Service
 @Transactional
@@ -27,17 +28,34 @@ public class DetalleIngresoServiceImpl implements DetalleIngresoService {
 
     private final DetalleIngresoMapper detalleIngresoMapper;
 
-    public DetalleIngresoServiceImpl(DetalleIngresoRepository detalleIngresoRepository, DetalleIngresoMapper detalleIngresoMapper) {
+    private final com.ferronica.app.repository.ArticuloRepository articuloRepository;
+
+    public DetalleIngresoServiceImpl(
+            DetalleIngresoRepository detalleIngresoRepository,
+            DetalleIngresoMapper detalleIngresoMapper,
+            com.ferronica.app.repository.ArticuloRepository articuloRepository) {
         this.detalleIngresoRepository = detalleIngresoRepository;
         this.detalleIngresoMapper = detalleIngresoMapper;
+        this.articuloRepository = articuloRepository;
     }
 
     @Override
     public DetalleIngresoDTO save(DetalleIngresoDTO detalleIngresoDTO) {
         LOG.debug("Request to save DetalleIngreso : {}", detalleIngresoDTO);
-        DetalleIngreso detalleIngreso = detalleIngresoMapper.toEntity(detalleIngresoDTO);
-        detalleIngreso = detalleIngresoRepository.save(detalleIngreso);
-        return detalleIngresoMapper.toDto(detalleIngreso);
+        final DetalleIngreso detalleIngreso = detalleIngresoMapper.toEntity(detalleIngresoDTO);
+
+        // Actualización de Inventario (Suma)
+        if (detalleIngreso.getArticulo() != null) {
+            articuloRepository
+                    .findByIdWithLock(detalleIngreso.getArticulo().getId())
+                    .ifPresent(articulo -> {
+                        articulo.setExistencia(articulo.getExistencia().add(detalleIngreso.getCantidad()));
+                        articuloRepository.save(articulo);
+                    });
+        }
+
+        DetalleIngreso savedDetalleIngreso = detalleIngresoRepository.save(detalleIngreso);
+        return detalleIngresoMapper.toDto(savedDetalleIngreso);
     }
 
     @Override
@@ -53,14 +71,14 @@ public class DetalleIngresoServiceImpl implements DetalleIngresoService {
         LOG.debug("Request to partially update DetalleIngreso : {}", detalleIngresoDTO);
 
         return detalleIngresoRepository
-            .findById(detalleIngresoDTO.getId())
-            .map(existingDetalleIngreso -> {
-                detalleIngresoMapper.partialUpdate(existingDetalleIngreso, detalleIngresoDTO);
+                .findById(detalleIngresoDTO.getId())
+                .map(existingDetalleIngreso -> {
+                    detalleIngresoMapper.partialUpdate(existingDetalleIngreso, detalleIngresoDTO);
 
-                return existingDetalleIngreso;
-            })
-            .map(detalleIngresoRepository::save)
-            .map(detalleIngresoMapper::toDto);
+                    return existingDetalleIngreso;
+                })
+                .map(detalleIngresoRepository::save)
+                .map(detalleIngresoMapper::toDto);
     }
 
     @Override
@@ -68,10 +86,10 @@ public class DetalleIngresoServiceImpl implements DetalleIngresoService {
     public List<DetalleIngresoDTO> findAll() {
         LOG.debug("Request to get all DetalleIngresos");
         return detalleIngresoRepository
-            .findAll()
-            .stream()
-            .map(detalleIngresoMapper::toDto)
-            .collect(Collectors.toCollection(LinkedList::new));
+                .findAll()
+                .stream()
+                .map(detalleIngresoMapper::toDto)
+                .collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Override

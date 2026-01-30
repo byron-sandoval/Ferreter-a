@@ -15,7 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service Implementation for managing {@link com.ferronica.app.domain.Devolucion}.
+ * Service Implementation for managing
+ * {@link com.ferronica.app.domain.Devolucion}.
  */
 @Service
 @Transactional
@@ -36,6 +37,10 @@ public class DevolucionServiceImpl implements DevolucionService {
     public DevolucionDTO save(DevolucionDTO devolucionDTO) {
         LOG.debug("Request to save Devolucion : {}", devolucionDTO);
         Devolucion devolucion = devolucionMapper.toEntity(devolucionDTO);
+
+        // Automatización de Fecha
+        devolucion.setFecha(java.time.Instant.now());
+
         devolucion = devolucionRepository.save(devolucion);
         return devolucionMapper.toDto(devolucion);
     }
@@ -53,21 +58,22 @@ public class DevolucionServiceImpl implements DevolucionService {
         LOG.debug("Request to partially update Devolucion : {}", devolucionDTO);
 
         return devolucionRepository
-            .findById(devolucionDTO.getId())
-            .map(existingDevolucion -> {
-                devolucionMapper.partialUpdate(existingDevolucion, devolucionDTO);
+                .findById(devolucionDTO.getId())
+                .map(existingDevolucion -> {
+                    devolucionMapper.partialUpdate(existingDevolucion, devolucionDTO);
 
-                return existingDevolucion;
-            })
-            .map(devolucionRepository::save)
-            .map(devolucionMapper::toDto);
+                    return existingDevolucion;
+                })
+                .map(devolucionRepository::save)
+                .map(devolucionMapper::toDto);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<DevolucionDTO> findAll() {
         LOG.debug("Request to get all Devolucions");
-        return devolucionRepository.findAll().stream().map(devolucionMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return devolucionRepository.findAll().stream().map(devolucionMapper::toDto)
+                .collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Override

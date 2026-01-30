@@ -15,10 +15,8 @@ public class VentaDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
     private Instant fecha;
 
-    @NotNull
     private Long noFactura;
 
     @NotNull
@@ -205,22 +203,22 @@ public class VentaDTO implements Serializable {
     @Override
     public String toString() {
         return "VentaDTO{" +
-            "id=" + getId() +
-            ", fecha='" + getFecha() + "'" +
-            ", noFactura=" + getNoFactura() +
-            ", subtotal=" + getSubtotal() +
-            ", iva=" + getIva() +
-            ", total=" + getTotal() +
-            ", totalEnMonedaBase=" + getTotalEnMonedaBase() +
-            ", metodoPago='" + getMetodoPago() + "'" +
-            ", stripeId='" + getStripeId() + "'" +
-            ", esContado='" + getEsContado() + "'" +
-            ", tipoCambioVenta=" + getTipoCambioVenta() +
-            ", anulada='" + getAnulada() + "'" +
-            ", cliente=" + getCliente() +
-            ", vendedor=" + getVendedor() +
-            ", moneda=" + getMoneda() +
-            ", numeracion=" + getNumeracion() +
-            "}";
+                "id=" + getId() +
+                ", fecha='" + getFecha() + "'" +
+                ", noFactura=" + getNoFactura() +
+                ", subtotal=" + getSubtotal() +
+                ", iva=" + getIva() +
+                ", total=" + getTotal() +
+                ", totalEnMonedaBase=" + getTotalEnMonedaBase() +
+                ", metodoPago='" + getMetodoPago() + "'" +
+                ", stripeId='" + getStripeId() + "'" +
+                ", esContado='" + getEsContado() + "'" +
+                ", tipoCambioVenta=" + getTipoCambioVenta() +
+                ", anulada='" + getAnulada() + "'" +
+                ", cliente=" + getCliente() +
+                ", vendedor=" + getVendedor() +
+                ", moneda=" + getMoneda() +
+                ", numeracion=" + getNumeracion() +
+                "}";
     }
 }

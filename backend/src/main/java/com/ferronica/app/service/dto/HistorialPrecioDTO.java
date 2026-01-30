@@ -20,7 +20,6 @@ public class HistorialPrecioDTO implements Serializable {
     @NotNull
     private BigDecimal precioNuevo;
 
-    @NotNull
     private Instant fecha;
 
     @Size(max = 100)
@@ -101,12 +100,12 @@ public class HistorialPrecioDTO implements Serializable {
     @Override
     public String toString() {
         return "HistorialPrecioDTO{" +
-            "id=" + getId() +
-            ", precioAnterior=" + getPrecioAnterior() +
-            ", precioNuevo=" + getPrecioNuevo() +
-            ", fecha='" + getFecha() + "'" +
-            ", motivo='" + getMotivo() + "'" +
-            ", articulo=" + getArticulo() +
-            "}";
+                "id=" + getId() +
+                ", precioAnterior=" + getPrecioAnterior() +
+                ", precioNuevo=" + getPrecioNuevo() +
+                ", fecha='" + getFecha() + "'" +
+                ", motivo='" + getMotivo() + "'" +
+                ", articulo=" + getArticulo() +
+                "}";
     }
 }

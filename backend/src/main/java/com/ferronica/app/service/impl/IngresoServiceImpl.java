@@ -33,6 +33,15 @@ public class IngresoServiceImpl implements IngresoService {
     public IngresoDTO save(IngresoDTO ingresoDTO) {
         LOG.debug("Request to save Ingreso : {}", ingresoDTO);
         Ingreso ingreso = ingresoMapper.toEntity(ingresoDTO);
+
+        // Automatización de Fecha
+        ingreso.setFecha(java.time.Instant.now());
+
+        // Estado inicial
+        if (ingreso.getActivo() == null) {
+            ingreso.setActivo(true);
+        }
+
         ingreso = ingresoRepository.save(ingreso);
         return ingresoMapper.toDto(ingreso);
     }

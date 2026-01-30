@@ -24,17 +24,44 @@ public class VentaServiceImpl implements VentaService {
 
     private final VentaMapper ventaMapper;
 
-    public VentaServiceImpl(VentaRepository ventaRepository, VentaMapper ventaMapper) {
+    private final com.ferronica.app.repository.NumeracionFacturaRepository numeracionFacturaRepository;
+
+    public VentaServiceImpl(
+            VentaRepository ventaRepository,
+            VentaMapper ventaMapper,
+            com.ferronica.app.repository.NumeracionFacturaRepository numeracionFacturaRepository) {
         this.ventaRepository = ventaRepository;
         this.ventaMapper = ventaMapper;
+        this.numeracionFacturaRepository = numeracionFacturaRepository;
     }
 
     @Override
     public VentaDTO save(VentaDTO ventaDTO) {
         LOG.debug("Request to save Venta : {}", ventaDTO);
-        Venta venta = ventaMapper.toEntity(ventaDTO);
-        venta = ventaRepository.save(venta);
-        return ventaMapper.toDto(venta);
+        final Venta venta = ventaMapper.toEntity(ventaDTO);
+
+        // Automatización de Fecha
+        venta.setFecha(java.time.Instant.now());
+
+        // Automatización de Numeración
+        numeracionFacturaRepository
+                .findByActivoTrue()
+                .ifPresent(numeracion -> {
+                    Long proximoCorrelativo = numeracion.getCorrelativoActual() + 1;
+                    numeracion.setCorrelativoActual(proximoCorrelativo);
+                    numeracionFacturaRepository.save(numeracion);
+
+                    venta.setNoFactura(proximoCorrelativo);
+                    venta.setNumeracion(numeracion);
+                });
+
+        // Estado inicial
+        if (venta.getAnulada() == null) {
+            venta.setAnulada(false);
+        }
+
+        Venta savedVenta = ventaRepository.save(venta);
+        return ventaMapper.toDto(savedVenta);
     }
 
     @Override

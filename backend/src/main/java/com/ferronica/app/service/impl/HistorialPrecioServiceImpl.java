@@ -15,7 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service Implementation for managing {@link com.ferronica.app.domain.HistorialPrecio}.
+ * Service Implementation for managing
+ * {@link com.ferronica.app.domain.HistorialPrecio}.
  */
 @Service
 @Transactional
@@ -27,7 +28,8 @@ public class HistorialPrecioServiceImpl implements HistorialPrecioService {
 
     private final HistorialPrecioMapper historialPrecioMapper;
 
-    public HistorialPrecioServiceImpl(HistorialPrecioRepository historialPrecioRepository, HistorialPrecioMapper historialPrecioMapper) {
+    public HistorialPrecioServiceImpl(HistorialPrecioRepository historialPrecioRepository,
+            HistorialPrecioMapper historialPrecioMapper) {
         this.historialPrecioRepository = historialPrecioRepository;
         this.historialPrecioMapper = historialPrecioMapper;
     }
@@ -36,6 +38,10 @@ public class HistorialPrecioServiceImpl implements HistorialPrecioService {
     public HistorialPrecioDTO save(HistorialPrecioDTO historialPrecioDTO) {
         LOG.debug("Request to save HistorialPrecio : {}", historialPrecioDTO);
         HistorialPrecio historialPrecio = historialPrecioMapper.toEntity(historialPrecioDTO);
+
+        // Automatización de Fecha
+        historialPrecio.setFecha(java.time.Instant.now());
+
         historialPrecio = historialPrecioRepository.save(historialPrecio);
         return historialPrecioMapper.toDto(historialPrecio);
     }
@@ -53,14 +59,14 @@ public class HistorialPrecioServiceImpl implements HistorialPrecioService {
         LOG.debug("Request to partially update HistorialPrecio : {}", historialPrecioDTO);
 
         return historialPrecioRepository
-            .findById(historialPrecioDTO.getId())
-            .map(existingHistorialPrecio -> {
-                historialPrecioMapper.partialUpdate(existingHistorialPrecio, historialPrecioDTO);
+                .findById(historialPrecioDTO.getId())
+                .map(existingHistorialPrecio -> {
+                    historialPrecioMapper.partialUpdate(existingHistorialPrecio, historialPrecioDTO);
 
-                return existingHistorialPrecio;
-            })
-            .map(historialPrecioRepository::save)
-            .map(historialPrecioMapper::toDto);
+                    return existingHistorialPrecio;
+                })
+                .map(historialPrecioRepository::save)
+                .map(historialPrecioMapper::toDto);
     }
 
     @Override
@@ -68,10 +74,10 @@ public class HistorialPrecioServiceImpl implements HistorialPrecioService {
     public List<HistorialPrecioDTO> findAll() {
         LOG.debug("Request to get all HistorialPrecios");
         return historialPrecioRepository
-            .findAll()
-            .stream()
-            .map(historialPrecioMapper::toDto)
-            .collect(Collectors.toCollection(LinkedList::new));
+                .findAll()
+                .stream()
+                .map(historialPrecioMapper::toDto)
+                .collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Override
