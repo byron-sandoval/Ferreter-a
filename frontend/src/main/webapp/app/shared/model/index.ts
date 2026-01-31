@@ -3,6 +3,7 @@ export * from './categoria.model';
 export * from './cliente.model';
 export * from './detalle-ingreso.model';
 export * from './detalle-venta.model';
+export * from './devolucion.model';
 export * from './ingreso.model';
 export * from './moneda.model';
 export * from './numeracion-factura.model';
