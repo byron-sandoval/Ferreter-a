@@ -1,142 +1,133 @@
 import './home.scss';
-
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { Alert, Col, Row, Card, CardBody, CardTitle, CardText, Button } from 'reactstrap';
+import { Row, Col, Card, CardBody, Button, Container } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCashRegister, faPlusCircle, faBoxes, faUsers, faChartLine } from '@fortawesome/free-solid-svg-icons';
-
+import { faCashRegister, faBoxes, faUsers, faWarehouse, faChartLine, faShoppingCart, faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 import { useAppSelector } from 'app/config/store';
 
 export const Home = () => {
   const account = useAppSelector(state => state.authentication.account);
-  const isAuthenticated = useAppSelector(state => state.authentication.isAuthenticated);
-  const loading = useAppSelector(state => state.authentication.loading);
-
-  // Redirect automático a Keycloak solo si:
-  // 1. No está autenticado
-  // 2. No hay un proceso de autenticación en curso
-  // 3. No hay información de cuenta cargándose
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!isAuthenticated && !loading && !account?.login) {
-        window.location.href = '/oauth2/authorization/oidc';
-      }
-    }, 500); // Pequeño delay para permitir que se complete la carga del estado
-
-    return () => clearTimeout(timer);
-  }, [isAuthenticated, loading, account]);
-
-  // Si está cargando o no autenticado, mostrar mensaje
-  if (loading || !isAuthenticated) {
-    return (
-      <div className="home-dashboard d-flex justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
-        <div className="text-center">
-          <div className="spinner-border text-primary mb-3" role="status">
-            <span className="visually-hidden">Cargando...</span>
-          </div>
-          <p className="text-muted">{loading ? 'Verificando sesión...' : 'Redirigiendo a inicio de sesión...'}</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="home-dashboard">
-      <Row className="mb-4">
-        <Col md="12">
-          <div className="hero-section p-4 bg-light rounded shadow-sm border-left-primary">
-            <h1 className="display-5 text-primary">¡Bienvenido a FerroNica!</h1>
-            <p className="lead text-muted">Sistema de Gestión de Inventario y Ventas</p>
-            <Alert color="info" className="d-inline-block">
-              Conectado como: <strong>{account.login}</strong>
-            </Alert>
-          </div>
-        </Col>
-      </Row>
+    <div className="home-container" style={{ backgroundColor: '#f4f6f9', minHeight: 'calc(100vh - 60px)' }}>
+      {/* 1. Header Premium Oscuro */}
+      <div
+        className="premium-header text-white py-5 px-4 mb-5 shadow-lg"
+        style={{ background: 'linear-gradient(135deg, #1a237e 0%, #283593 100%)', borderRadius: '0 0 20px 20px' }}
+      >
+        <Container fluid>
+          <Row className="align-items-center">
+            <Col md="8">
+              <h1 className="display-4 fw-bold mb-2 animate__animated animate__fadeInLeft">Bienvenido a FerroNica</h1>
+              <p className="lead opacity-75 animate__animated animate__fadeInLeft animate__delay-1s">
+                Sistema Integral de Gestión de Ferretería
+              </p>
+              {account?.login ? (
+                <div className="mt-3 badge bg-white text-primary px-3 py-2 fs-6 rounded-pill shadow-sm">
+                  <span className="fw-normal text-muted me-1">Usuario:</span>
+                  <strong>{account.login}</strong>
+                </div>
+              ) : (
+                <div className="mt-3">
+                  <Link to="/login" className="btn btn-light rounded-pill px-4 fw-bold text-primary">
+                    <FontAwesomeIcon icon={faSignInAlt} className="me-2" /> Iniciar Sesión Para Acceder
+                  </Link>
+                </div>
+              )}
+            </Col>
+            <Col md="4" className="text-end d-none d-md-block">
+              <FontAwesomeIcon icon={faWarehouse} size="8x" className="opacity-25" />
+            </Col>
+          </Row>
+        </Container>
+      </div>
 
+      {/* 2. Grid de Accesos Rápidos (Visible solo si logueado) */}
       {account?.login && (
-        <>
-          <Row className="mb-4">
-            <Col md="4">
-              <Card className="text-white bg-success shadow h-100 py-2">
-                <CardBody>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div>
-                      <div className="text-xs font-weight-bold text-uppercase mb-1">Ventas de Hoy</div>
-                      <CardTitle tag="h3" className="mb-0">
-                        C$ 0.00
-                      </CardTitle>
+        <Container>
+          <h3 className="text-secondary mb-4 border-bottom pb-2">Accesos Directos</h3>
+          <Row className="g-4">
+            {/* Venta Rápida */}
+            <Col md="4" lg="3">
+              <Link to="/vendedor/nueva-venta" className="text-decoration-none">
+                <Card className="h-100 shadow-sm border-0 transform-hover" style={{ transition: '0.3s' }}>
+                  <CardBody className="text-center py-5">
+                    <div className="icon-circle bg-success bg-opacity-10 text-success p-4 rounded-circle mb-3 d-inline-block">
+                      <FontAwesomeIcon icon={faShoppingCart} size="2x" />
                     </div>
-                    <FontAwesomeIcon icon={faCashRegister} size="3x" className="text-white-50" />
-                  </div>
-                </CardBody>
-              </Card>
+                    <h5 className="fw-bold text-dark">Nueva Venta</h5>
+                    <p className="text-muted small">Punto de Venta Rápido (POS)</p>
+                  </CardBody>
+                </Card>
+              </Link>
             </Col>
-            <Col md="4">
-              <Card className="text-white bg-info shadow h-100 py-2">
-                <CardBody>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div>
-                      <div className="text-xs font-weight-bold text-uppercase mb-1">Productos en Inventario</div>
-                      <CardTitle tag="h3" className="mb-0">
-                        0
-                      </CardTitle>
+
+            {/* Inventario */}
+            <Col md="4" lg="3">
+              <Link to="/admin/articulos" className="text-decoration-none">
+                <Card className="h-100 shadow-sm border-0 transform-hover" style={{ transition: '0.3s' }}>
+                  <CardBody className="text-center py-5">
+                    <div className="icon-circle bg-primary bg-opacity-10 text-primary p-4 rounded-circle mb-3 d-inline-block">
+                      <FontAwesomeIcon icon={faBoxes} size="2x" />
                     </div>
-                    <FontAwesomeIcon icon={faBoxes} size="3x" className="text-white-50" />
-                  </div>
-                </CardBody>
-              </Card>
+                    <h5 className="fw-bold text-dark">Inventario</h5>
+                    <p className="text-muted small">Productos y Stock</p>
+                  </CardBody>
+                </Card>
+              </Link>
             </Col>
-            <Col md="4">
-              <Card className="text-white bg-warning shadow h-100 py-2">
-                <CardBody>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div>
-                      <div className="text-xs font-weight-bold text-uppercase mb-1">Clientes Registrados</div>
-                      <CardTitle tag="h3" className="mb-0">
-                        0
-                      </CardTitle>
+
+            {/* Reportes/Ventas */}
+            <Col md="4" lg="3">
+              <Link to="/vendedor" className="text-decoration-none">
+                <Card className="h-100 shadow-sm border-0 transform-hover" style={{ transition: '0.3s' }}>
+                  <CardBody className="text-center py-5">
+                    <div className="icon-circle bg-warning bg-opacity-10 text-warning p-4 rounded-circle mb-3 d-inline-block">
+                      <FontAwesomeIcon icon={faCashRegister} size="2x" />
                     </div>
-                    <FontAwesomeIcon icon={faUsers} size="3x" className="text-white-50" />
-                  </div>
-                </CardBody>
-              </Card>
+                    <h5 className="fw-bold text-dark">Mis Ventas</h5>
+                    <p className="text-muted small">Historial de Transacciones</p>
+                  </CardBody>
+                </Card>
+              </Link>
+            </Col>
+
+            {/* Admin Panel (Solo si es Admin) */}
+            <Col md="4" lg="3">
+              <Link to="/admin" className="text-decoration-none">
+                <Card className="h-100 shadow-sm border-0 transform-hover" style={{ transition: '0.3s', background: '#2c3e50' }}>
+                  <CardBody className="text-center py-5">
+                    <div className="icon-circle bg-white bg-opacity-10 text-white p-4 rounded-circle mb-3 d-inline-block">
+                      <FontAwesomeIcon icon={faUsers} size="2x" />
+                    </div>
+                    <h5 className="fw-bold text-white">Administración</h5>
+                    <p className="text-white-50 small">Gestión Global y Usuarios</p>
+                  </CardBody>
+                </Card>
+              </Link>
             </Col>
           </Row>
 
-          <Row>
-            <Col md="6" className="mb-4">
-              <Card className="shadow h-100">
-                <CardBody>
-                  <CardTitle tag="h5" className="text-primary border-bottom pb-2">
-                    <FontAwesomeIcon icon={faPlusCircle} className="mr-2" /> Accesos Rápidos
-                  </CardTitle>
-                  <div className="d-grid gap-2 mt-3">
-                    <Button color="primary" block tag={Link} to="/venta/new">
-                      <FontAwesomeIcon icon={faPlusCircle} className="mr-2" /> Nueva Venta
-                    </Button>
-                    <Button color="outline-primary" block tag={Link} to="/producto">
-                      <FontAwesomeIcon icon={faBoxes} className="mr-2" /> Ver Inventario
-                    </Button>
+          {/* 3. Indicadores Rápidos */}
+          <Row className="mt-5">
+            <Col md="6">
+              <Card className="shadow-sm border-start border-success border-4">
+                <CardBody className="d-flex align-items-center justify-content-between p-4">
+                  <div>
+                    <h6 className="text-uppercase text-muted fw-bold small">Estado del Sistema</h6>
+                    <h4 className="text-success mb-0">
+                      <FontAwesomeIcon icon={faChartLine} /> Operativo
+                    </h4>
                   </div>
-                </CardBody>
-              </Card>
-            </Col>
-            <Col md="6" className="mb-4">
-              <Card className="shadow h-100">
-                <CardBody>
-                  <CardTitle tag="h5" className="text-primary border-bottom pb-2">
-                    <FontAwesomeIcon icon={faChartLine} className="mr-2" /> Resumen de Actividad
-                  </CardTitle>
-                  <CardText className="mt-3 text-muted">
-                    Aquí aparecerán las últimas transacciones y movimientos de stock una vez que comiences a operar.
-                  </CardText>
+                  <Button color="success" outline size="sm">
+                    Ver Detalles
+                  </Button>
                 </CardBody>
               </Card>
             </Col>
           </Row>
-        </>
+        </Container>
       )}
     </div>
   );
