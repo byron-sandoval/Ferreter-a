@@ -1,10 +1,24 @@
 /* ==========================================================================
 Main page styles
 ========================================================================== */
-.hipster {
-  display: inline-block;
-  width: 100%;
-  height: 497px;
-  background: url('/content/images/jhipster_family_member_3.svg') no-repeat center top;
-  background-size: contain;
+.home-dashboard {
+  .hero-section {
+    border-left: 5px solid #007bff;
+    background-color: #f8f9fa;
+  }
+
+  .card {
+    transition: transform 0.2s ease-in-out;
+    &:hover {
+      transform: translateY(-5px);
+    }
+  }
+
+  .text-xs {
+    font-size: 0.7rem;
+  }
+
+  .font-weight-bold {
+    font-weight: 700;
+  }
 }

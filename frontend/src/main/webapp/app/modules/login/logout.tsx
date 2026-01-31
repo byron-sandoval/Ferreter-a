@@ -9,12 +9,7 @@ export const Logout = () => {
 
   useLayoutEffect(() => {
     dispatch(logout());
-    if (authentication.logoutUrl) {
-      window.location.href = authentication.logoutUrl;
-    } else if (!authentication.isAuthenticated) {
-      window.location.href = '/';
-    }
-  });
+  }, []);
 
   return (
     <div className="p-5">
