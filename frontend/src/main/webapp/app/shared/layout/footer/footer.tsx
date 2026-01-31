@@ -8,8 +8,8 @@ const Footer = () => (
   <div className="footer page-content">
     <Row>
       <Col md="12">
-        <p>
-          <Translate contentKey="footer">Your footer</Translate>
+        <p className="text-center mt-3 text-muted">
+          &copy; {new Date().getFullYear()} FerroNica - Sistema de Gestión de Ferretería. Todos los derechos reservados.
         </p>
       </Col>
     </Row>

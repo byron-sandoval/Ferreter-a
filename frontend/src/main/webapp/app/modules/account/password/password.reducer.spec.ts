@@ -56,7 +56,7 @@ describe('Password reducer tests', () => {
         updateSuccess: false,
         updateFailure: false,
       };
-      expect(password({ ...initialState, loading: true }, reset)).toEqual({
+      expect(password({ ...initialState, loading: true }, reset as any)).toEqual({
         ...initialState,
       });
     });
@@ -71,7 +71,7 @@ describe('Password reducer tests', () => {
     const extra = {};
     beforeEach(() => {
       store = configureStore({
-        reducer: (state = [], action) => [...state, action],
+        reducer: (state = [], action: any) => [...state, action],
       });
       axios.post = sinon.stub().returns(Promise.resolve(resolvedObject));
     });
@@ -86,8 +86,8 @@ describe('Password reducer tests', () => {
       expect(savePassword.fulfilled.match(result)).toBe(true);
     });
     it('dispatches RESET actions', async () => {
-      await store.dispatch(reset());
-      expect(store.getState()).toEqual([expect.any(Object), expect.objectContaining(reset())]);
+      await store.dispatch(reset() as any);
+      expect(store.getState()).toEqual([expect.any(Object), expect.objectContaining(reset() as any)]);
     });
   });
 });
