@@ -1,23 +1,20 @@
 import React from 'react';
 import { useAppSelector } from 'app/config/store';
-import { hasAnyAuthority } from 'app/shared/auth/private-route';
-import { AUTHORITIES } from 'app/config/constants';
 import Footer from 'app/shared/layout/footer/footer';
 import ErrorBoundary from 'app/shared/error/error-boundary';
-import { Sidebar } from 'app/shared/layout/sidebar/Sidebar';
+import { TopNavbar } from 'app/shared/layout/header/TopNavbar';
 
 export const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = useAppSelector(state => state.authentication.isAuthenticated);
-  const isAdmin = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.ADMIN]));
 
   return (
-    <div className="app-container">
-      <div className="d-flex">
-        {isAuthenticated && <Sidebar />}
-        <div className="flex-grow-1 p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+    <div className="app-container d-flex flex-column min-vh-100">
+      {isAuthenticated && <TopNavbar />}
+      <div className="flex-grow-1 p-0" style={{ backgroundColor: '#f8f9fa' }}>
+        <div className="p-4">
           <ErrorBoundary>{children}</ErrorBoundary>
-          <Footer />
         </div>
+        <Footer />
       </div>
     </div>
   );

@@ -14,6 +14,7 @@ import {
   faWarehouse,
   faUserFriends,
   faSignOutAlt,
+  faTags,
 } from '@fortawesome/free-solid-svg-icons';
 
 export const Sidebar = () => {
@@ -95,6 +96,13 @@ export const Sidebar = () => {
                 <FontAwesomeIcon icon={faBoxes} className="me-3" /> Inventario
               </NavLink>
             </NavItem>
+            {isAdmin && (
+              <NavItem>
+                <NavLink tag={Link} to="/admin/categorias" style={navLinkStyle}>
+                  <FontAwesomeIcon icon={faTags} className="me-3" /> Categorías
+                </NavLink>
+              </NavItem>
+            )}
           </>
         )}
 
