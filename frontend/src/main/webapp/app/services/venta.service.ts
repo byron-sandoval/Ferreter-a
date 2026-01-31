@@ -26,6 +26,10 @@ export const VentaService = {
   getFactura(id: number) {
     return axios.get<IVenta>(`${API_VENTAS}/${id}`);
   },
+
+  getAll() {
+    return axios.get<IVenta[]>(API_VENTAS);
+  },
 };
 
 export default VentaService;
