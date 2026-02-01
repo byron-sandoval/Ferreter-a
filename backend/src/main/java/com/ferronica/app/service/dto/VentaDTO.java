@@ -5,6 +5,7 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -49,6 +50,8 @@ public class VentaDTO implements Serializable {
     private MonedaDTO moneda;
 
     private NumeracionFacturaDTO numeracion;
+
+    private List<DetalleVentaDTO> detalles;
 
     public Long getId() {
         return id;
@@ -178,6 +181,14 @@ public class VentaDTO implements Serializable {
         this.numeracion = numeracion;
     }
 
+    public List<DetalleVentaDTO> getDetalles() {
+        return detalles;
+    }
+
+    public void setDetalles(List<DetalleVentaDTO> detalles) {
+        this.detalles = detalles;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -219,6 +230,7 @@ public class VentaDTO implements Serializable {
                 ", vendedor=" + getVendedor() +
                 ", moneda=" + getMoneda() +
                 ", numeracion=" + getNumeracion() +
+                ", detalles=" + getDetalles() +
                 "}";
     }
 }
