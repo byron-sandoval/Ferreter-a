@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Input, Card, Badge } from 'reactstrap';
+import { Table, Button, Input, Card, Badge, Modal, ModalHeader, ModalBody, ModalFooter, Label } from 'reactstrap';
 import { IIngreso } from 'app/shared/model/ingreso.model';
 import IngresoService from 'app/services/ingreso.service';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,6 +10,8 @@ export const IngresoList = () => {
   const [ingresos, setIngresos] = useState<IIngreso[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
+  const [showDetalleModal, setShowDetalleModal] = useState(false);
+  const [ingresoSeleccionado, setIngresoSeleccionado] = useState<IIngreso | null>(null);
 
   const loadAll = () => {
     setLoading(true);
@@ -22,6 +24,16 @@ export const IngresoList = () => {
         console.error(err);
         setLoading(false);
       });
+  };
+
+  const verDetalles = async (id: number) => {
+    try {
+      const res = await IngresoService.get(id);
+      setIngresoSeleccionado(res.data);
+      setShowDetalleModal(true);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   useEffect(() => {
@@ -87,7 +99,7 @@ export const IngresoList = () => {
                     </Badge>
                   </td>
                   <td>
-                    <Button size="sm" color="info" outline className="me-1" title="Ver detalles">
+                    <Button size="sm" color="info" outline className="me-1" title="Ver detalles" onClick={() => i.id && verDetalles(i.id)}>
                       <FontAwesomeIcon icon={faEye} />
                     </Button>
                   </td>
@@ -106,6 +118,79 @@ export const IngresoList = () => {
       <div className="mt-3 text-muted small">
         <p>* Los ingresos representan las entradas de mercancía al almacén que aumentan el stock.</p>
       </div>
+
+      {/* MODAL DETALLES DE COMPRA (INGRESO) */}
+      <Modal isOpen={showDetalleModal} toggle={() => setShowDetalleModal(false)} size="lg" centered>
+        <ModalHeader toggle={() => setShowDetalleModal(false)} className="bg-dark text-white">
+          <FontAwesomeIcon icon={faFileInvoice} className="me-2 text-info" /> Detalles de Compra #{ingresoSeleccionado?.noDocumento}
+        </ModalHeader>
+        <ModalBody>
+          <div className="d-flex justify-content-between mb-4 border-bottom pb-2">
+            <div>
+              <Label className="text-muted small text-uppercase fw-bold mb-0">Proveedor</Label>
+              <div className="fw-bold fs-5 text-dark">{ingresoSeleccionado?.proveedor?.nombre}</div>
+              <small className="text-muted">{ingresoSeleccionado?.proveedor?.telefono}</small>
+            </div>
+            <div className="text-end">
+              <Label className="text-muted small text-uppercase fw-bold mb-0">Fecha de Ingreso</Label>
+              <div className="fw-bold">{dayjs(ingresoSeleccionado?.fecha).format('DD/MM/YYYY')}</div>
+              <Badge color={ingresoSeleccionado?.activo ? 'success' : 'danger'}>
+                {ingresoSeleccionado?.activo ? 'Procesado' : 'Anulado'}
+              </Badge>
+            </div>
+          </div>
+
+          <Table hover responsive borderless className="align-middle">
+            <thead className="table-dark small text-uppercase">
+              <tr>
+                <th>Producto</th>
+                <th className="text-center">Cantidad</th>
+                <th className="text-end">Costo Unit.</th>
+                <th className="text-end">Monto</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ingresoSeleccionado?.detalles?.map((det, i) => (
+                <tr key={i} className="border-bottom border-light">
+                  <td>
+                    <div className="fw-bold">{det.articulo?.nombre}</div>
+                    <small className="text-muted">{det.articulo?.codigo}</small>
+                  </td>
+                  <td className="text-center">
+                    <Badge color="info" outline className="px-3">
+                      {det.cantidad}
+                    </Badge>
+                  </td>
+                  <td className="text-end">C$ {det.costoUnitario?.toLocaleString()}</td>
+                  <td className="text-end fw-bold">C$ {det.monto?.toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+
+          <div className="mt-4 p-3 bg-light rounded-4 ms-auto" style={{ maxWidth: '300px' }}>
+            <div className="d-flex justify-content-between border-top pt-2">
+              <h5 className="fw-bold m-0">Total Compra:</h5>
+              <h5 className="fw-bold text-dark m-0">C$ {ingresoSeleccionado?.total?.toLocaleString()}</h5>
+            </div>
+          </div>
+
+          {ingresoSeleccionado?.observaciones && (
+            <div className="mt-3 p-2 bg-warning bg-opacity-10 border-start border-warning border-3 rounded">
+              <small className="fw-bold text-muted d-block text-uppercase">Observaciones:</small>
+              {ingresoSeleccionado.observaciones}
+            </div>
+          )}
+        </ModalBody>
+        <ModalFooter className="border-0">
+          <Button color="secondary" size="sm" onClick={() => setShowDetalleModal(false)}>
+            Cerrar
+          </Button>
+          <Button color="dark" size="sm">
+            <FontAwesomeIcon icon={faEye} className="me-2 text-info" /> Imprimir Comprobante
+          </Button>
+        </ModalFooter>
+      </Modal>
     </div>
   );
 };
