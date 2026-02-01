@@ -8,6 +8,7 @@ const ArticuloUpdate = React.lazy(() => import('./ArticuloUpdate'));
 const ProveedorList = React.lazy(() => import('./ProveedorList'));
 const CategoriaList = React.lazy(() => import('./categorias/CategoriaList'));
 const CategoriaUpdate = React.lazy(() => import('./categorias/CategoriaUpdate'));
+const ReportList = React.lazy(() => import('./reportes/ReportList'));
 
 const Loadable = ({ children }: { children: React.ReactNode }) => (
   <Suspense
@@ -94,6 +95,15 @@ const AdminRoutes = () => (
         }
       />
     </Route>
+
+    <Route
+      path="reportes"
+      element={
+        <Loadable>
+          <ReportList />
+        </Loadable>
+      }
+    />
   </ErrorBoundaryRoutes>
 );
 

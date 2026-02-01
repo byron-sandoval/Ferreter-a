@@ -45,10 +45,10 @@ export const CategoriaList = () => {
   return (
     <div>
       <h2 className="d-flex justify-content-between align-items-center mb-4">
-        📂 Categorías
+        Categorías
         <div className="d-flex gap-2">
           <Button color="info" onClick={loadAll} disabled={loading}>
-            <FontAwesomeIcon icon={faSync} spin={loading} /> Actualizar
+            <FontAwesomeIcon icon={faSync} spin={loading} />
           </Button>
           <Button color="primary" tag={Link} to="new">
             <FontAwesomeIcon icon={faPlus} /> Nueva Categoría
