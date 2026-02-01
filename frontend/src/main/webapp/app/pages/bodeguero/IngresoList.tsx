@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Table, Button, Input, Card, Badge, Modal, ModalHeader, ModalBody, ModalFooter, Label } from 'reactstrap';
 import { IIngreso } from 'app/shared/model/ingreso.model';
 import IngresoService from 'app/services/ingreso.service';
@@ -7,6 +8,7 @@ import { faPlus, faSync, faSearch, faEye, faFileInvoice } from '@fortawesome/fre
 import dayjs from 'dayjs';
 
 export const IngresoList = () => {
+  const navigate = useNavigate();
   const [ingresos, setIngresos] = useState<IIngreso[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
@@ -67,7 +69,7 @@ export const IngresoList = () => {
             className="form-control-sm border-0"
             style={{ width: '300px' }}
           />
-          <Button color="success" size="sm" onClick={() => {}}>
+          <Button color="success" size="sm" onClick={() => navigate('/bodeguero/ingresos/nuevo')}>
             <FontAwesomeIcon icon={faPlus} className="me-2" /> Nueva Compra
           </Button>
         </div>
