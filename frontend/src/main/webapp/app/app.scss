@@ -9,8 +9,18 @@ $bg-light: #f4f7f6;
 @import 'bootstrap/scss/bootstrap';
 @import 'bootswatch/dist/materia/bootswatch';
 
-body {
+html,
+body,
+#root,
+.app-main-container,
+.app-container {
+  width: 100%;
   margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+body {
   background-color: $bg-light;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -27,6 +37,47 @@ a {
 
 .bg-primary {
   background-color: $primary-color !important;
+}
+
+.top-navbar-container {
+  background-color: #1a0633 !important;
+  width: 100% !important;
+  margin: 0 !important;
+  left: 0;
+  right: 0;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.search-input:focus {
+  box-shadow: 0 0 0 2px rgba(0, 86, 179, 0.2);
+  outline: none;
+}
+
+.nav-link-item {
+  position: relative;
+
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 15px;
+    right: 15px;
+    height: 2px;
+    background: transparent;
+    transition: background 0.2s;
+  }
+
+  &:hover:after {
+    background: rgba(255, 255, 255, 0.5);
+  }
 }
 
 // Remove JHipster specific styles if any left
@@ -62,9 +113,9 @@ a {
   position: fixed;
   top: 100px;
   left: 0;
-  width: 99% !important;
+  width: 100% !important;
   height: calc(100vh - 110px) !important;
-  margin: 5px;
+  margin: 0;
   z-index: 1000;
   padding: 5px 25px 50px 25px !important;
 }
