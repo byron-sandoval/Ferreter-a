@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Row, Col, Card, CardBody, CardTitle, CardText, Button, Container } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -21,52 +22,61 @@ const reports = [
     description: 'Análisis detallado de ingresos por rango de fechas y sucursales.',
     icon: faCalendarAlt,
     color: 'primary',
+    path: null,
   },
   {
     title: 'Inventario Crítico',
     description: 'Productos con bajo stock y alertas de reorden de mercancía.',
     icon: faExclamationTriangle,
     color: 'danger',
+    path: null,
   },
   {
     title: 'Cierre de Caja',
     description: 'Resumen de ventas diarias desglosado por método de pago.',
     icon: faCashRegister,
     color: 'success',
+    path: null,
   },
   {
     title: 'Productos Más Vendidos',
     description: 'Ranking de artículos con mayor rotación en el periodo.',
     icon: faStar,
     color: 'warning',
+    path: null,
   },
   {
     title: 'Compras por Proveedor',
     description: 'Historial de ingresos y abastecimiento por cada proveedor.',
     icon: faTruck,
     color: 'info',
+    path: '/admin/reportes/compras-por-proveedor',
   },
   {
     title: 'Reporte de Ganancias',
     description: 'Margen de utilidad calculado entre costo y precio de venta.',
     icon: faMoneyBillWave,
     color: 'secondary',
+    path: null,
   },
   {
     title: 'Estado de Cuenta Clientes',
     description: 'Saldos pendientes y comportamiento de pagos de clientes.',
     icon: faUserFriends,
     color: 'dark',
+    path: null,
   },
   {
     title: 'Factura Maestro-Detalle',
     description: 'Consulta de facturas específicas con desglose de artículos.',
     icon: faFileInvoice,
     color: 'primary',
+    path: null,
   },
 ];
 
 export const ReportList = () => {
+  const navigate = useNavigate();
   return (
     <div className="animate__animated animate__fadeIn p-3 px-md-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -123,8 +133,10 @@ export const ReportList = () => {
                   <Button
                     color="link"
                     className={`p-0 text-${report.color} text-decoration-none small fw-bold w-100 d-flex justify-content-between align-items-center`}
+                    onClick={() => report.path && navigate(report.path)}
+                    disabled={!report.path}
                   >
-                    VER REPORTE
+                    {report.path ? 'VER REPORTE' : 'PRÓXIMAMENTE'}
                     <FontAwesomeIcon icon={faArrowRight} size="xs" />
                   </Button>
                 </div>
