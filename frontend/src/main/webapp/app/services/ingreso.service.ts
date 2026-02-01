@@ -6,12 +6,24 @@ const API_INGRESOS = 'api/ingresos';
 const API_DETALLES = 'api/detalle-ingresos';
 
 export const IngresoService = {
-  createIngreso(ingreso: IIngreso) {
+  getAll() {
+    return axios.get<IIngreso[]>(API_INGRESOS);
+  },
+
+  get(id: number) {
+    return axios.get<IIngreso>(`${API_INGRESOS}/${id}`);
+  },
+
+  create(ingreso: IIngreso) {
     return axios.post<IIngreso>(API_INGRESOS, ingreso);
   },
 
-  addDetalle(detalle: IDetalleIngreso) {
-    return axios.post<IDetalleIngreso>(API_DETALLES, detalle);
+  update(ingreso: IIngreso) {
+    return axios.put<IIngreso>(`${API_INGRESOS}/${ingreso.id}`, ingreso);
+  },
+
+  delete(id: number) {
+    return axios.delete(`${API_INGRESOS}/${id}`);
   },
 
   getIngresosRecientes() {

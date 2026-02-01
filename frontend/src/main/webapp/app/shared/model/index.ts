@@ -12,3 +12,5 @@ export * from './unidad-medida.model';
 export * from './vendedor.model';
 export * from './venta.model';
 export * from './user.model';
+export * from './empresa.model';
+export * from './historial-precio.model';
