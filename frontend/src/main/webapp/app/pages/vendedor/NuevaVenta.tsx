@@ -31,6 +31,8 @@ import {
   faHandHoldingUsd,
   faPrint,
   faExclamationTriangle,
+  faVenusMars,
+  faMapMarkerAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import ArticuloService from 'app/services/articulo.service';
 import VentaService from 'app/services/venta.service';
@@ -39,7 +41,7 @@ import MonedaService from 'app/services/moneda.service';
 import NumeracionService from 'app/services/numeracion.service';
 import VendedorService from 'app/services/vendedor.service';
 import { IArticulo } from 'app/shared/model/articulo.model';
-import { ICliente } from 'app/shared/model/cliente.model';
+import { ICliente, GeneroEnum } from 'app/shared/model/cliente.model';
 import { IMoneda } from 'app/shared/model/moneda.model';
 import { INumeracionFactura } from 'app/shared/model/numeracion-factura.model';
 import { MetodoPagoEnum, IVenta } from 'app/shared/model/venta.model';
@@ -59,7 +61,13 @@ export const NuevaVenta = () => {
   const [cliente, setCliente] = useState<ICliente | null>(null);
   const [busquedaCedula, setBusquedaCedula] = useState('');
   const [showClienteModal, setShowClienteModal] = useState(false);
-  const [nuevoCliente, setNuevoCliente] = useState<ICliente>({ cedula: '', nombre: '', activo: true });
+  const [nuevoCliente, setNuevoCliente] = useState<ICliente>({
+    cedula: '',
+    nombre: '',
+    activo: true,
+    genero: GeneroEnum.MASCULINO,
+    direccion: '',
+  });
 
   // Configuración Venta
   const [metodoPago, setMetodoPago] = useState<MetodoPagoEnum>(MetodoPagoEnum.EFECTIVO);
@@ -71,6 +79,10 @@ export const NuevaVenta = () => {
 
   // Impresion
   const componentRef = useRef<any>(null);
+  const handlePrint = useReactToPrint({
+    contentRef: componentRef,
+  });
+
   const [ventaExitosa, setVentaExitosa] = useState<IVenta | null>(null);
 
   useEffect(() => {
@@ -119,6 +131,10 @@ export const NuevaVenta = () => {
 
   const guardarNuevoCliente = async () => {
     try {
+      if (!nuevoCliente.cedula || !nuevoCliente.nombre) {
+        toast.error('Cédula y Nombre son obligatorios');
+        return;
+      }
       const res = await ClienteService.create(nuevoCliente);
       setCliente(res.data);
       setShowClienteModal(false);
@@ -240,15 +256,18 @@ export const NuevaVenta = () => {
         {/* PARTE IZQUIERDA: CATÁLOGO */}
         <Col md="7">
           <Card className="shadow-sm mb-3 border-0">
-            <CardBody className="bg-dark rounded-3 p-3">
+            <CardBody
+              className="rounded-3 p-3"
+              style={{ backgroundColor: '#ffc107', backgroundImage: 'linear-gradient(45deg, #ffc107 0%, #ffdb58 100%)' }}
+            >
               <div className="input-group input-group-lg">
-                <span className="input-group-text bg-transparent border-end-0 text-white opacity-50">
+                <span className="input-group-text bg-transparent border-end-0 text-dark opacity-75">
                   <FontAwesomeIcon icon={faSearch} />
                 </span>
                 <Input
                   placeholder="Escribe el nombre o código del producto..."
-                  className="bg-transparent border-start-0 text-white"
-                  style={{ border: '1px solid #444' }}
+                  className="bg-transparent border-start-0 text-dark placeholder-dark"
+                  style={{ border: '1px solid rgba(0,0,0,0.1)', fontWeight: '500' }}
                   autoFocus
                   value={termino}
                   onChange={e => setTermino(e.target.value)}
@@ -503,17 +522,23 @@ export const NuevaVenta = () => {
 
       {/* MODAL NUEVO CLIENTE */}
       <Modal isOpen={showClienteModal} toggle={() => setShowClienteModal(!showClienteModal)} centered>
-        <ModalHeader toggle={() => setShowClienteModal(!showClienteModal)} className="bg-primary text-white border-0 py-3">
-          <FontAwesomeIcon icon={faUserPlus} className="me-2" /> Registrar Nuevo Cliente
+        <ModalHeader
+          toggle={() => setShowClienteModal(!showClienteModal)}
+          className="bg-primary text-white border-0 py-3 text-center w-100"
+        >
+          <div className="w-100 text-center">
+            <FontAwesomeIcon icon={faUserPlus} className="me-2" /> Registrar Nuevo Cliente
+          </div>
         </ModalHeader>
         <ModalBody className="p-4">
           <Form>
             <Row>
               <Col md="6">
                 <FormGroup>
-                  <Label className="small fw-bold text-muted">CÉDULA</Label>
+                  <Label className="small fw-bold text-muted text-uppercase">Cédula</Label>
                   <Input
                     value={nuevoCliente.cedula}
+                    placeholder="281-XXXXXX-XXXXX"
                     className="bg-light border-0"
                     onChange={e => setNuevoCliente({ ...nuevoCliente, cedula: e.target.value })}
                   />
@@ -521,31 +546,66 @@ export const NuevaVenta = () => {
               </Col>
               <Col md="6">
                 <FormGroup>
-                  <Label className="small fw-bold text-muted">NOMBRE</Label>
+                  <Label className="small fw-bold text-muted text-uppercase">Nombre Completo</Label>
                   <Input
                     value={nuevoCliente.nombre}
+                    placeholder="Ej. Juan Pérez"
                     className="bg-light border-0"
                     onChange={e => setNuevoCliente({ ...nuevoCliente, nombre: e.target.value })}
                   />
                 </FormGroup>
               </Col>
             </Row>
+            <Row>
+              <Col md="6">
+                <FormGroup>
+                  <Label className="small fw-bold text-muted text-uppercase">
+                    <FontAwesomeIcon icon={faVenusMars} className="me-1" /> Género
+                  </Label>
+                  <Input
+                    type="select"
+                    value={nuevoCliente.genero}
+                    className="bg-light border-0"
+                    onChange={e => setNuevoCliente({ ...nuevoCliente, genero: e.target.value as GeneroEnum })}
+                  >
+                    <option value={GeneroEnum.MASCULINO}>Masculino</option>
+                    <option value={GeneroEnum.FEMENINO}>Femenino</option>
+                  </Input>
+                </FormGroup>
+              </Col>
+              <Col md="6">
+                <FormGroup>
+                  <Label className="small fw-bold text-muted text-uppercase">Teléfono</Label>
+                  <Input
+                    value={nuevoCliente.telefono || ''}
+                    placeholder="8888-8888"
+                    className="bg-light border-0"
+                    onChange={e => setNuevoCliente({ ...nuevoCliente, telefono: e.target.value })}
+                  />
+                </FormGroup>
+              </Col>
+            </Row>
             <FormGroup>
-              <Label className="small fw-bold text-muted">TELÉFONO</Label>
+              <Label className="small fw-bold text-muted text-uppercase">
+                <FontAwesomeIcon icon={faMapMarkerAlt} className="me-1" /> Dirección
+              </Label>
               <Input
-                value={nuevoCliente.telefono || ''}
+                type="textarea"
+                value={nuevoCliente.direccion || ''}
+                placeholder="Dirección exacta del cliente..."
                 className="bg-light border-0"
-                onChange={e => setNuevoCliente({ ...nuevoCliente, telefono: e.target.value })}
+                rows={2}
+                onChange={e => setNuevoCliente({ ...nuevoCliente, direccion: e.target.value })}
               />
             </FormGroup>
           </Form>
         </ModalBody>
-        <ModalFooter className="border-0">
-          <Button color="light" onClick={() => setShowClienteModal(false)}>
-            Cancelar
+        <ModalFooter className="border-0 bg-light rounded-bottom-4">
+          <Button color="link" className="text-muted text-decoration-none" onClick={() => setShowClienteModal(false)}>
+            CANCELAR
           </Button>
-          <Button color="primary" className="px-4 fw-bold" onClick={guardarNuevoCliente}>
-            Guardar
+          <Button color="primary" className="px-5 fw-bold rounded-pill shadow-sm" onClick={guardarNuevoCliente}>
+            GUARDAR
           </Button>
         </ModalFooter>
       </Modal>
@@ -558,26 +618,65 @@ export const NuevaVenta = () => {
         <ModalBody className="p-4 text-center">
           <h5 className="fw-bold mb-3">Factura #{ventaExitosa?.noFactura}</h5>
           <p className="text-muted small">La transacción se ha registrado correctamente en el sistema.</p>
-          <div ref={componentRef} className="p-3 bg-white text-dark shadow-sm rounded border d-none">
-            {/* Elemento oculto para impresion real */}
-            <div className="text-center mb-3">
-              <h4 className="fw-bold m-0">FerroNica</h4>
-              <small>Factura de Venta</small>
-            </div>
-            <div className="d-flex justify-content-between small border-bottom mb-2">
-              <span>Folio:</span>
-              <span>#{ventaExitosa?.noFactura}</span>
-            </div>
-            <div className="d-flex justify-content-between small border-bottom mb-2">
-              <span>Fecha:</span>
-              <span>{dayjs(ventaExitosa?.fecha).format('DD/MM/YYYY HH:mm')}</span>
-            </div>
-            <div className="text-center mt-3">
-              <h3 className="fw-bold">Total: C$ {ventaExitosa?.total?.toFixed(2)}</h3>
+
+          {/* TICKET DE IMPRESIÓN (OCULTO EN PANTALLA, VISIBLE EN IMPRESIÓN) */}
+          <div style={{ display: 'none' }}>
+            <div ref={componentRef} style={{ padding: '20px', fontFamily: 'monospace', width: '300px' }}>
+              <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+                <h2 style={{ margin: '0' }}>FERRONICA</h2>
+                <p style={{ margin: '0', fontSize: '12px' }}>Ferretería & Suministros</p>
+                <p style={{ margin: '0', fontSize: '10px' }}>RUC: 0000000000000</p>
+              </div>
+              <div style={{ borderBottom: '1px dashed #000', marginBottom: '10px' }}></div>
+              <div style={{ fontSize: '12px' }}>
+                <p style={{ margin: '2px 0' }}>
+                  <strong>No. Factura:</strong> {ventaExitosa?.noFactura}
+                </p>
+                <p style={{ margin: '2px 0' }}>
+                  <strong>Fecha:</strong> {dayjs(ventaExitosa?.fecha).format('DD/MM/YYYY HH:mm')}
+                </p>
+                <p style={{ margin: '2px 0' }}>
+                  <strong>Cliente:</strong> {ventaExitosa?.cliente?.nombre}
+                </p>
+                <p style={{ margin: '2px 0' }}>
+                  <strong>Vendedor:</strong> {ventaExitosa?.vendedor?.nombre}
+                </p>
+              </div>
+              <div style={{ borderBottom: '1px dashed #000', margin: '10px 0' }}></div>
+              <table style={{ width: '100%', fontSize: '12px' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #000' }}>
+                    <th style={{ textAlign: 'left' }}>Item</th>
+                    <th style={{ textAlign: 'center' }}>Cant</th>
+                    <th style={{ textAlign: 'right' }}>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {carrito.map((item, i) => (
+                    <tr key={i}>
+                      <td>{item.articulo.nombre}</td>
+                      <td style={{ textAlign: 'center' }}>{item.cantidad}</td>
+                      <td style={{ textAlign: 'right' }}>C$ {item.subtotal.toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div style={{ borderBottom: '1px dashed #000', margin: '10px 0' }}></div>
+              <div style={{ fontSize: '12px', textAlign: 'right' }}>
+                <p style={{ margin: '2px 0' }}>Subtotal: C$ {ventaExitosa?.subtotal?.toFixed(2)}</p>
+                <p style={{ margin: '2px 0' }}>IVA (15%): C$ {ventaExitosa?.iva?.toFixed(2)}</p>
+                <h3 style={{ margin: '5px 0' }}>TOTAL: C$ {ventaExitosa?.total?.toFixed(2)}</h3>
+              </div>
+              <div style={{ borderBottom: '1px dashed #000', margin: '10px 0' }}></div>
+              <div style={{ textAlign: 'center', fontSize: '10px' }}>
+                <p>¡Gracias por su compra!</p>
+                <p>Revise su mercadería antes de salir.</p>
+              </div>
             </div>
           </div>
+
           <div className="d-grid gap-2 mt-4">
-            <Button color="primary" className="fw-bold py-2" onClick={useReactToPrint({ contentRef: componentRef })}>
+            <Button color="primary" className="fw-bold py-2 shadow-sm" onClick={() => handlePrint()}>
               <FontAwesomeIcon icon={faPrint} className="me-2" /> Imprimir Ticket
             </Button>
             <Button color="outline-dark" onClick={finalizarVentaYLimpiar}>
