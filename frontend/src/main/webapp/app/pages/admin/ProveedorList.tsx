@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Table, Button, Input, Card, Badge } from 'reactstrap';
 import { IProveedor } from 'app/shared/model/proveedor.model';
 import ProveedorService from 'app/services/proveedor.service';
@@ -6,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSync, faSearch, faPencilAlt, faTrash, faTruck } from '@fortawesome/free-solid-svg-icons';
 
 export const ProveedorList = () => {
+  const navigate = useNavigate();
   const [proveedores, setProveedores] = useState<IProveedor[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
@@ -47,7 +49,7 @@ export const ProveedorList = () => {
             className="form-control-sm"
             style={{ width: '250px' }}
           />
-          <Button color="primary" size="sm" onClick={() => {}}>
+          <Button color="primary" size="sm" onClick={() => navigate('/admin/proveedores/new')}>
             <FontAwesomeIcon icon={faPlus} className="me-2" /> Nuevo Proveedor
           </Button>
         </div>

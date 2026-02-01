@@ -91,7 +91,7 @@ public class VentaServiceImpl implements VentaService {
     @Transactional(readOnly = true)
     public Optional<VentaDTO> findOne(Long id) {
         LOG.debug("Request to get Venta : {}", id);
-        return ventaRepository.findById(id).map(ventaMapper::toDto);
+        return ventaRepository.findOneWithEagerRelationships(id).map(ventaMapper::toDto);
     }
 
     @Override
