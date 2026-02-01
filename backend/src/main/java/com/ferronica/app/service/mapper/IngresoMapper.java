@@ -11,19 +11,10 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity {@link Ingreso} and its DTO {@link IngresoDTO}.
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = { DetalleIngresoMapper.class, VendedorMapper.class, ProveedorMapper.class })
 public interface IngresoMapper extends EntityMapper<IngresoDTO, Ingreso> {
-    @Mapping(target = "vendedor", source = "vendedor", qualifiedByName = "vendedorId")
-    @Mapping(target = "proveedor", source = "proveedor", qualifiedByName = "proveedorId")
+    @Mapping(target = "vendedor", source = "vendedor")
+    @Mapping(target = "proveedor", source = "proveedor")
+    @Mapping(target = "detalles", source = "detalles")
     IngresoDTO toDto(Ingreso s);
-
-    @Named("vendedorId")
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "id", source = "id")
-    VendedorDTO toDtoVendedorId(Vendedor vendedor);
-
-    @Named("proveedorId")
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "id", source = "id")
-    ProveedorDTO toDtoProveedorId(Proveedor proveedor);
 }

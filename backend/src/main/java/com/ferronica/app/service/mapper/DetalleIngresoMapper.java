@@ -9,7 +9,8 @@ import com.ferronica.app.service.dto.IngresoDTO;
 import org.mapstruct.*;
 
 /**
- * Mapper for the entity {@link DetalleIngreso} and its DTO {@link DetalleIngresoDTO}.
+ * Mapper for the entity {@link DetalleIngreso} and its DTO
+ * {@link DetalleIngresoDTO}.
  */
 @Mapper(componentModel = "spring")
 public interface DetalleIngresoMapper extends EntityMapper<DetalleIngresoDTO, DetalleIngreso> {
@@ -20,6 +21,7 @@ public interface DetalleIngresoMapper extends EntityMapper<DetalleIngresoDTO, De
     @Named("articuloId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "nombre", source = "nombre")
     ArticuloDTO toDtoArticuloId(Articulo articulo);
 
     @Named("ingresoId")

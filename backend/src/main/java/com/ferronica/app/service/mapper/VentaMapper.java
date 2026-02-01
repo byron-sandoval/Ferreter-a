@@ -15,12 +15,14 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity {@link Venta} and its DTO {@link VentaDTO}.
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = { DetalleVentaMapper.class, ClienteMapper.class, VendedorMapper.class,
+        MonedaMapper.class, NumeracionFacturaMapper.class })
 public interface VentaMapper extends EntityMapper<VentaDTO, Venta> {
-    @Mapping(target = "cliente", source = "cliente", qualifiedByName = "clienteId")
-    @Mapping(target = "vendedor", source = "vendedor", qualifiedByName = "vendedorId")
-    @Mapping(target = "moneda", source = "moneda", qualifiedByName = "monedaId")
-    @Mapping(target = "numeracion", source = "numeracion", qualifiedByName = "numeracionFacturaId")
+    @Mapping(target = "cliente", source = "cliente")
+    @Mapping(target = "vendedor", source = "vendedor")
+    @Mapping(target = "moneda", source = "moneda")
+    @Mapping(target = "numeracion", source = "numeracion")
+    @Mapping(target = "detalles", source = "detalles")
     VentaDTO toDto(Venta s);
 
     @Named("clienteId")
