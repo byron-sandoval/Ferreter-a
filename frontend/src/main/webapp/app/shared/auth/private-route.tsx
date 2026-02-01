@@ -39,16 +39,12 @@ export const PrivateRoute = ({ children, hasAnyAuthorities = [], ...rest }: IOwn
     );
   }
 
-  return (
-    <Navigate
-      to={{
-        pathname: '/login',
-        search: pageLocation.search,
-      }}
-      replace
-      state={{ from: pageLocation }}
-    />
-  );
+  if (!isAuthenticated) {
+    window.location.href = '/oauth2/authorization/oidc';
+    return null;
+  }
+
+  return <ErrorBoundary>{children}</ErrorBoundary>;
 };
 
 export const hasAnyAuthority = (authorities: string[], hasAnyAuthorities: string[]) => {

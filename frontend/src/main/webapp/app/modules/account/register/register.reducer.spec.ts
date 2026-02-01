@@ -33,7 +33,10 @@ describe('Creating account tests', () => {
 
   it('should handle RESET', () => {
     expect(
-      register({ loading: true, registrationSuccess: true, registrationFailure: true, errorMessage: '', successMessage: '' }, reset()),
+      register(
+        { loading: true, registrationSuccess: true, registrationFailure: true, errorMessage: '', successMessage: '' },
+        reset() as any,
+      ),
     ).toEqual({
       ...initialState,
     });
@@ -75,7 +78,7 @@ describe('Creating account tests', () => {
     const extra = {};
     beforeEach(() => {
       store = configureStore({
-        reducer: (state = [], action) => [...state, action],
+        reducer: (state = [], action: any) => [...state, action],
       });
       axios.post = sinon.stub().returns(Promise.resolve(resolvedObject));
     });
@@ -91,7 +94,7 @@ describe('Creating account tests', () => {
       expect(result.payload).toBe(resolvedObject);
     });
     it('dispatches RESET actions', async () => {
-      await store.dispatch(reset());
+      await store.dispatch(reset() as any);
       expect(store.getState()).toEqual([expect.any(Object), expect.objectContaining(reset())]);
     });
   });

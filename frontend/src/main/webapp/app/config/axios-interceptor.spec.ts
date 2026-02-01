@@ -17,7 +17,7 @@ describe('Axios Interceptor', () => {
     it('onResponseSuccess is called on fulfilled response', () => {
       expect((client.interceptors.response as any).handlers[0].fulfilled({ data: 'foo' })).toEqual({ data: 'foo' });
     });
-    it('onResponseError is called on rejected response', () => {
+    it('onResponseError is called on rejected response', async () => {
       const rejectError = {
         response: {
           statusText: 'NotFound',
@@ -25,7 +25,7 @@ describe('Axios Interceptor', () => {
           data: { message: 'Page not found' },
         },
       };
-      expect((client.interceptors.response as any).handlers[0].rejected(rejectError)).rejects.toEqual(rejectError);
+      await expect((client.interceptors.response as any).handlers[0].rejected(rejectError)).rejects.toEqual(rejectError);
       expect(onUnauthenticated.calledOnce).toBe(true);
     });
   });

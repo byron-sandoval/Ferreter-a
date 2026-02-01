@@ -46,19 +46,28 @@ module.exports = async options =>
     },
     devServer: {
       hot: true,
+      host: '127.0.0.1',
       static: {
         directory: './target/classes/static/',
       },
       port: 9060,
       proxy: [
         {
-          context: ['/api', '/services', '/management', '/v3/api-docs', '/h2-console'],
-          target: `http${options.tls ? 's' : ''}://localhost:8080`,
+          context: ['/api', '/services', '/management', '/v3/api-docs', '/h2-console', '/login', '/oauth2'],
+          target: `http${options.tls ? 's' : ''}://127.0.0.1:8081`,
           secure: false,
           changeOrigin: options.tls,
         },
       ],
-      historyApiFallback: true,
+      historyApiFallback: {
+        index: '/index.html',
+        disableDotRule: true,
+        htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
+        rewrites: [
+          { from: /^\/login/, to: context => context.parsedUrl.pathname },
+          { from: /^\/oauth2/, to: context => context.parsedUrl.pathname },
+        ],
+      },
     },
     stats: process.env.JHI_DISABLE_WEBPACK_LOGS ? 'none' : options.stats,
     plugins: [
@@ -70,10 +79,10 @@ module.exports = async options =>
       new BrowserSyncPlugin(
         {
           https: options.tls,
-          host: 'localhost',
+          host: '127.0.0.1',
           port: 9000,
           proxy: {
-            target: `http${options.tls ? 's' : ''}://localhost:${options.watch ? '8080' : '9060'}`,
+            target: `http${options.tls ? 's' : ''}://127.0.0.1:${options.watch ? '8081' : '9060'}`,
             ws: true,
             proxyOptions: {
               changeOrigin: false, //pass the Host header to the backend unchanged https://github.com/Browsersync/browser-sync/issues/430

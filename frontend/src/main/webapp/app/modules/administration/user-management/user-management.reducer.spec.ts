@@ -163,7 +163,7 @@ describe('User management reducer tests', () => {
         errorMessage: null,
         users: [],
         authorities: [] as any[],
-        user: defaultValue,
+        user: defaultValue as any,
         updating: false,
         updateSuccess: false,
         totalItems: 0,
@@ -172,7 +172,7 @@ describe('User management reducer tests', () => {
         ...initialState,
         loading: true,
       };
-      expect(userManagement(initialStateNew, reset)).toEqual(initialState);
+      expect(userManagement(initialStateNew, reset as any)).toEqual(initialState);
     });
   });
 
@@ -185,7 +185,7 @@ describe('User management reducer tests', () => {
     const extra = {};
     beforeEach(() => {
       store = configureStore({
-        reducer: (state = [], action) => [...state, action],
+        reducer: (state = [], action: any) => [...state, action],
       });
       axios.get = sinon.stub().returns(Promise.resolve(resolvedObject));
       axios.put = sinon.stub().returns(Promise.resolve(resolvedObject));
@@ -278,7 +278,7 @@ describe('User management reducer tests', () => {
     });
 
     it('dispatches RESET actions', async () => {
-      await store.dispatch(reset());
+      await store.dispatch(reset() as any);
       expect(store.getState()).toEqual([expect.any(Object), expect.objectContaining(reset())]);
     });
   });

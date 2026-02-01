@@ -27,12 +27,26 @@ const Admin = Loadable({
   loader: () => import(/* webpackChunkName: "administration" */ 'app/modules/administration'),
   loading: () => loading,
 });
+
+const AdminPages = Loadable({
+  loader: () => import(/* webpackChunkName: "admin-pages" */ 'app/pages/admin/routes'),
+  loading: () => loading,
+});
+
+const VendedorPages = Loadable({
+  loader: () => import(/* webpackChunkName: "vendedor-pages" */ 'app/pages/vendedor/routes'),
+  loading: () => loading,
+});
+
+const BodegueroPages = Loadable({
+  loader: () => import(/* webpackChunkName: "bodeguero-pages" */ 'app/pages/bodeguero/routes'),
+  loading: () => loading,
+});
 const AppRoutes = () => {
   return (
     <div className="view-routes">
       <ErrorBoundaryRoutes>
         <Route index element={<Home />} />
-        <Route path="login" element={<Login />} />
         <Route path="logout" element={<Logout />} />
         <Route path="account">
           <Route
@@ -52,6 +66,30 @@ const AppRoutes = () => {
         </Route>
         <Route
           path="admin/*"
+          element={
+            <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+              <AdminPages />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="vendedor/*"
+          element={
+            <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.VENDEDOR]}>
+              <VendedorPages />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="bodeguero/*"
+          element={
+            <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.BODEGUERO]}>
+              <BodegueroPages />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="administration/*"
           element={
             <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
               <Admin />
