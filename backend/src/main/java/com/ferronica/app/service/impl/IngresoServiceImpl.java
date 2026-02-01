@@ -73,7 +73,7 @@ public class IngresoServiceImpl implements IngresoService {
     @Transactional(readOnly = true)
     public Optional<IngresoDTO> findOne(Long id) {
         LOG.debug("Request to get Ingreso : {}", id);
-        return ingresoRepository.findById(id).map(ingresoMapper::toDto);
+        return ingresoRepository.findOneWithEagerRelationships(id).map(ingresoMapper::toDto);
     }
 
     @Override
