@@ -62,6 +62,7 @@
     "react-toastify": "11.0.5",
     "react-transition-group": "4.4.5",
     "reactstrap": "9.2.3",
+    "recharts": "^3.7.0",
     "redux": "5.0.1",
     "sonar-scanner": "3.1.0",
     "tslib": "2.8.1",
