@@ -2,9 +2,11 @@ package com.ferronica.app.service.impl;
 
 import com.ferronica.app.domain.Ingreso;
 import com.ferronica.app.repository.IngresoRepository;
+import com.ferronica.app.repository.ArticuloRepository;
 import com.ferronica.app.service.IngresoService;
 import com.ferronica.app.service.dto.IngresoDTO;
 import com.ferronica.app.service.mapper.IngresoMapper;
+import java.math.BigDecimal;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +26,13 @@ public class IngresoServiceImpl implements IngresoService {
 
     private final IngresoMapper ingresoMapper;
 
-    public IngresoServiceImpl(IngresoRepository ingresoRepository, IngresoMapper ingresoMapper) {
+    private final ArticuloRepository articuloRepository;
+
+    public IngresoServiceImpl(IngresoRepository ingresoRepository, IngresoMapper ingresoMapper,
+            ArticuloRepository articuloRepository) {
         this.ingresoRepository = ingresoRepository;
         this.ingresoMapper = ingresoMapper;
+        this.articuloRepository = articuloRepository;
     }
 
     @Override
@@ -43,6 +49,25 @@ public class IngresoServiceImpl implements IngresoService {
         }
 
         ingreso = ingresoRepository.save(ingreso);
+
+        // Actualizar stock de productos
+        if (ingreso.getDetalles() != null && !ingreso.getDetalles().isEmpty()) {
+            ingreso.getDetalles().forEach(detalle -> {
+                if (detalle.getArticulo() != null && detalle.getArticulo().getId() != null) {
+                    articuloRepository.findById(detalle.getArticulo().getId()).ifPresent(articulo -> {
+                        BigDecimal existenciaActual = articulo.getExistencia() != null ? articulo.getExistencia()
+                                : BigDecimal.ZERO;
+                        BigDecimal cantidadIngreso = detalle.getCantidad() != null ? detalle.getCantidad()
+                                : BigDecimal.ZERO;
+                        articulo.setExistencia(existenciaActual.add(cantidadIngreso));
+                        articuloRepository.save(articulo);
+                        LOG.debug("Stock actualizado para Articulo ID {}: {} + {} = {}",
+                                articulo.getId(), existenciaActual, cantidadIngreso, articulo.getExistencia());
+                    });
+                }
+            });
+        }
+
         return ingresoMapper.toDto(ingreso);
     }
 
