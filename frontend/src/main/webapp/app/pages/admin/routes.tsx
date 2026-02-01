@@ -5,6 +5,7 @@ import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
 const AdminDashboard = React.lazy(() => import('./AdminDashboard'));
 const ArticuloList = React.lazy(() => import('./ArticuloList'));
 const ArticuloUpdate = React.lazy(() => import('./ArticuloUpdate'));
+const ProveedorList = React.lazy(() => import('./ProveedorList'));
 const CategoriaList = React.lazy(() => import('./categorias/CategoriaList'));
 const CategoriaUpdate = React.lazy(() => import('./categorias/CategoriaUpdate'));
 
@@ -57,6 +58,15 @@ const AdminRoutes = () => (
         }
       />
     </Route>
+
+    <Route
+      path="proveedores"
+      element={
+        <Loadable>
+          <ProveedorList />
+        </Loadable>
+      }
+    />
 
     <Route path="categorias">
       <Route
