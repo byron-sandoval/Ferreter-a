@@ -5,6 +5,7 @@ export interface IProveedor {
   telefono?: string | null;
   email?: string | null;
   activo?: boolean | null;
+  ruc?: string | null;
 }
 
 export const defaultProveedor: Readonly<IProveedor> = {
