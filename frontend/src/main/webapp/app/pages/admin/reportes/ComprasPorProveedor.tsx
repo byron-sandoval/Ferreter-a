@@ -142,6 +142,8 @@ export const ComprasPorProveedor = () => {
             <div className="mb-3">
               <strong>Proveedor:</strong> {ingresoDetalle?.proveedor?.nombre}
               <br />
+              <strong>RUC:</strong> {ingresoDetalle?.proveedor?.ruc || 'N/A'}
+              <br />
               <strong>Fecha:</strong> {dayjs(ingresoDetalle?.fecha).format('DD/MM/YYYY')}
             </div>
             <Table hover responsive borderless size="sm">
