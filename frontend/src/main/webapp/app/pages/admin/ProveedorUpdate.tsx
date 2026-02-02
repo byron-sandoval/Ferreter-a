@@ -94,6 +94,20 @@ export const ProveedorUpdate = () => {
                   />
                 </FormGroup>
 
+                <FormGroup>
+                  <Label for="ruc" className="fw-bold">
+                    RUC / Identificación
+                  </Label>
+                  <Input
+                    type="text"
+                    id="ruc"
+                    name="ruc"
+                    placeholder="Ej: J0310000000000"
+                    value={proveedor.ruc || ''}
+                    onChange={handleChange}
+                  />
+                </FormGroup>
+
                 <Row>
                   <Col md="6">
                     <FormGroup>

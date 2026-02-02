@@ -67,6 +67,15 @@ public class Venta implements Serializable {
     @Column(name = "anulada")
     private Boolean anulada;
 
+    @Column(name = "descuento", precision = 21, scale = 2)
+    private BigDecimal descuento;
+
+    @Column(name = "importe_recibido", precision = 21, scale = 2)
+    private BigDecimal importeRecibido;
+
+    @Column(name = "cambio", precision = 21, scale = 2)
+    private BigDecimal cambio;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties(value = { "articulo", "venta" }, allowSetters = true)
     private Set<DetalleVenta> detalles = new HashSet<>();
@@ -241,6 +250,45 @@ public class Venta implements Serializable {
         this.anulada = anulada;
     }
 
+    public BigDecimal getDescuento() {
+        return this.descuento;
+    }
+
+    public Venta descuento(BigDecimal descuento) {
+        this.setDescuento(descuento);
+        return this;
+    }
+
+    public void setDescuento(BigDecimal descuento) {
+        this.descuento = descuento;
+    }
+
+    public BigDecimal getImporteRecibido() {
+        return this.importeRecibido;
+    }
+
+    public Venta importeRecibido(BigDecimal importeRecibido) {
+        this.setImporteRecibido(importeRecibido);
+        return this;
+    }
+
+    public void setImporteRecibido(BigDecimal importeRecibido) {
+        this.importeRecibido = importeRecibido;
+    }
+
+    public BigDecimal getCambio() {
+        return this.cambio;
+    }
+
+    public Venta cambio(BigDecimal cambio) {
+        this.setCambio(cambio);
+        return this;
+    }
+
+    public void setCambio(BigDecimal cambio) {
+        this.cambio = cambio;
+    }
+
     public Set<DetalleVenta> getDetalles() {
         return this.detalles;
     }
@@ -361,6 +409,9 @@ public class Venta implements Serializable {
                 ", esContado='" + getEsContado() + "'" +
                 ", tipoCambioVenta=" + getTipoCambioVenta() +
                 ", anulada='" + getAnulada() + "'" +
+                ", descuento=" + getDescuento() +
+                ", importeRecibido=" + getImporteRecibido() +
+                ", cambio=" + getCambio() +
                 "}";
     }
 }

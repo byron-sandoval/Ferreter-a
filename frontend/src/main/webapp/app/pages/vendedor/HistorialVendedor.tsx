@@ -15,7 +15,8 @@ import {
   Label,
 } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHistory, faUndo, faEye, faSearch, faCalendarAlt, faFileInvoiceDollar } from '@fortawesome/free-solid-svg-icons';
+import { faHistory, faUndo, faEye, faSearch, faCalendarAlt, faFileInvoiceDollar, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { useReactToPrint } from 'react-to-print';
 import VentaService from 'app/services/venta.service';
 import DevolucionService from 'app/services/devolucion.service';
 import { IVenta, IDevolucion } from 'app/shared/model';
@@ -31,7 +32,11 @@ export const HistorialVendedor = () => {
   const [showDetalleModal, setShowDetalleModal] = useState(false);
   const [ventaSeleccionada, setVentaSeleccionada] = useState<IVenta | null>(null);
   const [motivo, setMotivo] = useState('');
-
+  // Impresión
+  const componentRef = React.useRef<any>(null);
+  const handlePrint = useReactToPrint({
+    contentRef: componentRef,
+  });
   useEffect(() => {
     loadVentas();
   }, []);
@@ -273,14 +278,86 @@ export const HistorialVendedor = () => {
               <h5 className="fw-bold m-0">Total:</h5>
               <h5 className="fw-bold text-primary m-0">C$ {ventaSeleccionada?.total?.toFixed(2)}</h5>
             </div>
+            {ventaSeleccionada?.importeRecibido != null && (
+              <div className="d-flex justify-content-between mt-2 pt-2 border-top border-light">
+                <span className="text-muted">Efectivo:</span>
+                <span className="fw-bold">C$ {ventaSeleccionada?.importeRecibido?.toFixed(2)}</span>
+              </div>
+            )}
+            {ventaSeleccionada?.cambio != null && (
+              <div className="d-flex justify-content-between">
+                <span className="text-muted">Cambio:</span>
+                <span className="fw-bold text-success">C$ {ventaSeleccionada?.cambio?.toFixed(2)}</span>
+              </div>
+            )}
+          </div>
+
+          {/* TICKET OCULTO PARA IMPRESIÓN */}
+          <div style={{ display: 'none' }}>
+            <div ref={componentRef} style={{ padding: '20px', fontFamily: 'monospace', width: '300px' }}>
+              <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+                <h2 style={{ margin: '0' }}>FERRONICA</h2>
+                <p style={{ margin: '0', fontSize: '12px' }}>Ferretería & Suministros</p>
+                <p style={{ margin: '0', fontSize: '10px' }}>RUC: 0000000000000</p>
+              </div>
+              <div style={{ borderBottom: '1px dashed #000', marginBottom: '10px' }}></div>
+              <div style={{ fontSize: '12px' }}>
+                <p style={{ margin: '2px 0' }}>
+                  <strong>No. Factura:</strong> {ventaSeleccionada?.noFactura}
+                </p>
+                <p style={{ margin: '2px 0' }}>
+                  <strong>Fecha:</strong> {dayjs(ventaSeleccionada?.fecha).format('DD/MM/YYYY HH:mm')}
+                </p>
+                <p style={{ margin: '2px 0' }}>
+                  <strong>Cliente:</strong> {ventaSeleccionada?.cliente?.nombre || 'Consumidor Final'}
+                </p>
+                <p style={{ margin: '2px 0' }}>
+                  <strong>Vendedor:</strong> {ventaSeleccionada?.vendedor?.nombre || 'Cajero'}
+                </p>
+              </div>
+              <div style={{ borderBottom: '1px dashed #000', margin: '10px 0' }}></div>
+              <table style={{ width: '100%', fontSize: '12px' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #000' }}>
+                    <th style={{ textAlign: 'left' }}>Item</th>
+                    <th style={{ textAlign: 'center' }}>Cant</th>
+                    <th style={{ textAlign: 'right' }}>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ventaSeleccionada?.detalles?.map((det, i) => (
+                    <tr key={i}>
+                      <td>{det.articulo?.nombre}</td>
+                      <td style={{ textAlign: 'center' }}>{det.cantidad}</td>
+                      <td style={{ textAlign: 'right' }}>C$ {det.monto?.toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div style={{ borderBottom: '1px dashed #000', margin: '10px 0' }}></div>
+              <div style={{ fontSize: '12px', textAlign: 'right' }}>
+                <p style={{ margin: '2px 0' }}>Subtotal: C$ {ventaSeleccionada?.subtotal?.toFixed(2)}</p>
+                <p style={{ margin: '2px 0' }}>IVA (15%): C$ {ventaSeleccionada?.iva?.toFixed(2)}</p>
+                <h3 style={{ margin: '5px 0' }}>TOTAL: C$ {ventaSeleccionada?.total?.toFixed(2)}</h3>
+                {ventaSeleccionada?.importeRecibido != null && (
+                  <p style={{ margin: '2px 0' }}>Efectivo: C$ {ventaSeleccionada?.importeRecibido?.toFixed(2)}</p>
+                )}
+                {ventaSeleccionada?.cambio != null && <p style={{ margin: '2px 0' }}>Cambio: C$ {ventaSeleccionada?.cambio?.toFixed(2)}</p>}
+              </div>
+              <div style={{ borderBottom: '1px dashed #000', margin: '10px 0' }}></div>
+              <div style={{ textAlign: 'center', fontSize: '10px' }}>
+                <p>¡Gracias por su compra!</p>
+                <p>COPIA DE REIMPRESIÓN</p>
+              </div>
+            </div>
           </div>
         </ModalBody>
         <ModalFooter className="border-0">
           <Button color="secondary" onClick={() => setShowDetalleModal(false)}>
             Cerrar
           </Button>
-          <Button color="primary">
-            <FontAwesomeIcon icon={faEye} className="me-2" /> Reimprimir
+          <Button color="primary" onClick={() => handlePrint()}>
+            <FontAwesomeIcon icon={faPrint} className="me-2" /> Reimprimir
           </Button>
         </ModalFooter>
       </Modal>

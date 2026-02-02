@@ -16,6 +16,9 @@ public class ProveedorDTO implements Serializable {
     @Size(max = 100)
     private String nombre;
 
+    @Size(max = 20)
+    private String ruc;
+
     @Size(max = 250)
     private String direccion;
 
@@ -41,6 +44,14 @@ public class ProveedorDTO implements Serializable {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getRuc() {
+        return ruc;
+    }
+
+    public void setRuc(String ruc) {
+        this.ruc = ruc;
     }
 
     public String getDireccion() {
@@ -100,12 +111,13 @@ public class ProveedorDTO implements Serializable {
     @Override
     public String toString() {
         return "ProveedorDTO{" +
-            "id=" + getId() +
-            ", nombre='" + getNombre() + "'" +
-            ", direccion='" + getDireccion() + "'" +
-            ", telefono='" + getTelefono() + "'" +
-            ", email='" + getEmail() + "'" +
-            ", activo='" + getActivo() + "'" +
-            "}";
+                "id=" + getId() +
+                ", nombre='" + getNombre() + "'" +
+                ", ruc='" + getRuc() + "'" +
+                ", direccion='" + getDireccion() + "'" +
+                ", telefono='" + getTelefono() + "'" +
+                ", email='" + getEmail() + "'" +
+                ", activo='" + getActivo() + "'" +
+                "}";
     }
 }

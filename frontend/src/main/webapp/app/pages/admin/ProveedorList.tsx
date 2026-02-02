@@ -60,6 +60,7 @@ export const ProveedorList = () => {
           <thead className="text-center text-uppercase small" style={headerStyle}>
             <tr>
               <th className="py-2">Nombre</th>
+              <th className="py-2">RUC / ID</th>
               <th className="py-2">Dirección</th>
               <th className="py-2">Teléfono</th>
               <th className="py-2">Email</th>
@@ -72,6 +73,7 @@ export const ProveedorList = () => {
               filtrados.map(p => (
                 <tr key={p.id} className="text-center align-middle">
                   <td className="text-start fw-bold">{p.nombre}</td>
+                  <td className="small text-muted">{p.ruc || '-'}</td>
                   <td className="text-start small">{p.direccion || '-'}</td>
                   <td>{p.telefono || '-'}</td>
                   <td>{p.email || '-'}</td>
@@ -92,7 +94,7 @@ export const ProveedorList = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="text-center py-5 text-muted">
+                <td colSpan={7} className="text-center py-5 text-muted">
                   {loading ? 'Cargando proveedores...' : 'No se encontraron proveedores'}
                 </td>
               </tr>

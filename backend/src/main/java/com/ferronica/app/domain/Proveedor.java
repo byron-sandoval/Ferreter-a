@@ -40,6 +40,10 @@ public class Proveedor implements Serializable {
     @Column(name = "activo")
     private Boolean activo;
 
+    @Size(max = 20)
+    @Column(name = "ruc", length = 20)
+    private String ruc;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -120,7 +124,21 @@ public class Proveedor implements Serializable {
         this.activo = activo;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+    public String getRuc() {
+        return this.ruc;
+    }
+
+    public Proveedor ruc(String ruc) {
+        this.setRuc(ruc);
+        return this;
+    }
+
+    public void setRuc(String ruc) {
+        this.ruc = ruc;
+    }
+
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and
+    // setters here
 
     @Override
     public boolean equals(Object o) {
@@ -135,7 +153,8 @@ public class Proveedor implements Serializable {
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        // see
+        // https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 
@@ -143,12 +162,13 @@ public class Proveedor implements Serializable {
     @Override
     public String toString() {
         return "Proveedor{" +
-            "id=" + getId() +
-            ", nombre='" + getNombre() + "'" +
-            ", direccion='" + getDireccion() + "'" +
-            ", telefono='" + getTelefono() + "'" +
-            ", email='" + getEmail() + "'" +
-            ", activo='" + getActivo() + "'" +
-            "}";
+                "id=" + getId() +
+                ", nombre='" + getNombre() + "'" +
+                ", ruc='" + getRuc() + "'" +
+                ", direccion='" + getDireccion() + "'" +
+                ", telefono='" + getTelefono() + "'" +
+                ", email='" + getEmail() + "'" +
+                ", activo='" + getActivo() + "'" +
+                "}";
     }
 }

@@ -43,6 +43,12 @@ public class VentaDTO implements Serializable {
 
     private Boolean anulada;
 
+    private BigDecimal descuento;
+
+    private BigDecimal importeRecibido;
+
+    private BigDecimal cambio;
+
     private ClienteDTO cliente;
 
     private VendedorDTO vendedor;
@@ -149,6 +155,30 @@ public class VentaDTO implements Serializable {
         this.anulada = anulada;
     }
 
+    public BigDecimal getDescuento() {
+        return descuento;
+    }
+
+    public void setDescuento(BigDecimal descuento) {
+        this.descuento = descuento;
+    }
+
+    public BigDecimal getImporteRecibido() {
+        return importeRecibido;
+    }
+
+    public void setImporteRecibido(BigDecimal importeRecibido) {
+        this.importeRecibido = importeRecibido;
+    }
+
+    public BigDecimal getCambio() {
+        return cambio;
+    }
+
+    public void setCambio(BigDecimal cambio) {
+        this.cambio = cambio;
+    }
+
     public ClienteDTO getCliente() {
         return cliente;
     }
@@ -226,6 +256,9 @@ public class VentaDTO implements Serializable {
                 ", esContado='" + getEsContado() + "'" +
                 ", tipoCambioVenta=" + getTipoCambioVenta() +
                 ", anulada='" + getAnulada() + "'" +
+                ", descuento=" + getDescuento() +
+                ", importeRecibido=" + getImporteRecibido() +
+                ", cambio=" + getCambio() +
                 ", cliente=" + getCliente() +
                 ", vendedor=" + getVendedor() +
                 ", moneda=" + getMoneda() +
