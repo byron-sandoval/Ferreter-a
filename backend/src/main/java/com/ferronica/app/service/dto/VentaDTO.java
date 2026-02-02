@@ -5,6 +5,7 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -42,6 +43,12 @@ public class VentaDTO implements Serializable {
 
     private Boolean anulada;
 
+    private BigDecimal descuento;
+
+    private BigDecimal importeRecibido;
+
+    private BigDecimal cambio;
+
     private ClienteDTO cliente;
 
     private VendedorDTO vendedor;
@@ -49,6 +56,8 @@ public class VentaDTO implements Serializable {
     private MonedaDTO moneda;
 
     private NumeracionFacturaDTO numeracion;
+
+    private List<DetalleVentaDTO> detalles;
 
     public Long getId() {
         return id;
@@ -146,6 +155,30 @@ public class VentaDTO implements Serializable {
         this.anulada = anulada;
     }
 
+    public BigDecimal getDescuento() {
+        return descuento;
+    }
+
+    public void setDescuento(BigDecimal descuento) {
+        this.descuento = descuento;
+    }
+
+    public BigDecimal getImporteRecibido() {
+        return importeRecibido;
+    }
+
+    public void setImporteRecibido(BigDecimal importeRecibido) {
+        this.importeRecibido = importeRecibido;
+    }
+
+    public BigDecimal getCambio() {
+        return cambio;
+    }
+
+    public void setCambio(BigDecimal cambio) {
+        this.cambio = cambio;
+    }
+
     public ClienteDTO getCliente() {
         return cliente;
     }
@@ -176,6 +209,14 @@ public class VentaDTO implements Serializable {
 
     public void setNumeracion(NumeracionFacturaDTO numeracion) {
         this.numeracion = numeracion;
+    }
+
+    public List<DetalleVentaDTO> getDetalles() {
+        return detalles;
+    }
+
+    public void setDetalles(List<DetalleVentaDTO> detalles) {
+        this.detalles = detalles;
     }
 
     @Override
@@ -215,10 +256,14 @@ public class VentaDTO implements Serializable {
                 ", esContado='" + getEsContado() + "'" +
                 ", tipoCambioVenta=" + getTipoCambioVenta() +
                 ", anulada='" + getAnulada() + "'" +
+                ", descuento=" + getDescuento() +
+                ", importeRecibido=" + getImporteRecibido() +
+                ", cambio=" + getCambio() +
                 ", cliente=" + getCliente() +
                 ", vendedor=" + getVendedor() +
                 ", moneda=" + getMoneda() +
                 ", numeracion=" + getNumeracion() +
+                ", detalles=" + getDetalles() +
                 "}";
     }
 }

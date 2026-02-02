@@ -44,7 +44,7 @@ public class Ingreso implements Serializable {
     @Column(name = "activo")
     private Boolean activo;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "ingreso")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "ingreso", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties(value = { "articulo", "ingreso" }, allowSetters = true)
     private Set<DetalleIngreso> detalles = new HashSet<>();
 
@@ -191,7 +191,8 @@ public class Ingreso implements Serializable {
         return this;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and
+    // setters here
 
     @Override
     public boolean equals(Object o) {
@@ -206,7 +207,8 @@ public class Ingreso implements Serializable {
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        // see
+        // https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 
@@ -214,12 +216,12 @@ public class Ingreso implements Serializable {
     @Override
     public String toString() {
         return "Ingreso{" +
-            "id=" + getId() +
-            ", fecha='" + getFecha() + "'" +
-            ", noDocumento='" + getNoDocumento() + "'" +
-            ", total=" + getTotal() +
-            ", observaciones='" + getObservaciones() + "'" +
-            ", activo='" + getActivo() + "'" +
-            "}";
+                "id=" + getId() +
+                ", fecha='" + getFecha() + "'" +
+                ", noDocumento='" + getNoDocumento() + "'" +
+                ", total=" + getTotal() +
+                ", observaciones='" + getObservaciones() + "'" +
+                ", activo='" + getActivo() + "'" +
+                "}";
     }
 }

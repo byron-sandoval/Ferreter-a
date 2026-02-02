@@ -24,6 +24,9 @@ export interface IVenta {
   esContado?: boolean;
   tipoCambioVenta?: number | null;
   anulada?: boolean | null;
+  descuento?: number | null;
+  importeRecibido?: number | null;
+  cambio?: number | null;
   detalles?: IDetalleVenta[] | null;
   cliente?: ICliente | null;
   vendedor?: IVendedor | null;

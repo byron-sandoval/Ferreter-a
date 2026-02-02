@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Table, Button, Input, Card, Badge } from 'reactstrap';
 import { IProveedor } from 'app/shared/model/proveedor.model';
 import ProveedorService from 'app/services/proveedor.service';
@@ -6,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSync, faSearch, faPencilAlt, faTrash, faTruck } from '@fortawesome/free-solid-svg-icons';
 
 export const ProveedorList = () => {
+  const navigate = useNavigate();
   const [proveedores, setProveedores] = useState<IProveedor[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
@@ -47,7 +49,7 @@ export const ProveedorList = () => {
             className="form-control-sm"
             style={{ width: '250px' }}
           />
-          <Button color="primary" size="sm" onClick={() => {}}>
+          <Button color="primary" size="sm" onClick={() => navigate('/admin/proveedores/new')}>
             <FontAwesomeIcon icon={faPlus} className="me-2" /> Nuevo Proveedor
           </Button>
         </div>
@@ -58,6 +60,7 @@ export const ProveedorList = () => {
           <thead className="text-center text-uppercase small" style={headerStyle}>
             <tr>
               <th className="py-2">Nombre</th>
+              <th className="py-2">RUC / ID</th>
               <th className="py-2">Dirección</th>
               <th className="py-2">Teléfono</th>
               <th className="py-2">Email</th>
@@ -70,6 +73,7 @@ export const ProveedorList = () => {
               filtrados.map(p => (
                 <tr key={p.id} className="text-center align-middle">
                   <td className="text-start fw-bold">{p.nombre}</td>
+                  <td className="small text-muted">{p.ruc || '-'}</td>
                   <td className="text-start small">{p.direccion || '-'}</td>
                   <td>{p.telefono || '-'}</td>
                   <td>{p.email || '-'}</td>
@@ -90,7 +94,7 @@ export const ProveedorList = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="text-center py-5 text-muted">
+                <td colSpan={7} className="text-center py-5 text-muted">
                   {loading ? 'Cargando proveedores...' : 'No se encontraron proveedores'}
                 </td>
               </tr>

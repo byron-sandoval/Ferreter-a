@@ -20,7 +20,7 @@ import {
   faAddressBook,
   faTruck,
   faFileInvoice,
-  faSearch,
+  faChartBar,
 } from '@fortawesome/free-solid-svg-icons';
 
 export const TopNavbar = () => {
@@ -101,12 +101,14 @@ export const TopNavbar = () => {
         {/* ROW 2: Navigation Menu */}
         <div className="nav-links-bar w-100 px-3 py-1" style={{ backgroundColor: 'rgba(0,0,0,0.2)' }}>
           <Nav navbar className="flex-row flex-wrap align-items-center no-scrollbar overflow-auto">
+            {/* 1. Inicio */}
             <NavItem className="nav-link-item">
               <NavLink tag={Link} to="/" style={navLinkStyle}>
                 <FontAwesomeIcon icon={faHome} size="sm" /> Inicio
               </NavLink>
             </NavItem>
 
+            {/* 2. Dashboard */}
             {isAdmin && (
               <NavItem className="nav-link-item">
                 <NavLink tag={Link} to="/admin" style={navLinkStyle}>
@@ -115,21 +117,70 @@ export const TopNavbar = () => {
               </NavItem>
             )}
 
-            {(isAdmin || isBodeguero) && (
-              <>
-                <NavItem className="nav-link-item">
-                  <NavLink tag={Link} to="/admin/articulos" style={navLinkStyle}>
-                    <FontAwesomeIcon icon={faBoxes} size="sm" /> Productos
-                  </NavLink>
-                </NavItem>
-                <NavItem className="nav-link-item">
-                  <NavLink tag={Link} to="/bodeguero/ingresos" style={navLinkStyle}>
-                    <FontAwesomeIcon icon={faFileInvoice} size="sm" /> Compras
-                  </NavLink>
-                </NavItem>
-              </>
+            {/* 3. Facturar */}
+            {(isAdmin || isVendedor) && (
+              <NavItem className="nav-link-item">
+                <NavLink tag={Link} to="/vendedor/nueva-venta" style={navLinkStyle}>
+                  <FontAwesomeIcon icon={faCashRegister} size="sm" /> Facturar
+                </NavLink>
+              </NavItem>
             )}
 
+            {/* 4. Ventas */}
+            {(isAdmin || isVendedor) && (
+              <NavItem className="nav-link-item">
+                <NavLink tag={Link} to="/vendedor/historial-ventas" style={navLinkStyle}>
+                  <FontAwesomeIcon icon={faHistory} size="sm" /> Ventas
+                </NavLink>
+              </NavItem>
+            )}
+
+            {/* 5. Compras */}
+            {(isAdmin || isBodeguero) && (
+              <NavItem className="nav-link-item">
+                <NavLink tag={Link} to="/bodeguero/ingresos" style={navLinkStyle}>
+                  <FontAwesomeIcon icon={faFileInvoice} size="sm" /> Compras
+                </NavLink>
+              </NavItem>
+            )}
+
+            {/* 6. Inventario */}
+            {(isAdmin || isVendedor || isBodeguero) && (
+              <NavItem className="nav-link-item">
+                <NavLink tag={Link} to="/vendedor/consulta-inventario" style={navLinkStyle}>
+                  <FontAwesomeIcon icon={faWarehouse} size="sm" /> Inventario
+                </NavLink>
+              </NavItem>
+            )}
+
+            {/* 7. Productos */}
+            {(isAdmin || isBodeguero) && (
+              <NavItem className="nav-link-item">
+                <NavLink tag={Link} to="/admin/articulos" style={navLinkStyle}>
+                  <FontAwesomeIcon icon={faBoxes} size="sm" /> Productos
+                </NavLink>
+              </NavItem>
+            )}
+
+            {/* 8. Categorías */}
+            {isAdmin && (
+              <NavItem className="nav-link-item">
+                <NavLink tag={Link} to="/admin/categorias" style={navLinkStyle}>
+                  <FontAwesomeIcon icon={faTags} size="sm" /> Categorías
+                </NavLink>
+              </NavItem>
+            )}
+
+            {/* 9. Clientes */}
+            {(isAdmin || isVendedor) && (
+              <NavItem className="nav-link-item">
+                <NavLink tag={Link} to="/vendedor/clientes" style={navLinkStyle}>
+                  <FontAwesomeIcon icon={faUserFriends} size="sm" /> Clientes
+                </NavLink>
+              </NavItem>
+            )}
+
+            {/* 10. Proveedores */}
             {isAdmin && (
               <NavItem className="nav-link-item">
                 <NavLink tag={Link} to="/admin/proveedores" style={navLinkStyle}>
@@ -138,35 +189,11 @@ export const TopNavbar = () => {
               </NavItem>
             )}
 
-            {(isAdmin || isVendedor) && (
-              <>
-                <NavItem className="nav-link-item">
-                  <NavLink tag={Link} to="/vendedor/nueva-venta" style={navLinkStyle}>
-                    <FontAwesomeIcon icon={faCashRegister} size="sm" /> Facturar
-                  </NavLink>
-                </NavItem>
-                <NavItem className="nav-link-item">
-                  <NavLink tag={Link} to="/vendedor/consulta-inventario" style={navLinkStyle}>
-                    <FontAwesomeIcon icon={faBoxes} size="sm" /> Inventario
-                  </NavLink>
-                </NavItem>
-                <NavItem className="nav-link-item">
-                  <NavLink tag={Link} to="/vendedor/historial-ventas" style={navLinkStyle}>
-                    <FontAwesomeIcon icon={faHistory} size="sm" /> Ventas
-                  </NavLink>
-                </NavItem>
-                <NavItem className="nav-link-item">
-                  <NavLink tag={Link} to="/vendedor/clientes" style={navLinkStyle}>
-                    <FontAwesomeIcon icon={faUserFriends} size="sm" /> Clientes
-                  </NavLink>
-                </NavItem>
-              </>
-            )}
-
+            {/* 11. Reportes */}
             {isAdmin && (
               <NavItem className="nav-link-item">
-                <NavLink tag={Link} to="/admin/categorias" style={navLinkStyle}>
-                  <FontAwesomeIcon icon={faTags} size="sm" /> Categorías
+                <NavLink tag={Link} to="/admin/reportes" style={navLinkStyle}>
+                  <FontAwesomeIcon icon={faChartBar} size="sm" /> Reportes
                 </NavLink>
               </NavItem>
             )}
