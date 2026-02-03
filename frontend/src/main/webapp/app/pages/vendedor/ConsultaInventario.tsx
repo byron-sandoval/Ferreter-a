@@ -35,25 +35,25 @@ export const ConsultaInventario = () => {
     const matchText =
       (a.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (a.codigo || '').toLowerCase().includes(filter.toLowerCase());
     const matchCat = catFilter === '' || a.categoria?.id === Number(catFilter);
-    return matchText && matchCat;
+    return a.activo && matchText && matchCat;
   });
 
   return (
-    <div className="animate__animated animate__fadeIn p-2">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h3 className="fw-bold text-secondary mb-0">
+    <div className="animate__animated animate__fadeIn p-1">
+      <div className="d-flex justify-content-between align-items-center mb-2">
+        <h5 className="fw-bold text-secondary mb-0">
           <FontAwesomeIcon icon={faBox} className="me-2 text-primary" /> Consulta Rápida
-        </h3>
-        <Button color="light" size="sm" onClick={loadData} disabled={loading}>
-          <FontAwesomeIcon icon={faSync} spin={loading} className="me-2" /> Actualizar
+        </h5>
+        <Button color="light" size="sm" onClick={loadData} disabled={loading} style={{ fontSize: '0.75rem' }}>
+          <FontAwesomeIcon icon={faSync} spin={loading} className="me-1" /> Actualizar
         </Button>
       </div>
 
-      <Card className="shadow-sm border-0 mb-4 bg-light">
-        <CardBody className="p-3">
-          <Row className="g-3">
+      <Card className="shadow-sm border-0 mb-2 bg-light">
+        <CardBody className="p-2">
+          <Row className="g-2">
             <Col md="8">
-              <div className="input-group">
+              <div className="input-group input-group-sm">
                 <span className="input-group-text bg-white border-end-0">
                   <FontAwesomeIcon icon={faSearch} className="text-muted" />
                 </span>
@@ -62,11 +62,12 @@ export const ConsultaInventario = () => {
                   className="border-start-0"
                   value={filter}
                   onChange={e => setFilter(e.target.value)}
+                  style={{ fontSize: '0.8rem' }}
                 />
               </div>
             </Col>
             <Col md="4">
-              <Input type="select" value={catFilter} onChange={e => setCatFilter(e.target.value)}>
+              <Input type="select" bsSize="sm" value={catFilter} onChange={e => setCatFilter(e.target.value)} style={{ fontSize: '0.8rem' }}>
                 <option value="">Todas las Categorías</option>
                 {categorias.map(c => (
                   <option key={c.id} value={c.id}>
@@ -79,11 +80,11 @@ export const ConsultaInventario = () => {
         </CardBody>
       </Card>
 
-      <Row className="g-4">
+      <Row className="g-2">
         {filtered.map(a => (
-          <Col md="3" key={a.id}>
+          <Col md="2" sm="4" xs="6" key={a.id}>
             <Card className="h-100 border-0 shadow-sm hover-shadow transition-all">
-              <div className="text-center p-3 bg-white d-flex align-items-center justify-content-center" style={{ height: '180px' }}>
+              <div className="text-center p-2 bg-white d-flex align-items-center justify-content-center" style={{ height: '110px' }}>
                 {a.imagen ? (
                   <img
                     src={`data:${a.imagenContentType};base64,${a.imagen}`}
@@ -91,25 +92,25 @@ export const ConsultaInventario = () => {
                     style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }}
                   />
                 ) : (
-                  <FontAwesomeIcon icon={faImages} size="4x" className="text-muted opacity-25" />
+                  <FontAwesomeIcon icon={faImages} size="2x" className="text-muted opacity-25" />
                 )}
               </div>
-              <CardBody className="border-top p-3">
-                <div className="d-flex justify-content-between align-items-start mb-2">
-                  <Badge color="info" className="p-2 opacity-75">
+              <CardBody className="border-top p-2">
+                <div className="d-flex justify-content-between align-items-start mb-1 gap-1">
+                  <Badge color="info" className="p-1 opacity-75" style={{ fontSize: '0.65rem' }}>
                     {a.categoria?.nombre || 'General'}
                   </Badge>
-                  <Badge color={(a.existencia || 0) > (a.existenciaMinima || 0) ? 'success' : 'danger'} pill className="px-3">
+                  <Badge color={(a.existencia || 0) > (a.existenciaMinima || 0) ? 'success' : 'danger'} pill className="px-1" style={{ fontSize: '0.65rem' }}>
                     {a.existencia} disp.
                   </Badge>
                 </div>
-                <h6 className="fw-bold text-dark mb-1 text-truncate" title={a.nombre}>
+                <div className="fw-bold text-dark mb-0 text-truncate" title={a.nombre} style={{ fontSize: '0.8rem' }}>
                   {a.nombre}
-                </h6>
-                <div className="text-muted small mb-3">{a.codigo}</div>
-                <div className="d-flex justify-content-between align-items-center">
-                  <h5 className="text-primary fw-bold m-0">C$ {a.precio?.toFixed(2)}</h5>
-                  <small className="text-muted">Stock min: {a.existenciaMinima}</small>
+                </div>
+                <div className="text-muted" style={{ fontSize: '0.7rem' }}>{a.codigo}</div>
+                <div className="d-flex justify-content-between align-items-center mt-1">
+                  <span className="text-primary fw-bold" style={{ fontSize: '0.9rem' }}>C$ {a.precio?.toFixed(2)}</span>
+                  <div className="text-muted" style={{ fontSize: '0.65rem' }}>mín: {a.existenciaMinima}</div>
                 </div>
               </CardBody>
             </Card>

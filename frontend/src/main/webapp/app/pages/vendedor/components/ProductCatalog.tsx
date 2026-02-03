@@ -14,19 +14,16 @@ interface IProductCatalogProps {
 export const ProductCatalog: React.FC<IProductCatalogProps> = ({ articulos, termino, setTermino, agregarAlCarrito }) => {
   return (
     <Col md="7">
-      <Card className="shadow-sm mb-3 border-0">
-        <CardBody
-          className="rounded-3 p-3"
-          style={{ backgroundColor: '#ffc107', backgroundImage: 'linear-gradient(45deg, #ffc107 0%, #ffdb58 100%)' }}
-        >
-          <div className="input-group input-group-lg">
-            <span className="input-group-text bg-transparent border-end-0 text-dark opacity-75">
+      <Card className="shadow-sm mb-2 border">
+        <CardBody className="py-2 px-3 bg-white rounded">
+          <div className="input-group">
+            <span className="input-group-text bg-transparent border-0 text-muted">
               <FontAwesomeIcon icon={faSearch} />
             </span>
             <Input
               placeholder="Escribe el nombre o código del producto..."
-              className="bg-transparent border-start-0 text-dark placeholder-dark"
-              style={{ border: '1px solid rgba(0,0,0,0.1)', fontWeight: '500' }}
+              className="border-0 shadow-none ps-0"
+              style={{ fontSize: '0.9rem', fontWeight: '400' }}
               autoFocus
               value={termino}
               onChange={e => setTermino(e.target.value)}
@@ -40,8 +37,9 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({ articulos, term
           {articulos
             .filter(
               p =>
-                (p.nombre || '').toLowerCase().includes(termino.toLowerCase()) ||
-                (p.codigo || '').toLowerCase().includes(termino.toLowerCase()),
+                p.activo &&
+                ((p.nombre || '').toLowerCase().includes(termino.toLowerCase()) ||
+                  (p.codigo || '').toLowerCase().includes(termino.toLowerCase())),
             )
             .map(prod => (
               <Col md="4" key={prod.id}>
