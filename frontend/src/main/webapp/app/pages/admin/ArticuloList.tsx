@@ -71,7 +71,7 @@ export const ArticuloList = () => {
   };
 
   // Estilos "INASOFTWARE" Style
-  const headerStyle = { backgroundColor: '#6f42c1', color: 'white' }; // Purple header from image
+  const headerStyle = { backgroundColor: 'rgba(111, 66, 193, 1)', color: 'white' }; // Purple header from image
   const subHeaderStyle = { backgroundColor: '#343a40', color: 'white', fontSize: '0.85rem' };
   const rowSelectedStyle = { backgroundColor: '#f3e5f5', borderLeft: '5px solid #6f42c1' };
 
@@ -91,10 +91,10 @@ export const ArticuloList = () => {
               placeholder="Buscar Producto..."
               value={filter}
               onChange={e => setFilter(e.target.value)}
-              className="border-end-0 border-secondary bg-dark text-white opacity-75"
-              style={{ border: '1px solid #495057' }}
+              className="border-end-0 border-secondary bg-white text-dark"
+              style={{ border: '1px solid #ced4da' }}
             />
-            <span className="input-group-text bg-dark border-secondary text-white opacity-50">
+            <span className="input-group-text bg-white border-secondary text-muted">
               <FontAwesomeIcon icon={faSearch} />
             </span>
           </div>
@@ -114,27 +114,25 @@ export const ArticuloList = () => {
         </div>
       </div>
 
-      <div className="p-3 px-md-4">
-        <div className="bg-white p-3 border rounded shadow-sm d-flex align-items-center mb-3">
-          <h4 className="m-0 fw-bold underline-blue">Productos en inventario</h4>
-        </div>
+      <div className="p-1 px-md-2">
+
 
         {/* 2. Tabla Densa */}
         <Card className="shadow-sm mb-4 border-0">
           <div className="table-responsive">
-            <Table hover size="sm" className="mb-0 align-middle">
-              <thead className="text-center text-uppercase small" style={headerStyle}>
+            <Table hover striped size="sm" className="mb-0 align-middle">
+              <thead className="text-center text-uppercase mt-2" style={{ backgroundColor: '#343a40', color: 'black', fontSize: '0.75rem' }}>
                 <tr>
-                  <th className="py-2">ID</th>
+                  <th className="py-2 px-3">ID</th>
                   <th className="py-2">Código</th>
                   <th className="py-2 text-start">Producto</th>
                   <th className="py-2">Estado</th>
-                  <th className="py-2">Existencias</th>
-                  <th className="py-2">Ex. Mínima</th>
-                  <th className="py-2 text-end">Precio de Compra</th>
-                  <th className="py-2 text-end">Precio de Venta</th>
-                  <th className="py-2 text-end">Precio Total</th>
-                  <th className="py-2 text-start">Observaciones</th>
+                  <th className="py-2">Stock</th>
+                  <th className="py-2">Mín.</th>
+                  <th className="py-2 text-end">Costo</th>
+                  <th className="py-2 text-end">Venta</th>
+                  <th className="py-2 text-end">Total</th>
+                  <th className="py-2 text-start">Observación</th>
                   <th className="py-2">Acciones</th>
                 </tr>
               </thead>
@@ -147,14 +145,14 @@ export const ArticuloList = () => {
                     const isSelected = selectedArticulo?.id === articulo.id;
 
                     return (
-                      <tr key={articulo.id} style={isSelected ? rowSelectedStyle : {}} className="text-center">
+                      <tr key={articulo.id} style={isSelected ? rowSelectedStyle : {}} className={`text-center ${!articulo.activo ? 'text-muted' : ''}`}>
                         <td className="fw-bold text-primary">{articulo.id}</td>
                         <td>{articulo.codigo}</td>
                         <td className="text-start">{articulo.nombre}</td>
                         <td>
                           <Badge
-                            color={articulo.activo ? 'light' : 'secondary'}
-                            className={articulo.activo ? 'text-success border border-success' : ''}
+                            color={articulo.activo ? 'light' : 'danger'}
+                            className={articulo.activo ? 'text-success border border-success' : 'text-white'}
                           >
                             {articulo.activo ? 'Activo' : 'Inactivo'}
                           </Badge>
@@ -241,9 +239,6 @@ export const ArticuloList = () => {
                 </Button>
                 <Button size="sm" color="success" outline>
                   <FontAwesomeIcon icon={faFileExcel} className="me-2" /> Exportar
-                </Button>
-                <Button size="sm" color="danger" outline onClick={() => handleDelete(selectedArticulo.id)}>
-                  <FontAwesomeIcon icon={faTrash} className="me-2" /> Eliminar
                 </Button>
                 <Button size="sm" color="secondary" className="ms-2" onClick={() => setSelectedArticulo(null)}>
                   <FontAwesomeIcon icon={faTimes} />
