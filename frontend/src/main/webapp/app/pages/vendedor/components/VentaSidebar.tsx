@@ -9,7 +9,10 @@ import {
   faTimes,
   faShoppingCart,
   faMoneyBillWave,
+  faPlus,
+  faMinus,
 } from '@fortawesome/free-solid-svg-icons';
+import { IArticulo } from 'app/shared/model/articulo.model';
 import { ICliente } from 'app/shared/model/cliente.model';
 import { IMoneda } from 'app/shared/model/moneda.model';
 import { INumeracionFactura } from 'app/shared/model/numeracion-factura.model';
@@ -43,6 +46,8 @@ interface IVentaSidebarProps {
   procesarVenta: () => void;
   loading: boolean;
   ventaExitosa: IVenta | null;
+  quitarUnoDelCarrito: (id: number) => void;
+  agregarAlCarrito: (prod: IArticulo) => void;
 }
 
 export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
@@ -73,21 +78,23 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
   procesarVenta,
   loading,
   ventaExitosa,
+  quitarUnoDelCarrito,
+  agregarAlCarrito,
 }) => {
   return (
     <Col md="5">
       <Card className="shadow-lg border-0 mb-3 bg-white rounded-4 overflow-hidden">
-        <CardHeader className="bg-primary text-white p-3 d-flex justify-content-between align-items-center">
-          <h6 className="mb-0 fw-bold">
+        <CardHeader className="bg-primary text-white p-2 px-3 d-flex justify-content-between align-items-center">
+          <small className="mb-0 fw-bold">
             <FontAwesomeIcon icon={faUserCheck} className="me-2" /> Información del Cliente
-          </h6>
+          </small>
           {vendedorActual && (
             <Badge color="light" className="text-primary">
               Vendedor: {vendedorActual.nombre}
             </Badge>
           )}
         </CardHeader>
-        <CardBody className="p-3">
+        <CardBody className="p-2">
           {!cliente ? (
             <div className="d-flex gap-2">
               <Input
@@ -105,7 +112,7 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
               </Button>
             </div>
           ) : (
-            <div className="d-flex justify-content-between align-items-start border border-primary border-opacity-25 p-3 rounded-4 bg-light">
+            <div className="d-flex justify-content-between align-items-start border border-primary border-opacity-25 p-2 rounded-3 bg-light">
               <div>
                 <div className="fw-bold text-primary fs-5">{cliente.nombre}</div>
                 <div className="text-muted small">
@@ -126,11 +133,11 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
       </Card>
 
       <Card className="shadow-lg border-0 rounded-4 overflow-hidden h-100">
-        <CardHeader className="bg-dark text-white d-flex justify-content-between align-items-center py-3">
-          <h6 className="mb-0 fw-bold">
+        <CardHeader className="bg-dark text-white d-flex justify-content-between align-items-center py-2 px-3">
+          <small className="mb-0 fw-bold">
             <FontAwesomeIcon icon={faShoppingCart} className="me-2 text-primary" /> Ticket #
             {numeracion ? (numeracion.correlativoActual || 0) + 1 : '...'}
-          </h6>
+          </small>
           <div className="d-flex gap-2">
             <Input
               type="select"
@@ -148,30 +155,50 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
             </Input>
           </div>
         </CardHeader>
-        <div className="table-responsive flex-grow-1 px-3" style={{ maxHeight: '200px', overflowY: 'auto' }}>
-          <Table borderless hover className="align-middle small">
+        <div className="table-responsive flex-grow-1 px-3" style={{ maxHeight: '180px', overflowY: 'auto' }}>
+          <Table borderless hover className="align-middle" style={{ fontSize: '0.8rem' }}>
             <thead>
               <tr className="border-bottom">
-                <th className="py-3 text-muted">Items</th>
-                <th className="text-center py-3 text-muted">Cant.</th>
-                <th className="text-end py-3 text-muted">Subt.</th>
+                <th className="py-2 text-muted">Items</th>
+                <th className="text-center py-2 text-muted">Cant.</th>
+                <th className="text-end py-2 text-muted">Subt.</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
               {carrito.map((item, idx) => (
                 <tr key={idx} className="border-bottom border-light">
-                  <td className="py-3">
+                  <td className="py-2">
                     <div className="fw-bold text-dark">{item.articulo.nombre}</div>
-                    <small className="text-muted">Unit: C$ {item.articulo.precio?.toFixed(2)}</small>
+                    <small className="text-muted" style={{ fontSize: '0.7rem' }}>Unit: C$ {item.articulo.precio?.toFixed(2)}</small>
                   </td>
-                  <td className="text-center py-3">
-                    <Badge color="light" className="text-dark border px-2 py-1 fs-6">
-                      {item.cantidad}
-                    </Badge>
+                  <td className="text-center py-2">
+                    <div className="d-flex align-items-center justify-content-center gap-1 border rounded-pill bg-white px-1">
+                      <Button
+                        size="sm"
+                        color="link"
+                        className="p-0 text-muted"
+                        style={{ width: '20px', height: '20px' }}
+                        onClick={() => quitarUnoDelCarrito(item.articulo.id)}
+                      >
+                        <FontAwesomeIcon icon={faMinus} style={{ fontSize: '0.6rem' }} />
+                      </Button>
+                      <span className="fw-bold px-1" style={{ fontSize: '0.85rem', minWidth: '20px' }}>
+                        {item.cantidad}
+                      </span>
+                      <Button
+                        size="sm"
+                        color="link"
+                        className="p-0 text-primary"
+                        style={{ width: '20px', height: '20px' }}
+                        onClick={() => agregarAlCarrito(item.articulo)}
+                      >
+                        <FontAwesomeIcon icon={faPlus} style={{ fontSize: '0.6rem' }} />
+                      </Button>
+                    </div>
                   </td>
-                  <td className="text-end py-3 fw-bold">C$ {item.subtotal.toFixed(2)}</td>
-                  <td className="text-end py-3">
+                  <td className="text-end py-2 fw-bold">C$ {item.subtotal.toFixed(2)}</td>
+                  <td className="text-end py-2">
                     <Button
                       size="sm"
                       color="link"
@@ -187,39 +214,22 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
           </Table>
         </div>
 
-        <div className="bg-light p-4">
+        <div className="bg-light p-3">
           <Row className="mb-3 g-2">
-            <Col>
+            <Col md="12">
               <Card className="border-0 shadow-sm">
                 <CardBody className="p-2">
-                  <Label className="small text-muted mb-1 d-block text-uppercase fw-bold">Método</Label>
+                  <Label className="small text-muted mb-1 d-block text-uppercase fw-bold">Método de Pago</Label>
                   <Input
                     type="select"
                     bsSize="sm"
-                    className="border-0 p-0 fw-bold"
+                    className="border-0 p-0 fw-bold text-primary"
                     value={metodoPago}
                     onChange={e => setMetodoPago(e.target.value as any)}
                   >
                     <option value={MetodoPagoEnum.EFECTIVO}>Efectivo</option>
                     <option value={MetodoPagoEnum.TARJETA}>Tarjeta</option>
                     <option value={MetodoPagoEnum.TRANSFERENCIA}>Transferencia</option>
-                  </Input>
-                </CardBody>
-              </Card>
-            </Col>
-            <Col>
-              <Card className="border-0 shadow-sm">
-                <CardBody className="p-2">
-                  <Label className="small text-muted mb-1 d-block text-uppercase fw-bold">Condición</Label>
-                  <Input
-                    type="select"
-                    bsSize="sm"
-                    className="border-0 p-0 fw-bold"
-                    value={esContado ? 'true' : 'false'}
-                    onChange={e => setEsContado(e.target.value === 'true')}
-                  >
-                    <option value="true">Contado</option>
-                    <option value="false">Crédito</option>
                   </Input>
                 </CardBody>
               </Card>
@@ -235,10 +245,10 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
             <span className="fw-bold text-danger">C$ {iva.toFixed(2)}</span>
           </div>
 
-          <div className="d-flex justify-content-between align-items-center mb-4 bg-primary bg-opacity-10 p-3 rounded-4">
-            <h5 className="fw-bold text-dark m-0">Total Final</h5>
+          <div className="d-flex justify-content-between align-items-center mb-3 bg-primary bg-opacity-10 p-2 px-3 rounded-3">
+            <span className="fw-bold text-dark m-0 small">Total Final</span>
             <div className="text-end">
-              <h2 className="fw-bold text-primary m-0">C$ {total.toFixed(2)}</h2>
+              <h4 className="fw-bold text-primary m-0">C$ {total.toFixed(2)}</h4>
               {monedaSeleccionada?.simbolo !== 'C$' && (
                 <div className="text-secondary fw-bold small">
                   {monedaSeleccionada?.simbolo} {totalEnMoneda.toFixed(2)}
@@ -263,19 +273,35 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
                 <span className="fw-bold">Cambio:</span>
                 <span className="fw-bold fs-5">C$ {cambio.toFixed(2)}</span>
               </div>
+              {parseFloat(montoPagado) > 0 && cambio < 0 && (
+                <div className="text-danger small fw-bold text-center mt-2 animate__animated animate__shakeX">
+                  <FontAwesomeIcon icon={faExclamationTriangle} className="me-1" />
+                  Monto insuficiente por C$ {Math.abs(cambio).toFixed(2)}
+                </div>
+              )}
             </div>
           )}
 
           <Button
-            color="primary"
-            size="lg"
+            color={
+              metodoPago === MetodoPagoEnum.EFECTIVO && (parseFloat(montoPagado) || 0) < total ? 'secondary' : 'primary'
+            }
+            size="md"
             block
-            className="w-100 py-3 fw-bold shadow-lg rounded-pill"
+            className="w-100 py-2 fw-bold shadow-sm"
+            style={{ borderRadius: '10px' }}
             onClick={procesarVenta}
-            disabled={carrito.length === 0 || loading || !!ventaExitosa}
+            disabled={
+              carrito.length === 0 ||
+              loading ||
+              !!ventaExitosa ||
+              (metodoPago === MetodoPagoEnum.EFECTIVO && (parseFloat(montoPagado) || 0) < total)
+            }
           >
             {loading ? (
               'Validando...'
+            ) : metodoPago === MetodoPagoEnum.EFECTIVO && (parseFloat(montoPagado) || 0) < total ? (
+              'ESPERANDO PAGO...'
             ) : (
               <span>
                 <FontAwesomeIcon icon={faMoneyBillWave} className="me-2" /> COBRAR AHORA

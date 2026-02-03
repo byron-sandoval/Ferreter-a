@@ -48,17 +48,22 @@ export const GestionClientes = () => {
   );
 
   return (
-    <div className="animate__animated animate__fadeIn p-2">
-      <h3 className="fw-bold mb-4 text-secondary">
-        <FontAwesomeIcon icon={faUsers} className="me-2 text-primary" /> Gestión de Clientes y Crédito
-      </h3>
+    <div className="animate__animated animate__fadeIn p-1">
+      <div className="d-flex justify-content-between align-items-center mb-2 px-1">
+        <h5 className="fw-bold text-secondary mb-0">
+          <FontAwesomeIcon icon={faUsers} className="me-2 text-primary" /> Clientes y Créditos
+        </h5>
+        <Button color="primary" size="sm" outline style={{ fontSize: '0.75rem' }}>
+          <FontAwesomeIcon icon={faPlus} className="me-1" /> Nuevo Cliente
+        </Button>
+      </div>
 
-      <Row>
+      <Row className="g-2">
         <Col md="7">
-          <Card className="shadow-sm border-0 mb-4 bg-white rounded-4 overflow-hidden">
+          <Card className="shadow-sm border-0 mb-2 bg-white rounded-3 overflow-hidden">
             <CardBody className="p-0">
-              <div className="p-3 bg-light border-bottom d-flex justify-content-between">
-                <div className="input-group" style={{ maxWidth: '300px' }}>
+              <div className="p-2 bg-light border-bottom">
+                <div className="input-group input-group-sm" style={{ maxWidth: '300px' }}>
                   <span className="input-group-text bg-white border-end-0">
                     <FontAwesomeIcon icon={faSearch} className="text-muted" />
                   </span>
@@ -67,20 +72,18 @@ export const GestionClientes = () => {
                     className="border-start-0"
                     value={filter}
                     onChange={e => setFilter(e.target.value)}
+                    style={{ fontSize: '0.8rem' }}
                   />
                 </div>
-                <Button color="primary" size="sm" className="px-3" outline>
-                  <FontAwesomeIcon icon={faPlus} className="me-2" /> Nuevo Cliente
-                </Button>
               </div>
-              <Table hover className="mb-0 align-middle">
-                <thead className="bg-white text-muted small text-uppercase">
+              <Table hover size="sm" className="mb-0 align-middle">
+                <thead className="bg-white text-muted small text-uppercase fw-bold" style={{ fontSize: '0.7rem' }}>
                   <tr>
-                    <th className="py-3 px-4">Nombre</th>
+                    <th className="py-2 px-3">Nombre</th>
                     <th>Cédula</th>
                     <th>Saldo</th>
                     <th className="text-center">Estado</th>
-                    <th className="text-end px-4">Acción</th>
+                    <th className="text-end px-3">Acción</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -88,22 +91,22 @@ export const GestionClientes = () => {
                     <tr
                       key={c.id}
                       onClick={() => verDetalle(c)}
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: 'pointer', fontSize: '0.8rem' }}
                       className={clienteSeleccionado?.id === c.id ? 'table-primary border-start border-primary border-4' : ''}
                     >
-                      <td className="px-4 fw-bold">{c.nombre}</td>
+                      <td className="px-3 fw-bold">{c.nombre}</td>
                       <td className="small text-muted">{c.cedula}</td>
                       <td className="fw-bold">
                         <span className={(c.saldo || 0) > 0 ? 'text-danger' : 'text-success'}>C$ {c.saldo?.toFixed(2) || '0.00'}</span>
                       </td>
                       <td className="text-center">
-                        <Badge color={c.activo ? 'success' : 'secondary'} pill>
+                        <Badge color={c.activo ? 'success' : 'secondary'} pill style={{ fontSize: '0.65rem' }}>
                           {c.activo ? 'Activo' : 'Inactivo'}
                         </Badge>
                       </td>
-                      <td className="text-end px-4">
-                        <Button color="light" size="sm" className="rounded-pill">
-                          <FontAwesomeIcon icon={faUserEdit} />
+                      <td className="text-end px-3">
+                        <Button color="light" size="sm" className="p-1">
+                          <FontAwesomeIcon icon={faUserEdit} fixedWidth />
                         </Button>
                       </td>
                     </tr>
@@ -117,38 +120,28 @@ export const GestionClientes = () => {
         <Col md="5">
           {clienteSeleccionado ? (
             <div className="animate__animated animate__fadeIn">
-              <Card className="shadow-lg border-0 rounded-4 overflow-hidden mb-4">
-                <div className="bg-primary p-4 text-white">
-                  <div className="d-flex justify-content-between align-items-start mb-3">
+              <Card className="shadow-lg border-0 rounded-3 overflow-hidden mb-2">
+                <div className="bg-primary p-3 text-white">
+                  <div className="d-flex justify-content-between align-items-start mb-2">
                     <div>
-                      <h4 className="fw-bold m-0">{clienteSeleccionado.nombre}</h4>
-                      <small className="opacity-75">{clienteSeleccionado.cedula}</small>
+                      <h5 className="fw-bold m-0">{clienteSeleccionado.nombre}</h5>
+                      <small className="opacity-75" style={{ fontSize: '0.75rem' }}>{clienteSeleccionado.cedula}</small>
                     </div>
-                    <FontAwesomeIcon icon={faChartLine} size="2x" className="opacity-25" />
                   </div>
-                  <div className="mt-4">
-                    <small className="d-block text-uppercase opacity-75 fw-bold mb-1">Saldo Pendiente</small>
-                    <h2 className="fw-bold m-0">C$ {(clienteSeleccionado.saldo || 0).toFixed(2)}</h2>
+                  <div className="mt-2">
+                    <small className="d-block text-uppercase opacity-75 fw-bold mb-0" style={{ fontSize: '0.65rem' }}>Saldo Pendiente</small>
+                    <h3 className="fw-bold m-0">C$ {(clienteSeleccionado.saldo || 0).toFixed(2)}</h3>
                   </div>
                 </div>
-                <CardBody>
-                  <div className="mb-4">
-                    <Label className="small fw-bold text-muted text-uppercase mb-2">Comportamiento de Pago</Label>
-                    <Progress value={80} color="success" className="rounded-pill" style={{ height: '8px' }} />
-                    <small className="text-muted mt-1 d-block text-end">Crédito Saludable</small>
+                <CardBody className="p-2">
+                  <div className="mb-2">
+                    <Label className="fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.65rem' }}>Perfil</Label>
+                    <Progress value={80} color="success" style={{ height: '4px' }} />
                   </div>
                   <div className="list-group list-group-flush">
-                    <div className="list-group-item px-0 py-3 border-0">
-                      <FontAwesomeIcon icon={faHistory} className="me-3 text-primary" />
-                      <span>
-                        <strong>Ultima Compra:</strong> {historial.length > 0 ? dayjs(historial[0].fecha).format('DD/MM/YYYY') : 'N/A'}
-                      </span>
-                    </div>
-                    <div className="list-group-item px-0 py-3 border-0">
-                      <FontAwesomeIcon icon={faExclamationCircle} className="me-3 text-danger" />
-                      <span>
-                        <strong>Alertas:</strong> {(clienteSeleccionado.saldo || 0) > 1000 ? 'Riesgo de Mora' : 'Sin Alertas'}
-                      </span>
+                    <div className="list-group-item px-0 py-1 border-0" style={{ fontSize: '0.8rem' }}>
+                      <FontAwesomeIcon icon={faHistory} className="me-2 text-primary" />
+                      <span><strong>Venta:</strong> {historial.length > 0 ? dayjs(historial[0].fecha).format('DD/MM/YY') : 'N/A'}</span>
                     </div>
                   </div>
                 </CardBody>

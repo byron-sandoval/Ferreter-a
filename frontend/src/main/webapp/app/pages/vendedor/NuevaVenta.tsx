@@ -149,6 +149,22 @@ export const NuevaVenta = () => {
     setCarrito(carrito.filter(item => item.articulo.id !== id));
   };
 
+  const quitarUnoDelCarrito = (id: number) => {
+    const existente = carrito.find(item => item.articulo.id === id);
+    if (!existente) return;
+
+    if (existente.cantidad > 1) {
+      const actualizados = carrito.map(item =>
+        item.articulo.id === id
+          ? { ...item, cantidad: item.cantidad - 1, subtotal: (item.cantidad - 1) * (item.articulo.precio || 0) }
+          : item,
+      );
+      setCarrito(actualizados);
+    } else {
+      eliminarDelCarrito(id);
+    }
+  };
+
   const subtotal = carrito.reduce((acc, item) => acc + item.subtotal, 0);
   const iva = subtotal * 0.15;
   const total = subtotal + iva;
@@ -172,6 +188,11 @@ export const NuevaVenta = () => {
     if (!esContado && (cliente.saldo || 0) > 5000) {
       // Ejemplo de limite de credito
       toast.error('El cliente excede su límite de crédito. La venta debe ser de contado.');
+      return;
+    }
+
+    if (metodoPago === MetodoPagoEnum.EFECTIVO && montoPagadoNum < total) {
+      toast.error('El efectivo recibido es insuficiente para cubrir el total de la venta.');
       return;
     }
 
@@ -261,6 +282,8 @@ export const NuevaVenta = () => {
           procesarVenta={procesarVenta}
           loading={loading}
           ventaExitosa={ventaExitosa}
+          quitarUnoDelCarrito={quitarUnoDelCarrito}
+          agregarAlCarrito={agregarAlCarrito}
         />
       </Row>
 
