@@ -108,15 +108,6 @@ export const TopNavbar = () => {
               </NavLink>
             </NavItem>
 
-            {/* 2. Dashboard */}
-            {isAdmin && (
-              <NavItem className="nav-link-item">
-                <NavLink tag={Link} to="/admin" style={navLinkStyle}>
-                  <FontAwesomeIcon icon={faUsersCog} size="sm" /> Dashboard
-                </NavLink>
-              </NavItem>
-            )}
-
             {/* 3. Facturar */}
             {(isAdmin || isVendedor) && (
               <NavItem className="nav-link-item">
