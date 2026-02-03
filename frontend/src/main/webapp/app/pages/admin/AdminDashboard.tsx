@@ -240,15 +240,15 @@ export const AdminDashboard = () => {
               <CardTitle tag="h6" className="text-secondary border-bottom pb-2 mb-3">
                 Ventas por Categoría
               </CardTitle>
-              <div style={{ height: '300px', width: '100%' }}>
+              <div style={{ height: '350px', width: '100%' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={categoryData}
                       cx="50%"
                       cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
+                      innerRadius={50}
+                      outerRadius={130}
                       paddingAngle={5}
                       dataKey="value"
                       label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
