@@ -56,7 +56,7 @@ export const HistorialVendedor = () => {
       const devData: IDevolucion = {
         fecha: dayjs(),
         motivo,
-        montoTotal: ventaSeleccionada.total || 0,
+        total: ventaSeleccionada.total || 0,
         venta: ventaSeleccionada,
       };
       await DevolucionService.create(devData);
