@@ -30,6 +30,10 @@ export const VentaService = {
   getAll() {
     return axios.get<IVenta[]>(API_VENTAS);
   },
+
+  getAllDetalles() {
+    return axios.get<IDetalleVenta[]>(API_DETALLES);
+  },
 };
 
 export default VentaService;
