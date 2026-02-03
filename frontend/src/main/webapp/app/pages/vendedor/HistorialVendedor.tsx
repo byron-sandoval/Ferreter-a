@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Badge, Card, CardBody, Input, Label } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHistory, faUndo, faEye, faSearch, faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
+import { faHistory, faUndo, faEye, faSearch, faCalendarAlt, faSync } from '@fortawesome/free-solid-svg-icons';
 import VentaService from 'app/services/venta.service';
 import DevolucionService from 'app/services/devolucion.service';
 import { IVenta, IDevolucion } from 'app/shared/model';
@@ -74,14 +74,19 @@ export const HistorialVendedor = () => {
   );
 
   return (
-    <div className="animate__animated animate__fadeIn p-2">
-      <h3 className="fw-bold mb-4 text-secondary">
-        <FontAwesomeIcon icon={faHistory} className="me-2 text-primary" /> Historial de Ventas Recientes
-      </h3>
+    <div className="animate__animated animate__fadeIn p-1">
+      <div className="d-flex justify-content-between align-items-center mb-2">
+        <h5 className="fw-bold text-secondary mb-0">
+          <FontAwesomeIcon icon={faHistory} className="me-2 text-primary" /> Historial de Ventas Recientes
+        </h5>
+        <Button color="light" size="sm" onClick={loadVentas} disabled={loading} style={{ fontSize: '0.75rem' }}>
+          <FontAwesomeIcon icon={faSync} spin={loading} className="me-1" /> Actualizar
+        </Button>
+      </div>
 
-      <Card className="shadow-sm border-0 mb-4">
-        <CardBody className="p-3">
-          <div className="input-group" style={{ maxWidth: '400px' }}>
+      <Card className="shadow-sm border-0 mb-2 bg-light">
+        <CardBody className="p-2">
+          <div className="input-group input-group-sm" style={{ maxWidth: '350px' }}>
             <span className="input-group-text bg-white border-end-0">
               <FontAwesomeIcon icon={faSearch} className="text-muted" />
             </span>
@@ -90,22 +95,23 @@ export const HistorialVendedor = () => {
               className="border-start-0"
               value={filter}
               onChange={e => setFilter(e.target.value)}
+              style={{ fontSize: '0.8rem' }}
             />
           </div>
         </CardBody>
       </Card>
 
-      <Card className="shadow-sm border-0 rounded-4 overflow-hidden">
-        <Table hover responsive className="mb-0 align-middle">
-          <thead className="bg-light text-muted small text-uppercase fw-bold">
+      <Card className="shadow-sm border-0 rounded-3 overflow-hidden">
+        <Table hover responsive size="sm" className="mb-0 align-middle">
+          <thead className="bg-light text-muted small text-uppercase fw-bold" style={{ fontSize: '0.75rem' }}>
             <tr>
-              <th className="py-3 px-4">Folio</th>
-              <th>Fecha</th>
-              <th>Cliente</th>
-              <th>Total</th>
-              <th>Método</th>
-              <th className="text-center">Estado Garantía</th>
-              <th className="text-end px-4">Acciones</th>
+              <th className="py-2 px-3">Folio</th>
+              <th className="py-2">Fecha</th>
+              <th className="py-2">Cliente</th>
+              <th className="py-2">Total</th>
+              <th className="py-2">Método</th>
+              <th className="py-2 text-center">Garantía</th>
+              <th className="py-2 text-end px-3">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -113,44 +119,45 @@ export const HistorialVendedor = () => {
               const activa = puedeDevolver(v.fecha);
               return (
                 <tr key={v.id}>
-                  <td className="px-4 fw-bold text-primary">#{v.noFactura}</td>
-                  <td className="small text-muted">
+                  <td className="px-3 fw-bold text-primary" style={{ fontSize: '0.8rem' }}>#{v.noFactura}</td>
+                  <td style={{ fontSize: '0.75rem' }}>
                     <FontAwesomeIcon icon={faCalendarAlt} className="me-1 opacity-50" />
-                    {dayjs(v.fecha).format('DD/MM/YYYY HH:mm')}
+                    {dayjs(v.fecha).format('DD/MM/YY HH:mm')}
                   </td>
-                  <td className="fw-bold text-dark">{v.cliente?.nombre}</td>
-                  <td className="fw-bold">C$ {v.total?.toFixed(2)}</td>
+                  <td className="fw-bold text-dark" style={{ fontSize: '0.8rem' }}>{v.cliente?.nombre}</td>
+                  <td className="fw-bold" style={{ fontSize: '0.8rem' }}>C$ {v.total?.toFixed(2)}</td>
                   <td>
-                    <Badge pill color="light" className="text-dark border">
+                    <Badge color="light" className="text-dark border p-1" style={{ fontSize: '0.65rem' }}>
                       {v.metodoPago}
                     </Badge>
                   </td>
                   <td className="text-center">
                     {activa ? (
-                      <Badge color="soft-success" style={{ backgroundColor: '#e8f5e9', color: '#2e7d32' }}>
-                        Dentro de 72h
+                      <Badge color="soft-success" style={{ backgroundColor: '#e8f5e9', color: '#2e7d32', fontSize: '0.65rem' }}>
+                        Activa
                       </Badge>
                     ) : (
-                      <Badge color="soft-danger" style={{ backgroundColor: '#ffebee', color: '#c62828' }}>
-                        Garantía Vencida
+                      <Badge color="soft-danger" style={{ backgroundColor: '#ffebee', color: '#c62828', fontSize: '0.65rem' }}>
+                        Vencida
                       </Badge>
                     )}
                   </td>
-                  <td className="text-end px-4">
-                    <Button color="light" size="sm" className="me-2 rounded-pill" onClick={() => v.id && verDetalles(v.id)}>
-                      <FontAwesomeIcon icon={faEye} />
+                  <td className="text-end px-3">
+                    <Button color="light" size="sm" className="me-1 p-1" onClick={() => v.id && verDetalles(v.id)}>
+                      <FontAwesomeIcon icon={faEye} fixedWidth />
                     </Button>
                     <Button
                       color="outline-danger"
                       size="sm"
-                      className="rounded-pill"
+                      className="p-1 px-2"
+                      style={{ fontSize: '0.7rem' }}
                       disabled={!activa}
                       onClick={() => {
                         setVentaSeleccionada(v);
                         setShowDevolucionModal(true);
                       }}
                     >
-                      <FontAwesomeIcon icon={faUndo} className="me-1" /> Devolución
+                      Devolución
                     </Button>
                   </td>
                 </tr>

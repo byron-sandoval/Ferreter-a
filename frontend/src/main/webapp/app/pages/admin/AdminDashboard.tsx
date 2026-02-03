@@ -11,6 +11,7 @@ import {
   faTruck,
   faHistory,
   faBuilding,
+  faReceipt,
 } from '@fortawesome/free-solid-svg-icons';
 import ArticuloService from 'app/services/articulo.service';
 import VentaService from 'app/services/venta.service';
@@ -72,7 +73,7 @@ export const AdminDashboard = () => {
   });
 
   return (
-    <div className="animate__animated animate__fadeIn p-3 px-md-4">
+    <div className="animate__animated animate__fadeIn p-2 px-md-3">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h4 className="text-primary fw-bold m-0">
           <FontAwesomeIcon icon={faChartLine} className="me-2" /> Panel de Control Gerencial
@@ -93,19 +94,19 @@ export const AdminDashboard = () => {
       <Row className="mb-4">
         <Col md="4">
           <Card className="shadow-sm border-start border-primary border-4 h-100">
-            <CardBody>
+            <CardBody className="py-2">
               <div className="d-flex justify-content-between align-items-center">
                 <div>
-                  <div className="text-uppercase text-muted fw-bold mb-1" style={{ fontSize: '0.7rem' }}>
+                  <div className="text-uppercase text-muted fw-bold mb-1" style={{ fontSize: '0.65rem' }}>
                     Ventas del Día
                   </div>
-                  <h4 className="mb-0 text-primary fw-bold">
+                  <h5 className="mb-0 text-primary fw-bold">
                     C${' '}
                     {ventasRecientes
                       .filter(v => dayjs(v.fecha).isSame(dayjs(), 'day'))
                       .reduce((acc, v) => acc + (v.total || 0), 0)
                       .toLocaleString()}
-                  </h4>
+                  </h5>
                 </div>
                 <FontAwesomeIcon icon={faMoneyBillWave} size="lg" className="text-primary opacity-25" />
               </div>
@@ -114,19 +115,19 @@ export const AdminDashboard = () => {
         </Col>
         <Col md="4">
           <Card className="shadow-sm border-start border-success border-4 h-100">
-            <CardBody>
+            <CardBody className="py-2">
               <div className="d-flex justify-content-between align-items-center">
                 <div>
-                  <div className="text-uppercase text-muted fw-bold mb-1" style={{ fontSize: '0.7rem' }}>
+                  <div className="text-uppercase text-muted fw-bold mb-1" style={{ fontSize: '0.65rem' }}>
                     Ventas del Mes
                   </div>
-                  <h4 className="mb-0 text-success fw-bold">
+                  <h5 className="mb-0 text-success fw-bold">
                     C${' '}
                     {ventasRecientes
                       .filter(v => dayjs(v.fecha).isSame(dayjs(), 'month'))
                       .reduce((acc, v) => acc + (v.total || 0), 0)
                       .toLocaleString()}
-                  </h4>
+                  </h5>
                 </div>
                 <FontAwesomeIcon icon={faChartLine} size="lg" className="text-success opacity-25" />
               </div>
@@ -135,15 +136,17 @@ export const AdminDashboard = () => {
         </Col>
         <Col md="4">
           <Card className="shadow-sm border-start border-warning border-4 h-100">
-            <CardBody>
+            <CardBody className="py-2">
               <div className="d-flex justify-content-between align-items-center">
                 <div>
-                  <div className="text-uppercase text-muted fw-bold mb-1" style={{ fontSize: '0.7rem' }}>
-                    Vendedores
+                  <div className="text-uppercase text-muted fw-bold mb-1" style={{ fontSize: '0.65rem' }}>
+                    Facturas del Día
                   </div>
-                  <h4 className="mb-0 text-warning fw-bold">Activos</h4>
+                  <h5 className="mb-0 text-warning fw-bold">
+                    {ventasRecientes.filter(v => dayjs(v.fecha).isSame(dayjs(), 'day')).length}
+                  </h5>
                 </div>
-                <FontAwesomeIcon icon={faUsers} size="lg" className="text-warning opacity-25" />
+                <FontAwesomeIcon icon={faReceipt} size="lg" className="text-warning opacity-25" />
               </div>
             </CardBody>
           </Card>
@@ -160,7 +163,7 @@ export const AdminDashboard = () => {
                   C$ {ventasRecientes.reduce((acc, v) => acc + (v.total || 0), 0).toLocaleString()}
                 </Badge>
               </CardTitle>
-              <div style={{ height: '300px', width: '100%' }}>
+              <div style={{ height: '220px', width: '100%' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={chartData}>
                     <defs>
@@ -199,7 +202,7 @@ export const AdminDashboard = () => {
                   <div className="spinner-border spinner-border-sm text-danger" role="status"></div>
                 </div>
               ) : bajoStock.length > 0 ? (
-                <div className="table-responsive" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                <div className="table-responsive" style={{ maxHeight: '200px', overflowY: 'auto' }}>
                   <Table size="sm" borderless hover className="align-middle">
                     <tbody>
                       {bajoStock.map(p => (
@@ -240,7 +243,7 @@ export const AdminDashboard = () => {
               <CardTitle tag="h6" className="text-secondary border-bottom pb-2 mb-3">
                 Ventas por Categoría
               </CardTitle>
-              <div style={{ height: '350px', width: '100%' }}>
+              <div style={{ height: '250px', width: '100%' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -248,7 +251,7 @@ export const AdminDashboard = () => {
                       cx="50%"
                       cy="50%"
                       innerRadius={50}
-                      outerRadius={130}
+                      outerRadius={90}
                       paddingAngle={5}
                       dataKey="value"
                       label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
