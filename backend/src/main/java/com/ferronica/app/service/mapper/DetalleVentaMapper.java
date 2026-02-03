@@ -1,9 +1,11 @@
 package com.ferronica.app.service.mapper;
 
 import com.ferronica.app.domain.Articulo;
+import com.ferronica.app.domain.Categoria;
 import com.ferronica.app.domain.DetalleVenta;
 import com.ferronica.app.domain.Venta;
 import com.ferronica.app.service.dto.ArticuloDTO;
+import com.ferronica.app.service.dto.CategoriaDTO;
 import com.ferronica.app.service.dto.DetalleVentaDTO;
 import com.ferronica.app.service.dto.VentaDTO;
 import org.mapstruct.*;
@@ -22,7 +24,14 @@ public interface DetalleVentaMapper extends EntityMapper<DetalleVentaDTO, Detall
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
     @Mapping(target = "nombre", source = "nombre")
+    @Mapping(target = "categoria", source = "categoria", qualifiedByName = "articuloCategoriaId")
     ArticuloDTO toDtoArticuloId(Articulo articulo);
+
+    @Named("articuloCategoriaId")
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "nombre", source = "nombre")
+    CategoriaDTO toDtoArticuloCategoriaId(Categoria categoria);
 
     @Named("ventaId")
     @BeanMapping(ignoreByDefault = true)
