@@ -50,9 +50,7 @@ export const ComprasPorProveedor = () => {
       const comprasProv = ingresos.filter(ing => ing.proveedor?.id === proveedor.id && ing.activo);
 
       // Cargamos los detalles de cada ingreso de forma paralela para ser "directos"
-      const detailedIngresos = await Promise.all(
-        comprasProv.map(ing => IngresoService.get(ing.id!))
-      );
+      const detailedIngresos = await Promise.all(comprasProv.map(ing => IngresoService.get(ing.id)));
 
       // Aplanamos todos los detalles en una sola lista para el reporte
       const allItems: any[] = [];
@@ -62,7 +60,7 @@ export const ComprasPorProveedor = () => {
           allItems.push({
             ...det,
             fecha: ing.fecha,
-            noDocumento: ing.noDocumento
+            noDocumento: ing.noDocumento,
           });
         });
       });
@@ -70,7 +68,7 @@ export const ComprasPorProveedor = () => {
       // Ordenar por fecha descendente
       setItemsProveedor(allItems.sort((a, b) => dayjs(b.fecha).unix() - dayjs(a.fecha).unix()));
     } catch (error) {
-      console.error("Error cargando detalles del proveedor:", error);
+      console.error('Error cargando detalles del proveedor:', error);
     }
     setLoadingItems(false);
   };
@@ -80,7 +78,10 @@ export const ComprasPorProveedor = () => {
   if (proveedorSeleccionado) {
     return (
       <div className="animate__animated animate__fadeIn p-1">
-        <div className="d-flex justify-content-between align-items-center mb-2 px-2 py-1 text-white rounded shadow-sm" style={{ backgroundColor: '#343a40' }}>
+        <div
+          className="d-flex justify-content-between align-items-center mb-2 px-2 py-1 text-white rounded shadow-sm"
+          style={{ backgroundColor: '#343a40' }}
+        >
           <div className="d-flex align-items-center gap-2">
             <FontAwesomeIcon icon={faTruck} />
             <div>
@@ -120,10 +121,14 @@ export const ComprasPorProveedor = () => {
                         <td className="text-center fw-bold text-primary">{item.noDocumento}</td>
                         <td>
                           <div className="fw-bold">{item.articulo?.nombre}</div>
-                          <small className="text-muted" style={{ fontSize: '0.65rem' }}>{item.articulo?.codigo}</small>
+                          <small className="text-muted" style={{ fontSize: '0.65rem' }}>
+                            {item.articulo?.codigo}
+                          </small>
                         </td>
                         <td className="text-center">
-                          <Badge color="light" className="text-dark border">{item.cantidad}</Badge>
+                          <Badge color="light" className="text-dark border">
+                            {item.cantidad}
+                          </Badge>
                         </td>
                         <td className="text-end">C$ {item.costoUnitario?.toLocaleString()}</td>
                         <td className="text-end fw-bold px-3 text-success">C$ {item.monto?.toLocaleString()}</td>
@@ -131,14 +136,18 @@ export const ComprasPorProveedor = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={6} className="text-center py-4 text-muted small">No se encontraron productos para este proveedor.</td>
+                      <td colSpan={6} className="text-center py-4 text-muted small">
+                        No se encontraron productos para este proveedor.
+                      </td>
                     </tr>
                   )}
                 </tbody>
                 {itemsProveedor.length > 0 && (
                   <tfoot>
                     <tr className="bg-light fw-bold border-top" style={{ fontSize: '0.85rem' }}>
-                      <td colSpan={5} className="text-end py-2">TOTAL HISTÓRICO:</td>
+                      <td colSpan={5} className="text-end py-2">
+                        TOTAL HISTÓRICO:
+                      </td>
                       <td className="text-end px-3 text-primary">
                         C$ {itemsProveedor.reduce((sum, item) => sum + (item.monto || 0), 0).toLocaleString()}
                       </td>
@@ -155,7 +164,10 @@ export const ComprasPorProveedor = () => {
 
   return (
     <div className="animate__animated animate__fadeIn p-1">
-      <div className="d-flex justify-content-between align-items-center mb-2 px-1 py-1 text-white rounded shadow-sm" style={{ backgroundColor: '#343a40' }}>
+      <div
+        className="d-flex justify-content-between align-items-center mb-2 px-1 py-1 text-white rounded shadow-sm"
+        style={{ backgroundColor: '#343a40' }}
+      >
         <div className="d-flex align-items-center gap-2">
           <FontAwesomeIcon icon={faTruck} />
           <h5 className="m-0 fw-bold">Reporte de Compras por Proveedor</h5>

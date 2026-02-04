@@ -30,7 +30,7 @@ export const VendedorDashboard = () => {
         ArticuloService.getAll(),
       ]);
 
-      const ventas = resVentas.data;
+      const ventas = resVentas.data.filter(v => !v.anulada);
       const monto = ventas.reduce((acc, v) => acc + (v.total || 0), 0);
       const bajoStock = resArt.data.filter(a => (a.existencia || 0) <= (a.existenciaMinima || 0)).length;
 

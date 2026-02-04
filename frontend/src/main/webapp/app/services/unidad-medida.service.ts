@@ -11,7 +11,22 @@ const getById = (id: number) => {
   return axios.get<IUnidadMedida>(`${API_URL}/${id}`);
 };
 
+const create = (unidad: IUnidadMedida) => {
+  return axios.post<IUnidadMedida>(API_URL, unidad);
+};
+
+const update = (unidad: IUnidadMedida) => {
+  return axios.put<IUnidadMedida>(`${API_URL}/${unidad.id}`, unidad);
+};
+
+const remove = (id: number) => {
+  return axios.delete(`${API_URL}/${id}`);
+};
+
 export default {
   getAll,
   getById,
+  create,
+  update,
+  delete: remove,
 };
