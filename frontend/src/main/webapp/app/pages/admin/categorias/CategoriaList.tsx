@@ -1,15 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Table, Button, Input, Badge, Card, CardBody } from 'reactstrap';
+import {
+  Table,
+  Button,
+  Input,
+  Badge,
+  Card,
+  CardBody,
+} from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSync, faPencilAlt, faTrash, faTags } from '@fortawesome/free-solid-svg-icons';
 import { ICategoria } from 'app/shared/model/categoria.model';
 import CategoriaService from 'app/services/categoria.service';
 
+import { toast } from 'react-toastify';
+
 export const CategoriaList = () => {
   const [categorias, setCategorias] = useState<ICategoria[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
+
+
 
   const loadAll = () => {
     setLoading(true);
@@ -24,8 +35,11 @@ export const CategoriaList = () => {
       });
   };
 
+
+
   useEffect(() => {
     loadAll();
+
   }, []);
 
   const filtered = categorias.filter(
@@ -33,11 +47,15 @@ export const CategoriaList = () => {
       (c.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (c.descripcion || '').toLowerCase().includes(filter.toLowerCase()),
   );
 
+
+
   const handleDelete = (id: number) => {
     if (window.confirm('¿Eliminar categoría?')) {
       import('axios').then(axios => axios.default.delete(`api/categorias/${id}`).then(loadAll));
     }
   };
+
+
 
   return (
     <div className="animate__animated animate__fadeIn p-1">
@@ -85,12 +103,18 @@ export const CategoriaList = () => {
                 <tr key={cat.id} style={{ fontSize: '0.8rem' }}>
                   <td className="px-3">{cat.id}</td>
                   <td className="fw-bold">{cat.nombre}</td>
-                  <td className="small text-muted text-truncate" style={{ maxWidth: '200px' }}>{cat.descripcion}</td>
+                  <td className="small text-muted text-truncate" style={{ maxWidth: '200px' }}>
+                    {cat.descripcion}
+                  </td>
                   <td>
                     {cat.activo ? (
-                      <Badge color="success" pill style={{ fontSize: '0.65rem' }}>Activo</Badge>
+                      <Badge color="success" pill style={{ fontSize: '0.65rem' }}>
+                        Activo
+                      </Badge>
                     ) : (
-                      <Badge color="secondary" pill style={{ fontSize: '0.65rem' }}>Inactivo</Badge>
+                      <Badge color="secondary" pill style={{ fontSize: '0.65rem' }}>
+                        Inactivo
+                      </Badge>
                     )}
                   </td>
                   <td className="text-end px-3">
@@ -107,6 +131,8 @@ export const CategoriaList = () => {
           </Table>
         </CardBody>
       </Card>
+
+
     </div>
   );
 };

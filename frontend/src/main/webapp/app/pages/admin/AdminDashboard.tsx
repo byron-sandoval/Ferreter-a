@@ -50,7 +50,6 @@ export const AdminDashboard = () => {
 
         // Procesar datos para la gráfica de pastel (Ventas por Categoría)
         const details: IDetalleVenta[] = detRes.data;
-        console.log('DEBUG - Detalles de Venta:', details);
         const groupByCategory = details.reduce((acc: Record<string, number>, det) => {
           const catName = det.articulo?.categoria?.nombre || 'Sin Categoría';
           const monto = det.monto || 0;
@@ -85,13 +84,7 @@ export const AdminDashboard = () => {
         <h4 className="text-primary fw-bold m-0">
           <FontAwesomeIcon icon={faChartLine} className="me-2" /> Panel de Control
         </h4>
-        <Button
-          color="dark"
-          outline
-          size="sm"
-          className="border-0 shadow-sm bg-white"
-          onClick={() => navigate('/admin/configuracion')}
-        >
+        <Button color="dark" outline size="sm" className="border-0 shadow-sm bg-white" onClick={() => navigate('/admin/configuracion')}>
           <FontAwesomeIcon icon={faBuilding} className="me-2 text-primary" />
           Configurar Empresa
         </Button>
@@ -147,7 +140,9 @@ export const AdminDashboard = () => {
                   <FontAwesomeIcon icon={faReceipt} />
                 </div>
                 <div className="text-end">
-                  <div className="stat-value-palette">{ventasRecientes.filter(v => dayjs(v.fecha).isSame(dayjs(), 'day') && !v.anulada).length}</div>
+                  <div className="stat-value-palette">
+                    {ventasRecientes.filter(v => dayjs(v.fecha).isSame(dayjs(), 'day') && !v.anulada).length}
+                  </div>
                   <div className="stat-label-palette">Facturas del Día</div>
                 </div>
               </div>

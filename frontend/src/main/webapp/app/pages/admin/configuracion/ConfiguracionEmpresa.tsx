@@ -17,15 +17,8 @@ import {
     Alert,
 } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-    faBuilding,
-    faHistory,
-    faDatabase,
-    faSave,
-    faImage,
-    faUpload,
-    faInfoCircle,
-} from '@fortawesome/free-solid-svg-icons';
+import { faBuilding, faHistory, faDatabase, faSave, faImage, faUpload, faInfoCircle, faRulerCombined } from '@fortawesome/free-solid-svg-icons';
+import GestionUnidadMedida from '../GestionUnidadMedida';
 import { EmpresaService } from 'app/services/empresa.service';
 import { IEmpresa, defaultEmpresa } from 'app/shared/model/empresa.model';
 import { toast } from 'react-toastify';
@@ -115,6 +108,15 @@ export const ConfiguracionEmpresa = () => {
                             </NavItem>
                             <NavItem>
                                 <NavLink
+                                    className={`p-3 border-start border-4 ${activeTab === '4' ? 'bg-light border-primary fw-bold text-primary' : 'border-transparent text-secondary'}`}
+                                    onClick={() => setActiveTab('4')}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <FontAwesomeIcon icon={faRulerCombined} className="me-2" /> Unidades de Medida
+                                </NavLink>
+                            </NavItem>
+                            <NavItem>
+                                <NavLink
                                     className={`p-3 border-start border-4 ${activeTab === '2' ? 'bg-light border-primary fw-bold text-primary' : 'border-transparent text-secondary text-opacity-50'}`}
                                     style={{ cursor: 'not-allowed' }}
                                 >
@@ -143,7 +145,9 @@ export const ConfiguracionEmpresa = () => {
                                         <Row>
                                             <Col md="7">
                                                 <FormGroup className="mb-3">
-                                                    <Label for="nombre" className="small fw-bold text-secondary">Nombre del Negocio *</Label>
+                                                    <Label for="nombre" className="small fw-bold text-secondary">
+                                                        Nombre del Negocio *
+                                                    </Label>
                                                     <Input
                                                         type="text"
                                                         name="nombre"
@@ -157,7 +161,9 @@ export const ConfiguracionEmpresa = () => {
                                                 </FormGroup>
 
                                                 <FormGroup className="mb-3">
-                                                    <Label for="ruc" className="small fw-bold text-secondary">RUC / Identificación Fiscal *</Label>
+                                                    <Label for="ruc" className="small fw-bold text-secondary">
+                                                        RUC / Identificación Fiscal *
+                                                    </Label>
                                                     <Input
                                                         type="text"
                                                         name="ruc"
@@ -171,7 +177,9 @@ export const ConfiguracionEmpresa = () => {
                                                 </FormGroup>
 
                                                 <FormGroup className="mb-3">
-                                                    <Label for="direccion" className="small fw-bold text-secondary">Dirección Exacta *</Label>
+                                                    <Label for="direccion" className="small fw-bold text-secondary">
+                                                        Dirección Exacta *
+                                                    </Label>
                                                     <Input
                                                         type="textarea"
                                                         name="direccion"
@@ -188,7 +196,9 @@ export const ConfiguracionEmpresa = () => {
                                                 <Row>
                                                     <Col md="6">
                                                         <FormGroup className="mb-3">
-                                                            <Label for="telefono" className="small fw-bold text-secondary">Teléfonos</Label>
+                                                            <Label for="telefono" className="small fw-bold text-secondary">
+                                                                Teléfonos
+                                                            </Label>
                                                             <Input
                                                                 type="text"
                                                                 name="telefono"
@@ -202,7 +212,9 @@ export const ConfiguracionEmpresa = () => {
                                                     </Col>
                                                     <Col md="6">
                                                         <FormGroup className="mb-3">
-                                                            <Label for="correo" className="small fw-bold text-secondary">Correo Electrónico</Label>
+                                                            <Label for="correo" className="small fw-bold text-secondary">
+                                                                Correo Electrónico
+                                                            </Label>
                                                             <Input
                                                                 type="email"
                                                                 name="correo"
@@ -217,7 +229,9 @@ export const ConfiguracionEmpresa = () => {
                                                 </Row>
 
                                                 <FormGroup className="mb-4">
-                                                    <Label for="eslogan" className="small fw-bold text-secondary">Eslogan o Lema</Label>
+                                                    <Label for="eslogan" className="small fw-bold text-secondary">
+                                                        Eslogan o Lema
+                                                    </Label>
                                                     <Input
                                                         type="text"
                                                         name="eslogan"
@@ -318,10 +332,13 @@ export const ConfiguracionEmpresa = () => {
                                 </CardBody>
                             </Card>
                         </TabPane>
+                        <TabPane tabId="4">
+                            <GestionUnidadMedida />
+                        </TabPane>
                     </TabContent>
                 </Col>
             </Row>
-        </div>
+        </div >
     );
 };
 
