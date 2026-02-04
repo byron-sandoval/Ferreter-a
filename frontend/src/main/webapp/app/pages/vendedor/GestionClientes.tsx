@@ -37,7 +37,7 @@ export const GestionClientes = () => {
     try {
       const res = await VentaService.getAll({
         size: 1000,
-        sort: 'fecha,desc'
+        sort: 'fecha,desc',
       });
       setHistorial(res.data.filter(v => v.cliente?.id === c.id));
     } catch (e) {
@@ -127,23 +127,31 @@ export const GestionClientes = () => {
                   <div className="d-flex justify-content-between align-items-start mb-2">
                     <div>
                       <h5 className="fw-bold m-0">{clienteSeleccionado.nombre}</h5>
-                      <small className="opacity-75" style={{ fontSize: '0.75rem' }}>{clienteSeleccionado.cedula}</small>
+                      <small className="opacity-75" style={{ fontSize: '0.75rem' }}>
+                        {clienteSeleccionado.cedula}
+                      </small>
                     </div>
                   </div>
                   <div className="mt-2">
-                    <small className="d-block text-uppercase opacity-75 fw-bold mb-0" style={{ fontSize: '0.65rem' }}>Saldo Pendiente</small>
+                    <small className="d-block text-uppercase opacity-75 fw-bold mb-0" style={{ fontSize: '0.65rem' }}>
+                      Saldo Pendiente
+                    </small>
                     <h3 className="fw-bold m-0">C$ {(clienteSeleccionado.saldo || 0).toFixed(2)}</h3>
                   </div>
                 </div>
                 <CardBody className="p-2">
                   <div className="mb-2">
-                    <Label className="fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.65rem' }}>Perfil</Label>
+                    <Label className="fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.65rem' }}>
+                      Perfil
+                    </Label>
                     <Progress value={80} color="success" style={{ height: '4px' }} />
                   </div>
                   <div className="list-group list-group-flush">
                     <div className="list-group-item px-0 py-1 border-0" style={{ fontSize: '0.8rem' }}>
                       <FontAwesomeIcon icon={faHistory} className="me-2 text-primary" />
-                      <span><strong>Venta:</strong> {historial.length > 0 ? dayjs(historial[0].fecha).format('DD/MM/YY') : 'N/A'}</span>
+                      <span>
+                        <strong>Venta:</strong> {historial.length > 0 ? dayjs(historial[0].fecha).format('DD/MM/YY') : 'N/A'}
+                      </span>
                     </div>
                   </div>
                 </CardBody>

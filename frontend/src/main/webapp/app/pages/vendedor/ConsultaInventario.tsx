@@ -67,7 +67,13 @@ export const ConsultaInventario = () => {
               </div>
             </Col>
             <Col md="4">
-              <Input type="select" bsSize="sm" value={catFilter} onChange={e => setCatFilter(e.target.value)} style={{ fontSize: '0.8rem' }}>
+              <Input
+                type="select"
+                bsSize="sm"
+                value={catFilter}
+                onChange={e => setCatFilter(e.target.value)}
+                style={{ fontSize: '0.8rem' }}
+              >
                 <option value="">Todas las Categorías</option>
                 {categorias.map(c => (
                   <option key={c.id} value={c.id}>
@@ -100,17 +106,28 @@ export const ConsultaInventario = () => {
                   <Badge color="info" className="p-1 opacity-75" style={{ fontSize: '0.65rem' }}>
                     {a.categoria?.nombre || 'General'}
                   </Badge>
-                  <Badge color={(a.existencia || 0) > (a.existenciaMinima || 0) ? 'success' : 'danger'} pill className="px-1" style={{ fontSize: '0.65rem' }}>
+                  <Badge
+                    color={(a.existencia || 0) > (a.existenciaMinima || 0) ? 'success' : 'danger'}
+                    pill
+                    className="px-1"
+                    style={{ fontSize: '0.65rem' }}
+                  >
                     {a.existencia} disp.
                   </Badge>
                 </div>
                 <div className="fw-bold text-dark mb-0 text-truncate" title={a.nombre} style={{ fontSize: '0.8rem' }}>
                   {a.nombre}
                 </div>
-                <div className="text-muted" style={{ fontSize: '0.7rem' }}>{a.codigo}</div>
+                <div className="text-muted" style={{ fontSize: '0.7rem' }}>
+                  {a.codigo}
+                </div>
                 <div className="d-flex justify-content-between align-items-center mt-1">
-                  <span className="text-primary fw-bold" style={{ fontSize: '0.9rem' }}>C$ {a.precio?.toFixed(2)}</span>
-                  <div className="text-muted" style={{ fontSize: '0.65rem' }}>mín: {a.existenciaMinima}</div>
+                  <span className="text-primary fw-bold" style={{ fontSize: '0.9rem' }}>
+                    C$ {a.precio?.toFixed(2)}
+                  </span>
+                  <div className="text-muted" style={{ fontSize: '0.65rem' }}>
+                    mín: {a.existenciaMinima}
+                  </div>
                 </div>
               </CardBody>
             </Card>

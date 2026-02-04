@@ -10,6 +10,8 @@ import { IArticulo } from 'app/shared/model/articulo.model';
 import { ICliente, GeneroEnum } from 'app/shared/model/cliente.model';
 import { IMoneda } from 'app/shared/model/moneda.model';
 import { INumeracionFactura } from 'app/shared/model/numeracion-factura.model';
+import { ICategoria } from 'app/shared/model/categoria.model';
+import CategoriaService from 'app/services/categoria.service';
 import { MetodoPagoEnum, IVenta } from 'app/shared/model/venta.model';
 import { useAppSelector } from 'app/config/store';
 import { toast } from 'react-toastify';
@@ -27,7 +29,9 @@ import { IEmpresa } from 'app/shared/model/empresa.model';
 export const NuevaVenta = () => {
   const account = useAppSelector(state => state.authentication.account);
   const [articulos, setArticulos] = useState<IArticulo[]>([]);
+  const [categorias, setCategorias] = useState<ICategoria[]>([]);
   const [termino, setTermino] = useState('');
+  const [categoriaFiltro, setCategoriaFiltro] = useState<string>('todas');
   const [carrito, setCarrito] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [empresa, setEmpresa] = useState<IEmpresa | null>(null);
@@ -67,13 +71,15 @@ export const NuevaVenta = () => {
 
   const cargarDatosIniciales = async () => {
     try {
-      const [resArt, resMon, resNum, resEmp] = await Promise.all([
+      const [resArt, resMon, resNum, resEmp, resCat] = await Promise.all([
         ArticuloService.getAll(),
         MonedaService.getAll(),
         NumeracionService.getAll(),
         EmpresaService.getAll(),
+        CategoriaService.getAll(),
       ]);
       setArticulos(resArt.data);
+      setCategorias(resCat.data);
       setMonedas(resMon.data);
       if (resMon.data.length > 0) setMonedaSeleccionada(resMon.data[0]);
       if (resNum.data.length > 0) setNumeracion(resNum.data.find(n => n.activo) || resNum.data[0]);
@@ -280,7 +286,15 @@ export const NuevaVenta = () => {
   return (
     <div className="pos-container animate__animated animate__fadeIn">
       <Row>
-        <ProductCatalog articulos={articulos} termino={termino} setTermino={setTermino} agregarAlCarrito={agregarAlCarrito} />
+        <ProductCatalog
+          articulos={articulos}
+          categorias={categorias}
+          termino={termino}
+          setTermino={setTermino}
+          categoriaFiltro={categoriaFiltro}
+          setCategoriaFiltro={setCategoriaFiltro}
+          agregarAlCarrito={agregarAlCarrito}
+        />
 
         <VentaSidebar
           cliente={cliente}

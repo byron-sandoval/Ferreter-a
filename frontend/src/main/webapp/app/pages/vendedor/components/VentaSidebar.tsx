@@ -170,7 +170,9 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
                 <tr key={idx} className="border-bottom border-light">
                   <td className="py-2">
                     <div className="fw-bold text-dark">{item.articulo.nombre}</div>
-                    <small className="text-muted" style={{ fontSize: '0.7rem' }}>Unit: C$ {item.articulo.precio?.toFixed(2)}</small>
+                    <small className="text-muted" style={{ fontSize: '0.7rem' }}>
+                      Unit: C$ {item.articulo.precio?.toFixed(2)}
+                    </small>
                   </td>
                   <td className="text-center py-2">
                     <div className="d-flex align-items-center justify-content-center gap-1 border rounded-pill bg-white px-1">
@@ -283,9 +285,7 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
           )}
 
           <Button
-            color={
-              metodoPago === MetodoPagoEnum.EFECTIVO && (parseFloat(montoPagado) || 0) < total ? 'secondary' : 'primary'
-            }
+            color={metodoPago === MetodoPagoEnum.EFECTIVO && (parseFloat(montoPagado) || 0) < total ? 'secondary' : 'primary'}
             size="md"
             block
             className="w-100 py-2 fw-bold shadow-sm"
