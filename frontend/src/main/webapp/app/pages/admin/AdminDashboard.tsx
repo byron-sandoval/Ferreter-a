@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import './AdminDashboard.css';
 import { Row, Col, Card, CardBody, CardTitle, Table, Badge, Progress, Button } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -73,10 +74,10 @@ export const AdminDashboard = () => {
   });
 
   return (
-    <div className="animate__animated animate__fadeIn p-2 px-md-3">
+    <div className="dashboard-container animate__animated animate__fadeIn p-2 px-md-3">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h4 className="text-primary fw-bold m-0">
-          <FontAwesomeIcon icon={faChartLine} className="me-2" /> Panel de Control Gerencial
+          <FontAwesomeIcon icon={faChartLine} className="me-2" /> Panel de Control
         </h4>
         <Button
           color="dark"
@@ -93,60 +94,56 @@ export const AdminDashboard = () => {
       {/* KPI Cards */}
       <Row className="mb-4">
         <Col md="4">
-          <Card className="shadow-sm border-start border-primary border-4 h-100">
-            <CardBody className="py-2">
+          <Card className="kpi-palette-cyan h-100">
+            <CardBody className="py-2 px-3">
               <div className="d-flex justify-content-between align-items-center">
-                <div>
-                  <div className="text-uppercase text-muted fw-bold mb-1" style={{ fontSize: '0.65rem' }}>
-                    Ventas del Día
-                  </div>
-                  <h5 className="mb-0 text-primary fw-bold">
-                    C${' '}
+                <div className="kpi-icon-palette">
+                  <FontAwesomeIcon icon={faMoneyBillWave} />
+                </div>
+                <div className="text-end">
+                  <div className="stat-value-palette">
                     {ventasRecientes
                       .filter(v => dayjs(v.fecha).isSame(dayjs(), 'day'))
                       .reduce((acc, v) => acc + (v.total || 0), 0)
-                      .toLocaleString()}
-                  </h5>
+                      .toLocaleString('es-NI', { style: 'currency', currency: 'NIO', currencyDisplay: 'narrowSymbol' })}
+                  </div>
+                  <div className="stat-label-palette">Ventas del Día</div>
                 </div>
-                <FontAwesomeIcon icon={faMoneyBillWave} size="lg" className="text-primary opacity-25" />
               </div>
             </CardBody>
           </Card>
         </Col>
         <Col md="4">
-          <Card className="shadow-sm border-start border-success border-4 h-100">
-            <CardBody className="py-2">
+          <Card className="kpi-palette-grey h-100">
+            <CardBody className="py-2 px-3">
               <div className="d-flex justify-content-between align-items-center">
-                <div>
-                  <div className="text-uppercase text-muted fw-bold mb-1" style={{ fontSize: '0.65rem' }}>
-                    Ventas del Mes
-                  </div>
-                  <h5 className="mb-0 text-success fw-bold">
-                    C${' '}
+                <div className="kpi-icon-palette">
+                  <FontAwesomeIcon icon={faChartLine} />
+                </div>
+                <div className="text-end">
+                  <div className="stat-value-palette">
                     {ventasRecientes
                       .filter(v => dayjs(v.fecha).isSame(dayjs(), 'month'))
                       .reduce((acc, v) => acc + (v.total || 0), 0)
-                      .toLocaleString()}
-                  </h5>
+                      .toLocaleString('es-NI', { style: 'currency', currency: 'NIO', currencyDisplay: 'narrowSymbol' })}
+                  </div>
+                  <div className="stat-label-palette">Ventas del Mes</div>
                 </div>
-                <FontAwesomeIcon icon={faChartLine} size="lg" className="text-success opacity-25" />
               </div>
             </CardBody>
           </Card>
         </Col>
         <Col md="4">
-          <Card className="shadow-sm border-start border-warning border-4 h-100">
-            <CardBody className="py-2">
+          <Card className="kpi-palette-cyan h-100">
+            <CardBody className="py-2 px-3">
               <div className="d-flex justify-content-between align-items-center">
-                <div>
-                  <div className="text-uppercase text-muted fw-bold mb-1" style={{ fontSize: '0.65rem' }}>
-                    Facturas del Día
-                  </div>
-                  <h5 className="mb-0 text-warning fw-bold">
-                    {ventasRecientes.filter(v => dayjs(v.fecha).isSame(dayjs(), 'day')).length}
-                  </h5>
+                <div className="kpi-icon-palette">
+                  <FontAwesomeIcon icon={faReceipt} />
                 </div>
-                <FontAwesomeIcon icon={faReceipt} size="lg" className="text-warning opacity-25" />
+                <div className="text-end">
+                  <div className="stat-value-palette">{ventasRecientes.filter(v => dayjs(v.fecha).isSame(dayjs(), 'day')).length}</div>
+                  <div className="stat-label-palette">Facturas del Día</div>
+                </div>
               </div>
             </CardBody>
           </Card>
