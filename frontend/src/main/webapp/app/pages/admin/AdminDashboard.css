@@ -1,0 +1,51 @@
+/* AdminDashboard Modern Palette - ONLY KPI CARDS */
+
+.dashboard-container {
+    padding: 1.5rem;
+    background-color: #f8fafc;
+    /* Color de fondo muy suave para que resalten las paletas */
+}
+
+/* Gradient Cards based on user image - ONLY for top KPIs */
+.kpi-palette-cyan {
+    border: none !important;
+    border-radius: 8px !important;
+    background: linear-gradient(135deg, #1e1b4b 0%, #1a103d 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(26, 16, 61, 0.4) !important;
+    transition: transform 0.3s ease;
+}
+
+.kpi-palette-grey {
+    border: none !important;
+    border-radius: 8px !important;
+    background: linear-gradient(135deg, #536976 0%, #292e49 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(41, 46, 73, 0.25) !important;
+    transition: transform 0.3s ease;
+}
+
+.kpi-palette-cyan:hover,
+.kpi-palette-grey:hover {
+    transform: translateY(-4px);
+}
+
+.stat-label-palette {
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 600;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stat-value-palette {
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: white;
+}
+
+.kpi-icon-palette {
+    font-size: 1.8rem;
+    color: rgba(255, 255, 255, 0.25);
+}
