@@ -218,6 +218,15 @@ export const TopNavbar = () => {
                 </NavLink>
               </NavItem>
             )}
+
+            {/* 12. Configuraciones */}
+            {isAdmin && (
+              <NavItem className="nav-link-item">
+                <NavLink tag={Link} to="/admin/configuracion" style={navLinkStyle}>
+                  <FontAwesomeIcon icon={faUsersCog} size="sm" /> Configuraciones
+                </NavLink>
+              </NavItem>
+            )}
           </Nav>
         </div>
       </header>

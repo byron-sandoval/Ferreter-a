@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './AdminDashboard.css';
+import { useNavigate } from 'react-router-dom';
 import { Row, Col, Card, CardBody, CardTitle, Table, Badge, Progress, Button } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -30,13 +31,18 @@ interface ICategoryData {
 }
 
 export const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [bajoStock, setBajoStock] = useState<IArticulo[]>([]);
   const [ventasRecientes, setVentasRecientes] = useState<IVenta[]>([]);
   const [categoryData, setCategoryData] = useState<ICategoryData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([ArticuloService.getAll(), VentaService.getAll(), VentaService.getAllDetalles()])
+    Promise.all([
+      ArticuloService.getAll(),
+      VentaService.getAll({ size: 1000, sort: 'fecha,desc' }),
+      VentaService.getAllDetalles({ size: 1000 }),
+    ])
       .then(([artRes, venRes, detRes]) => {
         const low = artRes.data.filter(a => (a.existencia || 0) <= (a.existenciaMinima || 0));
         setBajoStock(low);
@@ -84,7 +90,7 @@ export const AdminDashboard = () => {
           outline
           size="sm"
           className="border-0 shadow-sm bg-white"
-          onClick={() => alert('Configuración de Empresa próximamente')}
+          onClick={() => navigate('/admin/configuracion')}
         >
           <FontAwesomeIcon icon={faBuilding} className="me-2 text-primary" />
           Configurar Empresa
@@ -103,7 +109,7 @@ export const AdminDashboard = () => {
                 <div className="text-end">
                   <div className="stat-value-palette">
                     {ventasRecientes
-                      .filter(v => dayjs(v.fecha).isSame(dayjs(), 'day'))
+                      .filter(v => dayjs(v.fecha).isSame(dayjs(), 'day') && !v.anulada)
                       .reduce((acc, v) => acc + (v.total || 0), 0)
                       .toLocaleString('es-NI', { style: 'currency', currency: 'NIO', currencyDisplay: 'narrowSymbol' })}
                   </div>
@@ -123,7 +129,7 @@ export const AdminDashboard = () => {
                 <div className="text-end">
                   <div className="stat-value-palette">
                     {ventasRecientes
-                      .filter(v => dayjs(v.fecha).isSame(dayjs(), 'month'))
+                      .filter(v => dayjs(v.fecha).isSame(dayjs(), 'month') && !v.anulada)
                       .reduce((acc, v) => acc + (v.total || 0), 0)
                       .toLocaleString('es-NI', { style: 'currency', currency: 'NIO', currencyDisplay: 'narrowSymbol' })}
                   </div>
@@ -141,7 +147,7 @@ export const AdminDashboard = () => {
                   <FontAwesomeIcon icon={faReceipt} />
                 </div>
                 <div className="text-end">
-                  <div className="stat-value-palette">{ventasRecientes.filter(v => dayjs(v.fecha).isSame(dayjs(), 'day')).length}</div>
+                  <div className="stat-value-palette">{ventasRecientes.filter(v => dayjs(v.fecha).isSame(dayjs(), 'day') && !v.anulada).length}</div>
                   <div className="stat-label-palette">Facturas del Día</div>
                 </div>
               </div>
