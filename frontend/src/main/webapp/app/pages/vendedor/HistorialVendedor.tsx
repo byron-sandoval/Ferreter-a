@@ -9,6 +9,8 @@ import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
 import { VentaDetalleModal } from './components/VentaDetalleModal';
 import { DevolucionModal } from './components/DevolucionModal';
+import { EmpresaService } from 'app/services/empresa.service';
+import { IEmpresa } from 'app/shared/model/empresa.model';
 
 export const HistorialVendedor = () => {
   const [ventas, setVentas] = useState<IVenta[]>([]);
@@ -19,14 +21,26 @@ export const HistorialVendedor = () => {
   const [showDetalleModal, setShowDetalleModal] = useState(false);
   const [ventaSeleccionada, setVentaSeleccionada] = useState<IVenta | null>(null);
   const [motivo, setMotivo] = useState('');
+  const [empresa, setEmpresa] = useState<IEmpresa | null>(null);
+
   useEffect(() => {
     loadVentas();
+    loadEmpresa();
   }, []);
+
+  const loadEmpresa = async () => {
+    try {
+      const res = await EmpresaService.getAll();
+      if (res.data.length > 0) setEmpresa(res.data[0]);
+    } catch (e) {
+      console.error('Error cargando empresa', e);
+    }
+  };
 
   const loadVentas = async () => {
     setLoading(true);
     try {
-      const res = await VentaService.getAll();
+      const res = await VentaService.getAll({ size: 1000, sort: 'fecha,desc' });
       setVentas(res.data);
     } catch (e) {
       toast.error('Error al cargar historial');
@@ -177,7 +191,12 @@ export const HistorialVendedor = () => {
       />
 
       {/* MODAL DETALLES DE VENTA (Refactorizado) */}
-      <VentaDetalleModal isOpen={showDetalleModal} toggle={() => setShowDetalleModal(false)} venta={ventaSeleccionada} />
+      <VentaDetalleModal
+        isOpen={showDetalleModal}
+        toggle={() => setShowDetalleModal(false)}
+        venta={ventaSeleccionada}
+        empresa={empresa}
+      />
     </div>
   );
 };

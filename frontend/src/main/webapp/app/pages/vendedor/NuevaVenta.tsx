@@ -21,6 +21,8 @@ import { ProductCatalog } from './components/ProductCatalog';
 import { VentaSidebar } from './components/VentaSidebar';
 import { ClientRegistrationModal } from './components/ClientRegistrationModal';
 import { SuccessModal } from './components/SuccessModal';
+import { EmpresaService } from 'app/services/empresa.service';
+import { IEmpresa } from 'app/shared/model/empresa.model';
 
 export const NuevaVenta = () => {
   const account = useAppSelector(state => state.authentication.account);
@@ -28,6 +30,7 @@ export const NuevaVenta = () => {
   const [termino, setTermino] = useState('');
   const [carrito, setCarrito] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [empresa, setEmpresa] = useState<IEmpresa | null>(null);
 
   // Datos del Cliente
   const [cliente, setCliente] = useState<ICliente | null>(null);
@@ -64,11 +67,17 @@ export const NuevaVenta = () => {
 
   const cargarDatosIniciales = async () => {
     try {
-      const [resArt, resMon, resNum] = await Promise.all([ArticuloService.getAll(), MonedaService.getAll(), NumeracionService.getAll()]);
+      const [resArt, resMon, resNum, resEmp] = await Promise.all([
+        ArticuloService.getAll(),
+        MonedaService.getAll(),
+        NumeracionService.getAll(),
+        EmpresaService.getAll(),
+      ]);
       setArticulos(resArt.data);
       setMonedas(resMon.data);
       if (resMon.data.length > 0) setMonedaSeleccionada(resMon.data[0]);
       if (resNum.data.length > 0) setNumeracion(resNum.data.find(n => n.activo) || resNum.data[0]);
+      if (resEmp.data.length > 0) setEmpresa(resEmp.data[0]);
 
       // Cargar vendedor por Keycloak ID
       if (account?.id) {
@@ -227,6 +236,25 @@ export const NuevaVenta = () => {
           articulo: item.articulo,
           venta: { id: ventaId },
         });
+
+        // Actualizar stock del artículo
+        const articuloActualizado = {
+          ...item.articulo,
+          existencia: (item.articulo.existencia || 0) - item.cantidad,
+        };
+        await ArticuloService.update(articuloActualizado);
+      }
+
+      // Actualizar saldo del cliente si es crédito
+      if (!esContado && cliente) {
+        const deuda = total - montoPagadoNum;
+        if (deuda > 0) {
+          const clienteActualizado = {
+            ...cliente,
+            saldo: (cliente.saldo || 0) + deuda,
+          };
+          await ClienteService.update(clienteActualizado);
+        }
       }
 
       toast.success(`¡Venta #${resVenta.data.noFactura} registrada con éxito!`);
@@ -301,6 +329,7 @@ export const NuevaVenta = () => {
         handlePrint={handlePrint}
         componentRef={componentRef}
         carrito={carrito}
+        empresa={empresa}
       />
     </div>
   );

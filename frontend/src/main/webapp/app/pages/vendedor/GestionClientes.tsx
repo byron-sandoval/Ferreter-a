@@ -35,8 +35,10 @@ export const GestionClientes = () => {
   const verDetalle = async (c: ICliente) => {
     setClienteSeleccionado(c);
     try {
-      // JHipster usually supports filtering by client.id
-      const res = await VentaService.getAll(); // Simplified for now, in real dev we filter by ID
+      const res = await VentaService.getAll({
+        size: 1000,
+        sort: 'fecha,desc'
+      });
       setHistorial(res.data.filter(v => v.cliente?.id === c.id));
     } catch (e) {
       console.error(e);
