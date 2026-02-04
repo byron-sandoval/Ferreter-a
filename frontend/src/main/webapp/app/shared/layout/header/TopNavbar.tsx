@@ -24,6 +24,7 @@ import {
   faFileInvoice,
   faChartBar,
   faClock,
+  faRulerCombined,
 } from '@fortawesome/free-solid-svg-icons';
 
 export const TopNavbar = () => {
