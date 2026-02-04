@@ -11,25 +11,52 @@ import {
   faTruck,
   faHistory,
   faBuilding,
+  faReceipt,
 } from '@fortawesome/free-solid-svg-icons';
 import ArticuloService from 'app/services/articulo.service';
 import VentaService from 'app/services/venta.service';
 import { IArticulo } from 'app/shared/model/articulo.model';
 import { IVenta } from 'app/shared/model/venta.model';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import dayjs from 'dayjs';
+import { IDetalleVenta } from 'app/shared/model/detalle-venta.model';
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658'];
+
+interface ICategoryData {
+  name: string;
+  value: number;
+}
 
 export const AdminDashboard = () => {
   const [bajoStock, setBajoStock] = useState<IArticulo[]>([]);
   const [ventasRecientes, setVentasRecientes] = useState<IVenta[]>([]);
+  const [categoryData, setCategoryData] = useState<ICategoryData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([ArticuloService.getAll(), VentaService.getAll()])
-      .then(([artRes, venRes]) => {
+    Promise.all([ArticuloService.getAll(), VentaService.getAll(), VentaService.getAllDetalles()])
+      .then(([artRes, venRes, detRes]) => {
         const low = artRes.data.filter(a => (a.existencia || 0) <= (a.existenciaMinima || 0));
         setBajoStock(low);
         setVentasRecientes(venRes.data);
+
+        // Procesar datos para la gráfica de pastel (Ventas por Categoría)
+        const details: IDetalleVenta[] = detRes.data;
+        console.log('DEBUG - Detalles de Venta:', details);
+        const groupByCategory = details.reduce((acc: Record<string, number>, det) => {
+          const catName = det.articulo?.categoria?.nombre || 'Sin Categoría';
+          const monto = det.monto || 0;
+          acc[catName] = (acc[catName] || 0) + monto;
+          return acc;
+        }, {});
+
+        const pieData: ICategoryData[] = Object.keys(groupByCategory).map(name => ({
+          name,
+          value: groupByCategory[name],
+        }));
+
+        setCategoryData(pieData.sort((a, b) => b.value - a.value));
         setLoading(false);
       })
       .catch(console.error);
@@ -46,7 +73,7 @@ export const AdminDashboard = () => {
   });
 
   return (
-    <div className="animate__animated animate__fadeIn p-3 px-md-4">
+    <div className="animate__animated animate__fadeIn p-2 px-md-3">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h4 className="text-primary fw-bold m-0">
           <FontAwesomeIcon icon={faChartLine} className="me-2" /> Panel de Control Gerencial
@@ -65,74 +92,61 @@ export const AdminDashboard = () => {
 
       {/* KPI Cards */}
       <Row className="mb-4">
-        <Col md="3">
+        <Col md="4">
           <Card className="shadow-sm border-start border-primary border-4 h-100">
-            <CardBody>
+            <CardBody className="py-2">
               <div className="d-flex justify-content-between align-items-center">
                 <div>
-                  <div className="text-uppercase text-muted fw-bold mb-1" style={{ fontSize: '0.7rem' }}>
+                  <div className="text-uppercase text-muted fw-bold mb-1" style={{ fontSize: '0.65rem' }}>
                     Ventas del Día
                   </div>
-                  <h4 className="mb-0 text-primary fw-bold">
+                  <h5 className="mb-0 text-primary fw-bold">
                     C${' '}
                     {ventasRecientes
                       .filter(v => dayjs(v.fecha).isSame(dayjs(), 'day'))
                       .reduce((acc, v) => acc + (v.total || 0), 0)
                       .toLocaleString()}
-                  </h4>
+                  </h5>
                 </div>
                 <FontAwesomeIcon icon={faMoneyBillWave} size="lg" className="text-primary opacity-25" />
               </div>
             </CardBody>
           </Card>
         </Col>
-        <Col md="3">
+        <Col md="4">
           <Card className="shadow-sm border-start border-success border-4 h-100">
-            <CardBody>
+            <CardBody className="py-2">
               <div className="d-flex justify-content-between align-items-center">
                 <div>
-                  <div className="text-uppercase text-muted fw-bold mb-1" style={{ fontSize: '0.7rem' }}>
+                  <div className="text-uppercase text-muted fw-bold mb-1" style={{ fontSize: '0.65rem' }}>
                     Ventas del Mes
                   </div>
-                  <h4 className="mb-0 text-success fw-bold">
+                  <h5 className="mb-0 text-success fw-bold">
                     C${' '}
                     {ventasRecientes
                       .filter(v => dayjs(v.fecha).isSame(dayjs(), 'month'))
                       .reduce((acc, v) => acc + (v.total || 0), 0)
                       .toLocaleString()}
-                  </h4>
+                  </h5>
                 </div>
                 <FontAwesomeIcon icon={faChartLine} size="lg" className="text-success opacity-25" />
               </div>
             </CardBody>
           </Card>
         </Col>
-        <Col md="3">
-          <Card className="shadow-sm border-start border-info border-4 h-100">
-            <CardBody>
-              <div className="d-flex justify-content-between align-items-center">
-                <div>
-                  <div className="text-uppercase text-muted fw-bold mb-1" style={{ fontSize: '0.7rem' }}>
-                    Alertas de Stock
-                  </div>
-                  <h4 className="mb-0 text-info fw-bold">{bajoStock.length} Items</h4>
-                </div>
-                <FontAwesomeIcon icon={faBoxes} size="lg" className="text-info opacity-25" />
-              </div>
-            </CardBody>
-          </Card>
-        </Col>
-        <Col md="3">
+        <Col md="4">
           <Card className="shadow-sm border-start border-warning border-4 h-100">
-            <CardBody>
+            <CardBody className="py-2">
               <div className="d-flex justify-content-between align-items-center">
                 <div>
-                  <div className="text-uppercase text-muted fw-bold mb-1" style={{ fontSize: '0.7rem' }}>
-                    Vendedores
+                  <div className="text-uppercase text-muted fw-bold mb-1" style={{ fontSize: '0.65rem' }}>
+                    Facturas del Día
                   </div>
-                  <h4 className="mb-0 text-warning fw-bold">Activos</h4>
+                  <h5 className="mb-0 text-warning fw-bold">
+                    {ventasRecientes.filter(v => dayjs(v.fecha).isSame(dayjs(), 'day')).length}
+                  </h5>
                 </div>
-                <FontAwesomeIcon icon={faUsers} size="lg" className="text-warning opacity-25" />
+                <FontAwesomeIcon icon={faReceipt} size="lg" className="text-warning opacity-25" />
               </div>
             </CardBody>
           </Card>
@@ -144,12 +158,12 @@ export const AdminDashboard = () => {
           <Card className="shadow mb-4">
             <CardBody>
               <CardTitle tag="h6" className="text-secondary border-bottom pb-2 mb-3 d-flex justify-content-between align-items-center">
-                <span>📊 Tendencia de Ventas (Últimos 7 días)</span>
+                <span> Tendencia de Ventas (Últimos 7 días)</span>
                 <Badge color="primary" pill style={{ fontSize: '0.7rem' }}>
                   C$ {ventasRecientes.reduce((acc, v) => acc + (v.total || 0), 0).toLocaleString()}
                 </Badge>
               </CardTitle>
-              <div style={{ height: '240px', width: '100%' }}>
+              <div style={{ height: '220px', width: '100%' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={chartData}>
                     <defs>
@@ -161,7 +175,7 @@ export const AdminDashboard = () => {
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
                     <XAxis dataKey="name" axisLine={false} tickLine={false} />
                     <YAxis axisLine={false} tickLine={false} />
-                    <Tooltip />
+                    <Tooltip contentStyle={{ borderRadius: '10px', border: 'none', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }} />
                     <Area type="monotone" dataKey="total" stroke="#8884d8" fillOpacity={1} fill="url(#colorTotal)" />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -172,7 +186,7 @@ export const AdminDashboard = () => {
 
         {/* Alertas de Stock */}
         <Col md="4">
-          <Card className="shadow mb-4">
+          <Card className="shadow mb-4 h-100">
             <CardBody>
               <CardTitle tag="h6" className="text-danger border-bottom pb-2 mb-3 d-flex justify-content-between align-items-center">
                 <span>
@@ -184,19 +198,27 @@ export const AdminDashboard = () => {
               </CardTitle>
 
               {loading ? (
-                <div className="text-center">checking stock...</div>
+                <div className="text-center py-5">
+                  <div className="spinner-border spinner-border-sm text-danger" role="status"></div>
+                </div>
               ) : bajoStock.length > 0 ? (
-                <div className="table-responsive" style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                  <Table size="sm" borderless>
+                <div className="table-responsive" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                  <Table size="sm" borderless hover className="align-middle">
                     <tbody>
                       {bajoStock.map(p => (
                         <tr key={p.id}>
                           <td>
-                            <div className="fw-bold">{p.nombre}</div>
-                            <small className="text-muted">{p.codigo}</small>
+                            <div className="fw-bold small text-truncate" style={{ maxWidth: '150px' }}>
+                              {p.nombre}
+                            </div>
+                            <div className="text-muted" style={{ fontSize: '0.65rem' }}>
+                              {p.codigo}
+                            </div>
                           </td>
-                          <td className="text-end text-danger fw-bold">
-                            {p.existencia} / {p.existenciaMinima}
+                          <td className="text-end">
+                            <Badge color="soft-danger" style={{ backgroundColor: '#ffebee', color: '#c62828', fontSize: '0.7rem' }}>
+                              {p.existencia} / {p.existenciaMinima}
+                            </Badge>
                           </td>
                         </tr>
                       ))}
@@ -204,11 +226,45 @@ export const AdminDashboard = () => {
                   </Table>
                 </div>
               ) : (
-                <div className="text-center text-success py-4">
-                  <FontAwesomeIcon icon={faBoxes} size="2x" className="mb-2" />
-                  <p>¡Todo en orden! No hay stock bajo.</p>
+                <div className="text-center text-success py-5">
+                  <FontAwesomeIcon icon={faBoxes} size="2x" className="mb-2 opacity-25" />
+                  <p className="small mb-0">¡Todo en orden!</p>
                 </div>
               )}
+            </CardBody>
+          </Card>
+        </Col>
+      </Row>
+
+      <Row>
+        <Col md="8">
+          <Card className="shadow mb-4">
+            <CardBody>
+              <CardTitle tag="h6" className="text-secondary border-bottom pb-2 mb-3">
+                Ventas por Categoría
+              </CardTitle>
+              <div style={{ height: '250px', width: '100%' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={categoryData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={50}
+                      outerRadius={90}
+                      paddingAngle={5}
+                      dataKey="value"
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {categoryData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={value => [`C$ ${Number(value).toLocaleString()}`, 'Ventas']} />
+                    <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
             </CardBody>
           </Card>
         </Col>

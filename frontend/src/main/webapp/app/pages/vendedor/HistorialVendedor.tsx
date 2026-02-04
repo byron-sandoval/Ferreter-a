@@ -1,27 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Table,
-  Button,
-  Badge,
-  Card,
-  CardBody,
-  Input,
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Form,
-  FormGroup,
-  Label,
-} from 'reactstrap';
+import { Table, Button, Badge, Card, CardBody, Input, Label } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHistory, faUndo, faEye, faSearch, faCalendarAlt, faFileInvoiceDollar, faPrint } from '@fortawesome/free-solid-svg-icons';
-import { useReactToPrint } from 'react-to-print';
+import { faHistory, faUndo, faEye, faSearch, faCalendarAlt, faSync } from '@fortawesome/free-solid-svg-icons';
 import VentaService from 'app/services/venta.service';
 import DevolucionService from 'app/services/devolucion.service';
 import { IVenta, IDevolucion } from 'app/shared/model';
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
+import { VentaDetalleModal } from './components/VentaDetalleModal';
+import { DevolucionModal } from './components/DevolucionModal';
 
 export const HistorialVendedor = () => {
   const [ventas, setVentas] = useState<IVenta[]>([]);
@@ -32,11 +19,6 @@ export const HistorialVendedor = () => {
   const [showDetalleModal, setShowDetalleModal] = useState(false);
   const [ventaSeleccionada, setVentaSeleccionada] = useState<IVenta | null>(null);
   const [motivo, setMotivo] = useState('');
-  // Impresión
-  const componentRef = React.useRef<any>(null);
-  const handlePrint = useReactToPrint({
-    contentRef: componentRef,
-  });
   useEffect(() => {
     loadVentas();
   }, []);
@@ -74,7 +56,7 @@ export const HistorialVendedor = () => {
       const devData: IDevolucion = {
         fecha: dayjs(),
         motivo,
-        montoTotal: ventaSeleccionada.total || 0,
+        total: ventaSeleccionada.total || 0,
         venta: ventaSeleccionada,
       };
       await DevolucionService.create(devData);
@@ -92,14 +74,19 @@ export const HistorialVendedor = () => {
   );
 
   return (
-    <div className="animate__animated animate__fadeIn p-2">
-      <h3 className="fw-bold mb-4 text-secondary">
-        <FontAwesomeIcon icon={faHistory} className="me-2 text-primary" /> Historial de Ventas Recientes
-      </h3>
+    <div className="animate__animated animate__fadeIn p-1">
+      <div className="d-flex justify-content-between align-items-center mb-2">
+        <h5 className="fw-bold text-secondary mb-0">
+          <FontAwesomeIcon icon={faHistory} className="me-2 text-primary" /> Historial de Ventas Recientes
+        </h5>
+        <Button color="light" size="sm" onClick={loadVentas} disabled={loading} style={{ fontSize: '0.75rem' }}>
+          <FontAwesomeIcon icon={faSync} spin={loading} className="me-1" /> Actualizar
+        </Button>
+      </div>
 
-      <Card className="shadow-sm border-0 mb-4">
-        <CardBody className="p-3">
-          <div className="input-group" style={{ maxWidth: '400px' }}>
+      <Card className="shadow-sm border-0 mb-2 bg-light">
+        <CardBody className="p-2">
+          <div className="input-group input-group-sm" style={{ maxWidth: '350px' }}>
             <span className="input-group-text bg-white border-end-0">
               <FontAwesomeIcon icon={faSearch} className="text-muted" />
             </span>
@@ -108,22 +95,23 @@ export const HistorialVendedor = () => {
               className="border-start-0"
               value={filter}
               onChange={e => setFilter(e.target.value)}
+              style={{ fontSize: '0.8rem' }}
             />
           </div>
         </CardBody>
       </Card>
 
-      <Card className="shadow-sm border-0 rounded-4 overflow-hidden">
-        <Table hover responsive className="mb-0 align-middle">
-          <thead className="bg-light text-muted small text-uppercase fw-bold">
+      <Card className="shadow-sm border-0 rounded-3 overflow-hidden">
+        <Table hover responsive size="sm" className="mb-0 align-middle">
+          <thead className="bg-light text-muted small text-uppercase fw-bold" style={{ fontSize: '0.75rem' }}>
             <tr>
-              <th className="py-3 px-4">Folio</th>
-              <th>Fecha</th>
-              <th>Cliente</th>
-              <th>Total</th>
-              <th>Método</th>
-              <th className="text-center">Estado Garantía</th>
-              <th className="text-end px-4">Acciones</th>
+              <th className="py-2 px-3">Folio</th>
+              <th className="py-2">Fecha</th>
+              <th className="py-2">Cliente</th>
+              <th className="py-2">Total</th>
+              <th className="py-2">Método</th>
+              <th className="py-2 text-center">Garantía</th>
+              <th className="py-2 text-end px-3">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -131,44 +119,45 @@ export const HistorialVendedor = () => {
               const activa = puedeDevolver(v.fecha);
               return (
                 <tr key={v.id}>
-                  <td className="px-4 fw-bold text-primary">#{v.noFactura}</td>
-                  <td className="small text-muted">
+                  <td className="px-3 fw-bold text-primary" style={{ fontSize: '0.8rem' }}>#{v.noFactura}</td>
+                  <td style={{ fontSize: '0.75rem' }}>
                     <FontAwesomeIcon icon={faCalendarAlt} className="me-1 opacity-50" />
-                    {dayjs(v.fecha).format('DD/MM/YYYY HH:mm')}
+                    {dayjs(v.fecha).format('DD/MM/YY HH:mm')}
                   </td>
-                  <td className="fw-bold text-dark">{v.cliente?.nombre}</td>
-                  <td className="fw-bold">C$ {v.total?.toFixed(2)}</td>
+                  <td className="fw-bold text-dark" style={{ fontSize: '0.8rem' }}>{v.cliente?.nombre}</td>
+                  <td className="fw-bold" style={{ fontSize: '0.8rem' }}>C$ {v.total?.toFixed(2)}</td>
                   <td>
-                    <Badge pill color="light" className="text-dark border">
+                    <Badge color="light" className="text-dark border p-1" style={{ fontSize: '0.65rem' }}>
                       {v.metodoPago}
                     </Badge>
                   </td>
                   <td className="text-center">
                     {activa ? (
-                      <Badge color="soft-success" style={{ backgroundColor: '#e8f5e9', color: '#2e7d32' }}>
-                        Dentro de 72h
+                      <Badge color="soft-success" style={{ backgroundColor: '#e8f5e9', color: '#2e7d32', fontSize: '0.65rem' }}>
+                        Activa
                       </Badge>
                     ) : (
-                      <Badge color="soft-danger" style={{ backgroundColor: '#ffebee', color: '#c62828' }}>
-                        Garantía Vencida
+                      <Badge color="soft-danger" style={{ backgroundColor: '#ffebee', color: '#c62828', fontSize: '0.65rem' }}>
+                        Vencida
                       </Badge>
                     )}
                   </td>
-                  <td className="text-end px-4">
-                    <Button color="light" size="sm" className="me-2 rounded-pill" onClick={() => v.id && verDetalles(v.id)}>
-                      <FontAwesomeIcon icon={faEye} />
+                  <td className="text-end px-3">
+                    <Button color="light" size="sm" className="me-1 p-1" onClick={() => v.id && verDetalles(v.id)}>
+                      <FontAwesomeIcon icon={faEye} fixedWidth />
                     </Button>
                     <Button
                       color="outline-danger"
                       size="sm"
-                      className="rounded-pill"
+                      className="p-1 px-2"
+                      style={{ fontSize: '0.7rem' }}
                       disabled={!activa}
                       onClick={() => {
                         setVentaSeleccionada(v);
                         setShowDevolucionModal(true);
                       }}
                     >
-                      <FontAwesomeIcon icon={faUndo} className="me-1" /> Devolución
+                      Devolución
                     </Button>
                   </td>
                 </tr>
@@ -178,189 +167,17 @@ export const HistorialVendedor = () => {
         </Table>
       </Card>
 
-      <Modal isOpen={showDevolucionModal} toggle={() => setShowDevolucionModal(false)} centered>
-        <ModalHeader toggle={() => setShowDevolucionModal(false)} className="bg-danger text-white border-0">
-          <FontAwesomeIcon icon={faUndo} className="me-2" /> Procesar Devolución
-        </ModalHeader>
-        <ModalBody className="p-4">
-          <div className="bg-light p-3 rounded-4 mb-4 text-center">
-            <small className="text-muted d-block text-uppercase fw-bold mb-1">Folio a Reversar</small>
-            <h4 className="fw-bold text-danger m-0">#{ventaSeleccionada?.noFactura}</h4>
-            <div className="mt-2 fw-bold fs-5">Monto Total: C$ {ventaSeleccionada?.total?.toFixed(2)}</div>
-          </div>
-          <Form>
-            <FormGroup>
-              <Label className="small fw-bold text-muted text-uppercase">Motivo de la Devolución</Label>
-              <Input
-                type="textarea"
-                rows="4"
-                placeholder="Ej: Producto defectuoso, Error en despacho, Cliente arrepentido..."
-                className="bg-light border-0"
-                value={motivo}
-                onChange={e => setMotivo(e.target.value)}
-              />
-            </FormGroup>
-          </Form>
-          <div className="alert alert-warning border-0 small mb-0">
-            <FontAwesomeIcon icon={faUndo} className="me-2" /> Al confirmar, se generará una nota de crédito y el inventario será ajustado
-            automáticamente (si aplica).
-          </div>
-        </ModalBody>
-        <ModalFooter className="border-0">
-          <Button color="light" onClick={() => setShowDevolucionModal(false)}>
-            Cancelar
-          </Button>
-          <Button color="danger" className="px-4 fw-bold" onClick={procesarDevolucion} disabled={!motivo}>
-            Confirmar Devolución
-          </Button>
-        </ModalFooter>
-      </Modal>
+      <DevolucionModal
+        isOpen={showDevolucionModal}
+        toggle={() => setShowDevolucionModal(false)}
+        venta={ventaSeleccionada}
+        motivo={motivo}
+        setMotivo={setMotivo}
+        onConfirm={procesarDevolucion}
+      />
 
-      {/* MODAL DETALLES DE VENTA */}
-      <Modal isOpen={showDetalleModal} toggle={() => setShowDetalleModal(false)} size="lg" centered>
-        <ModalHeader toggle={() => setShowDetalleModal(false)} className="bg-primary text-white">
-          <FontAwesomeIcon icon={faFileInvoiceDollar} className="me-2" /> Detalles de Factura #{ventaSeleccionada?.noFactura}
-        </ModalHeader>
-        <ModalBody>
-          <div className="d-flex justify-content-between mb-4 border-bottom pb-2">
-            <div>
-              <Label className="text-muted small text-uppercase fw-bold mb-0">Cliente</Label>
-              <div className="fw-bold fs-5 text-primary">{ventaSeleccionada?.cliente?.nombre || 'General'}</div>
-              <small className="text-muted">{ventaSeleccionada?.cliente?.cedula}</small>
-            </div>
-            <div className="text-end">
-              <Label className="text-muted small text-uppercase fw-bold mb-0">Fecha y Hora</Label>
-              <div className="fw-bold">{dayjs(ventaSeleccionada?.fecha).format('DD/MM/YYYY HH:mm')}</div>
-              <Badge color={ventaSeleccionada?.esContado ? 'success' : 'warning'}>
-                {ventaSeleccionada?.esContado ? 'Contado' : 'Crédito'}
-              </Badge>
-            </div>
-          </div>
-
-          <Table hover responsive borderless className="align-middle">
-            <thead className="table-light small text-uppercase">
-              <tr>
-                <th>Producto</th>
-                <th className="text-center">Cant.</th>
-                <th className="text-end">Precio</th>
-                <th className="text-end">Subtotal</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ventaSeleccionada?.detalles?.map((det, i) => (
-                <tr key={i} className="border-bottom border-light">
-                  <td>
-                    <div className="fw-bold">{det.articulo?.nombre}</div>
-                    <small className="text-muted">{det.articulo?.codigo}</small>
-                  </td>
-                  <td className="text-center">
-                    <Badge color="light" className="text-dark border px-3">
-                      {det.cantidad}
-                    </Badge>
-                  </td>
-                  <td className="text-end">C$ {det.precioVenta?.toFixed(2)}</td>
-                  <td className="text-end fw-bold">C$ {det.monto?.toFixed(2)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-
-          <div className="mt-4 p-3 bg-light rounded-4 ms-auto" style={{ maxWidth: '300px' }}>
-            <div className="d-flex justify-content-between mb-1">
-              <span className="text-muted">Subtotal:</span>
-              <span className="fw-bold">C$ {ventaSeleccionada?.subtotal?.toFixed(2)}</span>
-            </div>
-            <div className="d-flex justify-content-between mb-2">
-              <span className="text-muted">IVA (15%):</span>
-              <span className="text-danger fw-bold">C$ {ventaSeleccionada?.iva?.toFixed(2)}</span>
-            </div>
-            <div className="d-flex justify-content-between border-top pt-2">
-              <h5 className="fw-bold m-0">Total:</h5>
-              <h5 className="fw-bold text-primary m-0">C$ {ventaSeleccionada?.total?.toFixed(2)}</h5>
-            </div>
-            {ventaSeleccionada?.importeRecibido != null && (
-              <div className="d-flex justify-content-between mt-2 pt-2 border-top border-light">
-                <span className="text-muted">Efectivo:</span>
-                <span className="fw-bold">C$ {ventaSeleccionada?.importeRecibido?.toFixed(2)}</span>
-              </div>
-            )}
-            {ventaSeleccionada?.cambio != null && (
-              <div className="d-flex justify-content-between">
-                <span className="text-muted">Cambio:</span>
-                <span className="fw-bold text-success">C$ {ventaSeleccionada?.cambio?.toFixed(2)}</span>
-              </div>
-            )}
-          </div>
-
-          {/* TICKET OCULTO PARA IMPRESIÓN */}
-          <div style={{ display: 'none' }}>
-            <div ref={componentRef} style={{ padding: '20px', fontFamily: 'monospace', width: '300px' }}>
-              <div style={{ textAlign: 'center', marginBottom: '10px' }}>
-                <h2 style={{ margin: '0' }}>FERRONICA</h2>
-                <p style={{ margin: '0', fontSize: '12px' }}>Ferretería & Suministros</p>
-                <p style={{ margin: '0', fontSize: '10px' }}>RUC: 0000000000000</p>
-              </div>
-              <div style={{ borderBottom: '1px dashed #000', marginBottom: '10px' }}></div>
-              <div style={{ fontSize: '12px' }}>
-                <p style={{ margin: '2px 0' }}>
-                  <strong>No. Factura:</strong> {ventaSeleccionada?.noFactura}
-                </p>
-                <p style={{ margin: '2px 0' }}>
-                  <strong>Fecha:</strong> {dayjs(ventaSeleccionada?.fecha).format('DD/MM/YYYY HH:mm')}
-                </p>
-                <p style={{ margin: '2px 0' }}>
-                  <strong>Cliente:</strong> {ventaSeleccionada?.cliente?.nombre || 'Consumidor Final'}
-                </p>
-                <p style={{ margin: '2px 0' }}>
-                  <strong>Vendedor:</strong> {ventaSeleccionada?.vendedor?.nombre || 'Cajero'}
-                </p>
-              </div>
-              <div style={{ borderBottom: '1px dashed #000', margin: '10px 0' }}></div>
-              <table style={{ width: '100%', fontSize: '12px' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid #000' }}>
-                    <th style={{ textAlign: 'left' }}>Item</th>
-                    <th style={{ textAlign: 'center' }}>Cant</th>
-                    <th style={{ textAlign: 'right' }}>Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {ventaSeleccionada?.detalles?.map((det, i) => (
-                    <tr key={i}>
-                      <td>{det.articulo?.nombre}</td>
-                      <td style={{ textAlign: 'center' }}>{det.cantidad}</td>
-                      <td style={{ textAlign: 'right' }}>C$ {det.monto?.toFixed(2)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div style={{ borderBottom: '1px dashed #000', margin: '10px 0' }}></div>
-              <div style={{ fontSize: '12px', textAlign: 'right' }}>
-                <p style={{ margin: '2px 0' }}>Subtotal: C$ {ventaSeleccionada?.subtotal?.toFixed(2)}</p>
-                <p style={{ margin: '2px 0' }}>IVA (15%): C$ {ventaSeleccionada?.iva?.toFixed(2)}</p>
-                <h3 style={{ margin: '5px 0' }}>TOTAL: C$ {ventaSeleccionada?.total?.toFixed(2)}</h3>
-                {ventaSeleccionada?.importeRecibido != null && (
-                  <p style={{ margin: '2px 0' }}>Efectivo: C$ {ventaSeleccionada?.importeRecibido?.toFixed(2)}</p>
-                )}
-                {ventaSeleccionada?.cambio != null && <p style={{ margin: '2px 0' }}>Cambio: C$ {ventaSeleccionada?.cambio?.toFixed(2)}</p>}
-              </div>
-              <div style={{ borderBottom: '1px dashed #000', margin: '10px 0' }}></div>
-              <div style={{ textAlign: 'center', fontSize: '10px' }}>
-                <p>¡Gracias por su compra!</p>
-                <p>COPIA DE REIMPRESIÓN</p>
-              </div>
-            </div>
-          </div>
-        </ModalBody>
-        <ModalFooter className="border-0">
-          <Button color="secondary" onClick={() => setShowDetalleModal(false)}>
-            Cerrar
-          </Button>
-          <Button color="primary" onClick={() => handlePrint()}>
-            <FontAwesomeIcon icon={faPrint} className="me-2" /> Reimprimir
-          </Button>
-        </ModalFooter>
-      </Modal>
+      {/* MODAL DETALLES DE VENTA (Refactorizado) */}
+      <VentaDetalleModal isOpen={showDetalleModal} toggle={() => setShowDetalleModal(false)} venta={ventaSeleccionada} />
     </div>
   );
 };

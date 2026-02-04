@@ -5,7 +5,7 @@ export interface IDevolucion {
   id?: number;
   fecha?: dayjs.Dayjs | null;
   motivo?: string;
-  montoTotal?: number;
+  total?: number;
   venta?: IVenta | null;
 }
 

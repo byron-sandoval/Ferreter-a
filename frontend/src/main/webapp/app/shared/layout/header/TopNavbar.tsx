@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink as Link } from 'react-router-dom';
 import { Nav, NavItem, NavLink, Navbar, Container, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import { useAppSelector } from 'app/config/store';
 import { hasAnyAuthority } from 'app/shared/auth/private-route';
 import { AUTHORITIES } from 'app/config/constants';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import dayjs from 'dayjs';
+import 'dayjs/locale/es';
 import {
   faHome,
   faCashRegister,
@@ -21,6 +23,7 @@ import {
   faTruck,
   faFileInvoice,
   faChartBar,
+  faClock,
 } from '@fortawesome/free-solid-svg-icons';
 
 export const TopNavbar = () => {
@@ -28,6 +31,20 @@ export const TopNavbar = () => {
   const isAdmin = hasAnyAuthority(account?.authorities || [], [AUTHORITIES.ADMIN]);
   const isVendedor = hasAnyAuthority(account?.authorities || [], [AUTHORITIES.VENDEDOR]);
   const isBodeguero = hasAnyAuthority(account?.authorities || [], [AUTHORITIES.BODEGUERO]);
+
+  const [dateStr, setDateStr] = useState('');
+  const [timeStr, setTimeStr] = useState('');
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = dayjs().locale('es');
+      setDateStr(now.format('dddd, D [de] MMMM [de] YYYY'));
+      setTimeStr(now.format('hh:mm:ss A'));
+    };
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const navLinkStyle = {
     color: '#fff',
@@ -47,7 +64,7 @@ export const TopNavbar = () => {
   return (
     <div className="top-navbar-container shadow-sm w-100 sticky-top" style={navStyle}>
       <header className="w-100">
-        {/* ROW 1: Logo & Brand (Left), User (Right) */}
+        {/* ROW 1: Logo & Brand (Left), Clock & User (Right) */}
         <div className="d-flex align-items-center justify-content-between px-4 py-2 border-bottom border-light border-opacity-10">
           <div className="d-flex align-items-center gap-3">
             {/* Logo */}
@@ -73,8 +90,21 @@ export const TopNavbar = () => {
             </div>
           </div>
 
-          {/* User Section (Right Corner) */}
-          <div className="d-flex align-items-center">
+          {/* Clock & User Section (Right Corner) */}
+          <div className="d-flex align-items-center gap-4">
+            {/* Reloj Dinámico */}
+            <div className="d-none d-md-flex align-items-center text-white opacity-75 gap-3 border-end pe-4 border-light border-opacity-10">
+              <FontAwesomeIcon icon={faClock} className="text-info fs-5" />
+              <div className="text-end" style={{ lineHeight: '1.2' }}>
+                <div className="fw-bold small text-capitalize" style={{ fontSize: '0.75rem' }}>
+                  {dateStr}
+                </div>
+                <div className="small opacity-75" style={{ fontSize: '0.7rem' }}>
+                  {timeStr}
+                </div>
+              </div>
+            </div>
+
             <UncontrolledDropdown nav inNavbar className="list-unstyled">
               <DropdownToggle nav className="p-0">
                 <div className="d-flex align-items-center gap-2 text-white opacity-90">
@@ -107,15 +137,6 @@ export const TopNavbar = () => {
                 <FontAwesomeIcon icon={faHome} size="sm" /> Inicio
               </NavLink>
             </NavItem>
-
-            {/* 2. Dashboard */}
-            {isAdmin && (
-              <NavItem className="nav-link-item">
-                <NavLink tag={Link} to="/admin" style={navLinkStyle}>
-                  <FontAwesomeIcon icon={faUsersCog} size="sm" /> Dashboard
-                </NavLink>
-              </NavItem>
-            )}
 
             {/* 3. Facturar */}
             {(isAdmin || isVendedor) && (

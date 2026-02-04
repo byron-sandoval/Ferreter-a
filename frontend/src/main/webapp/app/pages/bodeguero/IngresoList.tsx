@@ -51,26 +51,31 @@ export const IngresoList = () => {
   const headerStyle = { backgroundColor: '#2d0a4e', color: 'white' };
 
   return (
-    <div className="animate__animated animate__fadeIn p-3 px-md-4">
+    <div className="animate__animated animate__fadeIn p-1">
       <div
-        className="d-flex justify-content-between align-items-center p-3 text-white shadow-sm mb-3 rounded"
-        style={{ backgroundColor: '#1a0633' }}
+        className="d-flex justify-content-between align-items-center p-2 text-white shadow-sm mb-2 rounded"
+        style={{ backgroundColor: '#343a40' }}
       >
         <div className="d-flex align-items-center gap-2">
-          <FontAwesomeIcon icon={faFileInvoice} size="lg" />
-          <h4 className="m-0 fw-bold">Registro de Compras (Ingresos)</h4>
+          <FontAwesomeIcon icon={faFileInvoice} />
+          <h5 className="m-0 fw-bold">Registro de Compras</h5>
         </div>
         <div className="d-flex gap-2">
-          <Input
-            type="text"
-            placeholder="Buscar por factura o proveedor..."
-            value={filter}
-            onChange={e => setFilter(e.target.value)}
-            className="form-control-sm border-0"
-            style={{ width: '300px' }}
-          />
-          <Button color="success" size="sm" onClick={() => navigate('/bodeguero/ingresos/nuevo')}>
-            <FontAwesomeIcon icon={faPlus} className="me-2" /> Nueva Compra
+          <div className="input-group input-group-sm" style={{ width: '250px' }}>
+            <Input
+              type="text"
+              placeholder="Factura o proveedor..."
+              value={filter}
+              onChange={e => setFilter(e.target.value)}
+              className="border-end-0 border-secondary bg-white text-dark"
+              style={{ fontSize: '0.8rem' }}
+            />
+            <span className="input-group-text bg-white border-secondary text-muted">
+              <FontAwesomeIcon icon={faSearch} size="sm" />
+            </span>
+          </div>
+          <Button color="success" size="sm" onClick={() => navigate('/bodeguero/ingresos/nuevo')} style={{ fontSize: '0.75rem' }}>
+            <FontAwesomeIcon icon={faPlus} className="me-1" /> Nueva Compra
           </Button>
         </div>
       </div>
@@ -90,19 +95,19 @@ export const IngresoList = () => {
           <tbody>
             {filtrados.length > 0 ? (
               filtrados.map(i => (
-                <tr key={i.id} className="text-center align-middle">
-                  <td className="small">{dayjs(i.fecha).format('DD/MM/YYYY')}</td>
+                <tr key={i.id} className="text-center align-middle" style={{ fontSize: '0.8rem' }}>
+                  <td>{dayjs(i.fecha).format('DD/MM/YY')}</td>
                   <td className="fw-bold">{i.noDocumento}</td>
                   <td className="text-start">{i.proveedor?.nombre}</td>
                   <td className="text-end fw-bold text-primary">C$ {i.total?.toLocaleString()}</td>
                   <td>
-                    <Badge color={i.activo ? 'success' : 'secondary'} pill>
+                    <Badge color={i.activo ? 'success' : 'secondary'} pill style={{ fontSize: '0.65rem' }}>
                       {i.activo ? 'Recibido' : 'Anulado'}
                     </Badge>
                   </td>
                   <td>
-                    <Button size="sm" color="info" outline className="me-1" title="Ver detalles" onClick={() => i.id && verDetalles(i.id)}>
-                      <FontAwesomeIcon icon={faEye} />
+                    <Button size="sm" color="info" outline className="p-1" title="Ver detalles" onClick={() => i.id && verDetalles(i.id)}>
+                      <FontAwesomeIcon icon={faEye} fixedWidth />
                     </Button>
                   </td>
                 </tr>

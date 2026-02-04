@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Row, Col, Form, FormGroup, Label, Input, Card, CardBody, CardHeader, CardTitle, Badge } from 'reactstrap';
 import { useForm, Controller } from 'react-hook-form';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faSave, faImage, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faSave, faImage, faTimes, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { useAppDispatch } from 'app/config/store';
 import ArticuloService from 'app/services/articulo.service';
 import CategoriaService from 'app/services/categoria.service';
@@ -40,6 +40,10 @@ export const ArticuloUpdate = () => {
       costo: 0,
     },
   });
+
+  const precioVenta = watch('precio');
+  const costoUnitario = watch('costo');
+  const esPrecioBajo = precioVenta > 0 && costoUnitario > 0 && Number(precioVenta) < Number(costoUnitario);
 
   useEffect(() => {
     // Cargar catálogos
@@ -195,18 +199,26 @@ export const ArticuloUpdate = () => {
                     <Row>
                       <Col md="6">
                         <FormGroup>
-                          <Label className="fw-bold text-success">Precio Venta (C$) *</Label>
+                          <Label className={`fw-bold ${esPrecioBajo ? 'text-danger' : 'text-success'}`}>
+                            Precio Venta (C$) *
+                          </Label>
                           <Controller
                             name="precio"
                             control={control}
                             rules={{ required: true, min: 0 }}
-                            render={({ field }) => <Input type="number" step="0.01" {...field} />}
+                            render={({ field }) => <Input type="number" step="0.01" {...field} invalid={esPrecioBajo} />}
                           />
+                          {esPrecioBajo && (
+                            <div className="text-danger small mt-1 fw-bold">
+                              <FontAwesomeIcon icon={faExclamationTriangle} className="me-1" />
+                              ¡Precio menor al costo! Perderás dinero.
+                            </div>
+                          )}
                         </FormGroup>
                       </Col>
                       <Col md="6">
                         <FormGroup>
-                          <Label className="text-secondary">Costo Unitario (C$) *</Label>
+                          <Label className="text-secondary fw-bold">Costo Unitario (C$) *</Label>
                           <Controller
                             name="costo"
                             control={control}

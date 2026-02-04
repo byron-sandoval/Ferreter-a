@@ -34,23 +34,28 @@ export const ProveedorList = () => {
   const headerStyle = { backgroundColor: '#6f42c1', color: 'white' };
 
   return (
-    <div className="animate__animated animate__fadeIn">
-      <div className="d-flex justify-content-between align-items-center p-3 bg-dark text-white shadow-sm mb-3 rounded">
+    <div className="animate__animated animate__fadeIn p-1">
+      <div className="d-flex justify-content-between align-items-center p-2 text-white shadow-sm mb-2 rounded" style={{ backgroundColor: '#343a40' }}>
         <div className="d-flex align-items-center gap-2">
-          <FontAwesomeIcon icon={faTruck} size="lg" />
-          <h4 className="m-0 fw-bold">Gestión de Proveedores</h4>
+          <FontAwesomeIcon icon={faTruck} />
+          <h5 className="m-0 fw-bold">Proveedores</h5>
         </div>
         <div className="d-flex gap-2">
-          <Input
-            type="text"
-            placeholder="Buscar proveedor..."
-            value={filter}
-            onChange={e => setFilter(e.target.value)}
-            className="form-control-sm"
-            style={{ width: '250px' }}
-          />
-          <Button color="primary" size="sm" onClick={() => navigate('/admin/proveedores/new')}>
-            <FontAwesomeIcon icon={faPlus} className="me-2" /> Nuevo Proveedor
+          <div className="input-group input-group-sm" style={{ width: '250px' }}>
+            <Input
+              type="text"
+              placeholder="Buscar proveedor..."
+              value={filter}
+              onChange={e => setFilter(e.target.value)}
+              className="border-end-0 border-secondary bg-white text-dark"
+              style={{ fontSize: '0.8rem' }}
+            />
+            <span className="input-group-text bg-white border-secondary text-muted">
+              <FontAwesomeIcon icon={faSearch} size="sm" />
+            </span>
+          </div>
+          <Button color="primary" size="sm" onClick={() => navigate('/admin/proveedores/new')} style={{ fontSize: '0.75rem' }}>
+            <FontAwesomeIcon icon={faPlus} className="me-1" /> Nuevo
           </Button>
         </div>
       </div>
@@ -71,23 +76,23 @@ export const ProveedorList = () => {
           <tbody>
             {filtrados.length > 0 ? (
               filtrados.map(p => (
-                <tr key={p.id} className="text-center align-middle">
-                  <td className="text-start fw-bold">{p.nombre}</td>
+                <tr key={p.id} className="text-center align-middle" style={{ fontSize: '0.8rem' }}>
+                  <td className="text-start fw-bold px-3">{p.nombre}</td>
                   <td className="small text-muted">{p.ruc || '-'}</td>
-                  <td className="text-start small">{p.direccion || '-'}</td>
+                  <td className="text-start" style={{ fontSize: '0.75rem' }}>{p.direccion || '-'}</td>
                   <td>{p.telefono || '-'}</td>
-                  <td>{p.email || '-'}</td>
+                  <td style={{ fontSize: '0.75rem' }}>{p.email || '-'}</td>
                   <td>
-                    <Badge color={p.activo ? 'success' : 'secondary'} pill>
+                    <Badge color={p.activo ? 'success' : 'secondary'} pill style={{ fontSize: '0.65rem' }}>
                       {p.activo ? 'Activo' : 'Inactivo'}
                     </Badge>
                   </td>
-                  <td>
-                    <Button size="sm" color="info" outline className="me-1">
-                      <FontAwesomeIcon icon={faPencilAlt} />
+                  <td className="px-3">
+                    <Button size="sm" color="info" outline className="p-1 me-1">
+                      <FontAwesomeIcon icon={faPencilAlt} fixedWidth />
                     </Button>
-                    <Button size="sm" color="danger" outline>
-                      <FontAwesomeIcon icon={faTrash} />
+                    <Button size="sm" color="danger" outline className="p-1">
+                      <FontAwesomeIcon icon={faTrash} fixedWidth />
                     </Button>
                   </td>
                 </tr>
