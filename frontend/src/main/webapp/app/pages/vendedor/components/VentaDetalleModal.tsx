@@ -75,9 +75,13 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
             <span className="text-muted">Subtotal:</span>
             <span className="fw-bold">C$ {venta.subtotal?.toFixed(2)}</span>
           </div>
+          <div className="d-flex justify-content-between mb-1">
+            <span className="text-muted">Descuento:</span>
+            <span className="text-success fw-bold">- C$ {(venta.descuento || 0).toFixed(2)}</span>
+          </div>
           <div className="d-flex justify-content-between mb-2">
             <span className="text-muted">IVA (15%):</span>
-            <span className="text-danger fw-bold">C$ {venta.iva?.toFixed(2)}</span>
+            <span className="text-primary fw-bold">C$ {venta.iva?.toFixed(2)}</span>
           </div>
           <div className="d-flex justify-content-between border-top pt-2">
             <h5 className="fw-bold m-0">Total:</h5>
@@ -151,6 +155,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
             <div style={{ borderBottom: '1px dashed #000', margin: '10px 0' }}></div>
             <div style={{ fontSize: '12px', textAlign: 'right' }}>
               <p style={{ margin: '2px 0' }}>Subtotal: C$ {venta.subtotal?.toFixed(2)}</p>
+              <p style={{ margin: '2px 0' }}>Descuento: - C$ {(venta.descuento || 0).toFixed(2)}</p>
               <p style={{ margin: '2px 0' }}>IVA (15%): C$ {venta.iva?.toFixed(2)}</p>
               <h3 style={{ margin: '5px 0' }}>TOTAL: C$ {venta.total?.toFixed(2)}</h3>
               {venta.importeRecibido != null && <p style={{ margin: '2px 0' }}>Efectivo: C$ {venta.importeRecibido?.toFixed(2)}</p>}
