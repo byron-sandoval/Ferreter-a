@@ -53,7 +53,7 @@ export const GestionClientes = () => {
     <div className="animate__animated animate__fadeIn p-1">
       <div className="d-flex justify-content-between align-items-center mb-2 px-1">
         <h5 className="fw-bold text-secondary mb-0">
-          <FontAwesomeIcon icon={faUsers} className="me-2 text-primary" /> Clientes y Créditos
+          <FontAwesomeIcon icon={faUsers} className="me-2 text-primary" /> Clientes registrados
         </h5>
         <Button color="primary" size="sm" outline style={{ fontSize: '0.75rem' }}>
           <FontAwesomeIcon icon={faPlus} className="me-1" /> Nuevo Cliente
@@ -83,7 +83,8 @@ export const GestionClientes = () => {
                   <tr>
                     <th className="py-2 px-3">Nombre</th>
                     <th>Cédula</th>
-                    <th>Saldo</th>
+                    <th>Teléfono</th>
+                    <th>Género</th>
                     <th className="text-center">Estado</th>
                     <th className="text-end px-3">Acción</th>
                   </tr>
@@ -98,9 +99,8 @@ export const GestionClientes = () => {
                     >
                       <td className="px-3 fw-bold">{c.nombre}</td>
                       <td className="small text-muted">{c.cedula}</td>
-                      <td className="fw-bold">
-                        <span className={(c.saldo || 0) > 0 ? 'text-danger' : 'text-success'}>C$ {c.saldo?.toFixed(2) || '0.00'}</span>
-                      </td>
+                      <td className="small text-muted">{c.telefono || '-'}</td>
+                      <td className="small text-muted text-capitalize">{c.genero?.toLowerCase() || '-'}</td>
                       <td className="text-center">
                         <Badge color={c.activo ? 'success' : 'secondary'} pill style={{ fontSize: '0.65rem' }}>
                           {c.activo ? 'Activo' : 'Inactivo'}
@@ -132,12 +132,7 @@ export const GestionClientes = () => {
                       </small>
                     </div>
                   </div>
-                  <div className="mt-2">
-                    <small className="d-block text-uppercase opacity-75 fw-bold mb-0" style={{ fontSize: '0.65rem' }}>
-                      Saldo Pendiente
-                    </small>
-                    <h3 className="fw-bold m-0">C$ {(clienteSeleccionado.saldo || 0).toFixed(2)}</h3>
-                  </div>
+
                 </div>
                 <CardBody className="p-2">
                   <div className="mb-2">

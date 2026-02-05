@@ -118,11 +118,7 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
                 <div className="text-muted small">
                   <FontAwesomeIcon icon={faUserCheck} className="me-1" /> {cliente.cedula}
                 </div>
-                {(cliente.saldo || 0) > 0 && (
-                  <Badge color="danger" className="mt-2 p-2">
-                    <FontAwesomeIcon icon={faExclamationTriangle} className="me-1" /> Debe: C$ {cliente.saldo?.toFixed(2)}
-                  </Badge>
-                )}
+
               </div>
               <Button color="soft-danger" className="btn-sm rounded-circle shadow-sm" onClick={() => setCliente(null)}>
                 <FontAwesomeIcon icon={faTimes} />
