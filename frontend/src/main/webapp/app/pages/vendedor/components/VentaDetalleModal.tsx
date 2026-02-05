@@ -5,14 +5,16 @@ import { faFileInvoiceDollar, faPrint } from '@fortawesome/free-solid-svg-icons'
 import dayjs from 'dayjs';
 import { useReactToPrint } from 'react-to-print';
 import { IVenta } from 'app/shared/model';
+import { IEmpresa } from 'app/shared/model/empresa.model';
 
 interface VentaDetalleModalProps {
   isOpen: boolean;
   toggle: () => void;
   venta: IVenta | null;
+  empresa: IEmpresa | null;
 }
 
-export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, toggle, venta }) => {
+export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, toggle, venta, empresa }) => {
   const componentRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = useReactToPrint({
@@ -73,9 +75,13 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
             <span className="text-muted">Subtotal:</span>
             <span className="fw-bold">C$ {venta.subtotal?.toFixed(2)}</span>
           </div>
+          <div className="d-flex justify-content-between mb-1">
+            <span className="text-muted">Descuento:</span>
+            <span className="text-success fw-bold">- C$ {(venta.descuento || 0).toFixed(2)}</span>
+          </div>
           <div className="d-flex justify-content-between mb-2">
             <span className="text-muted">IVA (15%):</span>
-            <span className="text-danger fw-bold">C$ {venta.iva?.toFixed(2)}</span>
+            <span className="text-primary fw-bold">C$ {venta.iva?.toFixed(2)}</span>
           </div>
           <div className="d-flex justify-content-between border-top pt-2">
             <h5 className="fw-bold m-0">Total:</h5>
@@ -99,9 +105,18 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
         <div style={{ display: 'none' }}>
           <div ref={componentRef} style={{ padding: '20px', fontFamily: 'monospace', width: '300px' }}>
             <div style={{ textAlign: 'center', marginBottom: '10px' }}>
-              <h2 style={{ margin: '0' }}>FERRONICA</h2>
-              <p style={{ margin: '0', fontSize: '12px' }}>Ferretería & Suministros</p>
-              <p style={{ margin: '0', fontSize: '10px' }}>RUC: 0000000000000</p>
+              {empresa?.logo && (
+                <img
+                  src={`data:${empresa.logoContentType};base64,${empresa.logo}`}
+                  alt="logo"
+                  style={{ maxHeight: '60px', marginBottom: '10px' }}
+                />
+              )}
+              <h2 style={{ margin: '0', fontSize: '18px', textTransform: 'uppercase' }}>{empresa?.nombre || 'FERRONICA'}</h2>
+              <p style={{ margin: '0', fontSize: '11px' }}>{empresa?.eslogan || 'Ferretería & Suministros'}</p>
+              <p style={{ margin: '0', fontSize: '10px' }}>RUC: {empresa?.ruc || '0000000000000'}</p>
+              <p style={{ margin: '0', fontSize: '9px' }}>{empresa?.direccion}</p>
+              <p style={{ margin: '0', fontSize: '9px' }}>Tel: {empresa?.telefono}</p>
             </div>
             <div style={{ borderBottom: '1px dashed #000', marginBottom: '10px' }}></div>
             <div style={{ fontSize: '12px' }}>
@@ -140,6 +155,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
             <div style={{ borderBottom: '1px dashed #000', margin: '10px 0' }}></div>
             <div style={{ fontSize: '12px', textAlign: 'right' }}>
               <p style={{ margin: '2px 0' }}>Subtotal: C$ {venta.subtotal?.toFixed(2)}</p>
+              <p style={{ margin: '2px 0' }}>Descuento: - C$ {(venta.descuento || 0).toFixed(2)}</p>
               <p style={{ margin: '2px 0' }}>IVA (15%): C$ {venta.iva?.toFixed(2)}</p>
               <h3 style={{ margin: '5px 0' }}>TOTAL: C$ {venta.total?.toFixed(2)}</h3>
               {venta.importeRecibido != null && <p style={{ margin: '2px 0' }}>Efectivo: C$ {venta.importeRecibido?.toFixed(2)}</p>}

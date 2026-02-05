@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Badge, Card, CardBody, Input, Row, Col, Progress, Label } from 'reactstrap';
+import { Table, Button, Badge, Card, CardBody, Input, Row, Col, Progress, Label, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUsers, faSearch, faUserEdit, faHistory, faExclamationCircle, faPlus, faChartLine } from '@fortawesome/free-solid-svg-icons';
+import { faUsers, faSearch, faUserEdit, faHistory, faExclamationCircle, faPlus, faChartLine, faVenusMars, faMapMarkerAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import ClienteService from 'app/services/cliente.service';
 import VentaService from 'app/services/venta.service';
-import { ICliente } from 'app/shared/model/cliente.model';
+import { ICliente, GeneroEnum } from 'app/shared/model/cliente.model';
 import { IVenta } from 'app/shared/model/venta.model';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
@@ -15,6 +15,15 @@ export const GestionClientes = () => {
   const [filter, setFilter] = useState('');
   const [clienteSeleccionado, setClienteSeleccionado] = useState<ICliente | null>(null);
   const [historial, setHistorial] = useState<IVenta[]>([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [clienteEditar, setClienteEditar] = useState<ICliente>({
+    nombre: '',
+    cedula: '',
+    genero: GeneroEnum.MASCULINO,
+    telefono: '',
+    direccion: '',
+    activo: true,
+  });
 
   useEffect(() => {
     loadData();
@@ -32,11 +41,68 @@ export const GestionClientes = () => {
     }
   };
 
+  const toggleModal = () => setModalOpen(!modalOpen);
+
+  const abrirNuevo = () => {
+    setClienteEditar({
+      nombre: '',
+      cedula: '',
+      genero: GeneroEnum.MASCULINO,
+      telefono: '',
+      direccion: '',
+      activo: true,
+    });
+    toggleModal();
+  };
+
+  const abrirEditar = (e: React.MouseEvent, c: ICliente) => {
+    e.stopPropagation();
+    setClienteEditar({ ...c });
+    toggleModal();
+  };
+
+  const guardarCliente = async () => {
+    if (!clienteEditar.nombre || !clienteEditar.cedula) {
+      toast.error('Nombre y Cédula son requeridos');
+      return;
+    }
+
+    try {
+      if (clienteEditar.id) {
+        await ClienteService.update(clienteEditar);
+        toast.success('Cliente actualizado con éxito');
+      } else {
+        await ClienteService.create(clienteEditar);
+        toast.success('Cliente creado con éxito');
+      }
+      toggleModal();
+      loadData();
+    } catch (err) {
+      toast.error('Error al guardar cliente');
+    }
+  };
+
+  const eliminarCliente = async (e: React.MouseEvent, id: number) => {
+    e.stopPropagation();
+    if (window.confirm('¿Estás seguro de que deseas eliminar este cliente?')) {
+      try {
+        await ClienteService.delete(id);
+        toast.success('Cliente eliminado con éxito');
+        if (clienteSeleccionado?.id === id) setClienteSeleccionado(null);
+        loadData();
+      } catch (err) {
+        toast.error('No se pudo eliminar el cliente. Es posible que tenga registros asociados.');
+      }
+    }
+  };
+
   const verDetalle = async (c: ICliente) => {
     setClienteSeleccionado(c);
     try {
-      // JHipster usually supports filtering by client.id
-      const res = await VentaService.getAll(); // Simplified for now, in real dev we filter by ID
+      const res = await VentaService.getAll({
+        size: 1000,
+        sort: 'fecha,desc',
+      });
       setHistorial(res.data.filter(v => v.cliente?.id === c.id));
     } catch (e) {
       console.error(e);
@@ -51,9 +117,9 @@ export const GestionClientes = () => {
     <div className="animate__animated animate__fadeIn p-1">
       <div className="d-flex justify-content-between align-items-center mb-2 px-1">
         <h5 className="fw-bold text-secondary mb-0">
-          <FontAwesomeIcon icon={faUsers} className="me-2 text-primary" /> Clientes y Créditos
+          <FontAwesomeIcon icon={faUsers} className="me-2 text-primary" /> Clientes registrados
         </h5>
-        <Button color="primary" size="sm" outline style={{ fontSize: '0.75rem' }}>
+        <Button color="primary" size="sm" outline style={{ fontSize: '0.75rem' }} onClick={abrirNuevo}>
           <FontAwesomeIcon icon={faPlus} className="me-1" /> Nuevo Cliente
         </Button>
       </div>
@@ -81,7 +147,8 @@ export const GestionClientes = () => {
                   <tr>
                     <th className="py-2 px-3">Nombre</th>
                     <th>Cédula</th>
-                    <th>Saldo</th>
+                    <th>Teléfono</th>
+                    <th>Género</th>
                     <th className="text-center">Estado</th>
                     <th className="text-end px-3">Acción</th>
                   </tr>
@@ -96,17 +163,19 @@ export const GestionClientes = () => {
                     >
                       <td className="px-3 fw-bold">{c.nombre}</td>
                       <td className="small text-muted">{c.cedula}</td>
-                      <td className="fw-bold">
-                        <span className={(c.saldo || 0) > 0 ? 'text-danger' : 'text-success'}>C$ {c.saldo?.toFixed(2) || '0.00'}</span>
-                      </td>
+                      <td className="small text-muted">{c.telefono || '-'}</td>
+                      <td className="small text-muted text-capitalize">{c.genero?.toLowerCase() || '-'}</td>
                       <td className="text-center">
                         <Badge color={c.activo ? 'success' : 'secondary'} pill style={{ fontSize: '0.65rem' }}>
                           {c.activo ? 'Activo' : 'Inactivo'}
                         </Badge>
                       </td>
                       <td className="text-end px-3">
-                        <Button color="light" size="sm" className="p-1">
+                        <Button color="light" size="sm" className="p-1 me-1 text-primary" onClick={e => abrirEditar(e, c)}>
                           <FontAwesomeIcon icon={faUserEdit} fixedWidth />
+                        </Button>
+                        <Button color="light" size="sm" className="p-1 text-danger" onClick={e => eliminarCliente(e, c.id!)}>
+                          <FontAwesomeIcon icon={faTrash} fixedWidth />
                         </Button>
                       </td>
                     </tr>
@@ -125,23 +194,26 @@ export const GestionClientes = () => {
                   <div className="d-flex justify-content-between align-items-start mb-2">
                     <div>
                       <h5 className="fw-bold m-0">{clienteSeleccionado.nombre}</h5>
-                      <small className="opacity-75" style={{ fontSize: '0.75rem' }}>{clienteSeleccionado.cedula}</small>
+                      <small className="opacity-75" style={{ fontSize: '0.75rem' }}>
+                        {clienteSeleccionado.cedula}
+                      </small>
                     </div>
                   </div>
-                  <div className="mt-2">
-                    <small className="d-block text-uppercase opacity-75 fw-bold mb-0" style={{ fontSize: '0.65rem' }}>Saldo Pendiente</small>
-                    <h3 className="fw-bold m-0">C$ {(clienteSeleccionado.saldo || 0).toFixed(2)}</h3>
-                  </div>
+
                 </div>
                 <CardBody className="p-2">
                   <div className="mb-2">
-                    <Label className="fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.65rem' }}>Perfil</Label>
+                    <Label className="fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.65rem' }}>
+                      Perfil
+                    </Label>
                     <Progress value={80} color="success" style={{ height: '4px' }} />
                   </div>
                   <div className="list-group list-group-flush">
                     <div className="list-group-item px-0 py-1 border-0" style={{ fontSize: '0.8rem' }}>
                       <FontAwesomeIcon icon={faHistory} className="me-2 text-primary" />
-                      <span><strong>Venta:</strong> {historial.length > 0 ? dayjs(historial[0].fecha).format('DD/MM/YY') : 'N/A'}</span>
+                      <span>
+                        <strong>Venta:</strong> {historial.length > 0 ? dayjs(historial[0].fecha).format('DD/MM/YY') : 'N/A'}
+                      </span>
                     </div>
                   </div>
                 </CardBody>
@@ -180,6 +252,105 @@ export const GestionClientes = () => {
           )}
         </Col>
       </Row>
+
+      <Modal isOpen={modalOpen} toggle={toggleModal} centered>
+        <ModalHeader toggle={toggleModal} className="bg-primary text-white border-0 py-3">
+          <div className="w-100 text-center">
+            <FontAwesomeIcon icon={clienteEditar.id ? faUserEdit : faPlus} className="me-2" />
+            {clienteEditar.id ? 'Editar Cliente' : 'Nuevo Cliente'}
+          </div>
+        </ModalHeader>
+        <ModalBody className="p-4">
+          <Form>
+            <Row>
+              <Col md="6">
+                <FormGroup>
+                  <Label className="small fw-bold text-muted text-uppercase">Cédula</Label>
+                  <Input
+                    value={clienteEditar.cedula || ''}
+                    placeholder="000-000000-0000X"
+                    className="bg-light border-0"
+                    onChange={e => setClienteEditar({ ...clienteEditar, cedula: e.target.value })}
+                  />
+                </FormGroup>
+              </Col>
+              <Col md="6">
+                <FormGroup>
+                  <Label className="small fw-bold text-muted text-uppercase">Nombre Completo</Label>
+                  <Input
+                    value={clienteEditar.nombre || ''}
+                    placeholder="Ej. Juan Pérez"
+                    className="bg-light border-0"
+                    onChange={e => setClienteEditar({ ...clienteEditar, nombre: e.target.value })}
+                  />
+                </FormGroup>
+              </Col>
+            </Row>
+            <Row>
+              <Col md="6">
+                <FormGroup>
+                  <Label className="small fw-bold text-muted text-uppercase">
+                    <FontAwesomeIcon icon={faVenusMars} className="me-1" /> Género
+                  </Label>
+                  <Input
+                    type="select"
+                    value={clienteEditar.genero || ''}
+                    className="bg-light border-0"
+                    onChange={e => setClienteEditar({ ...clienteEditar, genero: e.target.value as GeneroEnum })}
+                  >
+                    <option value={GeneroEnum.MASCULINO}>Masculino</option>
+                    <option value={GeneroEnum.FEMENINO}>Femenino</option>
+                  </Input>
+                </FormGroup>
+              </Col>
+              <Col md="6">
+                <FormGroup>
+                  <Label className="small fw-bold text-muted text-uppercase">Teléfono</Label>
+                  <Input
+                    value={clienteEditar.telefono || ''}
+                    placeholder="8888-8888"
+                    className="bg-light border-0"
+                    onChange={e => setClienteEditar({ ...clienteEditar, telefono: e.target.value })}
+                  />
+                </FormGroup>
+              </Col>
+            </Row>
+            <FormGroup>
+              <Label className="small fw-bold text-muted text-uppercase">
+                <FontAwesomeIcon icon={faMapMarkerAlt} className="me-1" /> Dirección
+              </Label>
+              <Input
+                type="textarea"
+                value={clienteEditar.direccion || ''}
+                placeholder="Dirección exacta..."
+                className="bg-light border-0"
+                rows={2}
+                onChange={e => setClienteEditar({ ...clienteEditar, direccion: e.target.value })}
+              />
+            </FormGroup>
+            {clienteEditar.id && (
+              <FormGroup check>
+                <Label check className="small fw-bold text-muted text-uppercase">
+                  <Input
+                    type="checkbox"
+                    checked={!!clienteEditar.activo}
+                    onChange={e => setClienteEditar({ ...clienteEditar, activo: e.target.checked })}
+                  />{' '}
+                  Cliente Activo
+                </Label>
+              </FormGroup>
+            )}
+          </Form>
+        </ModalBody>
+        <ModalFooter className="border-0 bg-light rounded-bottom-4">
+          <Button color="link" className="text-muted text-decoration-none" onClick={toggleModal}>
+            CANCELAR
+          </Button>
+          <Button color="primary" className="px-5 fw-bold rounded-pill shadow-sm" onClick={guardarCliente}>
+            {clienteEditar.id ? 'ACTUALIZAR' : 'GUARDAR'}
+          </Button>
+        </ModalFooter>
+      </Modal>
     </div>
   );
 };

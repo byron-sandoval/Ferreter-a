@@ -162,11 +162,13 @@ export const ArticuloUpdate = () => {
                                 }}
                               >
                                 <option value="">Seleccione...</option>
-                                {categorias.map(cat => (
-                                  <option key={cat.id} value={cat.id}>
-                                    {cat.nombre}
-                                  </option>
-                                ))}
+                                {categorias
+                                  .filter(cat => cat.activo || cat.id === watch('categoria')?.id)
+                                  .map(cat => (
+                                    <option key={cat.id} value={cat.id}>
+                                      {cat.nombre} {!cat.activo && '(Inactivo)'}
+                                    </option>
+                                  ))}
                               </Input>
                             )}
                           />
@@ -199,9 +201,7 @@ export const ArticuloUpdate = () => {
                     <Row>
                       <Col md="6">
                         <FormGroup>
-                          <Label className={`fw-bold ${esPrecioBajo ? 'text-danger' : 'text-success'}`}>
-                            Precio Venta (C$) *
-                          </Label>
+                          <Label className={`fw-bold ${esPrecioBajo ? 'text-danger' : 'text-success'}`}>Precio Venta (C$) *</Label>
                           <Controller
                             name="precio"
                             control={control}
@@ -264,11 +264,13 @@ export const ArticuloUpdate = () => {
                                 }}
                               >
                                 <option value="">Seleccione...</option>
-                                {unidades.map(u => (
-                                  <option key={u.id} value={u.id}>
-                                    {u.nombre} ({u.simbolo})
-                                  </option>
-                                ))}
+                                {unidades
+                                  .filter(u => u.activo || u.id === watch('unidadMedida')?.id)
+                                  .map(u => (
+                                    <option key={u.id} value={u.id}>
+                                      {u.nombre} ({u.simbolo}) {!u.activo && '(Inactivo)'}
+                                    </option>
+                                  ))}
                               </Input>
                             )}
                           />

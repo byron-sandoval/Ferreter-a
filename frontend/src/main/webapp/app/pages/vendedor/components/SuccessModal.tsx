@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faPrint } from '@fortawesome/free-solid-svg-icons';
 import dayjs from 'dayjs';
 import { IVenta } from 'app/shared/model/venta.model';
+import { IEmpresa } from 'app/shared/model/empresa.model';
 
 interface ISuccessModalProps {
   ventaExitosa: IVenta | null;
@@ -11,6 +12,7 @@ interface ISuccessModalProps {
   handlePrint: () => void;
   componentRef: React.RefObject<any>;
   carrito: any[];
+  empresa: IEmpresa | null;
 }
 
 export const SuccessModal: React.FC<ISuccessModalProps> = ({
@@ -19,6 +21,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
   handlePrint,
   componentRef,
   carrito,
+  empresa,
 }) => {
   return (
     <Modal isOpen={!!ventaExitosa} toggle={finalizarVentaYLimpiar} centered size="sm">
@@ -33,9 +36,18 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
         <div style={{ display: 'none' }}>
           <div ref={componentRef} style={{ padding: '20px', fontFamily: 'monospace', width: '300px' }}>
             <div style={{ textAlign: 'center', marginBottom: '10px' }}>
-              <h2 style={{ margin: '0' }}>FERRONICA</h2>
-              <p style={{ margin: '0', fontSize: '12px' }}>Ferretería & Suministros</p>
-              <p style={{ margin: '0', fontSize: '10px' }}>RUC: 0000000000000</p>
+              {empresa?.logo && (
+                <img
+                  src={`data:${empresa.logoContentType};base64,${empresa.logo}`}
+                  alt="logo"
+                  style={{ maxHeight: '60px', marginBottom: '10px' }}
+                />
+              )}
+              <h2 style={{ margin: '0', fontSize: '18px', textTransform: 'uppercase' }}>{empresa?.nombre || 'FERRONICA'}</h2>
+              <p style={{ margin: '0', fontSize: '11px' }}>{empresa?.eslogan || 'Ferretería & Suministros'}</p>
+              <p style={{ margin: '0', fontSize: '10px' }}>RUC: {empresa?.ruc || '0000000000000'}</p>
+              <p style={{ margin: '0', fontSize: '9px' }}>{empresa?.direccion}</p>
+              <p style={{ margin: '0', fontSize: '9px' }}>Tel: {empresa?.telefono}</p>
             </div>
             <div style={{ borderBottom: '1px dashed #000', marginBottom: '10px' }}></div>
             <div style={{ fontSize: '12px' }}>
@@ -74,6 +86,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
             <div style={{ borderBottom: '1px dashed #000', margin: '10px 0' }}></div>
             <div style={{ fontSize: '12px', textAlign: 'right' }}>
               <p style={{ margin: '2px 0' }}>Subtotal: C$ {ventaExitosa?.subtotal?.toFixed(2)}</p>
+              <p style={{ margin: '2px 0' }}>Descuento: - C$ {(ventaExitosa?.descuento || 0).toFixed(2)}</p>
               <p style={{ margin: '2px 0' }}>IVA (15%): C$ {ventaExitosa?.iva?.toFixed(2)}</p>
               <h3 style={{ margin: '5px 0' }}>TOTAL: C$ {ventaExitosa?.total?.toFixed(2)}</h3>
               {ventaExitosa?.importeRecibido != null && (

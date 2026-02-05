@@ -24,6 +24,7 @@ import {
   faFileInvoice,
   faChartBar,
   faClock,
+  faRulerCombined,
 } from '@fortawesome/free-solid-svg-icons';
 
 export const TopNavbar = () => {
@@ -215,6 +216,15 @@ export const TopNavbar = () => {
               <NavItem className="nav-link-item">
                 <NavLink tag={Link} to="/admin/reportes" style={navLinkStyle}>
                   <FontAwesomeIcon icon={faChartBar} size="sm" /> Reportes
+                </NavLink>
+              </NavItem>
+            )}
+
+            {/* 12. Configuraciones */}
+            {isAdmin && (
+              <NavItem className="nav-link-item">
+                <NavLink tag={Link} to="/admin/configuracion" style={navLinkStyle}>
+                  <FontAwesomeIcon icon={faUsersCog} size="sm" /> Configuraciones
                 </NavLink>
               </NavItem>
             )}

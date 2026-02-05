@@ -115,13 +115,14 @@ export const ArticuloList = () => {
       </div>
 
       <div className="p-1 px-md-2">
-
-
         {/* 2. Tabla Densa */}
         <Card className="shadow-sm mb-4 border-0">
           <div className="table-responsive">
             <Table hover striped size="sm" className="mb-0 align-middle">
-              <thead className="text-center text-uppercase mt-2" style={{ backgroundColor: '#343a40', color: 'black', fontSize: '0.75rem' }}>
+              <thead
+                className="text-center text-uppercase mt-2"
+                style={{ backgroundColor: '#343a40', color: 'black', fontSize: '0.75rem' }}
+              >
                 <tr>
                   <th className="py-2 px-3">ID</th>
                   <th className="py-2">Código</th>
@@ -145,7 +146,11 @@ export const ArticuloList = () => {
                     const isSelected = selectedArticulo?.id === articulo.id;
 
                     return (
-                      <tr key={articulo.id} style={isSelected ? rowSelectedStyle : {}} className={`text-center ${!articulo.activo ? 'text-muted' : ''}`}>
+                      <tr
+                        key={articulo.id}
+                        style={isSelected ? rowSelectedStyle : {}}
+                        className={`text-center ${!articulo.activo ? 'text-muted' : ''}`}
+                      >
                         <td className="fw-bold text-primary">{articulo.id}</td>
                         <td>{articulo.codigo}</td>
                         <td className="text-start">{articulo.nombre}</td>

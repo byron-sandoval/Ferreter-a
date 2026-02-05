@@ -3,44 +3,79 @@ import { Row, Col, Card, CardBody, Input, Badge } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faBoxOpen } from '@fortawesome/free-solid-svg-icons';
 import { IArticulo } from 'app/shared/model/articulo.model';
+import { ICategoria } from 'app/shared/model/categoria.model';
 
 interface IProductCatalogProps {
   articulos: IArticulo[];
+  categorias: ICategoria[];
   termino: string;
   setTermino: (val: string) => void;
+  categoriaFiltro: string;
+  setCategoriaFiltro: (val: string) => void;
   agregarAlCarrito: (prod: IArticulo) => void;
 }
 
-export const ProductCatalog: React.FC<IProductCatalogProps> = ({ articulos, termino, setTermino, agregarAlCarrito }) => {
+export const ProductCatalog: React.FC<IProductCatalogProps> = ({
+  articulos,
+  categorias,
+  termino,
+  setTermino,
+  categoriaFiltro,
+  setCategoriaFiltro,
+  agregarAlCarrito,
+}) => {
   return (
     <Col md="7">
       <Card className="shadow-sm mb-2 border">
         <CardBody className="py-2 px-3 bg-white rounded">
-          <div className="input-group">
-            <span className="input-group-text bg-transparent border-0 text-muted">
-              <FontAwesomeIcon icon={faSearch} />
-            </span>
-            <Input
-              placeholder="Escribe el nombre o código del producto..."
-              className="border-0 shadow-none ps-0"
-              style={{ fontSize: '0.9rem', fontWeight: '400' }}
-              autoFocus
-              value={termino}
-              onChange={e => setTermino(e.target.value)}
-            />
-          </div>
+          <Row className="align-items-center g-0">
+            <Col className="d-flex align-items-center">
+              <span className="text-muted me-2">
+                <FontAwesomeIcon icon={faSearch} />
+              </span>
+              <Input
+                placeholder="Escribe el nombre o código..."
+                className="border-0 shadow-none ps-0 bg-transparent"
+                style={{ fontSize: '0.9rem', fontWeight: '400' }}
+                autoFocus
+                value={termino}
+                onChange={e => setTermino(e.target.value)}
+              />
+            </Col>
+            <Col xs="auto" className="border-start ps-3">
+              <Input
+                type="select"
+                className="border-0 shadow-none bg-transparent fw-bold text-primary"
+                style={{ fontSize: '0.85rem', width: 'auto', minWidth: '130px', cursor: 'pointer' }}
+                value={categoriaFiltro}
+                onChange={e => setCategoriaFiltro(e.target.value)}
+              >
+                <option value="todas">📦 Todas las Categorías</option>
+                {categorias
+                  .filter(c => c.activo !== false)
+                  .map(cat => (
+                    <option key={cat.id} value={cat.nombre}>
+                      {cat.nombre}
+                    </option>
+                  ))}
+              </Input>
+            </Col>
+          </Row>
         </CardBody>
       </Card>
 
       <div style={{ height: 'calc(100vh - 220px)', overflowY: 'auto' }}>
         <Row className="g-3">
           {articulos
-            .filter(
-              p =>
-                p.activo &&
-                ((p.nombre || '').toLowerCase().includes(termino.toLowerCase()) ||
-                  (p.codigo || '').toLowerCase().includes(termino.toLowerCase())),
-            )
+            .filter(p => {
+              const matchesSearch =
+                (p.nombre || '').toLowerCase().includes(termino.toLowerCase()) ||
+                (p.codigo || '').toLowerCase().includes(termino.toLowerCase());
+              const matchesCategory = categoriaFiltro === 'todas' || p.categoria?.nombre === categoriaFiltro;
+              // Si p.categoria es null o no tiene el campo activo, asumimos que está activa (true por defecto)
+              const categoryIsActive = p.categoria ? p.categoria.activo !== false : true;
+              return p.activo !== false && categoryIsActive && matchesSearch && matchesCategory;
+            })
             .map(prod => (
               <Col md="4" key={prod.id}>
                 <Card

@@ -35,7 +35,10 @@ export const ProveedorList = () => {
 
   return (
     <div className="animate__animated animate__fadeIn p-1">
-      <div className="d-flex justify-content-between align-items-center p-2 text-white shadow-sm mb-2 rounded" style={{ backgroundColor: '#343a40' }}>
+      <div
+        className="d-flex justify-content-between align-items-center p-2 text-white shadow-sm mb-2 rounded"
+        style={{ backgroundColor: '#343a40' }}
+      >
         <div className="d-flex align-items-center gap-2">
           <FontAwesomeIcon icon={faTruck} />
           <h5 className="m-0 fw-bold">Proveedores</h5>
@@ -79,7 +82,9 @@ export const ProveedorList = () => {
                 <tr key={p.id} className="text-center align-middle" style={{ fontSize: '0.8rem' }}>
                   <td className="text-start fw-bold px-3">{p.nombre}</td>
                   <td className="small text-muted">{p.ruc || '-'}</td>
-                  <td className="text-start" style={{ fontSize: '0.75rem' }}>{p.direccion || '-'}</td>
+                  <td className="text-start" style={{ fontSize: '0.75rem' }}>
+                    {p.direccion || '-'}
+                  </td>
                   <td>{p.telefono || '-'}</td>
                   <td style={{ fontSize: '0.75rem' }}>{p.email || '-'}</td>
                   <td>

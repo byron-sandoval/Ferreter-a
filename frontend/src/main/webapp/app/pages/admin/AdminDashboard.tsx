@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import './AdminDashboard.css';
+import { useNavigate } from 'react-router-dom';
 import { Row, Col, Card, CardBody, CardTitle, Table, Badge, Progress, Button } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -29,13 +31,18 @@ interface ICategoryData {
 }
 
 export const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [bajoStock, setBajoStock] = useState<IArticulo[]>([]);
   const [ventasRecientes, setVentasRecientes] = useState<IVenta[]>([]);
   const [categoryData, setCategoryData] = useState<ICategoryData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([ArticuloService.getAll(), VentaService.getAll(), VentaService.getAllDetalles()])
+    Promise.all([
+      ArticuloService.getAll(),
+      VentaService.getAll({ size: 1000, sort: 'fecha,desc' }),
+      VentaService.getAllDetalles({ size: 1000 }),
+    ])
       .then(([artRes, venRes, detRes]) => {
         const low = artRes.data.filter(a => (a.existencia || 0) <= (a.existenciaMinima || 0));
         setBajoStock(low);
@@ -43,7 +50,6 @@ export const AdminDashboard = () => {
 
         // Procesar datos para la gráfica de pastel (Ventas por Categoría)
         const details: IDetalleVenta[] = detRes.data;
-        console.log('DEBUG - Detalles de Venta:', details);
         const groupByCategory = details.reduce((acc: Record<string, number>, det) => {
           const catName = det.articulo?.categoria?.nombre || 'Sin Categoría';
           const monto = det.monto || 0;
@@ -73,18 +79,12 @@ export const AdminDashboard = () => {
   });
 
   return (
-    <div className="animate__animated animate__fadeIn p-2 px-md-3">
+    <div className="dashboard-container animate__animated animate__fadeIn p-2 px-md-3">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h4 className="text-primary fw-bold m-0">
-          <FontAwesomeIcon icon={faChartLine} className="me-2" /> Panel de Control Gerencial
+          <FontAwesomeIcon icon={faChartLine} className="me-2" /> Panel de Control
         </h4>
-        <Button
-          color="dark"
-          outline
-          size="sm"
-          className="border-0 shadow-sm bg-white"
-          onClick={() => alert('Configuración de Empresa próximamente')}
-        >
+        <Button color="dark" outline size="sm" className="border-0 shadow-sm bg-white" onClick={() => navigate('/admin/configuracion')}>
           <FontAwesomeIcon icon={faBuilding} className="me-2 text-primary" />
           Configurar Empresa
         </Button>
@@ -93,60 +93,58 @@ export const AdminDashboard = () => {
       {/* KPI Cards */}
       <Row className="mb-4">
         <Col md="4">
-          <Card className="shadow-sm border-start border-primary border-4 h-100">
-            <CardBody className="py-2">
+          <Card className="kpi-palette-cyan h-100">
+            <CardBody className="py-2 px-3">
               <div className="d-flex justify-content-between align-items-center">
-                <div>
-                  <div className="text-uppercase text-muted fw-bold mb-1" style={{ fontSize: '0.65rem' }}>
-                    Ventas del Día
-                  </div>
-                  <h5 className="mb-0 text-primary fw-bold">
-                    C${' '}
-                    {ventasRecientes
-                      .filter(v => dayjs(v.fecha).isSame(dayjs(), 'day'))
-                      .reduce((acc, v) => acc + (v.total || 0), 0)
-                      .toLocaleString()}
-                  </h5>
+                <div className="kpi-icon-palette">
+                  <FontAwesomeIcon icon={faMoneyBillWave} />
                 </div>
-                <FontAwesomeIcon icon={faMoneyBillWave} size="lg" className="text-primary opacity-25" />
+                <div className="text-end">
+                  <div className="stat-value-palette">
+                    {ventasRecientes
+                      .filter(v => dayjs(v.fecha).isSame(dayjs(), 'day') && !v.anulada)
+                      .reduce((acc, v) => acc + (v.total || 0), 0)
+                      .toLocaleString('es-NI', { style: 'currency', currency: 'NIO', currencyDisplay: 'narrowSymbol' })}
+                  </div>
+                  <div className="stat-label-palette">Ventas del Día</div>
+                </div>
               </div>
             </CardBody>
           </Card>
         </Col>
         <Col md="4">
-          <Card className="shadow-sm border-start border-success border-4 h-100">
-            <CardBody className="py-2">
+          <Card className="kpi-palette-grey h-100">
+            <CardBody className="py-2 px-3">
               <div className="d-flex justify-content-between align-items-center">
-                <div>
-                  <div className="text-uppercase text-muted fw-bold mb-1" style={{ fontSize: '0.65rem' }}>
-                    Ventas del Mes
-                  </div>
-                  <h5 className="mb-0 text-success fw-bold">
-                    C${' '}
-                    {ventasRecientes
-                      .filter(v => dayjs(v.fecha).isSame(dayjs(), 'month'))
-                      .reduce((acc, v) => acc + (v.total || 0), 0)
-                      .toLocaleString()}
-                  </h5>
+                <div className="kpi-icon-palette">
+                  <FontAwesomeIcon icon={faChartLine} />
                 </div>
-                <FontAwesomeIcon icon={faChartLine} size="lg" className="text-success opacity-25" />
+                <div className="text-end">
+                  <div className="stat-value-palette">
+                    {ventasRecientes
+                      .filter(v => dayjs(v.fecha).isSame(dayjs(), 'month') && !v.anulada)
+                      .reduce((acc, v) => acc + (v.total || 0), 0)
+                      .toLocaleString('es-NI', { style: 'currency', currency: 'NIO', currencyDisplay: 'narrowSymbol' })}
+                  </div>
+                  <div className="stat-label-palette">Ventas del Mes</div>
+                </div>
               </div>
             </CardBody>
           </Card>
         </Col>
         <Col md="4">
-          <Card className="shadow-sm border-start border-warning border-4 h-100">
-            <CardBody className="py-2">
+          <Card className="kpi-palette-cyan h-100">
+            <CardBody className="py-2 px-3">
               <div className="d-flex justify-content-between align-items-center">
-                <div>
-                  <div className="text-uppercase text-muted fw-bold mb-1" style={{ fontSize: '0.65rem' }}>
-                    Facturas del Día
-                  </div>
-                  <h5 className="mb-0 text-warning fw-bold">
-                    {ventasRecientes.filter(v => dayjs(v.fecha).isSame(dayjs(), 'day')).length}
-                  </h5>
+                <div className="kpi-icon-palette">
+                  <FontAwesomeIcon icon={faReceipt} />
                 </div>
-                <FontAwesomeIcon icon={faReceipt} size="lg" className="text-warning opacity-25" />
+                <div className="text-end">
+                  <div className="stat-value-palette">
+                    {ventasRecientes.filter(v => dayjs(v.fecha).isSame(dayjs(), 'day') && !v.anulada).length}
+                  </div>
+                  <div className="stat-label-palette">Facturas del Día</div>
+                </div>
               </div>
             </CardBody>
           </Card>
@@ -243,7 +241,7 @@ export const AdminDashboard = () => {
               <CardTitle tag="h6" className="text-secondary border-bottom pb-2 mb-3">
                 Ventas por Categoría
               </CardTitle>
-              <div style={{ height: '250px', width: '100%' }}>
+              <div style={{ height: '300px', width: '100%' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie

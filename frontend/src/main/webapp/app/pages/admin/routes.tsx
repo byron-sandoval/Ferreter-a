@@ -11,6 +11,8 @@ const CategoriaList = React.lazy(() => import('./categorias/CategoriaList'));
 const CategoriaUpdate = React.lazy(() => import('./categorias/CategoriaUpdate'));
 const ReportList = React.lazy(() => import('./reportes/ReportList'));
 const ComprasPorProveedor = React.lazy(() => import('./reportes/ComprasPorProveedor'));
+const ConfiguracionEmpresa = React.lazy(() => import('./configuracion/ConfiguracionEmpresa'));
+const GestionUnidadMedida = React.lazy(() => import('./GestionUnidadMedida'));
 
 const Loadable = ({ children }: { children: React.ReactNode }) => (
   <Suspense
@@ -134,6 +136,24 @@ const AdminRoutes = () => (
         }
       />
     </Route>
+
+    <Route
+      path="configuracion"
+      element={
+        <Loadable>
+          <ConfiguracionEmpresa />
+        </Loadable>
+      }
+    />
+
+    <Route
+      path="unidades-medida"
+      element={
+        <Loadable>
+          <GestionUnidadMedida />
+        </Loadable>
+      }
+    />
   </ErrorBoundaryRoutes>
 );
 
