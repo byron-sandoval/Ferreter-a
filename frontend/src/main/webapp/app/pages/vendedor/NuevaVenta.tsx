@@ -56,6 +56,7 @@ export const NuevaVenta = () => {
   const [numeracion, setNumeracion] = useState<INumeracionFactura | null>(null);
   const [vendedorActual, setVendedorActual] = useState<any>(null);
   const [montoPagado, setMontoPagado] = useState('');
+  const [descuento, setDescuento] = useState<string>('0');
 
   // Impresion
   const componentRef = useRef<any>(null);
@@ -180,9 +181,11 @@ export const NuevaVenta = () => {
     }
   };
 
-  const subtotal = carrito.reduce((acc, item) => acc + item.subtotal, 0);
-  const iva = subtotal * 0.15;
-  const total = subtotal + iva;
+  const subtotal = Math.round(carrito.reduce((acc, item) => acc + item.subtotal, 0) * 100) / 100;
+  const descuentoNum = Math.round((parseFloat(descuento) || 0) * 100) / 100;
+  const baseImponible = Math.round((subtotal - descuentoNum) * 100) / 100;
+  const iva = Math.round((baseImponible > 0 ? baseImponible * 0.15 : 0) * 100) / 100;
+  const total = Math.round((baseImponible + iva) * 100) / 100;
 
   // Calculo en moneda extranjera
   const conversionRate = monedaSeleccionada?.tipoCambio || 1;
@@ -214,10 +217,11 @@ export const NuevaVenta = () => {
     try {
       setLoading(true);
 
-      const ventaData: IVenta = {
-        fecha: dayjs(),
+      const ventaData: any = {
+        fecha: dayjs().toISOString(),
         subtotal,
         iva,
+        descuento: descuentoNum,
         total,
         totalEnMonedaBase: total, // Todo se asume en base C$ inicialmente
         metodoPago,
@@ -320,6 +324,8 @@ export const NuevaVenta = () => {
           totalEnMoneda={totalEnMoneda}
           montoPagado={montoPagado}
           setMontoPagado={setMontoPagado}
+          descuento={descuento}
+          setDescuento={setDescuento}
           cambio={cambio}
           procesarVenta={procesarVenta}
           loading={loading}
