@@ -241,7 +241,7 @@ export const AdminDashboard = () => {
               <CardTitle tag="h6" className="text-secondary border-bottom pb-2 mb-3">
                 Ventas por Categoría
               </CardTitle>
-              <div style={{ height: '250px', width: '100%' }}>
+              <div style={{ height: '300px', width: '100%' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie

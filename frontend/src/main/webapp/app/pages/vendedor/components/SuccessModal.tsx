@@ -86,6 +86,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
             <div style={{ borderBottom: '1px dashed #000', margin: '10px 0' }}></div>
             <div style={{ fontSize: '12px', textAlign: 'right' }}>
               <p style={{ margin: '2px 0' }}>Subtotal: C$ {ventaExitosa?.subtotal?.toFixed(2)}</p>
+              <p style={{ margin: '2px 0' }}>Descuento: - C$ {(ventaExitosa?.descuento || 0).toFixed(2)}</p>
               <p style={{ margin: '2px 0' }}>IVA (15%): C$ {ventaExitosa?.iva?.toFixed(2)}</p>
               <h3 style={{ margin: '5px 0' }}>TOTAL: C$ {ventaExitosa?.total?.toFixed(2)}</h3>
               {ventaExitosa?.importeRecibido != null && (

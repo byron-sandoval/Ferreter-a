@@ -42,6 +42,8 @@ interface IVentaSidebarProps {
   totalEnMoneda: number;
   montoPagado: string;
   setMontoPagado: (v: string) => void;
+  descuento: string;
+  setDescuento: (v: string) => void;
   cambio: number;
   procesarVenta: () => void;
   loading: boolean;
@@ -74,6 +76,8 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
   totalEnMoneda,
   montoPagado,
   setMontoPagado,
+  descuento,
+  setDescuento,
   cambio,
   procesarVenta,
   loading,
@@ -118,11 +122,7 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
                 <div className="text-muted small">
                   <FontAwesomeIcon icon={faUserCheck} className="me-1" /> {cliente.cedula}
                 </div>
-                {(cliente.saldo || 0) > 0 && (
-                  <Badge color="danger" className="mt-2 p-2">
-                    <FontAwesomeIcon icon={faExclamationTriangle} className="me-1" /> Debe: C$ {cliente.saldo?.toFixed(2)}
-                  </Badge>
-                )}
+
               </div>
               <Button color="soft-danger" className="btn-sm rounded-circle shadow-sm" onClick={() => setCliente(null)}>
                 <FontAwesomeIcon icon={faTimes} />
@@ -242,6 +242,11 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
             <span>Subtotal:</span>
             <span className="fw-bold">C$ {subtotal.toFixed(2)}</span>
           </div>
+
+          <div className="d-flex justify-content-between mb-1 small text-muted">
+            <span>Descuento:</span>
+            <span className="fw-bold text-success">- C$ {parseFloat(descuento || '0').toFixed(2)}</span>
+          </div>
           <div className="d-flex justify-content-between mb-3 small text-muted">
             <span>IVA (15%):</span>
             <span className="fw-bold text-danger">C$ {iva.toFixed(2)}</span>
@@ -260,17 +265,32 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
           </div>
 
           {/* INPUT PAGO CASH */}
-          {metodoPago === MetodoPagoEnum.EFECTIVO && (
+          {metodoPago === MetodoPagoEnum.EFECTIVO ? (
             <div className="mb-4">
-              <Label className="fw-bold small text-muted text-uppercase">Efectivo Recibido (C$)</Label>
-              <Input
-                type="number"
-                bsSize="lg"
-                className="fw-bold text-end"
-                placeholder="0.00"
-                value={montoPagado}
-                onChange={e => setMontoPagado(e.target.value)}
-              />
+              <Row className="g-2">
+                <Col md="6">
+                  <Label className="fw-bold small text-muted text-uppercase">Descuento (C$)</Label>
+                  <Input
+                    type="number"
+                    bsSize="lg"
+                    className="fw-bold text-end text-success"
+                    placeholder="0.00"
+                    value={descuento}
+                    onChange={e => setDescuento(e.target.value)}
+                  />
+                </Col>
+                <Col md="6">
+                  <Label className="fw-bold small text-muted text-uppercase">Efectivo Recibido (C$)</Label>
+                  <Input
+                    type="number"
+                    bsSize="lg"
+                    className="fw-bold text-end"
+                    placeholder="0.00"
+                    value={montoPagado}
+                    onChange={e => setMontoPagado(e.target.value)}
+                  />
+                </Col>
+              </Row>
               <div className={`d-flex justify-content-between mt-2 px-2 ${cambio >= 0 ? 'text-success' : 'text-danger'}`}>
                 <span className="fw-bold">Cambio:</span>
                 <span className="fw-bold fs-5">C$ {cambio.toFixed(2)}</span>
@@ -281,6 +301,18 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
                   Monto insuficiente por C$ {Math.abs(cambio).toFixed(2)}
                 </div>
               )}
+            </div>
+          ) : (
+            <div className="mb-4">
+              <Label className="fw-bold small text-muted text-uppercase">Descuento (C$)</Label>
+              <Input
+                type="number"
+                bsSize="lg"
+                className="fw-bold text-end text-success border-0 shadow-sm"
+                placeholder="0.00"
+                value={descuento}
+                onChange={e => setDescuento(e.target.value)}
+              />
             </div>
           )}
 
