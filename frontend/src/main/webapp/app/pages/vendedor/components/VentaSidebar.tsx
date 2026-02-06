@@ -230,8 +230,6 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
                     onChange={e => setMetodoPago(e.target.value as any)}
                   >
                     <option value={MetodoPagoEnum.EFECTIVO}>Efectivo</option>
-                    <option value={MetodoPagoEnum.TARJETA}>Tarjeta</option>
-                    <option value={MetodoPagoEnum.TRANSFERENCIA}>Transferencia</option>
                   </Input>
                 </CardBody>
               </Card>
