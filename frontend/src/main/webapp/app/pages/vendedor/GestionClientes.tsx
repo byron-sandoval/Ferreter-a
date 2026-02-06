@@ -67,12 +67,26 @@ export const GestionClientes = () => {
       return;
     }
 
+    // Validación de Cédula Nicaragüense (Formato: 001-010180-0005Y o 0010101800005Y)
+    const cedulaLimpia = (clienteEditar.cedula || '').replace(/-/g, '').toUpperCase();
+    const cedulaRegex = /^\d{13}[A-Z]$/;
+
+    if (!cedulaRegex.test(cedulaLimpia)) {
+      toast.error('La cédula no tiene un formato válido (Ej: 001-010180-0005Y)');
+      return;
+    }
+
+    const clienteParaGuardar = {
+      ...clienteEditar,
+      cedula: cedulaLimpia,
+    };
+
     try {
-      if (clienteEditar.id) {
-        await ClienteService.update(clienteEditar);
+      if (clienteParaGuardar.id) {
+        await ClienteService.update(clienteParaGuardar);
         toast.success('Cliente actualizado con éxito');
       } else {
-        await ClienteService.create(clienteEditar);
+        await ClienteService.create(clienteParaGuardar);
         toast.success('Cliente creado con éxito');
       }
       toggleModal();
@@ -268,9 +282,23 @@ export const GestionClientes = () => {
                   <Label className="small fw-bold text-muted text-uppercase">Cédula</Label>
                   <Input
                     value={clienteEditar.cedula || ''}
-                    placeholder="000-000000-0000X"
+                    placeholder="281-010180-0005Y"
                     className="bg-light border-0"
-                    onChange={e => setClienteEditar({ ...clienteEditar, cedula: e.target.value })}
+                    maxLength={16}
+                    onChange={e => {
+                      const raw = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
+                      const digitsOnly = raw.substring(0, 13).replace(/[^0-9]/g, '');
+                      const lastChar = raw.length > 13 ? raw.substring(13, 14).replace(/[^a-zA-Z]/g, '').toUpperCase() : '';
+                      const input = digitsOnly + lastChar;
+
+                      let formatted = input;
+                      if (input.length > 3 && input.length <= 9) {
+                        formatted = `${input.substring(0, 3)}-${input.substring(3)}`;
+                      } else if (input.length > 9) {
+                        formatted = `${input.substring(0, 3)}-${input.substring(3, 9)}-${input.substring(9)}`;
+                      }
+                      setClienteEditar({ ...clienteEditar, cedula: formatted });
+                    }}
                   />
                 </FormGroup>
               </Col>
@@ -281,7 +309,11 @@ export const GestionClientes = () => {
                     value={clienteEditar.nombre || ''}
                     placeholder="Ej. Juan Pérez"
                     className="bg-light border-0"
-                    onChange={e => setClienteEditar({ ...clienteEditar, nombre: e.target.value })}
+                    maxLength={50}
+                    onChange={e => {
+                      const val = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+                      setClienteEditar({ ...clienteEditar, nombre: val });
+                    }}
                   />
                 </FormGroup>
               </Col>
@@ -310,7 +342,15 @@ export const GestionClientes = () => {
                     value={clienteEditar.telefono || ''}
                     placeholder="8888-8888"
                     className="bg-light border-0"
-                    onChange={e => setClienteEditar({ ...clienteEditar, telefono: e.target.value })}
+                    maxLength={9}
+                    onChange={e => {
+                      const input = e.target.value.replace(/[^0-9]/g, '').substring(0, 8);
+                      let formatted = input;
+                      if (input.length > 4) {
+                        formatted = `${input.substring(0, 4)}-${input.substring(4)}`;
+                      }
+                      setClienteEditar({ ...clienteEditar, telefono: formatted });
+                    }}
                   />
                 </FormGroup>
               </Col>

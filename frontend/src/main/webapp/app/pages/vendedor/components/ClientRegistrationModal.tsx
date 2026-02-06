@@ -34,9 +34,23 @@ export const ClientRegistrationModal: React.FC<IClientRegistrationModalProps> = 
                 <Label className="small fw-bold text-muted text-uppercase">Cédula</Label>
                 <Input
                   value={nuevoCliente.cedula}
-                  placeholder="281-XXXXXX-XXXXX"
+                  placeholder="281-010180-0005Y"
                   className="bg-light border-0"
-                  onChange={e => setNuevoCliente({ ...nuevoCliente, cedula: e.target.value })}
+                  maxLength={16}
+                  onChange={e => {
+                    const raw = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
+                    const digitsOnly = raw.substring(0, 13).replace(/[^0-9]/g, '');
+                    const lastChar = raw.length > 13 ? raw.substring(13, 14).replace(/[^a-zA-Z]/g, '').toUpperCase() : '';
+                    const input = digitsOnly + lastChar;
+
+                    let formatted = input;
+                    if (input.length > 3 && input.length <= 9) {
+                      formatted = `${input.substring(0, 3)}-${input.substring(3)}`;
+                    } else if (input.length > 9) {
+                      formatted = `${input.substring(0, 3)}-${input.substring(3, 9)}-${input.substring(9)}`;
+                    }
+                    setNuevoCliente({ ...nuevoCliente, cedula: formatted });
+                  }}
                 />
               </FormGroup>
             </Col>
@@ -47,7 +61,11 @@ export const ClientRegistrationModal: React.FC<IClientRegistrationModalProps> = 
                   value={nuevoCliente.nombre}
                   placeholder="Ej. Juan Pérez"
                   className="bg-light border-0"
-                  onChange={e => setNuevoCliente({ ...nuevoCliente, nombre: e.target.value })}
+                  maxLength={50}
+                  onChange={e => {
+                    const val = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+                    setNuevoCliente({ ...nuevoCliente, nombre: val });
+                  }}
                 />
               </FormGroup>
             </Col>
@@ -76,7 +94,15 @@ export const ClientRegistrationModal: React.FC<IClientRegistrationModalProps> = 
                   value={nuevoCliente.telefono || ''}
                   placeholder="8888-8888"
                   className="bg-light border-0"
-                  onChange={e => setNuevoCliente({ ...nuevoCliente, telefono: e.target.value })}
+                  maxLength={9}
+                  onChange={e => {
+                    const input = e.target.value.replace(/[^0-9]/g, '').substring(0, 8);
+                    let formatted = input;
+                    if (input.length > 4) {
+                      formatted = `${input.substring(0, 4)}-${input.substring(4)}`;
+                    }
+                    setNuevoCliente({ ...nuevoCliente, telefono: formatted });
+                  }}
                 />
               </FormGroup>
             </Col>

@@ -133,7 +133,22 @@ export const NuevaVenta = () => {
         toast.error('Cédula y Nombre son obligatorios');
         return;
       }
-      const res = await ClienteService.create(nuevoCliente);
+
+      // Validación de Cédula Nicaragüense (Formato: 001-010180-0005Y o 0010101800005Y)
+      const cedulaLimpia = nuevoCliente.cedula.replace(/-/g, '').toUpperCase();
+      const cedulaRegex = /^\d{13}[A-Z]$/;
+
+      if (!cedulaRegex.test(cedulaLimpia)) {
+        toast.error('La cédula no tiene un formato válido (Ej: 001-010180-0005Y)');
+        return;
+      }
+
+      const clienteParaGuardar = {
+        ...nuevoCliente,
+        cedula: cedulaLimpia, // Guardamos la cédula limpia o formateada si prefieres
+      };
+
+      const res = await ClienteService.create(clienteParaGuardar);
       setCliente(res.data);
       setShowClienteModal(false);
       toast.success('Cliente registrado con éxito');
