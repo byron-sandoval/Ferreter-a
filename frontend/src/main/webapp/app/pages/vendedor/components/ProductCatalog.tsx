@@ -50,7 +50,7 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
                 value={categoriaFiltro}
                 onChange={e => setCategoriaFiltro(e.target.value)}
               >
-                <option value="todas">📦 Todas las Categorías</option>
+                <option value="todas">Todas las Categorías</option>
                 {categorias
                   .filter(c => c.activo !== false)
                   .map(cat => (
@@ -64,20 +64,28 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
         </CardBody>
       </Card>
 
-      <div style={{ height: 'calc(100vh - 220px)', overflowY: 'auto' }}>
+      <div style={{ height: 'calc(100vh - 180px)', overflowY: 'auto', overflowX: 'hidden', paddingRight: '10px' }}>
         <Row className="g-3">
           {articulos
             .filter(p => {
+              const term = termino.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+              const nombre = (p.nombre || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+              const codigo = (p.codigo || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+              const uniNombre = (p.unidadMedida?.nombre || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+              const uniSimbolo = (p.unidadMedida?.simbolo || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
               const matchesSearch =
-                (p.nombre || '').toLowerCase().includes(termino.toLowerCase()) ||
-                (p.codigo || '').toLowerCase().includes(termino.toLowerCase());
+                nombre.includes(term) ||
+                codigo.includes(term) ||
+                uniNombre.includes(term) ||
+                uniSimbolo.includes(term);
+
               const matchesCategory = categoriaFiltro === 'todas' || p.categoria?.nombre === categoriaFiltro;
-              // Si p.categoria es null o no tiene el campo activo, asumimos que está activa (true por defecto)
               const categoryIsActive = p.categoria ? p.categoria.activo !== false : true;
               return p.activo !== false && categoryIsActive && matchesSearch && matchesCategory;
             })
             .map(prod => (
-              <Col md="4" key={prod.id}>
+              <Col md="3" key={prod.id}>
                 <Card
                   className="h-100 shadow-sm border-0 product-card cursor-pointer"
                   onClick={() => agregarAlCarrito(prod)}
@@ -88,7 +96,7 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
                       <img
                         src={`data:${prod.imagenContentType};base64,${prod.imagen}`}
                         alt={prod.nombre}
-                        style={{ height: '90px', objectFit: 'contain' }}
+                        style={{ height: '75px', objectFit: 'contain' }}
                       />
                     ) : (
                       <FontAwesomeIcon icon={faBoxOpen} size="3x" className="text-muted opacity-50" />

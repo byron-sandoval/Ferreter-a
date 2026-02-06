@@ -26,5 +26,7 @@ public interface ArticuloMapper extends EntityMapper<ArticuloDTO, Articulo> {
     @Named("unidadMedidaId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "nombre", source = "nombre")
+    @Mapping(target = "simbolo", source = "simbolo")
     UnidadMedidaDTO toDtoUnidadMedidaId(UnidadMedida unidadMedida);
 }

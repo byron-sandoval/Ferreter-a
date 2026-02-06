@@ -86,7 +86,7 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
   agregarAlCarrito,
 }) => {
   return (
-    <Col md="5">
+    <Col md="5" className="sticky-top" style={{ top: '20px', height: 'fit-content' }}>
       <Card className="shadow-lg border-0 mb-3 bg-white rounded-4 overflow-hidden">
         <CardHeader className="bg-primary text-white p-2 px-3 d-flex justify-content-between align-items-center">
           <small className="mb-0 fw-bold">
@@ -230,8 +230,6 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
                     onChange={e => setMetodoPago(e.target.value as any)}
                   >
                     <option value={MetodoPagoEnum.EFECTIVO}>Efectivo</option>
-                    <option value={MetodoPagoEnum.TARJETA}>Tarjeta</option>
-                    <option value={MetodoPagoEnum.TRANSFERENCIA}>Transferencia</option>
                   </Input>
                 </CardBody>
               </Card>
