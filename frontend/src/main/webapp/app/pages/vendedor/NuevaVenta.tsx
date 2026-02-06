@@ -89,7 +89,16 @@ export const NuevaVenta = () => {
       // Cargar vendedor por Keycloak ID
       if (account?.id) {
         const resVend = await VendedorService.getByKeycloakId(account.id);
-        if (resVend.data.length > 0) setVendedorActual(resVend.data[0]);
+        if (resVend.data.length > 0) {
+          setVendedorActual(resVend.data[0]);
+        } else {
+          // Fallback: Si no existe en la tabla Vendedor, usamos los datos de la cuenta
+          setVendedorActual({
+            nombre: account.firstName && account.lastName
+              ? `${account.firstName} ${account.lastName}`
+              : account.login || 'Admin'
+          });
+        }
       }
     } catch (e) {
       toast.error('Error al cargar datos iniciales');
@@ -268,7 +277,15 @@ export const NuevaVenta = () => {
       }
 
       toast.success(`¡Venta #${resVenta.data.noFactura} registrada con éxito!`);
-      setVentaExitosa(resVenta.data);
+
+      // Si la respuesta no trae vendedor (porque es un Admin sin record en DB), 
+      // le inyectamos manualmente el vendedorActual para que el modal lo muestre.
+      const ventaFinal = {
+        ...resVenta.data,
+        vendedor: resVenta.data.vendedor || vendedorActual
+      };
+
+      setVentaExitosa(ventaFinal);
       // Limpieza se hace despues de cerrar el modal de ticket o manual
     } catch (error) {
       console.error(error);

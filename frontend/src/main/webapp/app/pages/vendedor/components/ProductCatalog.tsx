@@ -46,7 +46,7 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
               <Input
                 type="select"
                 className="border-0 shadow-none bg-transparent fw-bold text-primary"
-                style={{ fontSize: '0.85rem', width: 'auto', minWidth: '130px', cursor: 'pointer' }}
+                style={{ fontSize: '0.85rem', width: 'auto', minWidth: '180px', cursor: 'pointer' }}
                 value={categoriaFiltro}
                 onChange={e => setCategoriaFiltro(e.target.value)}
               >
