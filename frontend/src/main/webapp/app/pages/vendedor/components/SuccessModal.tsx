@@ -189,7 +189,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
 
         <div className="d-grid gap-2 mt-4">
           <Button color="primary" className="fw-bold py-2 shadow-sm" onClick={() => handlePrint()}>
-            <FontAwesomeIcon icon={faPrint} className="me-2" /> Imprimir Ticket
+            <FontAwesomeIcon icon={faPrint} className="me-2" /> Imprimir
           </Button>
           <Button color="outline-dark" onClick={finalizarVentaYLimpiar}>
             Nueva Venta
