@@ -132,7 +132,6 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                     <tr key={i} style={{ borderBottom: '1.2px solid #ccc' }}>
                       <td style={{ padding: '8px 15px', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
                         <div style={{ fontWeight: 'bold' }}>{item.articulo.nombre}</div>
-                        <div style={{ fontSize: '9.5px', color: '#888' }}>ID: {item.articulo.id}</div>
                       </td>
                       <td style={{ padding: '8px 15px', textAlign: 'center', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>{item.cantidad}</td>
                       <td style={{ padding: '8px 15px', textAlign: 'right', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>C$ {item.articulo.precio?.toFixed(2)}</td>

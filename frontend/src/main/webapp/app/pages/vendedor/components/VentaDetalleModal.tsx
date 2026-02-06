@@ -201,7 +201,6 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                     <tr key={i} style={{ borderBottom: '1.2px solid #ccc' }}>
                       <td style={{ padding: '8px 15px', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
                         <div style={{ fontWeight: 'bold' }}>{det.articulo?.nombre}</div>
-                        <div style={{ fontSize: '9.5px', color: '#888' }}>ID: {det.articulo?.id}</div>
                       </td>
                       <td style={{ padding: '8px 15px', textAlign: 'center', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>{det.cantidad}</td>
                       <td style={{ padding: '8px 15px', textAlign: 'right', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>C$ {det.precioVenta?.toFixed(2)}</td>
