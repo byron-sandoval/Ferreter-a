@@ -68,11 +68,19 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
         <Row className="g-3">
           {articulos
             .filter(p => {
+              const term = termino.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+              const nombre = (p.nombre || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+              const codigo = (p.codigo || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+              const uniNombre = (p.unidadMedida?.nombre || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+              const uniSimbolo = (p.unidadMedida?.simbolo || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
               const matchesSearch =
-                (p.nombre || '').toLowerCase().includes(termino.toLowerCase()) ||
-                (p.codigo || '').toLowerCase().includes(termino.toLowerCase());
+                nombre.includes(term) ||
+                codigo.includes(term) ||
+                uniNombre.includes(term) ||
+                uniSimbolo.includes(term);
+
               const matchesCategory = categoriaFiltro === 'todas' || p.categoria?.nombre === categoriaFiltro;
-              // Si p.categoria es null o no tiene el campo activo, asumimos que está activa (true por defecto)
               const categoryIsActive = p.categoria ? p.categoria.activo !== false : true;
               return p.activo !== false && categoryIsActive && matchesSearch && matchesCategory;
             })
