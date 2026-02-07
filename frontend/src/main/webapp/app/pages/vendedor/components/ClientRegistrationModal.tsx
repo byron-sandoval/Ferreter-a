@@ -52,14 +52,20 @@ export const ClientRegistrationModal: React.FC<IClientRegistrationModalProps> = 
                     borderRadius: '8px',
                     border: '1px solid #dee2e6',
                     fontWeight: 'bold',
-                    color: nuevoCliente.id ? '#6c757d' : '#000'
+                    color: nuevoCliente.id ? '#6c757d' : '#000',
                   }}
                   maxLength={16}
                   disabled={!!nuevoCliente.id}
                   onChange={e => {
                     const raw = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
                     const digitsOnly = raw.substring(0, 13).replace(/[^0-9]/g, '');
-                    const lastChar = raw.length > 13 ? raw.substring(13, 14).replace(/[^a-zA-Z]/g, '').toUpperCase() : '';
+                    const lastChar =
+                      raw.length > 13
+                        ? raw
+                            .substring(13, 14)
+                            .replace(/[^a-zA-Z]/g, '')
+                            .toUpperCase()
+                        : '';
                     const input = digitsOnly + lastChar;
 
                     let formatted = input;
@@ -75,7 +81,9 @@ export const ClientRegistrationModal: React.FC<IClientRegistrationModalProps> = 
             </Col>
             <Col md="6">
               <FormGroup>
-                <Label className="small fw-bold text-uppercase" style={{ color: '#11373f' }}>Nombre Completo</Label>
+                <Label className="small fw-bold text-uppercase" style={{ color: '#11373f' }}>
+                  Nombre Completo
+                </Label>
                 <Input
                   value={nuevoCliente.nombre}
                   placeholder="Ej. Juan Pérez"
@@ -110,7 +118,9 @@ export const ClientRegistrationModal: React.FC<IClientRegistrationModalProps> = 
             </Col>
             <Col md="6">
               <FormGroup>
-                <Label className="small fw-bold text-uppercase" style={{ color: '#11373f' }}>Teléfono</Label>
+                <Label className="small fw-bold text-uppercase" style={{ color: '#11373f' }}>
+                  Teléfono
+                </Label>
                 <Input
                   value={nuevoCliente.telefono || ''}
                   placeholder="8888-8888"

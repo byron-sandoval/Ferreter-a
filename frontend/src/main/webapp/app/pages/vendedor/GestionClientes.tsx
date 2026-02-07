@@ -1,7 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Badge, Card, CardBody, Input, Row, Col, Progress, Label, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup } from 'reactstrap';
+import {
+  Table,
+  Button,
+  Badge,
+  Card,
+  CardBody,
+  Input,
+  Row,
+  Col,
+  Progress,
+  Label,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Form,
+  FormGroup,
+} from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUsers, faSearch, faUserEdit, faHistory, faExclamationCircle, faPlus, faChartLine, faVenusMars, faMapMarkerAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
+import {
+  faUsers,
+  faSearch,
+  faUserEdit,
+  faHistory,
+  faExclamationCircle,
+  faPlus,
+  faChartLine,
+  faVenusMars,
+  faMapMarkerAlt,
+  faTrash,
+} from '@fortawesome/free-solid-svg-icons';
 import ClienteService from 'app/services/cliente.service';
 import VentaService from 'app/services/venta.service';
 import { ICliente, GeneroEnum } from 'app/shared/model/cliente.model';
@@ -192,7 +220,7 @@ export const GestionClientes = () => {
                         <Button color="light" size="sm" className="p-1 me-1 text-primary" onClick={e => abrirEditar(e, c)}>
                           <FontAwesomeIcon icon={faUserEdit} fixedWidth />
                         </Button>
-                        <Button color="light" size="sm" className="p-1 text-danger" onClick={e => eliminarCliente(e, c.id!)}>
+                        <Button color="light" size="sm" className="p-1 text-danger" onClick={e => eliminarCliente(e, c.id)}>
                           <FontAwesomeIcon icon={faTrash} fixedWidth />
                         </Button>
                       </td>
@@ -217,7 +245,6 @@ export const GestionClientes = () => {
                       </small>
                     </div>
                   </div>
-
                 </div>
                 <CardBody className="p-2">
                   <div className="mb-2">
@@ -281,7 +308,10 @@ export const GestionClientes = () => {
           }}
         >
           <div className="w-100 text-center">
-            <FontAwesomeIcon icon={clienteEditar.id ? faUserEdit : faPlus} className="me-2 animate__animated animate__pulse animate__infinite" />
+            <FontAwesomeIcon
+              icon={clienteEditar.id ? faUserEdit : faPlus}
+              className="me-2 animate__animated animate__pulse animate__infinite"
+            />
             <span className="fw-bold text-uppercase" style={{ letterSpacing: '1px' }}>
               {clienteEditar.id ? 'Actualizar Perfil de Cliente' : 'Registro de Nuevo Cliente'}
             </span>
@@ -310,7 +340,13 @@ export const GestionClientes = () => {
                     onChange={e => {
                       const raw = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
                       const digitsOnly = raw.substring(0, 13).replace(/[^0-9]/g, '');
-                      const lastChar = raw.length > 13 ? raw.substring(13, 14).replace(/[^a-zA-Z]/g, '').toUpperCase() : '';
+                      const lastChar =
+                        raw.length > 13
+                          ? raw
+                              .substring(13, 14)
+                              .replace(/[^a-zA-Z]/g, '')
+                              .toUpperCase()
+                          : '';
                       const input = digitsOnly + lastChar;
 
                       let formatted = input;
@@ -326,7 +362,9 @@ export const GestionClientes = () => {
               </Col>
               <Col md="6">
                 <FormGroup>
-                  <Label className="small fw-bold text-uppercase" style={{ color: '#11373f' }}>Nombre Completo</Label>
+                  <Label className="small fw-bold text-uppercase" style={{ color: '#11373f' }}>
+                    Nombre Completo
+                  </Label>
                   <Input
                     value={clienteEditar.nombre || ''}
                     placeholder="Ej. Juan Pérez"
@@ -361,7 +399,9 @@ export const GestionClientes = () => {
               </Col>
               <Col md="6">
                 <FormGroup>
-                  <Label className="small fw-bold text-uppercase" style={{ color: '#11373f' }}>Teléfono</Label>
+                  <Label className="small fw-bold text-uppercase" style={{ color: '#11373f' }}>
+                    Teléfono
+                  </Label>
                   <Input
                     value={clienteEditar.telefono || ''}
                     placeholder="8888-8888"

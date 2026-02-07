@@ -122,7 +122,6 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
                 <div className="text-muted small">
                   <FontAwesomeIcon icon={faUserCheck} className="me-1" /> {cliente.cedula}
                 </div>
-
               </div>
               <Button color="soft-danger" className="btn-sm rounded-circle shadow-sm" onClick={() => setCliente(null)}>
                 <FontAwesomeIcon icon={faTimes} />

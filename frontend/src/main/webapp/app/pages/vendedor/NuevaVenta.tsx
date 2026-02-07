@@ -94,9 +94,7 @@ export const NuevaVenta = () => {
         } else {
           // Fallback: Si no existe en la tabla Vendedor, usamos los datos de la cuenta
           setVendedorActual({
-            nombre: account.firstName && account.lastName
-              ? `${account.firstName} ${account.lastName}`
-              : account.login || 'Admin'
+            nombre: account.firstName && account.lastName ? `${account.firstName} ${account.lastName}` : account.login || 'Admin',
           });
         }
       }
@@ -314,11 +312,11 @@ export const NuevaVenta = () => {
 
       toast.success(`¡Venta #${resVenta.data.noFactura} registrada con éxito!`);
 
-      // Si la respuesta no trae vendedor (porque es un Admin sin record en DB), 
+      // Si la respuesta no trae vendedor (porque es un Admin sin record en DB),
       // le inyectamos manualmente el vendedorActual para que el modal lo muestre.
       const ventaFinal = {
         ...resVenta.data,
-        vendedor: resVenta.data.vendedor || vendedorActual
+        vendedor: resVenta.data.vendedor || vendedorActual,
       };
 
       setVentaExitosa(ventaFinal);

@@ -68,17 +68,28 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
         <Row className="g-3">
           {articulos
             .filter(p => {
-              const term = termino.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-              const nombre = (p.nombre || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-              const codigo = (p.codigo || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-              const uniNombre = (p.unidadMedida?.nombre || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-              const uniSimbolo = (p.unidadMedida?.simbolo || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+              const term = termino
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '');
+              const nombre = (p.nombre || '')
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '');
+              const codigo = (p.codigo || '')
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '');
+              const uniNombre = (p.unidadMedida?.nombre || '')
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '');
+              const uniSimbolo = (p.unidadMedida?.simbolo || '')
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '');
 
-              const matchesSearch =
-                nombre.includes(term) ||
-                codigo.includes(term) ||
-                uniNombre.includes(term) ||
-                uniSimbolo.includes(term);
+              const matchesSearch = nombre.includes(term) || codigo.includes(term) || uniNombre.includes(term) || uniSimbolo.includes(term);
 
               const matchesCategory = categoriaFiltro === 'todas' || p.categoria?.nombre === categoriaFiltro;
               const categoryIsActive = p.categoria ? p.categoria.activo !== false : true;

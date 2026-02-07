@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Table,
-  Button,
-  Input,
-  Badge,
-  Card,
-  CardBody,
-} from 'reactstrap';
+import { Table, Button, Input, Badge, Card, CardBody } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSync, faPencilAlt, faTrash, faTags } from '@fortawesome/free-solid-svg-icons';
 import { ICategoria } from 'app/shared/model/categoria.model';
@@ -19,8 +12,6 @@ export const CategoriaList = () => {
   const [categorias, setCategorias] = useState<ICategoria[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
-
-
 
   const loadAll = () => {
     setLoading(true);
@@ -35,11 +26,8 @@ export const CategoriaList = () => {
       });
   };
 
-
-
   useEffect(() => {
     loadAll();
-
   }, []);
 
   const filtered = categorias.filter(
@@ -47,15 +35,11 @@ export const CategoriaList = () => {
       (c.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (c.descripcion || '').toLowerCase().includes(filter.toLowerCase()),
   );
 
-
-
   const handleDelete = (id: number) => {
     if (window.confirm('¿Eliminar categoría?')) {
       import('axios').then(axios => axios.default.delete(`api/categorias/${id}`).then(loadAll));
     }
   };
-
-
 
   return (
     <div className="animate__animated animate__fadeIn p-1">
@@ -131,8 +115,6 @@ export const CategoriaList = () => {
           </Table>
         </CardBody>
       </Card>
-
-
     </div>
   );
 };
