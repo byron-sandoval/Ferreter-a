@@ -102,7 +102,7 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
           {!cliente ? (
             <div className="d-flex gap-2">
               <Input
-                placeholder="Ingrese Cédula Rápida..."
+                placeholder="Buscar por Nombre o Cédula..."
                 value={busquedaCedula}
                 className="bg-light border-0"
                 onChange={e => setBusquedaCedula(e.target.value)}
