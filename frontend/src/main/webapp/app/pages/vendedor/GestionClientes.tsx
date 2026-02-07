@@ -91,8 +91,12 @@ export const GestionClientes = () => {
       }
       toggleModal();
       loadData();
-    } catch (err) {
-      toast.error('Error al guardar cliente');
+    } catch (err: any) {
+      if (err.response?.status === 400) {
+        toast.error('Error: Ya existe un cliente con esta cédula.');
+      } else {
+        toast.error('cédula existente');
+      }
     }
   };
 
@@ -268,10 +272,19 @@ export const GestionClientes = () => {
       </Row>
 
       <Modal isOpen={modalOpen} toggle={toggleModal} centered>
-        <ModalHeader toggle={toggleModal} className="bg-primary text-white border-0 py-3">
+        <ModalHeader
+          toggle={toggleModal}
+          className="text-white border-0 py-4 text-center w-100"
+          style={{
+            background: 'linear-gradient(135deg, #595e66 0%, #11373f 100%)',
+            boxShadow: '0 4px 15px rgba(29, 51, 56, 0.3)',
+          }}
+        >
           <div className="w-100 text-center">
-            <FontAwesomeIcon icon={clienteEditar.id ? faUserEdit : faPlus} className="me-2" />
-            {clienteEditar.id ? 'Editar Cliente' : 'Nuevo Cliente'}
+            <FontAwesomeIcon icon={clienteEditar.id ? faUserEdit : faPlus} className="me-2 animate__animated animate__pulse animate__infinite" />
+            <span className="fw-bold text-uppercase" style={{ letterSpacing: '1px' }}>
+              {clienteEditar.id ? 'Actualizar Perfil de Cliente' : 'Registro de Nuevo Cliente'}
+            </span>
           </div>
         </ModalHeader>
         <ModalBody className="p-4">
@@ -279,12 +292,21 @@ export const GestionClientes = () => {
             <Row>
               <Col md="6">
                 <FormGroup>
-                  <Label className="small fw-bold text-muted text-uppercase">Cédula</Label>
+                  <Label className="small fw-bold text-uppercase" style={{ color: '#11373f' }}>
+                    Cédula
+                  </Label>
                   <Input
                     value={clienteEditar.cedula || ''}
                     placeholder="281-010180-0005Y"
-                    className="bg-light border-0"
+                    className="bg-white border-1 shadow-sm"
+                    style={{
+                      borderRadius: '8px',
+                      border: '1px solid #dee2e6',
+                      fontWeight: 'bold',
+                      color: clienteEditar.id ? '#6c757d' : '#000',
+                    }}
                     maxLength={16}
+                    disabled={!!clienteEditar.id}
                     onChange={e => {
                       const raw = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
                       const digitsOnly = raw.substring(0, 13).replace(/[^0-9]/g, '');
@@ -304,11 +326,12 @@ export const GestionClientes = () => {
               </Col>
               <Col md="6">
                 <FormGroup>
-                  <Label className="small fw-bold text-muted text-uppercase">Nombre Completo</Label>
+                  <Label className="small fw-bold text-uppercase" style={{ color: '#11373f' }}>Nombre Completo</Label>
                   <Input
                     value={clienteEditar.nombre || ''}
                     placeholder="Ej. Juan Pérez"
-                    className="bg-light border-0"
+                    className="bg-white border-1 shadow-sm"
+                    style={{ borderRadius: '8px', border: '1px solid #dee2e6', fontWeight: 'bold', color: '#000' }}
                     maxLength={50}
                     onChange={e => {
                       const val = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
@@ -321,13 +344,14 @@ export const GestionClientes = () => {
             <Row>
               <Col md="6">
                 <FormGroup>
-                  <Label className="small fw-bold text-muted text-uppercase">
-                    <FontAwesomeIcon icon={faVenusMars} className="me-1" /> Género
+                  <Label className="small fw-bold text-uppercase" style={{ color: '#11373f' }}>
+                    <FontAwesomeIcon icon={faVenusMars} className="me-1" style={{ color: '#595e66' }} /> Género
                   </Label>
                   <Input
                     type="select"
                     value={clienteEditar.genero || ''}
-                    className="bg-light border-0"
+                    className="bg-white border-1 shadow-sm"
+                    style={{ borderRadius: '8px', border: '1px solid #dee2e6', fontWeight: 'bold', color: '#000' }}
                     onChange={e => setClienteEditar({ ...clienteEditar, genero: e.target.value as GeneroEnum })}
                   >
                     <option value={GeneroEnum.MASCULINO}>Masculino</option>
@@ -337,11 +361,12 @@ export const GestionClientes = () => {
               </Col>
               <Col md="6">
                 <FormGroup>
-                  <Label className="small fw-bold text-muted text-uppercase">Teléfono</Label>
+                  <Label className="small fw-bold text-uppercase" style={{ color: '#11373f' }}>Teléfono</Label>
                   <Input
                     value={clienteEditar.telefono || ''}
                     placeholder="8888-8888"
-                    className="bg-light border-0"
+                    className="bg-white border-1 shadow-sm"
+                    style={{ borderRadius: '8px', border: '1px solid #dee2e6', fontWeight: 'bold', color: '#000' }}
                     maxLength={9}
                     onChange={e => {
                       const input = e.target.value.replace(/[^0-9]/g, '').substring(0, 8);
@@ -356,21 +381,22 @@ export const GestionClientes = () => {
               </Col>
             </Row>
             <FormGroup>
-              <Label className="small fw-bold text-muted text-uppercase">
-                <FontAwesomeIcon icon={faMapMarkerAlt} className="me-1" /> Dirección
+              <Label className="small fw-bold text-uppercase" style={{ color: '#11373f' }}>
+                <FontAwesomeIcon icon={faMapMarkerAlt} className="me-1" style={{ color: '#595e66' }} /> Dirección
               </Label>
               <Input
                 type="textarea"
                 value={clienteEditar.direccion || ''}
                 placeholder="Dirección exacta..."
-                className="bg-light border-0"
+                className="bg-white border-1 shadow-sm"
+                style={{ borderRadius: '12px', border: '1px solid #dee2e6', fontWeight: 'bold', color: '#000' }}
                 rows={2}
                 onChange={e => setClienteEditar({ ...clienteEditar, direccion: e.target.value })}
               />
             </FormGroup>
             {clienteEditar.id && (
               <FormGroup check>
-                <Label check className="small fw-bold text-muted text-uppercase">
+                <Label check className="small fw-bold text-uppercase" style={{ color: '#11373f' }}>
                   <Input
                     type="checkbox"
                     checked={!!clienteEditar.activo}
@@ -382,11 +408,16 @@ export const GestionClientes = () => {
             )}
           </Form>
         </ModalBody>
-        <ModalFooter className="border-0 bg-light rounded-bottom-4">
-          <Button color="link" className="text-muted text-decoration-none" onClick={toggleModal}>
+        <ModalFooter className="border-0 bg-white pb-4 px-4">
+          <Button color="link" className="text-muted fw-bold text-decoration-none" onClick={toggleModal}>
             CANCELAR
           </Button>
-          <Button color="primary" className="px-5 fw-bold rounded-pill shadow-sm" onClick={guardarCliente}>
+          <Button
+            color="primary"
+            className="px-5 fw-bold rounded-pill shadow"
+            style={{ background: 'linear-gradient(135deg, #595e66 0%, #11373f 100%)', border: 'none' }}
+            onClick={guardarCliente}
+          >
             {clienteEditar.id ? 'ACTUALIZAR' : 'GUARDAR'}
           </Button>
         </ModalFooter>
