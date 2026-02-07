@@ -108,18 +108,35 @@ export const NuevaVenta = () => {
   const buscarCliente = async () => {
     if (!busquedaCedula) return;
     try {
-      const res = await ClienteService.getByCedula(busquedaCedula);
+      // 1. Intentar por Cédula (Exacta)
+      let res = await ClienteService.getByCedula(busquedaCedula);
+
+      // 2. Si no hay por cédula, intentar por Nombre (Contiene)
+      if (res.data.length === 0) {
+        res = await ClienteService.search(busquedaCedula);
+      }
+
       if (res.data.length > 0) {
         const c = res.data[0];
         setCliente(c);
-        if ((c.saldo || 0) > 0) {
-          toast.warning(`Atención: El cliente ${c.nombre} tiene un saldo pendiente de C$ ${c.saldo?.toFixed(2)}`, { autoClose: 5000 });
+
+        if (res.data.length > 1) {
+          toast.info(`Se encontraron ${res.data.length} coincidencias. Se seleccionó: ${c.nombre}.`);
         } else {
-          toast.success(`Cliente seleccionado: ${c.nombre}`);
+          if ((c.saldo || 0) > 0) {
+            toast.warning(`Atención: El cliente ${c.nombre} tiene un saldo pendiente de C$ ${c.saldo?.toFixed(2)}`, { autoClose: 5000 });
+          } else {
+            toast.success(`Cliente seleccionado: ${c.nombre}`);
+          }
         }
       } else {
-        toast.info('Cliente no encontrado. Por favor regístrelo.');
-        setNuevoCliente({ ...nuevoCliente, cedula: busquedaCedula });
+        toast.info('No se encontró el cliente. Puede registrarlo ahora.');
+        // Si parece una cédula (contiene guiones o muchos números), la pre-llenamos
+        if (/[0-9]/.test(busquedaCedula)) {
+          setNuevoCliente({ ...nuevoCliente, cedula: busquedaCedula, nombre: '' });
+        } else {
+          setNuevoCliente({ ...nuevoCliente, nombre: busquedaCedula, cedula: '' });
+        }
         setShowClienteModal(true);
       }
     } catch (e) {
@@ -152,8 +169,12 @@ export const NuevaVenta = () => {
       setCliente(res.data);
       setShowClienteModal(false);
       toast.success('Cliente registrado con éxito');
-    } catch (e) {
-      toast.error('Error al registrar cliente');
+    } catch (e: any) {
+      if (e.response?.status === 400) {
+        toast.error('Error: Ya existe un cliente registrado con esta cédula.');
+      } else {
+        toast.error('cédula existente');
+      }
     }
   };
 
