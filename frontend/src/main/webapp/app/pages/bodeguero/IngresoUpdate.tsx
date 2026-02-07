@@ -194,7 +194,7 @@ export const IngresoUpdate = () => {
                     <option value="">Buscar producto...</option>
                     {articulos.map(a => (
                       <option key={a.id} value={a.id}>
-                        ({a.codigo}) {a.nombre}
+                        {a.nombre}
                       </option>
                     ))}
                   </Input>

@@ -102,7 +102,7 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
           {!cliente ? (
             <div className="d-flex gap-2">
               <Input
-                placeholder="Ingrese Cédula Rápida..."
+                placeholder="Buscar por Nombre o Cédula..."
                 value={busquedaCedula}
                 className="bg-light border-0"
                 onChange={e => setBusquedaCedula(e.target.value)}
@@ -122,7 +122,6 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
                 <div className="text-muted small">
                   <FontAwesomeIcon icon={faUserCheck} className="me-1" /> {cliente.cedula}
                 </div>
-
               </div>
               <Button color="soft-danger" className="btn-sm rounded-circle shadow-sm" onClick={() => setCliente(null)}>
                 <FontAwesomeIcon icon={faTimes} />

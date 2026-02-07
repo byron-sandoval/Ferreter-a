@@ -103,17 +103,28 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
 
         {/* TICKET OCULTO PARA IMPRESIÓN - NUEVO FORMATO CARTA */}
         <div style={{ display: 'none' }}>
-          <div ref={componentRef} style={{
-            padding: '28px',
-            fontFamily: "'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-            width: '800px',
-            backgroundColor: '#fff',
-            color: '#333',
-            margin: '0 auto',
-            position: 'relative'
-          }}>
+          <div
+            ref={componentRef}
+            style={{
+              padding: '28px',
+              fontFamily: "'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+              width: '800px',
+              backgroundColor: '#fff',
+              color: '#333',
+              margin: '0 auto',
+              position: 'relative',
+            }}
+          >
             {/* Header Section - Balanced */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px', borderBottom: '3px solid #fd7e14', paddingBottom: '8px' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginBottom: '15px',
+                borderBottom: '3px solid #fd7e14',
+                paddingBottom: '8px',
+              }}
+            >
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 {empresa?.logo && (
                   <img
@@ -123,52 +134,87 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                   />
                 )}
                 <div>
-                  <h1 style={{ margin: 0, fontSize: '28px', color: '#fd7e14', fontWeight: 'bold', letterSpacing: '0.5px' }}>{empresa?.nombre || 'FERRONICA'}</h1>
-                  <p style={{ margin: 0, fontSize: '13px', fontStyle: 'italic', color: '#666', fontWeight: '500' }}>{empresa?.eslogan || 'Ferretería & Suministros de Confianza'}</p>
+                  <h1 style={{ margin: 0, fontSize: '28px', color: '#fd7e14', fontWeight: 'bold', letterSpacing: '0.5px' }}>
+                    {empresa?.nombre || 'FERRONICA'}
+                  </h1>
+                  <p style={{ margin: 0, fontSize: '13px', fontStyle: 'italic', color: '#666', fontWeight: '500' }}>
+                    {empresa?.eslogan || 'Ferretería & Suministros de Confianza'}
+                  </p>
                 </div>
               </div>
               <div style={{ textAlign: 'right', fontSize: '12.5px', color: '#444' }}>
                 <p style={{ margin: '0 0 2px 0', fontSize: '15px', fontWeight: 'bold' }}></p>
-                <p style={{ margin: '1px 0' }}><strong>RUC:</strong> {empresa?.ruc || 'N/A'}</p>
+                <p style={{ margin: '1px 0' }}>
+                  <strong>RUC:</strong> {empresa?.ruc || 'N/A'}
+                </p>
                 <p style={{ margin: '1px 0' }}>{empresa?.direccion}</p>
-                <p style={{ margin: '1px 0' }}><strong>Tel:</strong> {empresa?.telefono}</p>
-                <p style={{ margin: '1px 0' }}><strong>Email:</strong> {empresa?.correo || 'ferronica@gmail.com'}</p>
+                <p style={{ margin: '1px 0' }}>
+                  <strong>Tel:</strong> {empresa?.telefono}
+                </p>
+                <p style={{ margin: '1px 0' }}>
+                  <strong>Email:</strong> {empresa?.correo || 'ferronica@gmail.com'}
+                </p>
               </div>
             </div>
 
             {/* Paid Stamp effect */}
-            <div style={{
-              position: 'absolute',
-              top: '160px',
-              right: '50px',
-              border: '5px solid #28a745',
-              color: '#28a745',
-              padding: '8px 25px',
-              fontSize: '40px',
-              fontWeight: 'bold',
-              borderRadius: '12px',
-              opacity: 0.12,
-              transform: 'rotate(-22deg)',
-              zIndex: 0,
-              pointerEvents: 'none'
-            }}>
+            <div
+              style={{
+                position: 'absolute',
+                top: '160px',
+                right: '50px',
+                border: '5px solid #28a745',
+                color: '#28a745',
+                padding: '8px 25px',
+                fontSize: '40px',
+                fontWeight: 'bold',
+                borderRadius: '12px',
+                opacity: 0.12,
+                transform: 'rotate(-22deg)',
+                zIndex: 0,
+                pointerEvents: 'none',
+              }}
+            >
               PAGADO
             </div>
 
             {/* Invoice Info Section - Balanced */}
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', position: 'relative', zIndex: 1 }}>
               <div style={{ flex: 1 }}>
-                <h2 style={{ fontSize: '15px', marginBottom: '6px', color: '#fd7e14', borderBottom: '1px solid #eee', display: 'inline-block', paddingRight: '40px' }}>CLIENTE</h2>
-                <p style={{ margin: '1px 0', fontSize: '15.5px', fontWeight: 'bold', color: '#000' }}>{venta.cliente?.nombre || 'Consumidor Final'}</p>
+                <h2
+                  style={{
+                    fontSize: '15px',
+                    marginBottom: '6px',
+                    color: '#fd7e14',
+                    borderBottom: '1px solid #eee',
+                    display: 'inline-block',
+                    paddingRight: '40px',
+                  }}
+                >
+                  CLIENTE
+                </h2>
+                <p style={{ margin: '1px 0', fontSize: '15.5px', fontWeight: 'bold', color: '#000' }}>
+                  {venta.cliente?.nombre || 'Consumidor Final'}
+                </p>
                 <div style={{ fontSize: '12.5px' }}>
-                  <p style={{ margin: '1px 0' }}><strong>Cédula/RUC:</strong> {venta.cliente?.cedula}</p>
-                  <p style={{ margin: '1px 0' }}><strong>Dirección:</strong> {venta.cliente?.direccion || 'Ciudad'}</p>
-                  <p style={{ margin: '1px 0' }}><strong>Teléfono:</strong> {venta.cliente?.telefono || 'N/A'}</p>
+                  <p style={{ margin: '1px 0' }}>
+                    <strong>Cédula/RUC:</strong> {venta.cliente?.cedula}
+                  </p>
+                  <p style={{ margin: '1px 0' }}>
+                    <strong>Dirección:</strong> {venta.cliente?.direccion || 'Ciudad'}
+                  </p>
+                  <p style={{ margin: '1px 0' }}>
+                    <strong>Teléfono:</strong> {venta.cliente?.telefono || 'N/A'}
+                  </p>
                 </div>
               </div>
-              <div style={{ backgroundColor: '#fff', padding: '10px', borderRadius: '10px', border: '2px solid #fd7e14', minWidth: '220px' }}>
+              <div
+                style={{ backgroundColor: '#fff', padding: '10px', borderRadius: '10px', border: '2px solid #fd7e14', minWidth: '220px' }}
+              >
                 <div style={{ textAlign: 'center', marginBottom: '6px', borderBottom: '1px solid #eee', paddingBottom: '4px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase' }}>Copia de Reimpresión</span>
+                  <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase' }}>
+                    Copia de Reimpresión
+                  </span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px' }}>
                   <strong>No. VENTA:</strong>
@@ -190,10 +236,45 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
               <table style={{ width: '100%', borderCollapse: 'collapse', border: '1.5px solid #ccc' }}>
                 <thead>
                   <tr style={{ backgroundColor: '#fd7e14', color: '#fff' }}>
-                    <th style={{ width: '45%', padding: '10px 15px', textAlign: 'left', fontWeight: 'bold', fontSize: '12.5px', borderRight: '1.5px solid #fff' }}>Descripción</th>
-                    <th style={{ width: '15%', padding: '10px 15px', textAlign: 'center', fontWeight: 'bold', fontSize: '12.5px', borderRight: '1.5px solid #fff' }}>Unidades</th>
-                    <th style={{ width: '20%', padding: '10px 15px', textAlign: 'right', fontWeight: 'bold', fontSize: '12.5px', borderRight: '1.5px solid #fff' }}>Precio Unitario</th>
-                    <th style={{ width: '20%', padding: '10px 15px', textAlign: 'right', fontWeight: 'bold', fontSize: '12.5px' }}>Precio</th>
+                    <th
+                      style={{
+                        width: '45%',
+                        padding: '10px 15px',
+                        textAlign: 'left',
+                        fontWeight: 'bold',
+                        fontSize: '12.5px',
+                        borderRight: '1.5px solid #fff',
+                      }}
+                    >
+                      Descripción
+                    </th>
+                    <th
+                      style={{
+                        width: '15%',
+                        padding: '10px 15px',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                        fontSize: '12.5px',
+                        borderRight: '1.5px solid #fff',
+                      }}
+                    >
+                      Unidades
+                    </th>
+                    <th
+                      style={{
+                        width: '20%',
+                        padding: '10px 15px',
+                        textAlign: 'right',
+                        fontWeight: 'bold',
+                        fontSize: '12.5px',
+                        borderRight: '1.5px solid #fff',
+                      }}
+                    >
+                      Precio Unitario
+                    </th>
+                    <th style={{ width: '20%', padding: '10px 15px', textAlign: 'right', fontWeight: 'bold', fontSize: '12.5px' }}>
+                      Precio
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -202,9 +283,15 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                       <td style={{ padding: '8px 15px', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
                         <div style={{ fontWeight: 'bold' }}>{det.articulo?.nombre}</div>
                       </td>
-                      <td style={{ padding: '8px 15px', textAlign: 'center', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>{det.cantidad}</td>
-                      <td style={{ padding: '8px 15px', textAlign: 'right', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>C$ {det.precioVenta?.toFixed(2)}</td>
-                      <td style={{ padding: '8px 15px', textAlign: 'right', fontSize: '12px', fontWeight: 'bold' }}>C$ {det.monto?.toFixed(2)}</td>
+                      <td style={{ padding: '8px 15px', textAlign: 'center', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
+                        {det.cantidad}
+                      </td>
+                      <td style={{ padding: '8px 15px', textAlign: 'right', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
+                        C$ {det.precioVenta?.toFixed(2)}
+                      </td>
+                      <td style={{ padding: '8px 15px', textAlign: 'right', fontSize: '12px', fontWeight: 'bold' }}>
+                        C$ {det.monto?.toFixed(2)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -212,32 +299,105 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
             </div>
 
             {/* Totals Section - Grid Box Style */}
-            <div style={{ display: 'flex', width: '100%', border: '1.5px solid #ccc', marginTop: '-1.5px', position: 'relative', zIndex: 1, backgroundColor: '#fff' }}>
+            <div
+              style={{
+                display: 'flex',
+                width: '100%',
+                border: '1.5px solid #ccc',
+                marginTop: '-1.5px',
+                position: 'relative',
+                zIndex: 1,
+                backgroundColor: '#fff',
+              }}
+            >
               {/* Observations Box */}
               <div style={{ width: '60%', padding: '10px', borderRight: '1.5px solid #ccc' }}>
-                <p style={{ margin: '0 0 8px 0', fontWeight: 'bold', fontSize: '11px', textTransform: 'uppercase', color: '#666' }}>Observaciones:</p>
-                <div style={{ textAlign: 'center', marginTop: '20px', fontSize: '13px', fontWeight: '500' }}>
-                  Gracias por su compra.
-                </div>
+                <p style={{ margin: '0 0 8px 0', fontWeight: 'bold', fontSize: '11px', textTransform: 'uppercase', color: '#666' }}>
+                  Observaciones:
+                </p>
+                <div style={{ textAlign: 'center', marginTop: '20px', fontSize: '13px', fontWeight: '500' }}>Gracias por su compra.</div>
               </div>
 
               {/* Totals Grid Box */}
               <div style={{ width: '40%' }}>
                 <div style={{ display: 'flex', borderBottom: '1.2px solid #ccc' }}>
-                  <div style={{ width: '50%', padding: '8px', borderRight: '1.2px solid #ccc', textAlign: 'right', fontWeight: 'bold', fontSize: '11.5px', color: '#444' }}>Total parcial</div>
-                  <div style={{ width: '50%', padding: '8px', textAlign: 'right', fontSize: '11.5px' }}>C$ {venta.subtotal?.toFixed(2)}</div>
+                  <div
+                    style={{
+                      width: '50%',
+                      padding: '8px',
+                      borderRight: '1.2px solid #ccc',
+                      textAlign: 'right',
+                      fontWeight: 'bold',
+                      fontSize: '11.5px',
+                      color: '#444',
+                    }}
+                  >
+                    Total parcial
+                  </div>
+                  <div style={{ width: '50%', padding: '8px', textAlign: 'right', fontSize: '11.5px' }}>
+                    C$ {venta.subtotal?.toFixed(2)}
+                  </div>
                 </div>
                 <div style={{ display: 'flex', borderBottom: '1.2px solid #ccc' }}>
-                  <div style={{ width: '50%', padding: '8px', borderRight: '1.2px solid #ccc', textAlign: 'right', fontWeight: 'bold', fontSize: '11.5px', color: '#444' }}>Descuento</div>
-                  <div style={{ width: '50%', padding: '8px', textAlign: 'right', fontSize: '11.5px', color: '#d9534f' }}>- C$ {(venta.descuento || 0).toFixed(2)}</div>
+                  <div
+                    style={{
+                      width: '50%',
+                      padding: '8px',
+                      borderRight: '1.2px solid #ccc',
+                      textAlign: 'right',
+                      fontWeight: 'bold',
+                      fontSize: '11.5px',
+                      color: '#444',
+                    }}
+                  >
+                    Descuento
+                  </div>
+                  <div style={{ width: '50%', padding: '8px', textAlign: 'right', fontSize: '11.5px', color: '#d9534f' }}>
+                    - C$ {(venta.descuento || 0).toFixed(2)}
+                  </div>
                 </div>
                 <div style={{ display: 'flex', borderBottom: '1.2px solid #ccc' }}>
-                  <div style={{ width: '50%', padding: '8px', borderRight: '1.2px solid #ccc', textAlign: 'right', fontWeight: 'bold', fontSize: '11.5px', color: '#444' }}>IVA (15%)</div>
+                  <div
+                    style={{
+                      width: '50%',
+                      padding: '8px',
+                      borderRight: '1.2px solid #ccc',
+                      textAlign: 'right',
+                      fontWeight: 'bold',
+                      fontSize: '11.5px',
+                      color: '#444',
+                    }}
+                  >
+                    IVA (15%)
+                  </div>
                   <div style={{ width: '50%', padding: '8px', textAlign: 'right', fontSize: '11.5px' }}>C$ {venta.iva?.toFixed(2)}</div>
                 </div>
                 <div style={{ display: 'flex', backgroundColor: '#fef3e7' }}>
-                  <div style={{ width: '50%', padding: '10px 8px', borderRight: '1.5px solid #ccc', textAlign: 'right', fontWeight: 'bold', fontSize: '12.5px', textTransform: 'uppercase' }}>TOTAL FACTURA</div>
-                  <div style={{ width: '50%', padding: '10px 8px', textAlign: 'right', fontWeight: 'bold', fontSize: '16px', color: '#fd7e14' }}>C$ {venta.total?.toFixed(2)}</div>
+                  <div
+                    style={{
+                      width: '50%',
+                      padding: '10px 8px',
+                      borderRight: '1.5px solid #ccc',
+                      textAlign: 'right',
+                      fontWeight: 'bold',
+                      fontSize: '12.5px',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    TOTAL FACTURA
+                  </div>
+                  <div
+                    style={{
+                      width: '50%',
+                      padding: '10px 8px',
+                      textAlign: 'right',
+                      fontWeight: 'bold',
+                      fontSize: '16px',
+                      color: '#fd7e14',
+                    }}
+                  >
+                    C$ {venta.total?.toFixed(2)}
+                  </div>
                 </div>
                 {/* Info Recibido/Cambio Alineada */}
                 <div style={{ borderTop: '1.2px solid #ccc', display: 'flex', fontSize: '12px', color: '#333' }}>
@@ -250,7 +410,6 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </ModalBody>
