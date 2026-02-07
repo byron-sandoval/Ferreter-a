@@ -332,7 +332,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                       color: '#444',
                     }}
                   >
-                    Total parcial
+                    Sub-total
                   </div>
                   <div style={{ width: '50%', padding: '8px', textAlign: 'right', fontSize: '11.5px' }}>
                     C$ {venta.subtotal?.toFixed(2)}

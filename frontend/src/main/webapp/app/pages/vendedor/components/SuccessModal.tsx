@@ -266,7 +266,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                       color: '#444',
                     }}
                   >
-                    Total parcial
+                    Sub-total
                   </div>
                   <div style={{ width: '50%', padding: '8px', textAlign: 'right', fontSize: '11.5px' }}>
                     C$ {ventaExitosa?.subtotal?.toFixed(2)}
