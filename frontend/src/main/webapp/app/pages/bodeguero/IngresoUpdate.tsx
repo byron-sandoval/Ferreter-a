@@ -4,6 +4,9 @@ import { Card, CardBody, Form, FormGroup, Label, Input, Button, Row, Col, Table,
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faArrowLeft, faPlus, faTrash, faSearch, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
+import { useAppSelector } from 'app/config/store';
+import UsuarioService from 'app/services/usuario.service';
+import { IUsuario } from 'app/shared/model/usuario.model';
 import { IIngreso } from 'app/shared/model/ingreso.model';
 import { IDetalleIngreso } from 'app/shared/model/detalle-ingreso.model';
 import { IArticulo } from 'app/shared/model/articulo.model';
@@ -13,9 +16,11 @@ import ArticuloService from 'app/services/articulo.service';
 import ProveedorService from 'app/services/proveedor.service';
 
 export const IngresoUpdate = () => {
+  const account = useAppSelector(state => state.authentication.account);
   const navigate = useNavigate();
   const [proveedores, setProveedores] = useState<IProveedor[]>([]);
   const [articulos, setArticulos] = useState<IArticulo[]>([]);
+  const [usuarioActual, setUsuarioActual] = useState<IUsuario | null>(null);
 
   // Estado del formulario
   const [proveedorId, setProveedorId] = useState<string>('');
@@ -32,7 +37,14 @@ export const IngresoUpdate = () => {
     // Cargar proveedores y artículos
     ProveedorService.getAll().then(res => setProveedores(res.data));
     ArticuloService.getAll().then(res => setArticulos(res.data));
-  }, []);
+
+    // Cargar usuario actual
+    if (account?.id) {
+      UsuarioService.getByKeycloakId(account.id).then(res => {
+        if (res.data.length > 0) setUsuarioActual(res.data[0]);
+      });
+    }
+  }, [account]);
 
   const agregarDetalle = () => {
     if (!articuloSeleccionado || cantidad <= 0 || costoUnitario < 0) {
@@ -88,7 +100,7 @@ export const IngresoUpdate = () => {
       total: calcularTotal(),
       activo: true,
       proveedor: { id: parseInt(proveedorId, 10) },
-      vendedor: null, // Podría ser el usuario logueado
+      usuario: usuarioActual,
       detalles: detalles.map(d => ({
         articulo: { id: d.articulo?.id },
         cantidad: d.cantidad,

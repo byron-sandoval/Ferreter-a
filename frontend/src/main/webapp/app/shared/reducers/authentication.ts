@@ -95,6 +95,12 @@ export const AuthenticationSlice = createSlice({
       }))
       .addCase(getAccount.fulfilled, (state, action) => {
         const isAuthenticated = action.payload && action.payload.data && action.payload.data.activated;
+        console.log('🔐 [AUTH DEBUG] getAccount.fulfilled:', {
+          isAuthenticated,
+          activated: action.payload?.data?.activated,
+          login: action.payload?.data?.login,
+          authorities: action.payload?.data?.authorities,
+        });
         return {
           ...state,
           isAuthenticated,

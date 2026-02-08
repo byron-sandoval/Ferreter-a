@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { ICliente } from './cliente.model';
-import { IVendedor } from './vendedor.model';
+import { IUsuario } from './usuario.model';
 import { IMoneda } from './moneda.model';
 import { INumeracionFactura } from './numeracion-factura.model';
 import { IDetalleVenta } from './detalle-venta.model';
@@ -29,7 +29,7 @@ export interface IVenta {
   cambio?: number | null;
   detalles?: IDetalleVenta[] | null;
   cliente?: ICliente | null;
-  vendedor?: IVendedor | null;
+  usuario?: IUsuario | null;
   moneda?: IMoneda | null;
   numeracion?: INumeracionFactura | null;
 }
