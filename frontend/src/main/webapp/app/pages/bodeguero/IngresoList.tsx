@@ -4,7 +4,8 @@ import { Table, Button, Input, Card, Badge, Modal, ModalHeader, ModalBody, Modal
 import { IIngreso } from 'app/shared/model/ingreso.model';
 import IngresoService from 'app/services/ingreso.service';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faSync, faSearch, faEye, faFileInvoice } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSync, faSearch, faEye, faFileInvoice, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import dayjs from 'dayjs';
 
 export const IngresoList = () => {
@@ -14,6 +15,13 @@ export const IngresoList = () => {
   const [filter, setFilter] = useState('');
   const [showDetalleModal, setShowDetalleModal] = useState(false);
   const [ingresoSeleccionado, setIngresoSeleccionado] = useState<IIngreso | null>(null);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter]);
 
   const loadAll = () => {
     setLoading(true);
@@ -47,6 +55,14 @@ export const IngresoList = () => {
       (i.noDocumento || '').toLowerCase().includes(filter.toLowerCase()) ||
       (i.proveedor?.nombre || '').toLowerCase().includes(filter.toLowerCase()),
   );
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filtrados.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filtrados.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
 
   const headerStyle = { backgroundColor: '#2d0a4e', color: 'white' };
 
@@ -93,8 +109,8 @@ export const IngresoList = () => {
             </tr>
           </thead>
           <tbody>
-            {filtrados.length > 0 ? (
-              filtrados.map(i => (
+            {currentItems.length > 0 ? (
+              currentItems.map(i => (
                 <tr key={i.id} className="text-center align-middle" style={{ fontSize: '0.8rem' }}>
                   <td>{dayjs(i.fecha).format('DD/MM/YY')}</td>
                   <td className="fw-bold">{i.noDocumento}</td>
@@ -121,10 +137,31 @@ export const IngresoList = () => {
             )}
           </tbody>
         </Table>
+        {totalPages > 1 && (
+          <div className="d-flex justify-content-between align-items-center p-2 border-top bg-light">
+            <small className="text-muted ps-2">
+              Mostrando {Math.min(indexOfLastItem, filtrados.length)} de {filtrados.length} facturas de compra
+            </small>
+            <Pagination size="sm" className="mb-0 pe-2">
+              <PaginationItem disabled={currentPage === 1}>
+                <PaginationLink previous onClick={() => paginate(currentPage - 1)}>
+                  <FontAwesomeIcon icon={faChevronLeft} />
+                </PaginationLink>
+              </PaginationItem>
+              {[...Array(totalPages)].map((_, i) => (
+                <PaginationItem active={i + 1 === currentPage} key={i}>
+                  <PaginationLink onClick={() => paginate(i + 1)}>{i + 1}</PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem disabled={currentPage === totalPages}>
+                <PaginationLink next onClick={() => paginate(currentPage + 1)}>
+                  <FontAwesomeIcon icon={faChevronRight} />
+                </PaginationLink>
+              </PaginationItem>
+            </Pagination>
+          </div>
+        )}
       </Card>
-      <div className="mt-3 text-muted small">
-        <p>* Los ingresos representan las entradas de mercancía al almacén que aumentan el stock.</p>
-      </div>
 
       {/* MODAL DETALLES DE COMPRA (INGRESO) */}
       <Modal isOpen={showDetalleModal} toggle={() => setShowDetalleModal(false)} size="lg" centered>
