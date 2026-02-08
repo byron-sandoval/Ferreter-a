@@ -29,7 +29,10 @@ import {
   faVenusMars,
   faMapMarkerAlt,
   faTrash,
+  faChevronLeft,
+  faChevronRight,
 } from '@fortawesome/free-solid-svg-icons';
+import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import ClienteService from 'app/services/cliente.service';
 import VentaService from 'app/services/venta.service';
 import { ICliente, GeneroEnum } from 'app/shared/model/cliente.model';
@@ -52,6 +55,15 @@ export const GestionClientes = () => {
     direccion: '',
     activo: true,
   });
+
+  // --- Lógica de Paginación ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  // Reiniciar a la página 1 cuando se escribe en el buscador
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter]);
 
   useEffect(() => {
     loadData();
@@ -159,6 +171,15 @@ export const GestionClientes = () => {
     c => (c.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (c.cedula || '').toLowerCase().includes(filter.toLowerCase()),
   );
 
+  // Cálculos para mostrar solo los 10 de la página actual
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filtered.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+
   return (
     <div className="animate__animated animate__fadeIn p-1">
       <div className="d-flex justify-content-between align-items-center mb-2 px-1">
@@ -200,7 +221,7 @@ export const GestionClientes = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map(c => (
+                  {currentItems.map(c => (
                     <tr
                       key={c.id}
                       onClick={() => verDetalle(c)}
@@ -228,6 +249,30 @@ export const GestionClientes = () => {
                   ))}
                 </tbody>
               </Table>
+              {totalPages > 1 && (
+                <div className="d-flex justify-content-between align-items-center p-2 border-top bg-light">
+                  <small className="text-muted ps-2">
+                    Mostrando {Math.min(indexOfLastItem, filtered.length)} de {filtered.length} clientes
+                  </small>
+                  <Pagination size="sm" className="mb-0 pe-2">
+                    <PaginationItem disabled={currentPage === 1}>
+                      <PaginationLink previous onClick={() => paginate(currentPage - 1)}>
+                        <FontAwesomeIcon icon={faChevronLeft} />
+                      </PaginationLink>
+                    </PaginationItem>
+                    {[...Array(totalPages)].map((_, i) => (
+                      <PaginationItem active={i + 1 === currentPage} key={i}>
+                        <PaginationLink onClick={() => paginate(i + 1)}>{i + 1}</PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem disabled={currentPage === totalPages}>
+                      <PaginationLink next onClick={() => paginate(currentPage + 1)}>
+                        <FontAwesomeIcon icon={faChevronRight} />
+                      </PaginationLink>
+                    </PaginationItem>
+                  </Pagination>
+                </div>
+              )}
             </CardBody>
           </Card>
         </Col>
@@ -343,9 +388,9 @@ export const GestionClientes = () => {
                       const lastChar =
                         raw.length > 13
                           ? raw
-                              .substring(13, 14)
-                              .replace(/[^a-zA-Z]/g, '')
-                              .toUpperCase()
+                            .substring(13, 14)
+                            .replace(/[^a-zA-Z]/g, '')
+                            .toUpperCase()
                           : '';
                       const input = digitsOnly + lastChar;
 

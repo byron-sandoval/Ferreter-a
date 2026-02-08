@@ -27,7 +27,8 @@ public final class SecurityUtils {
 
     public static final String CLAIMS_NAMESPACE = "https://www.jhipster.tech/";
 
-    private SecurityUtils() {}
+    private SecurityUtils() {
+    }
 
     /**
      * Get the login of the current user.
@@ -37,6 +38,17 @@ public final class SecurityUtils {
     public static Optional<String> getCurrentUserLogin() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         return Optional.ofNullable(extractPrincipal(securityContext.getAuthentication()));
+    }
+
+    public static Optional<String> getCurrentUserKeycloakId() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication authentication = securityContext.getAuthentication();
+        if (authentication instanceof JwtAuthenticationToken jwtAuthenticationToken) {
+            return Optional.ofNullable((String) jwtAuthenticationToken.getToken().getClaims().get("sub"));
+        } else if (authentication != null && authentication.getPrincipal() instanceof DefaultOidcUser oidcUser) {
+            return Optional.ofNullable(oidcUser.getSubject());
+        }
+        return Optional.empty();
     }
 
     private static String extractPrincipal(Authentication authentication) {
@@ -64,7 +76,8 @@ public final class SecurityUtils {
      */
     public static boolean isAuthenticated() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication != null && getAuthorities(authentication).noneMatch(AuthoritiesConstants.ANONYMOUS::equals);
+        return authentication != null
+                && getAuthorities(authentication).noneMatch(AuthoritiesConstants.ANONYMOUS::equals);
     }
 
     /**
@@ -75,16 +88,16 @@ public final class SecurityUtils {
      */
     public static boolean hasCurrentUserAnyOfAuthorities(String... authorities) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (
-            authentication != null && getAuthorities(authentication).anyMatch(authority -> Arrays.asList(authorities).contains(authority))
-        );
+        return (authentication != null && getAuthorities(authentication)
+                .anyMatch(authority -> Arrays.asList(authorities).contains(authority)));
     }
 
     /**
      * Checks if the current user has none of the authorities.
      *
      * @param authorities the authorities to check.
-     * @return true if the current user has none of the authorities, false otherwise.
+     * @return true if the current user has none of the authorities, false
+     *         otherwise.
      */
     public static boolean hasCurrentUserNoneOfAuthorities(String... authorities) {
         return !hasCurrentUserAnyOfAuthorities(authorities);
@@ -102,8 +115,8 @@ public final class SecurityUtils {
 
     private static Stream<String> getAuthorities(Authentication authentication) {
         Collection<? extends GrantedAuthority> authorities = authentication instanceof JwtAuthenticationToken
-            ? extractAuthorityFromClaims(((JwtAuthenticationToken) authentication).getToken().getClaims())
-            : authentication.getAuthorities();
+                ? extractAuthorityFromClaims(((JwtAuthenticationToken) authentication).getToken().getClaims())
+                : authentication.getAuthorities();
         return authorities.stream().map(GrantedAuthority::getAuthority);
     }
 
@@ -114,13 +127,13 @@ public final class SecurityUtils {
     @SuppressWarnings("unchecked")
     private static Collection<String> getRolesFromClaims(Map<String, Object> claims) {
         return (Collection<String>) claims.getOrDefault(
-            "groups",
-            claims.getOrDefault("roles", claims.getOrDefault(CLAIMS_NAMESPACE + "roles", new ArrayList<>()))
-        );
+                "groups",
+                claims.getOrDefault("roles", claims.getOrDefault(CLAIMS_NAMESPACE + "roles", new ArrayList<>())));
     }
 
     private static List<GrantedAuthority> mapRolesToGrantedAuthorities(Collection<String> roles) {
-        return roles.stream().filter(role -> role.startsWith("ROLE_")).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+        return roles.stream().filter(role -> role.startsWith("ROLE_")).map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
     }
 
     public static Map<String, Object> extractDetailsFromTokenAttributes(Map<String, Object> attributes) {
@@ -128,13 +141,15 @@ public final class SecurityUtils {
 
         details.put("activated", Optional.ofNullable(attributes.get(StandardClaimNames.EMAIL_VERIFIED)).orElse(true));
         Optional.ofNullable(attributes.get("uid")).ifPresent(id -> details.put("id", id));
-        Optional.ofNullable(attributes.get(StandardClaimNames.FAMILY_NAME)).ifPresent(lastName -> details.put("lastName", lastName));
-        Optional.ofNullable(attributes.get(StandardClaimNames.PICTURE)).ifPresent(imageUrl -> details.put("imageUrl", imageUrl));
+        Optional.ofNullable(attributes.get(StandardClaimNames.FAMILY_NAME))
+                .ifPresent(lastName -> details.put("lastName", lastName));
+        Optional.ofNullable(attributes.get(StandardClaimNames.PICTURE))
+                .ifPresent(imageUrl -> details.put("imageUrl", imageUrl));
 
         Optional.ofNullable(attributes.get(StandardClaimNames.GIVEN_NAME)).ifPresentOrElse(
-            firstName -> details.put("firstName", firstName),
-            () -> Optional.ofNullable(attributes.get(StandardClaimNames.NAME)).ifPresent(firstName -> details.put("firstName", firstName))
-        );
+                firstName -> details.put("firstName", firstName),
+                () -> Optional.ofNullable(attributes.get(StandardClaimNames.NAME))
+                        .ifPresent(firstName -> details.put("firstName", firstName)));
 
         if (attributes.get(StandardClaimNames.EMAIL) != null) {
             details.put("email", attributes.get(StandardClaimNames.EMAIL));

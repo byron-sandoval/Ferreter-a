@@ -192,11 +192,13 @@ export const IngresoUpdate = () => {
                     }}
                   >
                     <option value="">Buscar producto...</option>
-                    {articulos.map(a => (
-                      <option key={a.id} value={a.id}>
-                        {a.nombre}
-                      </option>
-                    ))}
+                    {articulos
+                      .filter(a => a.activo)
+                      .map(a => (
+                        <option key={a.id} value={a.id}>
+                          {a.nombre}
+                        </option>
+                      ))}
                   </Input>
                 </Col>
                 <Col md="2">

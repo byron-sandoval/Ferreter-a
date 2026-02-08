@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Badge, Card, CardBody, Input, Label } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHistory, faUndo, faEye, faSearch, faCalendarAlt, faSync } from '@fortawesome/free-solid-svg-icons';
+import { faHistory, faUndo, faEye, faSearch, faCalendarAlt, faSync, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import VentaService from 'app/services/venta.service';
 import DevolucionService from 'app/services/devolucion.service';
 import { IVenta, IDevolucion } from 'app/shared/model';
@@ -22,6 +23,13 @@ export const HistorialVendedor = () => {
   const [ventaSeleccionada, setVentaSeleccionada] = useState<IVenta | null>(null);
   const [motivo, setMotivo] = useState('');
   const [empresa, setEmpresa] = useState<IEmpresa | null>(null);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter]);
 
   useEffect(() => {
     loadVentas();
@@ -87,6 +95,14 @@ export const HistorialVendedor = () => {
     v => (v.noFactura?.toString() || '').includes(filter) || (v.cliente?.nombre || '').toLowerCase().includes(filter.toLowerCase()),
   );
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filtered.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+
   return (
     <div className="animate__animated animate__fadeIn p-1">
       <div className="d-flex justify-content-between align-items-center mb-2">
@@ -129,7 +145,7 @@ export const HistorialVendedor = () => {
             </tr>
           </thead>
           <tbody>
-            {filtered.map(v => {
+            {currentItems.map(v => {
               const activa = puedeDevolver(v.fecha);
               return (
                 <tr key={v.id}>
@@ -185,6 +201,30 @@ export const HistorialVendedor = () => {
             })}
           </tbody>
         </Table>
+        {totalPages > 1 && (
+          <div className="d-flex justify-content-between align-items-center p-2 border-top bg-light">
+            <small className="text-muted ps-2">
+              Mostrando {Math.min(indexOfLastItem, filtered.length)} de {filtered.length} ventas
+            </small>
+            <Pagination size="sm" className="mb-0 pe-2">
+              <PaginationItem disabled={currentPage === 1}>
+                <PaginationLink previous onClick={() => paginate(currentPage - 1)}>
+                  <FontAwesomeIcon icon={faChevronLeft} />
+                </PaginationLink>
+              </PaginationItem>
+              {[...Array(totalPages)].map((_, i) => (
+                <PaginationItem active={i + 1 === currentPage} key={i}>
+                  <PaginationLink onClick={() => paginate(i + 1)}>{i + 1}</PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem disabled={currentPage === totalPages}>
+                <PaginationLink next onClick={() => paginate(currentPage + 1)}>
+                  <FontAwesomeIcon icon={faChevronRight} />
+                </PaginationLink>
+              </PaginationItem>
+            </Pagination>
+          </div>
+        )}
       </Card>
 
       <DevolucionModal

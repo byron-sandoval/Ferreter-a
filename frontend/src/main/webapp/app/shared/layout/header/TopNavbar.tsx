@@ -25,6 +25,7 @@ import {
   faChartBar,
   faClock,
   faRulerCombined,
+  faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 
 export const TopNavbar = () => {
@@ -166,14 +167,6 @@ export const TopNavbar = () => {
               </NavItem>
             )}
 
-            {/* 6. Inventario */}
-            {(isAdmin || isVendedor || isBodeguero) && (
-              <NavItem className="nav-link-item">
-                <NavLink tag={Link} to="/vendedor/consulta-inventario" style={navLinkStyle}>
-                  <FontAwesomeIcon icon={faWarehouse} size="sm" /> Inventario
-                </NavLink>
-              </NavItem>
-            )}
 
             {/* 7. Productos */}
             {(isAdmin || isBodeguero) && (
@@ -210,6 +203,16 @@ export const TopNavbar = () => {
                 </NavLink>
               </NavItem>
             )}
+
+            {/* 14. Usuarios */}
+            {isAdmin && (
+              <NavItem className="nav-link-item">
+                <NavLink tag={Link} to="/admin/vendedores" style={navLinkStyle}>
+                  <FontAwesomeIcon icon={faUsers} size="sm" /> Usuarios
+                </NavLink>
+              </NavItem>
+            )}
+
 
             {/* 11. Reportes */}
             {isAdmin && (

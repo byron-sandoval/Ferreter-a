@@ -91,7 +91,7 @@ public class ClienteResource {
      *         couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_VENDEDOR')")
     @PutMapping("/{id}")
     public ResponseEntity<ClienteDTO> updateCliente(
             @PathVariable(value = "id", required = false) final Long id,
@@ -131,7 +131,7 @@ public class ClienteResource {
      *         couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_VENDEDOR')")
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<ClienteDTO> partialUpdateCliente(
             @PathVariable(value = "id", required = false) final Long id,

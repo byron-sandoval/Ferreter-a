@@ -127,7 +127,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                 <p style={{ margin: '1px 0', fontSize: '15.5px', fontWeight: 'bold', color: '#000' }}>{ventaExitosa?.cliente?.nombre}</p>
                 <div style={{ fontSize: '12.5px' }}>
                   <p style={{ margin: '1px 0' }}>
-                    <strong>Cédula/RUC:</strong> {ventaExitosa?.cliente?.cedula}
+                    <strong>Cédula:</strong> {ventaExitosa?.cliente?.cedula}
                   </p>
                   <p style={{ margin: '1px 0' }}>
                     <strong>Dirección:</strong> {ventaExitosa?.cliente?.direccion || 'Ciudad'}
@@ -266,7 +266,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                       color: '#444',
                     }}
                   >
-                    Total parcial
+                    Sub-total
                   </div>
                   <div style={{ width: '50%', padding: '8px', textAlign: 'right', fontSize: '11.5px' }}>
                     C$ {ventaExitosa?.subtotal?.toFixed(2)}
