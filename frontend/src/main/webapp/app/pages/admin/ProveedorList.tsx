@@ -4,13 +4,21 @@ import { Table, Button, Input, Card, Badge } from 'reactstrap';
 import { IProveedor } from 'app/shared/model/proveedor.model';
 import ProveedorService from 'app/services/proveedor.service';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faSync, faSearch, faPencilAlt, faTrash, faTruck } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSync, faSearch, faPencilAlt, faTrash, faTruck, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 
 export const ProveedorList = () => {
   const navigate = useNavigate();
   const [proveedores, setProveedores] = useState<IProveedor[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter]);
 
   const loadAll = () => {
     setLoading(true);
@@ -30,6 +38,14 @@ export const ProveedorList = () => {
   }, []);
 
   const filtrados = proveedores.filter(p => (p.nombre || '').toLowerCase().includes(filter.toLowerCase()));
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filtrados.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filtrados.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
 
   const headerStyle = { backgroundColor: '#6f42c1', color: 'white' };
 
@@ -77,8 +93,8 @@ export const ProveedorList = () => {
             </tr>
           </thead>
           <tbody>
-            {filtrados.length > 0 ? (
-              filtrados.map(p => (
+            {currentItems.length > 0 ? (
+              currentItems.map(p => (
                 <tr key={p.id} className="text-center align-middle" style={{ fontSize: '0.8rem' }}>
                   <td className="text-start fw-bold px-3">{p.nombre}</td>
                   <td className="small text-muted">{p.ruc || '-'}</td>
@@ -111,6 +127,30 @@ export const ProveedorList = () => {
             )}
           </tbody>
         </Table>
+        {totalPages > 1 && (
+          <div className="d-flex justify-content-between align-items-center p-2 border-top bg-light">
+            <small className="text-muted ps-2">
+              Mostrando {Math.min(indexOfLastItem, filtrados.length)} de {filtrados.length} proveedores
+            </small>
+            <Pagination size="sm" className="mb-0 pe-2">
+              <PaginationItem disabled={currentPage === 1}>
+                <PaginationLink previous onClick={() => paginate(currentPage - 1)}>
+                  <FontAwesomeIcon icon={faChevronLeft} />
+                </PaginationLink>
+              </PaginationItem>
+              {[...Array(totalPages)].map((_, i) => (
+                <PaginationItem active={i + 1 === currentPage} key={i}>
+                  <PaginationLink onClick={() => paginate(i + 1)}>{i + 1}</PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem disabled={currentPage === totalPages}>
+                <PaginationLink next onClick={() => paginate(currentPage + 1)}>
+                  <FontAwesomeIcon icon={faChevronRight} />
+                </PaginationLink>
+              </PaginationItem>
+            </Pagination>
+          </div>
+        )}
       </Card>
     </div>
   );
