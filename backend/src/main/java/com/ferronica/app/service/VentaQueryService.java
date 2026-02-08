@@ -17,8 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 import tech.jhipster.service.QueryService;
 
 /**
- * Service for executing complex queries for {@link Venta} entities in the database.
- * The main input is a {@link VentaCriteria} which gets converted to {@link Specification},
+ * Service for executing complex queries for {@link Venta} entities in the
+ * database.
+ * The main input is a {@link VentaCriteria} which gets converted to
+ * {@link Specification},
  * in a way that all the filters must apply.
  * It returns a {@link Page} of {@link VentaDTO} which fulfills the criteria.
  */
@@ -38,9 +40,12 @@ public class VentaQueryService extends QueryService<Venta> {
     }
 
     /**
-     * Return a {@link Page} of {@link VentaDTO} which matches the criteria from the database.
-     * @param criteria The object which holds all the filters, which the entities should match.
-     * @param page The page, which should be returned.
+     * Return a {@link Page} of {@link VentaDTO} which matches the criteria from the
+     * database.
+     * 
+     * @param criteria The object which holds all the filters, which the entities
+     *                 should match.
+     * @param page     The page, which should be returned.
      * @return the matching entities.
      */
     @Transactional(readOnly = true)
@@ -52,7 +57,9 @@ public class VentaQueryService extends QueryService<Venta> {
 
     /**
      * Return the number of matching entities in the database.
-     * @param criteria The object which holds all the filters, which the entities should match.
+     * 
+     * @param criteria The object which holds all the filters, which the entities
+     *                 should match.
      * @return the number of matching entities.
      */
     @Transactional(readOnly = true)
@@ -64,7 +71,9 @@ public class VentaQueryService extends QueryService<Venta> {
 
     /**
      * Function to convert {@link VentaCriteria} to a {@link Specification}
-     * @param criteria The object which holds all the filters, which the entities should match.
+     * 
+     * @param criteria The object which holds all the filters, which the entities
+     *                 should match.
      * @return the matching {@link Specification} of the entity.
      */
     protected Specification<Venta> createSpecification(VentaCriteria criteria) {
@@ -72,27 +81,29 @@ public class VentaQueryService extends QueryService<Venta> {
         if (criteria != null) {
             // This has to be called first, because the distinct method returns null
             specification = Specification.allOf(
-                Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : null,
-                buildRangeSpecification(criteria.getId(), Venta_.id),
-                buildRangeSpecification(criteria.getFecha(), Venta_.fecha),
-                buildRangeSpecification(criteria.getNoFactura(), Venta_.noFactura),
-                buildRangeSpecification(criteria.getSubtotal(), Venta_.subtotal),
-                buildRangeSpecification(criteria.getIva(), Venta_.iva),
-                buildRangeSpecification(criteria.getTotal(), Venta_.total),
-                buildRangeSpecification(criteria.getTotalEnMonedaBase(), Venta_.totalEnMonedaBase),
-                buildSpecification(criteria.getMetodoPago(), Venta_.metodoPago),
-                buildStringSpecification(criteria.getStripeId(), Venta_.stripeId),
-                buildSpecification(criteria.getEsContado(), Venta_.esContado),
-                buildRangeSpecification(criteria.getTipoCambioVenta(), Venta_.tipoCambioVenta),
-                buildSpecification(criteria.getAnulada(), Venta_.anulada),
-                buildSpecification(criteria.getDetallesId(), root -> root.join(Venta_.detalles, JoinType.LEFT).get(DetalleVenta_.id)),
-                buildSpecification(criteria.getClienteId(), root -> root.join(Venta_.cliente, JoinType.LEFT).get(Cliente_.id)),
-                buildSpecification(criteria.getVendedorId(), root -> root.join(Venta_.vendedor, JoinType.LEFT).get(Vendedor_.id)),
-                buildSpecification(criteria.getMonedaId(), root -> root.join(Venta_.moneda, JoinType.LEFT).get(Moneda_.id)),
-                buildSpecification(criteria.getNumeracionId(), root ->
-                    root.join(Venta_.numeracion, JoinType.LEFT).get(NumeracionFactura_.id)
-                )
-            );
+                    Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : null,
+                    buildRangeSpecification(criteria.getId(), Venta_.id),
+                    buildRangeSpecification(criteria.getFecha(), Venta_.fecha),
+                    buildRangeSpecification(criteria.getNoFactura(), Venta_.noFactura),
+                    buildRangeSpecification(criteria.getSubtotal(), Venta_.subtotal),
+                    buildRangeSpecification(criteria.getIva(), Venta_.iva),
+                    buildRangeSpecification(criteria.getTotal(), Venta_.total),
+                    buildRangeSpecification(criteria.getTotalEnMonedaBase(), Venta_.totalEnMonedaBase),
+                    buildSpecification(criteria.getMetodoPago(), Venta_.metodoPago),
+                    buildStringSpecification(criteria.getStripeId(), Venta_.stripeId),
+                    buildSpecification(criteria.getEsContado(), Venta_.esContado),
+                    buildRangeSpecification(criteria.getTipoCambioVenta(), Venta_.tipoCambioVenta),
+                    buildSpecification(criteria.getAnulada(), Venta_.anulada),
+                    buildSpecification(criteria.getDetallesId(),
+                            root -> root.join(Venta_.detalles, JoinType.LEFT).get(DetalleVenta_.id)),
+                    buildSpecification(criteria.getClienteId(),
+                            root -> root.join(Venta_.cliente, JoinType.LEFT).get(Cliente_.id)),
+                    buildSpecification(criteria.getUsuarioId(),
+                            root -> root.join(Venta_.usuario, JoinType.LEFT).get(Usuario_.id)),
+                    buildSpecification(criteria.getMonedaId(),
+                            root -> root.join(Venta_.moneda, JoinType.LEFT).get(Moneda_.id)),
+                    buildSpecification(criteria.getNumeracionId(),
+                            root -> root.join(Venta_.numeracion, JoinType.LEFT).get(NumeracionFactura_.id)));
         }
         return specification;
     }

@@ -17,8 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 import tech.jhipster.service.QueryService;
 
 /**
- * Service for executing complex queries for {@link Ingreso} entities in the database.
- * The main input is a {@link IngresoCriteria} which gets converted to {@link Specification},
+ * Service for executing complex queries for {@link Ingreso} entities in the
+ * database.
+ * The main input is a {@link IngresoCriteria} which gets converted to
+ * {@link Specification},
  * in a way that all the filters must apply.
  * It returns a {@link Page} of {@link IngresoDTO} which fulfills the criteria.
  */
@@ -38,9 +40,12 @@ public class IngresoQueryService extends QueryService<Ingreso> {
     }
 
     /**
-     * Return a {@link Page} of {@link IngresoDTO} which matches the criteria from the database.
-     * @param criteria The object which holds all the filters, which the entities should match.
-     * @param page The page, which should be returned.
+     * Return a {@link Page} of {@link IngresoDTO} which matches the criteria from
+     * the database.
+     * 
+     * @param criteria The object which holds all the filters, which the entities
+     *                 should match.
+     * @param page     The page, which should be returned.
      * @return the matching entities.
      */
     @Transactional(readOnly = true)
@@ -52,7 +57,9 @@ public class IngresoQueryService extends QueryService<Ingreso> {
 
     /**
      * Return the number of matching entities in the database.
-     * @param criteria The object which holds all the filters, which the entities should match.
+     * 
+     * @param criteria The object which holds all the filters, which the entities
+     *                 should match.
      * @return the number of matching entities.
      */
     @Transactional(readOnly = true)
@@ -64,7 +71,9 @@ public class IngresoQueryService extends QueryService<Ingreso> {
 
     /**
      * Function to convert {@link IngresoCriteria} to a {@link Specification}
-     * @param criteria The object which holds all the filters, which the entities should match.
+     * 
+     * @param criteria The object which holds all the filters, which the entities
+     *                 should match.
      * @return the matching {@link Specification} of the entity.
      */
     protected Specification<Ingreso> createSpecification(IngresoCriteria criteria) {
@@ -72,17 +81,19 @@ public class IngresoQueryService extends QueryService<Ingreso> {
         if (criteria != null) {
             // This has to be called first, because the distinct method returns null
             specification = Specification.allOf(
-                Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : null,
-                buildRangeSpecification(criteria.getId(), Ingreso_.id),
-                buildRangeSpecification(criteria.getFecha(), Ingreso_.fecha),
-                buildStringSpecification(criteria.getNoDocumento(), Ingreso_.noDocumento),
-                buildRangeSpecification(criteria.getTotal(), Ingreso_.total),
-                buildStringSpecification(criteria.getObservaciones(), Ingreso_.observaciones),
-                buildSpecification(criteria.getActivo(), Ingreso_.activo),
-                buildSpecification(criteria.getDetallesId(), root -> root.join(Ingreso_.detalles, JoinType.LEFT).get(DetalleIngreso_.id)),
-                buildSpecification(criteria.getVendedorId(), root -> root.join(Ingreso_.vendedor, JoinType.LEFT).get(Vendedor_.id)),
-                buildSpecification(criteria.getProveedorId(), root -> root.join(Ingreso_.proveedor, JoinType.LEFT).get(Proveedor_.id))
-            );
+                    Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : null,
+                    buildRangeSpecification(criteria.getId(), Ingreso_.id),
+                    buildRangeSpecification(criteria.getFecha(), Ingreso_.fecha),
+                    buildStringSpecification(criteria.getNoDocumento(), Ingreso_.noDocumento),
+                    buildRangeSpecification(criteria.getTotal(), Ingreso_.total),
+                    buildStringSpecification(criteria.getObservaciones(), Ingreso_.observaciones),
+                    buildSpecification(criteria.getActivo(), Ingreso_.activo),
+                    buildSpecification(criteria.getDetallesId(),
+                            root -> root.join(Ingreso_.detalles, JoinType.LEFT).get(DetalleIngreso_.id)),
+                    buildSpecification(criteria.getUsuarioId(),
+                            root -> root.join(Ingreso_.usuario, JoinType.LEFT).get(Usuario_.id)),
+                    buildSpecification(criteria.getProveedorId(),
+                            root -> root.join(Ingreso_.proveedor, JoinType.LEFT).get(Proveedor_.id)));
         }
         return specification;
     }

@@ -8,12 +8,15 @@ import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
 
 /**
- * Criteria class for the {@link com.ferronica.app.domain.Ingreso} entity. This class is used
- * in {@link com.ferronica.app.web.rest.IngresoResource} to receive all the possible filtering options from
+ * Criteria class for the {@link com.ferronica.app.domain.Ingreso} entity. This
+ * class is used
+ * in {@link com.ferronica.app.web.rest.IngresoResource} to receive all the
+ * possible filtering options from
  * the Http GET request parameters.
  * For example the following could be a valid request:
  * {@code /ingresos?id.greaterThan=5&attr1.contains=something&attr2.specified=false}
- * As Spring is unable to properly convert the types, unless specific {@link Filter} class are used, we need to use
+ * As Spring is unable to properly convert the types, unless specific
+ * {@link Filter} class are used, we need to use
  * fix type specific filters.
  */
 @ParameterObject
@@ -36,13 +39,14 @@ public class IngresoCriteria implements Serializable, Criteria {
 
     private LongFilter detallesId;
 
-    private LongFilter vendedorId;
+    private LongFilter usuarioId;
 
     private LongFilter proveedorId;
 
     private Boolean distinct;
 
-    public IngresoCriteria() {}
+    public IngresoCriteria() {
+    }
 
     public IngresoCriteria(IngresoCriteria other) {
         this.id = other.optionalId().map(LongFilter::copy).orElse(null);
@@ -52,7 +56,7 @@ public class IngresoCriteria implements Serializable, Criteria {
         this.observaciones = other.optionalObservaciones().map(StringFilter::copy).orElse(null);
         this.activo = other.optionalActivo().map(BooleanFilter::copy).orElse(null);
         this.detallesId = other.optionalDetallesId().map(LongFilter::copy).orElse(null);
-        this.vendedorId = other.optionalVendedorId().map(LongFilter::copy).orElse(null);
+        this.usuarioId = other.optionalUsuarioId().map(LongFilter::copy).orElse(null);
         this.proveedorId = other.optionalProveedorId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
@@ -195,23 +199,23 @@ public class IngresoCriteria implements Serializable, Criteria {
         this.detallesId = detallesId;
     }
 
-    public LongFilter getVendedorId() {
-        return vendedorId;
+    public LongFilter getUsuarioId() {
+        return usuarioId;
     }
 
-    public Optional<LongFilter> optionalVendedorId() {
-        return Optional.ofNullable(vendedorId);
+    public Optional<LongFilter> optionalUsuarioId() {
+        return Optional.ofNullable(usuarioId);
     }
 
-    public LongFilter vendedorId() {
-        if (vendedorId == null) {
-            setVendedorId(new LongFilter());
+    public LongFilter usuarioId() {
+        if (usuarioId == null) {
+            setUsuarioId(new LongFilter());
         }
-        return vendedorId;
+        return usuarioId;
     }
 
-    public void setVendedorId(LongFilter vendedorId) {
-        this.vendedorId = vendedorId;
+    public void setUsuarioId(LongFilter usuarioId) {
+        this.usuarioId = usuarioId;
     }
 
     public LongFilter getProveedorId() {
@@ -261,39 +265,38 @@ public class IngresoCriteria implements Serializable, Criteria {
             return false;
         }
         final IngresoCriteria that = (IngresoCriteria) o;
-        return (
-            Objects.equals(id, that.id) &&
-            Objects.equals(fecha, that.fecha) &&
-            Objects.equals(noDocumento, that.noDocumento) &&
-            Objects.equals(total, that.total) &&
-            Objects.equals(observaciones, that.observaciones) &&
-            Objects.equals(activo, that.activo) &&
-            Objects.equals(detallesId, that.detallesId) &&
-            Objects.equals(vendedorId, that.vendedorId) &&
-            Objects.equals(proveedorId, that.proveedorId) &&
-            Objects.equals(distinct, that.distinct)
-        );
+        return (Objects.equals(id, that.id) &&
+                Objects.equals(fecha, that.fecha) &&
+                Objects.equals(noDocumento, that.noDocumento) &&
+                Objects.equals(total, that.total) &&
+                Objects.equals(observaciones, that.observaciones) &&
+                Objects.equals(activo, that.activo) &&
+                Objects.equals(detallesId, that.detallesId) &&
+                Objects.equals(usuarioId, that.usuarioId) &&
+                Objects.equals(proveedorId, that.proveedorId) &&
+                Objects.equals(distinct, that.distinct));
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, fecha, noDocumento, total, observaciones, activo, detallesId, vendedorId, proveedorId, distinct);
+        return Objects.hash(id, fecha, noDocumento, total, observaciones, activo, detallesId, usuarioId, proveedorId,
+                distinct);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "IngresoCriteria{" +
-            optionalId().map(f -> "id=" + f + ", ").orElse("") +
-            optionalFecha().map(f -> "fecha=" + f + ", ").orElse("") +
-            optionalNoDocumento().map(f -> "noDocumento=" + f + ", ").orElse("") +
-            optionalTotal().map(f -> "total=" + f + ", ").orElse("") +
-            optionalObservaciones().map(f -> "observaciones=" + f + ", ").orElse("") +
-            optionalActivo().map(f -> "activo=" + f + ", ").orElse("") +
-            optionalDetallesId().map(f -> "detallesId=" + f + ", ").orElse("") +
-            optionalVendedorId().map(f -> "vendedorId=" + f + ", ").orElse("") +
-            optionalProveedorId().map(f -> "proveedorId=" + f + ", ").orElse("") +
-            optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
-        "}";
+                optionalId().map(f -> "id=" + f + ", ").orElse("") +
+                optionalFecha().map(f -> "fecha=" + f + ", ").orElse("") +
+                optionalNoDocumento().map(f -> "noDocumento=" + f + ", ").orElse("") +
+                optionalTotal().map(f -> "total=" + f + ", ").orElse("") +
+                optionalObservaciones().map(f -> "observaciones=" + f + ", ").orElse("") +
+                optionalActivo().map(f -> "activo=" + f + ", ").orElse("") +
+                optionalDetallesId().map(f -> "detallesId=" + f + ", ").orElse("") +
+                optionalUsuarioId().map(f -> "usuarioId=" + f + ", ").orElse("") +
+                optionalProveedorId().map(f -> "proveedorId=" + f + ", ").orElse("") +
+                optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
+                "}";
     }
 }

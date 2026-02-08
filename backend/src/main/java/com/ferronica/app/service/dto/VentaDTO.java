@@ -51,7 +51,7 @@ public class VentaDTO implements Serializable {
 
     private ClienteDTO cliente;
 
-    private VendedorDTO vendedor;
+    private UsuarioDTO usuario;
 
     private MonedaDTO moneda;
 
@@ -187,12 +187,12 @@ public class VentaDTO implements Serializable {
         this.cliente = cliente;
     }
 
-    public VendedorDTO getVendedor() {
-        return vendedor;
+    public UsuarioDTO getUsuario() {
+        return usuario;
     }
 
-    public void setVendedor(VendedorDTO vendedor) {
-        this.vendedor = vendedor;
+    public void setUsuario(UsuarioDTO usuario) {
+        this.usuario = usuario;
     }
 
     public MonedaDTO getMoneda() {
@@ -260,7 +260,7 @@ public class VentaDTO implements Serializable {
                 ", importeRecibido=" + getImporteRecibido() +
                 ", cambio=" + getCambio() +
                 ", cliente=" + getCliente() +
-                ", vendedor=" + getVendedor() +
+                ", usuario=" + getUsuario() +
                 ", moneda=" + getMoneda() +
                 ", numeracion=" + getNumeracion() +
                 ", detalles=" + getDetalles() +

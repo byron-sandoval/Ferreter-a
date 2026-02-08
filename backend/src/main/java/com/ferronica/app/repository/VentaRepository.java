@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unused")
 @Repository
 public interface VentaRepository extends JpaRepository<Venta, Long>, JpaSpecificationExecutor<Venta> {
-    @EntityGraph(attributePaths = { "cliente", "vendedor", "moneda", "detalles", "detalles.articulo" })
+    @EntityGraph(attributePaths = { "cliente", "usuario", "moneda", "detalles", "detalles.articulo" })
     @Query("select venta from Venta venta where venta.id = :id")
     Optional<Venta> findOneWithEagerRelationships(@org.springframework.data.repository.query.Param("id") Long id);
 }
