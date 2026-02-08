@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Table, Button, Input, Badge, Card, CardBody } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faSync, faPencilAlt, faTrash, faTags } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSync, faPencilAlt, faTrash, faTags, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import { ICategoria } from 'app/shared/model/categoria.model';
 import CategoriaService from 'app/services/categoria.service';
 
@@ -12,6 +13,13 @@ export const CategoriaList = () => {
   const [categorias, setCategorias] = useState<ICategoria[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter]);
 
   const loadAll = () => {
     setLoading(true);
@@ -34,6 +42,14 @@ export const CategoriaList = () => {
     c =>
       (c.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (c.descripcion || '').toLowerCase().includes(filter.toLowerCase()),
   );
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filtered.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
 
   const handleDelete = (id: number) => {
     if (window.confirm('¿Eliminar categoría?')) {
@@ -83,7 +99,7 @@ export const CategoriaList = () => {
               </tr>
             </thead>
             <tbody>
-              {filtered.map(cat => (
+              {currentItems.map(cat => (
                 <tr key={cat.id} style={{ fontSize: '0.8rem' }}>
                   <td className="px-3">{cat.id}</td>
                   <td className="fw-bold">{cat.nombre}</td>
@@ -113,6 +129,30 @@ export const CategoriaList = () => {
               ))}
             </tbody>
           </Table>
+          {totalPages > 1 && (
+            <div className="d-flex justify-content-between align-items-center p-2 border-top bg-light">
+              <small className="text-muted ps-2">
+                Mostrando {Math.min(indexOfLastItem, filtered.length)} de {filtered.length} categorías
+              </small>
+              <Pagination size="sm" className="mb-0 pe-2">
+                <PaginationItem disabled={currentPage === 1}>
+                  <PaginationLink previous onClick={() => paginate(currentPage - 1)}>
+                    <FontAwesomeIcon icon={faChevronLeft} />
+                  </PaginationLink>
+                </PaginationItem>
+                {[...Array(totalPages)].map((_, i) => (
+                  <PaginationItem active={i + 1 === currentPage} key={i}>
+                    <PaginationLink onClick={() => paginate(i + 1)}>{i + 1}</PaginationLink>
+                  </PaginationItem>
+                ))}
+                <PaginationItem disabled={currentPage === totalPages}>
+                  <PaginationLink next onClick={() => paginate(currentPage + 1)}>
+                    <FontAwesomeIcon icon={faChevronRight} />
+                  </PaginationLink>
+                </PaginationItem>
+              </Pagination>
+            </div>
+          )}
         </CardBody>
       </Card>
     </div>
