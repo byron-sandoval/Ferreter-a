@@ -13,7 +13,7 @@ import { DevolucionModal } from './components/DevolucionModal';
 import { EmpresaService } from 'app/services/empresa.service';
 import { IEmpresa } from 'app/shared/model/empresa.model';
 
-export const HistorialVendedor = () => {
+export const HistorialVentas = () => {
   const [ventas, setVentas] = useState<IVenta[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
@@ -242,4 +242,4 @@ export const HistorialVendedor = () => {
   );
 };
 
-export default HistorialVendedor;
+export default HistorialVentas;

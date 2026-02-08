@@ -20,7 +20,7 @@ import { MetodoPagoEnum, IVenta } from 'app/shared/model/venta.model';
 
 interface IVentaSidebarProps {
   cliente: ICliente | null;
-  vendedorActual: any;
+  usuarioActual: any;
   busquedaCedula: string;
   setBusquedaCedula: (v: string) => void;
   buscarCliente: () => void;
@@ -54,7 +54,7 @@ interface IVentaSidebarProps {
 
 export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
   cliente,
-  vendedorActual,
+  usuarioActual,
   busquedaCedula,
   setBusquedaCedula,
   buscarCliente,
@@ -92,9 +92,9 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
           <small className="mb-0 fw-bold">
             <FontAwesomeIcon icon={faUserCheck} className="me-2" /> Información del Cliente
           </small>
-          {vendedorActual && (
+          {usuarioActual && (
             <Badge color="light" className="text-primary">
-              Vendedor: {vendedorActual.nombre}
+              Usuario: {usuarioActual.nombre}
             </Badge>
           )}
         </CardHeader>

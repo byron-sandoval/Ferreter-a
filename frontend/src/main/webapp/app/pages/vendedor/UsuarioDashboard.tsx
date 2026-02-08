@@ -8,7 +8,7 @@ import ClienteService from 'app/services/cliente.service';
 import ArticuloService from 'app/services/articulo.service';
 import { IVenta } from 'app/shared/model/venta.model';
 
-export const VendedorDashboard = () => {
+export const UsuarioDashboard = () => {
   const [stats, setStats] = useState({
     ventasHoy: 0,
     montoHoy: 0,
@@ -180,4 +180,4 @@ export const VendedorDashboard = () => {
   );
 };
 
-export default VendedorDashboard;
+export default UsuarioDashboard;

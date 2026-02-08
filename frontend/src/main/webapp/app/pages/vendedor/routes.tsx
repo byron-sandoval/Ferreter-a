@@ -1,20 +1,20 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
 import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
-import VendedorDashboard from './VendedorDashboard';
+import UsuarioDashboard from './UsuarioDashboard';
 import NuevaVenta from './NuevaVenta';
 import ConsultaInventario from './ConsultaInventario';
-import HistorialVendedor from './HistorialVendedor';
+import HistorialVentas from './HistorialVentas';
 import GestionClientes from './GestionClientes';
 
-const VendedorRoutes = () => (
+const VentaRoutes = () => (
   <ErrorBoundaryRoutes>
-    <Route index element={<VendedorDashboard />} />
+    <Route index element={<UsuarioDashboard />} />
     <Route path="nueva-venta" element={<NuevaVenta />} />
     {/* <Route path="consulta-inventario" element={<ConsultaInventario />} /> */}
-    <Route path="historial-ventas" element={<HistorialVendedor />} />
+    <Route path="historial-ventas" element={<HistorialVentas />} />
     <Route path="clientes" element={<GestionClientes />} />
   </ErrorBoundaryRoutes>
 );
 
-export default VendedorRoutes;
+export default VentaRoutes;

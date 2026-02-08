@@ -5,7 +5,7 @@ import VentaService from 'app/services/venta.service';
 import ClienteService from 'app/services/cliente.service';
 import MonedaService from 'app/services/moneda.service';
 import NumeracionService from 'app/services/numeracion.service';
-import VendedorService from 'app/services/vendedor.service';
+import UsuarioService from 'app/services/usuario.service';
 import { IArticulo } from 'app/shared/model/articulo.model';
 import { ICliente, GeneroEnum } from 'app/shared/model/cliente.model';
 import { IMoneda } from 'app/shared/model/moneda.model';
@@ -54,7 +54,7 @@ export const NuevaVenta = () => {
   const [monedas, setMonedas] = useState<IMoneda[]>([]);
   const [monedaSeleccionada, setMonedaSeleccionada] = useState<IMoneda | null>(null);
   const [numeracion, setNumeracion] = useState<INumeracionFactura | null>(null);
-  const [vendedorActual, setVendedorActual] = useState<any>(null);
+  const [usuarioActual, setUsuarioActual] = useState<any>(null);
   const [montoPagado, setMontoPagado] = useState('');
   const [descuento, setDescuento] = useState<string>('0');
 
@@ -86,14 +86,14 @@ export const NuevaVenta = () => {
       if (resNum.data.length > 0) setNumeracion(resNum.data.find(n => n.activo) || resNum.data[0]);
       if (resEmp.data.length > 0) setEmpresa(resEmp.data[0]);
 
-      // Cargar vendedor por Keycloak ID
+      // Cargar usuario por Keycloak ID
       if (account?.id) {
-        const resVend = await VendedorService.getByKeycloakId(account.id);
-        if (resVend.data.length > 0) {
-          setVendedorActual(resVend.data[0]);
+        const resUser = await UsuarioService.getByKeycloakId(account.id);
+        if (resUser.data.length > 0) {
+          setUsuarioActual(resUser.data[0]);
         } else {
-          // Fallback: Si no existe en la tabla Vendedor, usamos los datos de la cuenta
-          setVendedorActual({
+          // Fallback: Si no existe en la tabla Usuario, usamos los datos de la cuenta
+          setUsuarioActual({
             nombre: account.firstName && account.lastName ? `${account.firstName} ${account.lastName}` : account.login || 'Admin',
           });
         }
@@ -272,7 +272,7 @@ export const NuevaVenta = () => {
         cambio: cambio > 0 ? cambio : 0,
         esContado,
         cliente,
-        vendedor: vendedorActual,
+        usuario: usuarioActual,
         moneda: monedaSeleccionada,
         numeracion,
         noFactura: (numeracion?.correlativoActual || 0) + 1,
@@ -312,11 +312,11 @@ export const NuevaVenta = () => {
 
       toast.success(`¡Venta #${resVenta.data.noFactura} registrada con éxito!`);
 
-      // Si la respuesta no trae vendedor (porque es un Admin sin record en DB),
-      // le inyectamos manualmente el vendedorActual para que el modal lo muestre.
+      // Si la respuesta no trae usuario (porque es un Admin sin record en DB),
+      // le inyectamos manualmente el usuarioActual para que el modal lo muestre.
       const ventaFinal = {
         ...resVenta.data,
-        vendedor: resVenta.data.vendedor || vendedorActual,
+        usuario: resVenta.data.usuario || usuarioActual,
       };
 
       setVentaExitosa(ventaFinal);
@@ -353,7 +353,7 @@ export const NuevaVenta = () => {
 
         <VentaSidebar
           cliente={cliente}
-          vendedorActual={vendedorActual}
+          usuarioActual={usuarioActual}
           busquedaCedula={busquedaCedula}
           setBusquedaCedula={setBusquedaCedula}
           buscarCliente={buscarCliente}
