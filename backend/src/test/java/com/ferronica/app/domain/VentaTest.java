@@ -4,7 +4,7 @@ import static com.ferronica.app.domain.ClienteTestSamples.*;
 import static com.ferronica.app.domain.DetalleVentaTestSamples.*;
 import static com.ferronica.app.domain.MonedaTestSamples.*;
 import static com.ferronica.app.domain.NumeracionFacturaTestSamples.*;
-import static com.ferronica.app.domain.VendedorTestSamples.*;
+import static com.ferronica.app.domain.UsuarioTestSamples.*;
 import static com.ferronica.app.domain.VentaTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -64,15 +64,15 @@ class VentaTest {
     }
 
     @Test
-    void vendedorTest() {
+    void usuarioTest() {
         Venta venta = getVentaRandomSampleGenerator();
-        Vendedor vendedorBack = getVendedorRandomSampleGenerator();
+        Usuario usuarioBack = getUsuarioRandomSampleGenerator();
 
-        venta.setVendedor(vendedorBack);
-        assertThat(venta.getVendedor()).isEqualTo(vendedorBack);
+        venta.setUsuario(usuarioBack);
+        assertThat(venta.getUsuario()).isEqualTo(usuarioBack);
 
-        venta.vendedor(null);
-        assertThat(venta.getVendedor()).isNull();
+        venta.usuario(null);
+        assertThat(venta.getUsuario()).isNull();
     }
 
     @Test

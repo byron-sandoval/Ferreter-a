@@ -14,7 +14,7 @@ import com.ferronica.app.IntegrationTest;
 import com.ferronica.app.domain.Cliente;
 import com.ferronica.app.domain.Moneda;
 import com.ferronica.app.domain.NumeracionFactura;
-import com.ferronica.app.domain.Vendedor;
+import com.ferronica.app.domain.Usuario;
 import com.ferronica.app.domain.Venta;
 import com.ferronica.app.domain.enumeration.MetodoPagoEnum;
 import com.ferronica.app.repository.VentaRepository;
@@ -116,17 +116,17 @@ class VentaResourceIT {
      */
     public static Venta createEntity() {
         return new Venta()
-            .fecha(DEFAULT_FECHA)
-            .noFactura(DEFAULT_NO_FACTURA)
-            .subtotal(DEFAULT_SUBTOTAL)
-            .iva(DEFAULT_IVA)
-            .total(DEFAULT_TOTAL)
-            .totalEnMonedaBase(DEFAULT_TOTAL_EN_MONEDA_BASE)
-            .metodoPago(DEFAULT_METODO_PAGO)
-            .stripeId(DEFAULT_STRIPE_ID)
-            .esContado(DEFAULT_ES_CONTADO)
-            .tipoCambioVenta(DEFAULT_TIPO_CAMBIO_VENTA)
-            .anulada(DEFAULT_ANULADA);
+                .fecha(DEFAULT_FECHA)
+                .noFactura(DEFAULT_NO_FACTURA)
+                .subtotal(DEFAULT_SUBTOTAL)
+                .iva(DEFAULT_IVA)
+                .total(DEFAULT_TOTAL)
+                .totalEnMonedaBase(DEFAULT_TOTAL_EN_MONEDA_BASE)
+                .metodoPago(DEFAULT_METODO_PAGO)
+                .stripeId(DEFAULT_STRIPE_ID)
+                .esContado(DEFAULT_ES_CONTADO)
+                .tipoCambioVenta(DEFAULT_TIPO_CAMBIO_VENTA)
+                .anulada(DEFAULT_ANULADA);
     }
 
     /**
@@ -137,17 +137,17 @@ class VentaResourceIT {
      */
     public static Venta createUpdatedEntity() {
         return new Venta()
-            .fecha(UPDATED_FECHA)
-            .noFactura(UPDATED_NO_FACTURA)
-            .subtotal(UPDATED_SUBTOTAL)
-            .iva(UPDATED_IVA)
-            .total(UPDATED_TOTAL)
-            .totalEnMonedaBase(UPDATED_TOTAL_EN_MONEDA_BASE)
-            .metodoPago(UPDATED_METODO_PAGO)
-            .stripeId(UPDATED_STRIPE_ID)
-            .esContado(UPDATED_ES_CONTADO)
-            .tipoCambioVenta(UPDATED_TIPO_CAMBIO_VENTA)
-            .anulada(UPDATED_ANULADA);
+                .fecha(UPDATED_FECHA)
+                .noFactura(UPDATED_NO_FACTURA)
+                .subtotal(UPDATED_SUBTOTAL)
+                .iva(UPDATED_IVA)
+                .total(UPDATED_TOTAL)
+                .totalEnMonedaBase(UPDATED_TOTAL_EN_MONEDA_BASE)
+                .metodoPago(UPDATED_METODO_PAGO)
+                .stripeId(UPDATED_STRIPE_ID)
+                .esContado(UPDATED_ES_CONTADO)
+                .tipoCambioVenta(UPDATED_TIPO_CAMBIO_VENTA)
+                .anulada(UPDATED_ANULADA);
     }
 
     @BeforeEach
@@ -170,14 +170,14 @@ class VentaResourceIT {
         // Create the Venta
         VentaDTO ventaDTO = ventaMapper.toDto(venta);
         var returnedVentaDTO = om.readValue(
-            restVentaMockMvc
-                .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(ventaDTO)))
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getContentAsString(),
-            VentaDTO.class
-        );
+                restVentaMockMvc
+                        .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                                .content(om.writeValueAsBytes(ventaDTO)))
+                        .andExpect(status().isCreated())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString(),
+                VentaDTO.class);
 
         // Validate the Venta in the database
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
@@ -198,8 +198,9 @@ class VentaResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restVentaMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(ventaDTO)))
-            .andExpect(status().isBadRequest());
+                .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(ventaDTO)))
+                .andExpect(status().isBadRequest());
 
         // Validate the Venta in the database
         assertSameRepositoryCount(databaseSizeBeforeCreate);
@@ -216,8 +217,9 @@ class VentaResourceIT {
         VentaDTO ventaDTO = ventaMapper.toDto(venta);
 
         restVentaMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(ventaDTO)))
-            .andExpect(status().isBadRequest());
+                .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(ventaDTO)))
+                .andExpect(status().isBadRequest());
 
         assertSameRepositoryCount(databaseSizeBeforeTest);
     }
@@ -233,8 +235,9 @@ class VentaResourceIT {
         VentaDTO ventaDTO = ventaMapper.toDto(venta);
 
         restVentaMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(ventaDTO)))
-            .andExpect(status().isBadRequest());
+                .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(ventaDTO)))
+                .andExpect(status().isBadRequest());
 
         assertSameRepositoryCount(databaseSizeBeforeTest);
     }
@@ -250,8 +253,9 @@ class VentaResourceIT {
         VentaDTO ventaDTO = ventaMapper.toDto(venta);
 
         restVentaMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(ventaDTO)))
-            .andExpect(status().isBadRequest());
+                .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(ventaDTO)))
+                .andExpect(status().isBadRequest());
 
         assertSameRepositoryCount(databaseSizeBeforeTest);
     }
@@ -267,8 +271,9 @@ class VentaResourceIT {
         VentaDTO ventaDTO = ventaMapper.toDto(venta);
 
         restVentaMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(ventaDTO)))
-            .andExpect(status().isBadRequest());
+                .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(ventaDTO)))
+                .andExpect(status().isBadRequest());
 
         assertSameRepositoryCount(databaseSizeBeforeTest);
     }
@@ -284,8 +289,9 @@ class VentaResourceIT {
         VentaDTO ventaDTO = ventaMapper.toDto(venta);
 
         restVentaMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(ventaDTO)))
-            .andExpect(status().isBadRequest());
+                .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(ventaDTO)))
+                .andExpect(status().isBadRequest());
 
         assertSameRepositoryCount(databaseSizeBeforeTest);
     }
@@ -301,8 +307,9 @@ class VentaResourceIT {
         VentaDTO ventaDTO = ventaMapper.toDto(venta);
 
         restVentaMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(ventaDTO)))
-            .andExpect(status().isBadRequest());
+                .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(ventaDTO)))
+                .andExpect(status().isBadRequest());
 
         assertSameRepositoryCount(databaseSizeBeforeTest);
     }
@@ -318,8 +325,9 @@ class VentaResourceIT {
         VentaDTO ventaDTO = ventaMapper.toDto(venta);
 
         restVentaMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(ventaDTO)))
-            .andExpect(status().isBadRequest());
+                .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(ventaDTO)))
+                .andExpect(status().isBadRequest());
 
         assertSameRepositoryCount(databaseSizeBeforeTest);
     }
@@ -332,21 +340,21 @@ class VentaResourceIT {
 
         // Get all the ventaList
         restVentaMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(venta.getId().intValue())))
-            .andExpect(jsonPath("$.[*].fecha").value(hasItem(DEFAULT_FECHA.toString())))
-            .andExpect(jsonPath("$.[*].noFactura").value(hasItem(DEFAULT_NO_FACTURA.intValue())))
-            .andExpect(jsonPath("$.[*].subtotal").value(hasItem(sameNumber(DEFAULT_SUBTOTAL))))
-            .andExpect(jsonPath("$.[*].iva").value(hasItem(sameNumber(DEFAULT_IVA))))
-            .andExpect(jsonPath("$.[*].total").value(hasItem(sameNumber(DEFAULT_TOTAL))))
-            .andExpect(jsonPath("$.[*].totalEnMonedaBase").value(hasItem(sameNumber(DEFAULT_TOTAL_EN_MONEDA_BASE))))
-            .andExpect(jsonPath("$.[*].metodoPago").value(hasItem(DEFAULT_METODO_PAGO.toString())))
-            .andExpect(jsonPath("$.[*].stripeId").value(hasItem(DEFAULT_STRIPE_ID)))
-            .andExpect(jsonPath("$.[*].esContado").value(hasItem(DEFAULT_ES_CONTADO)))
-            .andExpect(jsonPath("$.[*].tipoCambioVenta").value(hasItem(sameNumber(DEFAULT_TIPO_CAMBIO_VENTA))))
-            .andExpect(jsonPath("$.[*].anulada").value(hasItem(DEFAULT_ANULADA)));
+                .perform(get(ENTITY_API_URL + "?sort=id,desc"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.[*].id").value(hasItem(venta.getId().intValue())))
+                .andExpect(jsonPath("$.[*].fecha").value(hasItem(DEFAULT_FECHA.toString())))
+                .andExpect(jsonPath("$.[*].noFactura").value(hasItem(DEFAULT_NO_FACTURA.intValue())))
+                .andExpect(jsonPath("$.[*].subtotal").value(hasItem(sameNumber(DEFAULT_SUBTOTAL))))
+                .andExpect(jsonPath("$.[*].iva").value(hasItem(sameNumber(DEFAULT_IVA))))
+                .andExpect(jsonPath("$.[*].total").value(hasItem(sameNumber(DEFAULT_TOTAL))))
+                .andExpect(jsonPath("$.[*].totalEnMonedaBase").value(hasItem(sameNumber(DEFAULT_TOTAL_EN_MONEDA_BASE))))
+                .andExpect(jsonPath("$.[*].metodoPago").value(hasItem(DEFAULT_METODO_PAGO.toString())))
+                .andExpect(jsonPath("$.[*].stripeId").value(hasItem(DEFAULT_STRIPE_ID)))
+                .andExpect(jsonPath("$.[*].esContado").value(hasItem(DEFAULT_ES_CONTADO)))
+                .andExpect(jsonPath("$.[*].tipoCambioVenta").value(hasItem(sameNumber(DEFAULT_TIPO_CAMBIO_VENTA))))
+                .andExpect(jsonPath("$.[*].anulada").value(hasItem(DEFAULT_ANULADA)));
     }
 
     @Test
@@ -357,21 +365,21 @@ class VentaResourceIT {
 
         // Get the venta
         restVentaMockMvc
-            .perform(get(ENTITY_API_URL_ID, venta.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.id").value(venta.getId().intValue()))
-            .andExpect(jsonPath("$.fecha").value(DEFAULT_FECHA.toString()))
-            .andExpect(jsonPath("$.noFactura").value(DEFAULT_NO_FACTURA.intValue()))
-            .andExpect(jsonPath("$.subtotal").value(sameNumber(DEFAULT_SUBTOTAL)))
-            .andExpect(jsonPath("$.iva").value(sameNumber(DEFAULT_IVA)))
-            .andExpect(jsonPath("$.total").value(sameNumber(DEFAULT_TOTAL)))
-            .andExpect(jsonPath("$.totalEnMonedaBase").value(sameNumber(DEFAULT_TOTAL_EN_MONEDA_BASE)))
-            .andExpect(jsonPath("$.metodoPago").value(DEFAULT_METODO_PAGO.toString()))
-            .andExpect(jsonPath("$.stripeId").value(DEFAULT_STRIPE_ID))
-            .andExpect(jsonPath("$.esContado").value(DEFAULT_ES_CONTADO))
-            .andExpect(jsonPath("$.tipoCambioVenta").value(sameNumber(DEFAULT_TIPO_CAMBIO_VENTA)))
-            .andExpect(jsonPath("$.anulada").value(DEFAULT_ANULADA));
+                .perform(get(ENTITY_API_URL_ID, venta.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.id").value(venta.getId().intValue()))
+                .andExpect(jsonPath("$.fecha").value(DEFAULT_FECHA.toString()))
+                .andExpect(jsonPath("$.noFactura").value(DEFAULT_NO_FACTURA.intValue()))
+                .andExpect(jsonPath("$.subtotal").value(sameNumber(DEFAULT_SUBTOTAL)))
+                .andExpect(jsonPath("$.iva").value(sameNumber(DEFAULT_IVA)))
+                .andExpect(jsonPath("$.total").value(sameNumber(DEFAULT_TOTAL)))
+                .andExpect(jsonPath("$.totalEnMonedaBase").value(sameNumber(DEFAULT_TOTAL_EN_MONEDA_BASE)))
+                .andExpect(jsonPath("$.metodoPago").value(DEFAULT_METODO_PAGO.toString()))
+                .andExpect(jsonPath("$.stripeId").value(DEFAULT_STRIPE_ID))
+                .andExpect(jsonPath("$.esContado").value(DEFAULT_ES_CONTADO))
+                .andExpect(jsonPath("$.tipoCambioVenta").value(sameNumber(DEFAULT_TIPO_CAMBIO_VENTA)))
+                .andExpect(jsonPath("$.anulada").value(DEFAULT_ANULADA));
     }
 
     @Test
@@ -436,7 +444,8 @@ class VentaResourceIT {
         insertedVenta = ventaRepository.saveAndFlush(venta);
 
         // Get all the ventaList where noFactura in
-        defaultVentaFiltering("noFactura.in=" + DEFAULT_NO_FACTURA + "," + UPDATED_NO_FACTURA, "noFactura.in=" + UPDATED_NO_FACTURA);
+        defaultVentaFiltering("noFactura.in=" + DEFAULT_NO_FACTURA + "," + UPDATED_NO_FACTURA,
+                "noFactura.in=" + UPDATED_NO_FACTURA);
     }
 
     @Test
@@ -456,7 +465,8 @@ class VentaResourceIT {
         insertedVenta = ventaRepository.saveAndFlush(venta);
 
         // Get all the ventaList where noFactura is greater than or equal to
-        defaultVentaFiltering("noFactura.greaterThanOrEqual=" + DEFAULT_NO_FACTURA, "noFactura.greaterThanOrEqual=" + UPDATED_NO_FACTURA);
+        defaultVentaFiltering("noFactura.greaterThanOrEqual=" + DEFAULT_NO_FACTURA,
+                "noFactura.greaterThanOrEqual=" + UPDATED_NO_FACTURA);
     }
 
     @Test
@@ -466,7 +476,8 @@ class VentaResourceIT {
         insertedVenta = ventaRepository.saveAndFlush(venta);
 
         // Get all the ventaList where noFactura is less than or equal to
-        defaultVentaFiltering("noFactura.lessThanOrEqual=" + DEFAULT_NO_FACTURA, "noFactura.lessThanOrEqual=" + SMALLER_NO_FACTURA);
+        defaultVentaFiltering("noFactura.lessThanOrEqual=" + DEFAULT_NO_FACTURA,
+                "noFactura.lessThanOrEqual=" + SMALLER_NO_FACTURA);
     }
 
     @Test
@@ -486,7 +497,8 @@ class VentaResourceIT {
         insertedVenta = ventaRepository.saveAndFlush(venta);
 
         // Get all the ventaList where noFactura is greater than
-        defaultVentaFiltering("noFactura.greaterThan=" + SMALLER_NO_FACTURA, "noFactura.greaterThan=" + DEFAULT_NO_FACTURA);
+        defaultVentaFiltering("noFactura.greaterThan=" + SMALLER_NO_FACTURA,
+                "noFactura.greaterThan=" + DEFAULT_NO_FACTURA);
     }
 
     @Test
@@ -506,7 +518,8 @@ class VentaResourceIT {
         insertedVenta = ventaRepository.saveAndFlush(venta);
 
         // Get all the ventaList where subtotal in
-        defaultVentaFiltering("subtotal.in=" + DEFAULT_SUBTOTAL + "," + UPDATED_SUBTOTAL, "subtotal.in=" + UPDATED_SUBTOTAL);
+        defaultVentaFiltering("subtotal.in=" + DEFAULT_SUBTOTAL + "," + UPDATED_SUBTOTAL,
+                "subtotal.in=" + UPDATED_SUBTOTAL);
     }
 
     @Test
@@ -526,7 +539,8 @@ class VentaResourceIT {
         insertedVenta = ventaRepository.saveAndFlush(venta);
 
         // Get all the ventaList where subtotal is greater than or equal to
-        defaultVentaFiltering("subtotal.greaterThanOrEqual=" + DEFAULT_SUBTOTAL, "subtotal.greaterThanOrEqual=" + UPDATED_SUBTOTAL);
+        defaultVentaFiltering("subtotal.greaterThanOrEqual=" + DEFAULT_SUBTOTAL,
+                "subtotal.greaterThanOrEqual=" + UPDATED_SUBTOTAL);
     }
 
     @Test
@@ -536,7 +550,8 @@ class VentaResourceIT {
         insertedVenta = ventaRepository.saveAndFlush(venta);
 
         // Get all the ventaList where subtotal is less than or equal to
-        defaultVentaFiltering("subtotal.lessThanOrEqual=" + DEFAULT_SUBTOTAL, "subtotal.lessThanOrEqual=" + SMALLER_SUBTOTAL);
+        defaultVentaFiltering("subtotal.lessThanOrEqual=" + DEFAULT_SUBTOTAL,
+                "subtotal.lessThanOrEqual=" + SMALLER_SUBTOTAL);
     }
 
     @Test
@@ -707,9 +722,8 @@ class VentaResourceIT {
 
         // Get all the ventaList where totalEnMonedaBase equals to
         defaultVentaFiltering(
-            "totalEnMonedaBase.equals=" + DEFAULT_TOTAL_EN_MONEDA_BASE,
-            "totalEnMonedaBase.equals=" + UPDATED_TOTAL_EN_MONEDA_BASE
-        );
+                "totalEnMonedaBase.equals=" + DEFAULT_TOTAL_EN_MONEDA_BASE,
+                "totalEnMonedaBase.equals=" + UPDATED_TOTAL_EN_MONEDA_BASE);
     }
 
     @Test
@@ -720,9 +734,8 @@ class VentaResourceIT {
 
         // Get all the ventaList where totalEnMonedaBase in
         defaultVentaFiltering(
-            "totalEnMonedaBase.in=" + DEFAULT_TOTAL_EN_MONEDA_BASE + "," + UPDATED_TOTAL_EN_MONEDA_BASE,
-            "totalEnMonedaBase.in=" + UPDATED_TOTAL_EN_MONEDA_BASE
-        );
+                "totalEnMonedaBase.in=" + DEFAULT_TOTAL_EN_MONEDA_BASE + "," + UPDATED_TOTAL_EN_MONEDA_BASE,
+                "totalEnMonedaBase.in=" + UPDATED_TOTAL_EN_MONEDA_BASE);
     }
 
     @Test
@@ -743,9 +756,8 @@ class VentaResourceIT {
 
         // Get all the ventaList where totalEnMonedaBase is greater than or equal to
         defaultVentaFiltering(
-            "totalEnMonedaBase.greaterThanOrEqual=" + DEFAULT_TOTAL_EN_MONEDA_BASE,
-            "totalEnMonedaBase.greaterThanOrEqual=" + UPDATED_TOTAL_EN_MONEDA_BASE
-        );
+                "totalEnMonedaBase.greaterThanOrEqual=" + DEFAULT_TOTAL_EN_MONEDA_BASE,
+                "totalEnMonedaBase.greaterThanOrEqual=" + UPDATED_TOTAL_EN_MONEDA_BASE);
     }
 
     @Test
@@ -756,9 +768,8 @@ class VentaResourceIT {
 
         // Get all the ventaList where totalEnMonedaBase is less than or equal to
         defaultVentaFiltering(
-            "totalEnMonedaBase.lessThanOrEqual=" + DEFAULT_TOTAL_EN_MONEDA_BASE,
-            "totalEnMonedaBase.lessThanOrEqual=" + SMALLER_TOTAL_EN_MONEDA_BASE
-        );
+                "totalEnMonedaBase.lessThanOrEqual=" + DEFAULT_TOTAL_EN_MONEDA_BASE,
+                "totalEnMonedaBase.lessThanOrEqual=" + SMALLER_TOTAL_EN_MONEDA_BASE);
     }
 
     @Test
@@ -769,9 +780,8 @@ class VentaResourceIT {
 
         // Get all the ventaList where totalEnMonedaBase is less than
         defaultVentaFiltering(
-            "totalEnMonedaBase.lessThan=" + UPDATED_TOTAL_EN_MONEDA_BASE,
-            "totalEnMonedaBase.lessThan=" + DEFAULT_TOTAL_EN_MONEDA_BASE
-        );
+                "totalEnMonedaBase.lessThan=" + UPDATED_TOTAL_EN_MONEDA_BASE,
+                "totalEnMonedaBase.lessThan=" + DEFAULT_TOTAL_EN_MONEDA_BASE);
     }
 
     @Test
@@ -782,9 +792,8 @@ class VentaResourceIT {
 
         // Get all the ventaList where totalEnMonedaBase is greater than
         defaultVentaFiltering(
-            "totalEnMonedaBase.greaterThan=" + SMALLER_TOTAL_EN_MONEDA_BASE,
-            "totalEnMonedaBase.greaterThan=" + DEFAULT_TOTAL_EN_MONEDA_BASE
-        );
+                "totalEnMonedaBase.greaterThan=" + SMALLER_TOTAL_EN_MONEDA_BASE,
+                "totalEnMonedaBase.greaterThan=" + DEFAULT_TOTAL_EN_MONEDA_BASE);
     }
 
     @Test
@@ -804,7 +813,8 @@ class VentaResourceIT {
         insertedVenta = ventaRepository.saveAndFlush(venta);
 
         // Get all the ventaList where metodoPago in
-        defaultVentaFiltering("metodoPago.in=" + DEFAULT_METODO_PAGO + "," + UPDATED_METODO_PAGO, "metodoPago.in=" + UPDATED_METODO_PAGO);
+        defaultVentaFiltering("metodoPago.in=" + DEFAULT_METODO_PAGO + "," + UPDATED_METODO_PAGO,
+                "metodoPago.in=" + UPDATED_METODO_PAGO);
     }
 
     @Test
@@ -834,7 +844,8 @@ class VentaResourceIT {
         insertedVenta = ventaRepository.saveAndFlush(venta);
 
         // Get all the ventaList where stripeId in
-        defaultVentaFiltering("stripeId.in=" + DEFAULT_STRIPE_ID + "," + UPDATED_STRIPE_ID, "stripeId.in=" + UPDATED_STRIPE_ID);
+        defaultVentaFiltering("stripeId.in=" + DEFAULT_STRIPE_ID + "," + UPDATED_STRIPE_ID,
+                "stripeId.in=" + UPDATED_STRIPE_ID);
     }
 
     @Test
@@ -864,7 +875,8 @@ class VentaResourceIT {
         insertedVenta = ventaRepository.saveAndFlush(venta);
 
         // Get all the ventaList where stripeId does not contain
-        defaultVentaFiltering("stripeId.doesNotContain=" + UPDATED_STRIPE_ID, "stripeId.doesNotContain=" + DEFAULT_STRIPE_ID);
+        defaultVentaFiltering("stripeId.doesNotContain=" + UPDATED_STRIPE_ID,
+                "stripeId.doesNotContain=" + DEFAULT_STRIPE_ID);
     }
 
     @Test
@@ -884,7 +896,8 @@ class VentaResourceIT {
         insertedVenta = ventaRepository.saveAndFlush(venta);
 
         // Get all the ventaList where esContado in
-        defaultVentaFiltering("esContado.in=" + DEFAULT_ES_CONTADO + "," + UPDATED_ES_CONTADO, "esContado.in=" + UPDATED_ES_CONTADO);
+        defaultVentaFiltering("esContado.in=" + DEFAULT_ES_CONTADO + "," + UPDATED_ES_CONTADO,
+                "esContado.in=" + UPDATED_ES_CONTADO);
     }
 
     @Test
@@ -904,7 +917,8 @@ class VentaResourceIT {
         insertedVenta = ventaRepository.saveAndFlush(venta);
 
         // Get all the ventaList where tipoCambioVenta equals to
-        defaultVentaFiltering("tipoCambioVenta.equals=" + DEFAULT_TIPO_CAMBIO_VENTA, "tipoCambioVenta.equals=" + UPDATED_TIPO_CAMBIO_VENTA);
+        defaultVentaFiltering("tipoCambioVenta.equals=" + DEFAULT_TIPO_CAMBIO_VENTA,
+                "tipoCambioVenta.equals=" + UPDATED_TIPO_CAMBIO_VENTA);
     }
 
     @Test
@@ -915,9 +929,8 @@ class VentaResourceIT {
 
         // Get all the ventaList where tipoCambioVenta in
         defaultVentaFiltering(
-            "tipoCambioVenta.in=" + DEFAULT_TIPO_CAMBIO_VENTA + "," + UPDATED_TIPO_CAMBIO_VENTA,
-            "tipoCambioVenta.in=" + UPDATED_TIPO_CAMBIO_VENTA
-        );
+                "tipoCambioVenta.in=" + DEFAULT_TIPO_CAMBIO_VENTA + "," + UPDATED_TIPO_CAMBIO_VENTA,
+                "tipoCambioVenta.in=" + UPDATED_TIPO_CAMBIO_VENTA);
     }
 
     @Test
@@ -938,9 +951,8 @@ class VentaResourceIT {
 
         // Get all the ventaList where tipoCambioVenta is greater than or equal to
         defaultVentaFiltering(
-            "tipoCambioVenta.greaterThanOrEqual=" + DEFAULT_TIPO_CAMBIO_VENTA,
-            "tipoCambioVenta.greaterThanOrEqual=" + UPDATED_TIPO_CAMBIO_VENTA
-        );
+                "tipoCambioVenta.greaterThanOrEqual=" + DEFAULT_TIPO_CAMBIO_VENTA,
+                "tipoCambioVenta.greaterThanOrEqual=" + UPDATED_TIPO_CAMBIO_VENTA);
     }
 
     @Test
@@ -951,9 +963,8 @@ class VentaResourceIT {
 
         // Get all the ventaList where tipoCambioVenta is less than or equal to
         defaultVentaFiltering(
-            "tipoCambioVenta.lessThanOrEqual=" + DEFAULT_TIPO_CAMBIO_VENTA,
-            "tipoCambioVenta.lessThanOrEqual=" + SMALLER_TIPO_CAMBIO_VENTA
-        );
+                "tipoCambioVenta.lessThanOrEqual=" + DEFAULT_TIPO_CAMBIO_VENTA,
+                "tipoCambioVenta.lessThanOrEqual=" + SMALLER_TIPO_CAMBIO_VENTA);
     }
 
     @Test
@@ -964,9 +975,8 @@ class VentaResourceIT {
 
         // Get all the ventaList where tipoCambioVenta is less than
         defaultVentaFiltering(
-            "tipoCambioVenta.lessThan=" + UPDATED_TIPO_CAMBIO_VENTA,
-            "tipoCambioVenta.lessThan=" + DEFAULT_TIPO_CAMBIO_VENTA
-        );
+                "tipoCambioVenta.lessThan=" + UPDATED_TIPO_CAMBIO_VENTA,
+                "tipoCambioVenta.lessThan=" + DEFAULT_TIPO_CAMBIO_VENTA);
     }
 
     @Test
@@ -977,9 +987,8 @@ class VentaResourceIT {
 
         // Get all the ventaList where tipoCambioVenta is greater than
         defaultVentaFiltering(
-            "tipoCambioVenta.greaterThan=" + SMALLER_TIPO_CAMBIO_VENTA,
-            "tipoCambioVenta.greaterThan=" + DEFAULT_TIPO_CAMBIO_VENTA
-        );
+                "tipoCambioVenta.greaterThan=" + SMALLER_TIPO_CAMBIO_VENTA,
+                "tipoCambioVenta.greaterThan=" + DEFAULT_TIPO_CAMBIO_VENTA);
     }
 
     @Test
@@ -1036,24 +1045,24 @@ class VentaResourceIT {
 
     @Test
     @Transactional
-    void getAllVentasByVendedorIsEqualToSomething() throws Exception {
-        Vendedor vendedor;
-        if (TestUtil.findAll(em, Vendedor.class).isEmpty()) {
+    void getAllVentasByUsuarioIsEqualToSomething() throws Exception {
+        Usuario usuario;
+        if (TestUtil.findAll(em, Usuario.class).isEmpty()) {
             ventaRepository.saveAndFlush(venta);
-            vendedor = VendedorResourceIT.createEntity();
+            usuario = UsuarioResourceIT.createEntity();
         } else {
-            vendedor = TestUtil.findAll(em, Vendedor.class).get(0);
+            usuario = TestUtil.findAll(em, Usuario.class).get(0);
         }
-        em.persist(vendedor);
+        em.persist(usuario);
         em.flush();
-        venta.setVendedor(vendedor);
+        venta.setUsuario(usuario);
         ventaRepository.saveAndFlush(venta);
-        Long vendedorId = vendedor.getId();
-        // Get all the ventaList where vendedor equals to vendedorId
-        defaultVentaShouldBeFound("vendedorId.equals=" + vendedorId);
+        Long usuarioId = usuario.getId();
+        // Get all the ventaList where usuario equals to usuarioId
+        defaultVentaShouldBeFound("usuarioId.equals=" + usuarioId);
 
-        // Get all the ventaList where vendedor equals to (vendedorId + 1)
-        defaultVentaShouldNotBeFound("vendedorId.equals=" + (vendedorId + 1));
+        // Get all the ventaList where usuario equals to (usuarioId + 1)
+        defaultVentaShouldNotBeFound("usuarioId.equals=" + (usuarioId + 1));
     }
 
     @Test
@@ -1110,28 +1119,28 @@ class VentaResourceIT {
      */
     private void defaultVentaShouldBeFound(String filter) throws Exception {
         restVentaMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(venta.getId().intValue())))
-            .andExpect(jsonPath("$.[*].fecha").value(hasItem(DEFAULT_FECHA.toString())))
-            .andExpect(jsonPath("$.[*].noFactura").value(hasItem(DEFAULT_NO_FACTURA.intValue())))
-            .andExpect(jsonPath("$.[*].subtotal").value(hasItem(sameNumber(DEFAULT_SUBTOTAL))))
-            .andExpect(jsonPath("$.[*].iva").value(hasItem(sameNumber(DEFAULT_IVA))))
-            .andExpect(jsonPath("$.[*].total").value(hasItem(sameNumber(DEFAULT_TOTAL))))
-            .andExpect(jsonPath("$.[*].totalEnMonedaBase").value(hasItem(sameNumber(DEFAULT_TOTAL_EN_MONEDA_BASE))))
-            .andExpect(jsonPath("$.[*].metodoPago").value(hasItem(DEFAULT_METODO_PAGO.toString())))
-            .andExpect(jsonPath("$.[*].stripeId").value(hasItem(DEFAULT_STRIPE_ID)))
-            .andExpect(jsonPath("$.[*].esContado").value(hasItem(DEFAULT_ES_CONTADO)))
-            .andExpect(jsonPath("$.[*].tipoCambioVenta").value(hasItem(sameNumber(DEFAULT_TIPO_CAMBIO_VENTA))))
-            .andExpect(jsonPath("$.[*].anulada").value(hasItem(DEFAULT_ANULADA)));
+                .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.[*].id").value(hasItem(venta.getId().intValue())))
+                .andExpect(jsonPath("$.[*].fecha").value(hasItem(DEFAULT_FECHA.toString())))
+                .andExpect(jsonPath("$.[*].noFactura").value(hasItem(DEFAULT_NO_FACTURA.intValue())))
+                .andExpect(jsonPath("$.[*].subtotal").value(hasItem(sameNumber(DEFAULT_SUBTOTAL))))
+                .andExpect(jsonPath("$.[*].iva").value(hasItem(sameNumber(DEFAULT_IVA))))
+                .andExpect(jsonPath("$.[*].total").value(hasItem(sameNumber(DEFAULT_TOTAL))))
+                .andExpect(jsonPath("$.[*].totalEnMonedaBase").value(hasItem(sameNumber(DEFAULT_TOTAL_EN_MONEDA_BASE))))
+                .andExpect(jsonPath("$.[*].metodoPago").value(hasItem(DEFAULT_METODO_PAGO.toString())))
+                .andExpect(jsonPath("$.[*].stripeId").value(hasItem(DEFAULT_STRIPE_ID)))
+                .andExpect(jsonPath("$.[*].esContado").value(hasItem(DEFAULT_ES_CONTADO)))
+                .andExpect(jsonPath("$.[*].tipoCambioVenta").value(hasItem(sameNumber(DEFAULT_TIPO_CAMBIO_VENTA))))
+                .andExpect(jsonPath("$.[*].anulada").value(hasItem(DEFAULT_ANULADA)));
 
         // Check, that the count call also returns 1
         restVentaMockMvc
-            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(content().string("1"));
+                .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().string("1"));
     }
 
     /**
@@ -1139,18 +1148,18 @@ class VentaResourceIT {
      */
     private void defaultVentaShouldNotBeFound(String filter) throws Exception {
         restVentaMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$").isArray())
-            .andExpect(jsonPath("$").isEmpty());
+                .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
 
         // Check, that the count call also returns 0
         restVentaMockMvc
-            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(content().string("0"));
+                .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().string("0"));
     }
 
     @Test
@@ -1170,30 +1179,30 @@ class VentaResourceIT {
 
         // Update the venta
         Venta updatedVenta = ventaRepository.findById(venta.getId()).orElseThrow();
-        // Disconnect from session so that the updates on updatedVenta are not directly saved in db
+        // Disconnect from session so that the updates on updatedVenta are not directly
+        // saved in db
         em.detach(updatedVenta);
         updatedVenta
-            .fecha(UPDATED_FECHA)
-            .noFactura(UPDATED_NO_FACTURA)
-            .subtotal(UPDATED_SUBTOTAL)
-            .iva(UPDATED_IVA)
-            .total(UPDATED_TOTAL)
-            .totalEnMonedaBase(UPDATED_TOTAL_EN_MONEDA_BASE)
-            .metodoPago(UPDATED_METODO_PAGO)
-            .stripeId(UPDATED_STRIPE_ID)
-            .esContado(UPDATED_ES_CONTADO)
-            .tipoCambioVenta(UPDATED_TIPO_CAMBIO_VENTA)
-            .anulada(UPDATED_ANULADA);
+                .fecha(UPDATED_FECHA)
+                .noFactura(UPDATED_NO_FACTURA)
+                .subtotal(UPDATED_SUBTOTAL)
+                .iva(UPDATED_IVA)
+                .total(UPDATED_TOTAL)
+                .totalEnMonedaBase(UPDATED_TOTAL_EN_MONEDA_BASE)
+                .metodoPago(UPDATED_METODO_PAGO)
+                .stripeId(UPDATED_STRIPE_ID)
+                .esContado(UPDATED_ES_CONTADO)
+                .tipoCambioVenta(UPDATED_TIPO_CAMBIO_VENTA)
+                .anulada(UPDATED_ANULADA);
         VentaDTO ventaDTO = ventaMapper.toDto(updatedVenta);
 
         restVentaMockMvc
-            .perform(
-                put(ENTITY_API_URL_ID, ventaDTO.getId())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(ventaDTO))
-            )
-            .andExpect(status().isOk());
+                .perform(
+                        put(ENTITY_API_URL_ID, ventaDTO.getId())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(om.writeValueAsBytes(ventaDTO)))
+                .andExpect(status().isOk());
 
         // Validate the Venta in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
@@ -1211,13 +1220,12 @@ class VentaResourceIT {
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restVentaMockMvc
-            .perform(
-                put(ENTITY_API_URL_ID, ventaDTO.getId())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(ventaDTO))
-            )
-            .andExpect(status().isBadRequest());
+                .perform(
+                        put(ENTITY_API_URL_ID, ventaDTO.getId())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(om.writeValueAsBytes(ventaDTO)))
+                .andExpect(status().isBadRequest());
 
         // Validate the Venta in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
@@ -1234,13 +1242,12 @@ class VentaResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restVentaMockMvc
-            .perform(
-                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(ventaDTO))
-            )
-            .andExpect(status().isBadRequest());
+                .perform(
+                        put(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(om.writeValueAsBytes(ventaDTO)))
+                .andExpect(status().isBadRequest());
 
         // Validate the Venta in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
@@ -1257,8 +1264,9 @@ class VentaResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restVentaMockMvc
-            .perform(put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(ventaDTO)))
-            .andExpect(status().isMethodNotAllowed());
+                .perform(put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(ventaDTO)))
+                .andExpect(status().isMethodNotAllowed());
 
         // Validate the Venta in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
@@ -1277,25 +1285,25 @@ class VentaResourceIT {
         partialUpdatedVenta.setId(venta.getId());
 
         partialUpdatedVenta
-            .noFactura(UPDATED_NO_FACTURA)
-            .total(UPDATED_TOTAL)
-            .totalEnMonedaBase(UPDATED_TOTAL_EN_MONEDA_BASE)
-            .stripeId(UPDATED_STRIPE_ID)
-            .anulada(UPDATED_ANULADA);
+                .noFactura(UPDATED_NO_FACTURA)
+                .total(UPDATED_TOTAL)
+                .totalEnMonedaBase(UPDATED_TOTAL_EN_MONEDA_BASE)
+                .stripeId(UPDATED_STRIPE_ID)
+                .anulada(UPDATED_ANULADA);
 
         restVentaMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, partialUpdatedVenta.getId())
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(partialUpdatedVenta))
-            )
-            .andExpect(status().isOk());
+                .perform(
+                        patch(ENTITY_API_URL_ID, partialUpdatedVenta.getId())
+                                .with(csrf())
+                                .contentType("application/merge-patch+json")
+                                .content(om.writeValueAsBytes(partialUpdatedVenta)))
+                .andExpect(status().isOk());
 
         // Validate the Venta in the database
 
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
-        assertVentaUpdatableFieldsEquals(createUpdateProxyForBean(partialUpdatedVenta, venta), getPersistedVenta(venta));
+        assertVentaUpdatableFieldsEquals(createUpdateProxyForBean(partialUpdatedVenta, venta),
+                getPersistedVenta(venta));
     }
 
     @Test
@@ -1311,26 +1319,25 @@ class VentaResourceIT {
         partialUpdatedVenta.setId(venta.getId());
 
         partialUpdatedVenta
-            .fecha(UPDATED_FECHA)
-            .noFactura(UPDATED_NO_FACTURA)
-            .subtotal(UPDATED_SUBTOTAL)
-            .iva(UPDATED_IVA)
-            .total(UPDATED_TOTAL)
-            .totalEnMonedaBase(UPDATED_TOTAL_EN_MONEDA_BASE)
-            .metodoPago(UPDATED_METODO_PAGO)
-            .stripeId(UPDATED_STRIPE_ID)
-            .esContado(UPDATED_ES_CONTADO)
-            .tipoCambioVenta(UPDATED_TIPO_CAMBIO_VENTA)
-            .anulada(UPDATED_ANULADA);
+                .fecha(UPDATED_FECHA)
+                .noFactura(UPDATED_NO_FACTURA)
+                .subtotal(UPDATED_SUBTOTAL)
+                .iva(UPDATED_IVA)
+                .total(UPDATED_TOTAL)
+                .totalEnMonedaBase(UPDATED_TOTAL_EN_MONEDA_BASE)
+                .metodoPago(UPDATED_METODO_PAGO)
+                .stripeId(UPDATED_STRIPE_ID)
+                .esContado(UPDATED_ES_CONTADO)
+                .tipoCambioVenta(UPDATED_TIPO_CAMBIO_VENTA)
+                .anulada(UPDATED_ANULADA);
 
         restVentaMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, partialUpdatedVenta.getId())
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(partialUpdatedVenta))
-            )
-            .andExpect(status().isOk());
+                .perform(
+                        patch(ENTITY_API_URL_ID, partialUpdatedVenta.getId())
+                                .with(csrf())
+                                .contentType("application/merge-patch+json")
+                                .content(om.writeValueAsBytes(partialUpdatedVenta)))
+                .andExpect(status().isOk());
 
         // Validate the Venta in the database
 
@@ -1349,13 +1356,12 @@ class VentaResourceIT {
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restVentaMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, ventaDTO.getId())
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(ventaDTO))
-            )
-            .andExpect(status().isBadRequest());
+                .perform(
+                        patch(ENTITY_API_URL_ID, ventaDTO.getId())
+                                .with(csrf())
+                                .contentType("application/merge-patch+json")
+                                .content(om.writeValueAsBytes(ventaDTO)))
+                .andExpect(status().isBadRequest());
 
         // Validate the Venta in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
@@ -1372,13 +1378,12 @@ class VentaResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restVentaMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(ventaDTO))
-            )
-            .andExpect(status().isBadRequest());
+                .perform(
+                        patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                                .with(csrf())
+                                .contentType("application/merge-patch+json")
+                                .content(om.writeValueAsBytes(ventaDTO)))
+                .andExpect(status().isBadRequest());
 
         // Validate the Venta in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
@@ -1395,8 +1400,9 @@ class VentaResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restVentaMockMvc
-            .perform(patch(ENTITY_API_URL).with(csrf()).contentType("application/merge-patch+json").content(om.writeValueAsBytes(ventaDTO)))
-            .andExpect(status().isMethodNotAllowed());
+                .perform(patch(ENTITY_API_URL).with(csrf()).contentType("application/merge-patch+json")
+                        .content(om.writeValueAsBytes(ventaDTO)))
+                .andExpect(status().isMethodNotAllowed());
 
         // Validate the Venta in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
@@ -1412,8 +1418,8 @@ class VentaResourceIT {
 
         // Delete the venta
         restVentaMockMvc
-            .perform(delete(ENTITY_API_URL_ID, venta.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNoContent());
+                .perform(delete(ENTITY_API_URL_ID, venta.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
         assertDecrementedRepositoryCount(databaseSizeBeforeDelete);

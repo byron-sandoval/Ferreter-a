@@ -3,7 +3,7 @@ package com.ferronica.app.domain;
 import static com.ferronica.app.domain.DetalleIngresoTestSamples.*;
 import static com.ferronica.app.domain.IngresoTestSamples.*;
 import static com.ferronica.app.domain.ProveedorTestSamples.*;
-import static com.ferronica.app.domain.VendedorTestSamples.*;
+import static com.ferronica.app.domain.UsuarioTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ferronica.app.web.rest.TestUtil;
@@ -50,15 +50,15 @@ class IngresoTest {
     }
 
     @Test
-    void vendedorTest() {
+    void usuarioTest() {
         Ingreso ingreso = getIngresoRandomSampleGenerator();
-        Vendedor vendedorBack = getVendedorRandomSampleGenerator();
+        Usuario usuarioBack = getUsuarioRandomSampleGenerator();
 
-        ingreso.setVendedor(vendedorBack);
-        assertThat(ingreso.getVendedor()).isEqualTo(vendedorBack);
+        ingreso.setUsuario(usuarioBack);
+        assertThat(ingreso.getUsuario()).isEqualTo(usuarioBack);
 
-        ingreso.vendedor(null);
-        assertThat(ingreso.getVendedor()).isNull();
+        ingreso.usuario(null);
+        assertThat(ingreso.getUsuario()).isNull();
     }
 
     @Test
