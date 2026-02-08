@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface VendedorRepository extends JpaRepository<Vendedor, Long> {}
+public interface VendedorRepository extends JpaRepository<Vendedor, Long> {
+    java.util.Optional<Vendedor> findByIdKeycloak(String idKeycloak);
+}
