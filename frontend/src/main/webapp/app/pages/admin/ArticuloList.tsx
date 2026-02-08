@@ -18,7 +18,10 @@ import {
   faBoxOpen,
   faHistory,
   faTimes,
+  faChevronLeft,
+  faChevronRight,
 } from '@fortawesome/free-solid-svg-icons';
+import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 
 export const ArticuloList = () => {
   const [articulos, setArticulos] = useState<IArticulo[]>([]);
@@ -42,6 +45,13 @@ export const ArticuloList = () => {
       });
   };
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter]);
+
   useEffect(() => {
     loadAll();
   }, []);
@@ -49,6 +59,14 @@ export const ArticuloList = () => {
   const articulosFiltrados = articulos.filter(
     a => (a.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (a.codigo || '').toLowerCase().includes(filter.toLowerCase()),
   );
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = articulosFiltrados.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(articulosFiltrados.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
 
   const handleDelete = (id: number) => {
     if (window.confirm('¿Estás seguro de eliminar este artículo?')) {
@@ -138,8 +156,8 @@ export const ArticuloList = () => {
                 </tr>
               </thead>
               <tbody>
-                {articulosFiltrados.length > 0 ? (
-                  articulosFiltrados.map(articulo => {
+                {currentItems.length > 0 ? (
+                  currentItems.map(articulo => {
                     const hasStock = (articulo.existencia || 0) > 0;
                     const isLowStock = (articulo.existencia || 0) <= (articulo.existenciaMinima || 0);
                     const stockBg = !hasStock ? '#ff0000' : isLowStock ? '#ffc107' : '#00a000';
@@ -227,6 +245,30 @@ export const ArticuloList = () => {
                 )}
               </tbody>
             </Table>
+            {totalPages > 1 && (
+              <div className="d-flex justify-content-between align-items-center p-2 border-top bg-light">
+                <small className="text-muted ps-2">
+                  Mostrando {Math.min(indexOfLastItem, articulosFiltrados.length)} de {articulosFiltrados.length} artículos
+                </small>
+                <Pagination size="sm" className="mb-0 pe-2">
+                  <PaginationItem disabled={currentPage === 1}>
+                    <PaginationLink previous onClick={() => paginate(currentPage - 1)}>
+                      <FontAwesomeIcon icon={faChevronLeft} />
+                    </PaginationLink>
+                  </PaginationItem>
+                  {[...Array(totalPages)].map((_, i) => (
+                    <PaginationItem active={i + 1 === currentPage} key={i}>
+                      <PaginationLink onClick={() => paginate(i + 1)}>{i + 1}</PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  <PaginationItem disabled={currentPage === totalPages}>
+                    <PaginationLink next onClick={() => paginate(currentPage + 1)}>
+                      <FontAwesomeIcon icon={faChevronRight} />
+                    </PaginationLink>
+                  </PaginationItem>
+                </Pagination>
+              </div>
+            )}
           </div>
         </Card>
 
