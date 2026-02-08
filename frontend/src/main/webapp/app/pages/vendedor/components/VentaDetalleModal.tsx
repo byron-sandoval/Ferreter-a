@@ -198,7 +198,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                 </p>
                 <div style={{ fontSize: '12.5px' }}>
                   <p style={{ margin: '1px 0' }}>
-                    <strong>Cédula/RUC:</strong> {venta.cliente?.cedula}
+                    <strong>Cédula:</strong> {venta.cliente?.cedula}
                   </p>
                   <p style={{ margin: '1px 0' }}>
                     <strong>Dirección:</strong> {venta.cliente?.direccion || 'Ciudad'}
