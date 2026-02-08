@@ -44,7 +44,7 @@ export const AdminDashboard = () => {
       VentaService.getAllDetalles({ size: 1000 }),
     ])
       .then(([artRes, venRes, detRes]) => {
-        const low = artRes.data.filter(a => (a.existencia || 0) <= (a.existenciaMinima || 0));
+        const low = artRes.data.filter(a => a.activo && (a.existencia || 0) <= (a.existenciaMinima || 0));
         setBajoStock(low);
         setVentasRecientes(venRes.data);
 
