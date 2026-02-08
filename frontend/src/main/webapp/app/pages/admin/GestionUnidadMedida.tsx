@@ -16,7 +16,8 @@ import {
   Label,
 } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRulerCombined, faPlus, faEdit, faTrash, faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faRulerCombined, faPlus, faEdit, faTrash, faSave, faTimes, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import UnidadMedidaService from '../../services/unidad-medida.service';
 import { IUnidadMedida } from '../../shared/model/unidad-medida.model';
 import { toast } from 'react-toastify';
@@ -26,6 +27,17 @@ export const GestionUnidadMedida = () => {
   const [loading, setLoading] = useState(false);
   const [modal, setModal] = useState(false);
   const [currentUnidad, setCurrentUnidad] = useState<IUnidadMedida>({ nombre: '', simbolo: '', activo: true });
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = unidades.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(unidades.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
 
   useEffect(() => {
     loadUnidades();
@@ -107,7 +119,7 @@ export const GestionUnidadMedida = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {unidades.map(u => (
+                  {currentItems.map(u => (
                     <tr key={u.id}>
                       <td className="px-4 fw-bold text-dark">{u.nombre}</td>
                       <td>
@@ -141,6 +153,30 @@ export const GestionUnidadMedida = () => {
                   )}
                 </tbody>
               </Table>
+              {totalPages > 1 && (
+                <div className="d-flex justify-content-between align-items-center p-2 border-top bg-light">
+                  <small className="text-muted ps-2">
+                    Mostrando {Math.min(indexOfLastItem, unidades.length)} de {unidades.length} unidades
+                  </small>
+                  <Pagination size="sm" className="mb-0 pe-2">
+                    <PaginationItem disabled={currentPage === 1}>
+                      <PaginationLink previous onClick={() => paginate(currentPage - 1)}>
+                        <FontAwesomeIcon icon={faChevronLeft} />
+                      </PaginationLink>
+                    </PaginationItem>
+                    {[...Array(totalPages)].map((_, i) => (
+                      <PaginationItem active={i + 1 === currentPage} key={i}>
+                        <PaginationLink onClick={() => paginate(i + 1)}>{i + 1}</PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem disabled={currentPage === totalPages}>
+                      <PaginationLink next onClick={() => paginate(currentPage + 1)}>
+                        <FontAwesomeIcon icon={faChevronRight} />
+                      </PaginationLink>
+                    </PaginationItem>
+                  </Pagination>
+                </div>
+              )}
             </CardBody>
           </Card>
         </Col>
