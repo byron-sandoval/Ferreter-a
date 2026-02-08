@@ -139,7 +139,8 @@ public final class SecurityUtils {
     public static Map<String, Object> extractDetailsFromTokenAttributes(Map<String, Object> attributes) {
         Map<String, Object> details = new HashMap<>();
 
-        details.put("activated", Optional.ofNullable(attributes.get(StandardClaimNames.EMAIL_VERIFIED)).orElse(true));
+        // Siempre marcar como activado si el usuario pudo autenticarse
+        details.put("activated", true);
         Optional.ofNullable(attributes.get("uid")).ifPresent(id -> details.put("id", id));
         Optional.ofNullable(attributes.get(StandardClaimNames.FAMILY_NAME))
                 .ifPresent(lastName -> details.put("lastName", lastName));
