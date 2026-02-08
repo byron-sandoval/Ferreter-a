@@ -13,8 +13,8 @@ const ReportList = React.lazy(() => import('./reportes/ReportList'));
 const ComprasPorProveedor = React.lazy(() => import('./reportes/ComprasPorProveedor'));
 const ConfiguracionEmpresa = React.lazy(() => import('./configuracion/ConfiguracionEmpresa'));
 const GestionUnidadMedida = React.lazy(() => import('./GestionUnidadMedida'));
-const VendedorList = React.lazy(() => import('./VendedorList'));
-const VendedorUpdate = React.lazy(() => import('./VendedorUpdate'));
+const UsuarioList = React.lazy(() => import('./UsuarioList'));
+const UsuarioUpdate = React.lazy(() => import('./UsuarioUpdate'));
 
 const Loadable = ({ children }: { children: React.ReactNode }) => (
   <Suspense
@@ -156,12 +156,12 @@ const AdminRoutes = () => (
         </Loadable>
       }
     />
-    <Route path="vendedores">
+    <Route path="usuarios">
       <Route
         index
         element={
           <Loadable>
-            <VendedorList />
+            <UsuarioList />
           </Loadable>
         }
       />
@@ -169,7 +169,7 @@ const AdminRoutes = () => (
         path="new"
         element={
           <Loadable>
-            <VendedorUpdate />
+            <UsuarioUpdate />
           </Loadable>
         }
       />
@@ -177,7 +177,7 @@ const AdminRoutes = () => (
         path=":id/edit"
         element={
           <Loadable>
-            <VendedorUpdate />
+            <UsuarioUpdate />
           </Loadable>
         }
       />

@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, Button, Input, Card, Badge } from 'reactstrap';
-import { IVendedor } from 'app/shared/model/vendedor.model';
-import VendedorService from 'app/services/vendedor.service';
+import { IUsuario } from 'app/shared/model/usuario.model';
+import UsuarioService from 'app/services/usuario.service';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSync, faSearch, faPencilAlt, faTrash, faUsers, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 
-export const VendedorList = () => {
+export const UsuarioList = () => {
     const navigate = useNavigate();
-    const [vendedores, setVendedores] = useState<IVendedor[]>([]);
+    const [usuarios, setUsuarios] = useState<IUsuario[]>([]);
     const [loading, setLoading] = useState(false);
     const [filter, setFilter] = useState('');
 
@@ -22,9 +22,9 @@ export const VendedorList = () => {
 
     const loadAll = () => {
         setLoading(true);
-        VendedorService.getAll()
+        UsuarioService.getAll()
             .then(res => {
-                setVendedores(res.data);
+                setUsuarios(res.data);
                 setLoading(false);
             })
             .catch(err => {
@@ -37,7 +37,7 @@ export const VendedorList = () => {
         loadAll();
     }, []);
 
-    const filtrados = vendedores.filter(
+    const filtrados = usuarios.filter(
         v =>
             (v.nombre || '').toLowerCase().includes(filter.toLowerCase()) ||
             (v.apellido || '').toLowerCase().includes(filter.toLowerCase()) ||
@@ -78,7 +78,7 @@ export const VendedorList = () => {
                             <FontAwesomeIcon icon={faSearch} size="sm" />
                         </span>
                     </div>
-                    <Button color="primary" size="sm" onClick={() => navigate('/admin/vendedores/new')} style={{ fontSize: '0.75rem' }}>
+                    <Button color="primary" size="sm" onClick={() => navigate('/admin/usuarios/new')} style={{ fontSize: '0.75rem' }}>
                         <FontAwesomeIcon icon={faPlus} className="me-1" /> Nuevo Usuario
                     </Button>
                 </div>
@@ -114,7 +114,7 @@ export const VendedorList = () => {
                                         </Badge>
                                     </td>
                                     <td className="px-3">
-                                        <Button size="sm" color="info" outline className="p-1 me-1" onClick={() => navigate(`/admin/vendedores/${v.id}/edit`)}>
+                                        <Button size="sm" color="info" outline className="p-1 me-1" onClick={() => navigate(`/admin/usuarios/${v.id}/edit`)}>
                                             <FontAwesomeIcon icon={faPencilAlt} fixedWidth />
                                         </Button>
                                         <Button size="sm" color="danger" outline className="p-1">
@@ -161,4 +161,4 @@ export const VendedorList = () => {
     );
 };
 
-export default VendedorList;
+export default UsuarioList;
