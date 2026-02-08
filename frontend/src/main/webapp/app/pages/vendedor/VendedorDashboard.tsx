@@ -128,23 +128,7 @@ export const VendedorDashboard = () => {
             <CardBody className="p-4">
               <h5 className="fw-bold mb-4">Accesos Directos</h5>
               <Row className="g-3">
-                <Col md="4">
-                  <Button
-                    color="light"
-                    tag={Link}
-                    to="/vendedor/consulta-inventario"
-                    className="w-100 py-4 border-0 shadow-none text-start d-flex align-items-center rounded-4 hover-primary-lite"
-                  >
-                    <div className="p-3 bg-white rounded-circle me-3 shadow-sm text-primary">
-                      <FontAwesomeIcon icon={faBoxes} />
-                    </div>
-                    <div>
-                      <div className="fw-bold d-block">Inventario</div>
-                      <small className="text-muted">Stock y precios</small>
-                    </div>
-                  </Button>
-                </Col>
-                <Col md="4">
+                <Col md="6">
                   <Button
                     color="light"
                     tag={Link}
@@ -160,7 +144,7 @@ export const VendedorDashboard = () => {
                     </div>
                   </Button>
                 </Col>
-                <Col md="4">
+                <Col md="6">
                   <Button
                     color="light"
                     tag={Link}

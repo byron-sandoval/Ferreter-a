@@ -11,7 +11,7 @@ const VendedorRoutes = () => (
   <ErrorBoundaryRoutes>
     <Route index element={<VendedorDashboard />} />
     <Route path="nueva-venta" element={<NuevaVenta />} />
-    <Route path="consulta-inventario" element={<ConsultaInventario />} />
+    {/* <Route path="consulta-inventario" element={<ConsultaInventario />} /> */}
     <Route path="historial-ventas" element={<HistorialVendedor />} />
     <Route path="clientes" element={<GestionClientes />} />
   </ErrorBoundaryRoutes>
