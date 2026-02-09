@@ -115,8 +115,13 @@ export const Sidebar = () => {
               </NavLink>
             </NavItem>
             <NavItem>
+              <NavLink tag={Link} to="/admin/usuarios" style={navLinkStyle}>
+                <FontAwesomeIcon icon={faUserFriends} className="me-3" /> Usuarios (Negocio)
+              </NavLink>
+            </NavItem>
+            <NavItem>
               <NavLink tag={Link} to="/administration/user-management" style={navLinkStyle}>
-                <FontAwesomeIcon icon={faUserFriends} className="me-3" /> Usuarios
+                <FontAwesomeIcon icon={faUsersCog} className="me-3" /> Usuarios (Sistema)
               </NavLink>
             </NavItem>
           </>

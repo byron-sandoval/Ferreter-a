@@ -33,7 +33,7 @@ const AdminPages = Loadable({
   loading: () => loading,
 });
 
-const VendedorPages = Loadable({
+const VentaPages = Loadable({
   loader: () => import(/* webpackChunkName: "vendedor-pages" */ 'app/pages/vendedor/routes'),
   loading: () => loading,
 });
@@ -76,7 +76,7 @@ const AppRoutes = () => {
           path="vendedor/*"
           element={
             <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.VENDEDOR]}>
-              <VendedorPages />
+              <VentaPages />
             </PrivateRoute>
           }
         />

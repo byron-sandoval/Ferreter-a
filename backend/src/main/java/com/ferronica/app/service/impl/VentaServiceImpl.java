@@ -5,7 +5,7 @@ import com.ferronica.app.repository.VentaRepository;
 import com.ferronica.app.service.VentaService;
 import com.ferronica.app.service.dto.VentaDTO;
 import com.ferronica.app.service.mapper.VentaMapper;
-import com.ferronica.app.repository.VendedorRepository;
+import com.ferronica.app.repository.UsuarioRepository;
 import com.ferronica.app.security.SecurityUtils;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -27,17 +27,17 @@ public class VentaServiceImpl implements VentaService {
     private final VentaMapper ventaMapper;
 
     private final com.ferronica.app.repository.NumeracionFacturaRepository numeracionFacturaRepository;
-    private final VendedorRepository vendedorRepository;
+    private final UsuarioRepository usuarioRepository;
 
     public VentaServiceImpl(
             VentaRepository ventaRepository,
             VentaMapper ventaMapper,
             com.ferronica.app.repository.NumeracionFacturaRepository numeracionFacturaRepository,
-            VendedorRepository vendedorRepository) {
+            UsuarioRepository usuarioRepository) {
         this.ventaRepository = ventaRepository;
         this.ventaMapper = ventaMapper;
         this.numeracionFacturaRepository = numeracionFacturaRepository;
-        this.vendedorRepository = vendedorRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Override
@@ -65,9 +65,9 @@ public class VentaServiceImpl implements VentaService {
             venta.setAnulada(false);
         }
 
-        // Automatización de Vendedor por Usuario Autenticado
+        // Automatización de Usuario por Usuario Autenticado
         SecurityUtils.getCurrentUserKeycloakId().ifPresent(idKeycloak -> {
-            vendedorRepository.findByIdKeycloak(idKeycloak).ifPresent(venta::setVendedor);
+            usuarioRepository.findByIdKeycloak(idKeycloak).ifPresent(venta::setUsuario);
         });
 
         Venta savedVenta = ventaRepository.save(venta);

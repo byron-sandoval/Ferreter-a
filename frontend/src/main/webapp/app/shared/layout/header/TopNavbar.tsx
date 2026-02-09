@@ -207,7 +207,7 @@ export const TopNavbar = () => {
             {/* 14. Usuarios */}
             {isAdmin && (
               <NavItem className="nav-link-item">
-                <NavLink tag={Link} to="/admin/vendedores" style={navLinkStyle}>
+                <NavLink tag={Link} to="/admin/usuarios" style={navLinkStyle}>
                   <FontAwesomeIcon icon={faUsers} size="sm" /> Usuarios
                 </NavLink>
               </NavItem>

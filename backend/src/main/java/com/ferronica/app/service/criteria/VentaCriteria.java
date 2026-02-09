@@ -9,12 +9,15 @@ import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
 
 /**
- * Criteria class for the {@link com.ferronica.app.domain.Venta} entity. This class is used
- * in {@link com.ferronica.app.web.rest.VentaResource} to receive all the possible filtering options from
+ * Criteria class for the {@link com.ferronica.app.domain.Venta} entity. This
+ * class is used
+ * in {@link com.ferronica.app.web.rest.VentaResource} to receive all the
+ * possible filtering options from
  * the Http GET request parameters.
  * For example the following could be a valid request:
  * {@code /ventas?id.greaterThan=5&attr1.contains=something&attr2.specified=false}
- * As Spring is unable to properly convert the types, unless specific {@link Filter} class are used, we need to use
+ * As Spring is unable to properly convert the types, unless specific
+ * {@link Filter} class are used, we need to use
  * fix type specific filters.
  */
 @ParameterObject
@@ -26,7 +29,8 @@ public class VentaCriteria implements Serializable, Criteria {
      */
     public static class MetodoPagoEnumFilter extends Filter<MetodoPagoEnum> {
 
-        public MetodoPagoEnumFilter() {}
+        public MetodoPagoEnumFilter() {
+        }
 
         public MetodoPagoEnumFilter(MetodoPagoEnumFilter filter) {
             super(filter);
@@ -68,7 +72,7 @@ public class VentaCriteria implements Serializable, Criteria {
 
     private LongFilter clienteId;
 
-    private LongFilter vendedorId;
+    private LongFilter usuarioId;
 
     private LongFilter monedaId;
 
@@ -76,7 +80,8 @@ public class VentaCriteria implements Serializable, Criteria {
 
     private Boolean distinct;
 
-    public VentaCriteria() {}
+    public VentaCriteria() {
+    }
 
     public VentaCriteria(VentaCriteria other) {
         this.id = other.optionalId().map(LongFilter::copy).orElse(null);
@@ -93,7 +98,7 @@ public class VentaCriteria implements Serializable, Criteria {
         this.anulada = other.optionalAnulada().map(BooleanFilter::copy).orElse(null);
         this.detallesId = other.optionalDetallesId().map(LongFilter::copy).orElse(null);
         this.clienteId = other.optionalClienteId().map(LongFilter::copy).orElse(null);
-        this.vendedorId = other.optionalVendedorId().map(LongFilter::copy).orElse(null);
+        this.usuarioId = other.optionalUsuarioId().map(LongFilter::copy).orElse(null);
         this.monedaId = other.optionalMonedaId().map(LongFilter::copy).orElse(null);
         this.numeracionId = other.optionalNumeracionId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
@@ -370,23 +375,23 @@ public class VentaCriteria implements Serializable, Criteria {
         this.clienteId = clienteId;
     }
 
-    public LongFilter getVendedorId() {
-        return vendedorId;
+    public LongFilter getUsuarioId() {
+        return usuarioId;
     }
 
-    public Optional<LongFilter> optionalVendedorId() {
-        return Optional.ofNullable(vendedorId);
+    public Optional<LongFilter> optionalUsuarioId() {
+        return Optional.ofNullable(usuarioId);
     }
 
-    public LongFilter vendedorId() {
-        if (vendedorId == null) {
-            setVendedorId(new LongFilter());
+    public LongFilter usuarioId() {
+        if (usuarioId == null) {
+            setUsuarioId(new LongFilter());
         }
-        return vendedorId;
+        return usuarioId;
     }
 
-    public void setVendedorId(LongFilter vendedorId) {
-        this.vendedorId = vendedorId;
+    public void setUsuarioId(LongFilter usuarioId) {
+        this.usuarioId = usuarioId;
     }
 
     public LongFilter getMonedaId() {
@@ -455,74 +460,71 @@ public class VentaCriteria implements Serializable, Criteria {
             return false;
         }
         final VentaCriteria that = (VentaCriteria) o;
-        return (
-            Objects.equals(id, that.id) &&
-            Objects.equals(fecha, that.fecha) &&
-            Objects.equals(noFactura, that.noFactura) &&
-            Objects.equals(subtotal, that.subtotal) &&
-            Objects.equals(iva, that.iva) &&
-            Objects.equals(total, that.total) &&
-            Objects.equals(totalEnMonedaBase, that.totalEnMonedaBase) &&
-            Objects.equals(metodoPago, that.metodoPago) &&
-            Objects.equals(stripeId, that.stripeId) &&
-            Objects.equals(esContado, that.esContado) &&
-            Objects.equals(tipoCambioVenta, that.tipoCambioVenta) &&
-            Objects.equals(anulada, that.anulada) &&
-            Objects.equals(detallesId, that.detallesId) &&
-            Objects.equals(clienteId, that.clienteId) &&
-            Objects.equals(vendedorId, that.vendedorId) &&
-            Objects.equals(monedaId, that.monedaId) &&
-            Objects.equals(numeracionId, that.numeracionId) &&
-            Objects.equals(distinct, that.distinct)
-        );
+        return (Objects.equals(id, that.id) &&
+                Objects.equals(fecha, that.fecha) &&
+                Objects.equals(noFactura, that.noFactura) &&
+                Objects.equals(subtotal, that.subtotal) &&
+                Objects.equals(iva, that.iva) &&
+                Objects.equals(total, that.total) &&
+                Objects.equals(totalEnMonedaBase, that.totalEnMonedaBase) &&
+                Objects.equals(metodoPago, that.metodoPago) &&
+                Objects.equals(stripeId, that.stripeId) &&
+                Objects.equals(esContado, that.esContado) &&
+                Objects.equals(tipoCambioVenta, that.tipoCambioVenta) &&
+                Objects.equals(anulada, that.anulada) &&
+                Objects.equals(detallesId, that.detallesId) &&
+                Objects.equals(clienteId, that.clienteId) &&
+                Objects.equals(usuarioId, that.usuarioId) &&
+                Objects.equals(monedaId, that.monedaId) &&
+                Objects.equals(numeracionId, that.numeracionId) &&
+                Objects.equals(distinct, that.distinct));
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-            id,
-            fecha,
-            noFactura,
-            subtotal,
-            iva,
-            total,
-            totalEnMonedaBase,
-            metodoPago,
-            stripeId,
-            esContado,
-            tipoCambioVenta,
-            anulada,
-            detallesId,
-            clienteId,
-            vendedorId,
-            monedaId,
-            numeracionId,
-            distinct
-        );
+                id,
+                fecha,
+                noFactura,
+                subtotal,
+                iva,
+                total,
+                totalEnMonedaBase,
+                metodoPago,
+                stripeId,
+                esContado,
+                tipoCambioVenta,
+                anulada,
+                detallesId,
+                clienteId,
+                usuarioId,
+                monedaId,
+                numeracionId,
+                distinct);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "VentaCriteria{" +
-            optionalId().map(f -> "id=" + f + ", ").orElse("") +
-            optionalFecha().map(f -> "fecha=" + f + ", ").orElse("") +
-            optionalNoFactura().map(f -> "noFactura=" + f + ", ").orElse("") +
-            optionalSubtotal().map(f -> "subtotal=" + f + ", ").orElse("") +
-            optionalIva().map(f -> "iva=" + f + ", ").orElse("") +
-            optionalTotal().map(f -> "total=" + f + ", ").orElse("") +
-            optionalTotalEnMonedaBase().map(f -> "totalEnMonedaBase=" + f + ", ").orElse("") +
-            optionalMetodoPago().map(f -> "metodoPago=" + f + ", ").orElse("") +
-            optionalStripeId().map(f -> "stripeId=" + f + ", ").orElse("") +
-            optionalEsContado().map(f -> "esContado=" + f + ", ").orElse("") +
-            optionalTipoCambioVenta().map(f -> "tipoCambioVenta=" + f + ", ").orElse("") +
-            optionalAnulada().map(f -> "anulada=" + f + ", ").orElse("") +
-            optionalDetallesId().map(f -> "detallesId=" + f + ", ").orElse("") +
-            optionalClienteId().map(f -> "clienteId=" + f + ", ").orElse("") +
-            optionalVendedorId().map(f -> "vendedorId=" + f + ", ").orElse("") +
-            optionalMonedaId().map(f -> "monedaId=" + f + ", ").orElse("") +
-            optionalNumeracionId().map(f -> "numeracionId=" + f + ", ").orElse("") +
-            optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
-        "}";
+                optionalId().map(f -> "id=" + f + ", ").orElse("") +
+                optionalFecha().map(f -> "fecha=" + f + ", ").orElse("") +
+                optionalNoFactura().map(f -> "noFactura=" + f + ", ").orElse("") +
+                optionalSubtotal().map(f -> "subtotal=" + f + ", ").orElse("") +
+                optionalIva().map(f -> "iva=" + f + ", ").orElse("") +
+                optionalTotal().map(f -> "total=" + f + ", ").orElse("") +
+                optionalTotalEnMonedaBase().map(f -> "totalEnMonedaBase=" + f + ", ").orElse("") +
+                optionalMetodoPago().map(f -> "metodoPago=" + f + ", ").orElse("") +
+                optionalStripeId().map(f -> "stripeId=" + f + ", ").orElse("") +
+                optionalEsContado().map(f -> "esContado=" + f + ", ").orElse("") +
+                optionalTipoCambioVenta().map(f -> "tipoCambioVenta=" + f + ", ").orElse("") +
+                optionalAnulada().map(f -> "anulada=" + f + ", ").orElse("") +
+                optionalDetallesId().map(f -> "detallesId=" + f + ", ").orElse("") +
+                optionalClienteId().map(f -> "clienteId=" + f + ", ").orElse("") +
+                optionalUsuarioId().map(f -> "usuarioId=" + f + ", ").orElse("") +
+                optionalMonedaId().map(f -> "monedaId=" + f + ", ").orElse("") +
+                optionalNumeracionId().map(f -> "numeracionId=" + f + ", ").orElse("") +
+                optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
+                "}";
     }
 }

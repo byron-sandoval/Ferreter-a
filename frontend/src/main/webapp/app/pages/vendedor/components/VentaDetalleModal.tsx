@@ -225,8 +225,8 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                   <span>{dayjs(venta.fecha).format('DD/MM/YYYY')}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                  <strong>VENDEDOR:</strong>
-                  <span>{venta.vendedor?.nombre || 'Administrador'}</span>
+                  <strong>USUARIO:</strong>
+                  <span>{venta.usuario?.nombre || 'Administrador'}</span>
                 </div>
               </div>
             </div>

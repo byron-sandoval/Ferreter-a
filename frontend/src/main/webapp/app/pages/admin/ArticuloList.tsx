@@ -22,6 +22,7 @@ import {
   faChevronRight,
 } from '@fortawesome/free-solid-svg-icons';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
+import * as XLSX from 'xlsx';
 
 export const ArticuloList = () => {
   const [articulos, setArticulos] = useState<IArticulo[]>([]);
@@ -88,6 +89,90 @@ export const ArticuloList = () => {
       .catch(() => setLoadingHistory(false));
   };
 
+  const exportToExcel = () => {
+    if (!selectedArticulo) return;
+
+    // Preparar datos para exportar
+    const data = [
+      { Campo: 'ID', Valor: selectedArticulo.id },
+      { Campo: 'Código', Valor: selectedArticulo.codigo },
+      { Campo: 'Nombre', Valor: selectedArticulo.nombre },
+      { Campo: 'Descripción', Valor: selectedArticulo.descripcion || 'Sin descripción' },
+      { Campo: 'Categoría', Valor: selectedArticulo.categoria?.nombre || 'General' },
+      { Campo: 'Estado', Valor: selectedArticulo.activo ? 'Activo' : 'Inactivo' },
+      { Campo: '', Valor: '' }, // Línea en blanco
+      { Campo: 'PRECIOS', Valor: '' },
+      { Campo: 'Precio de Compra', Valor: `C$ ${selectedArticulo.costo?.toFixed(2)}` },
+      { Campo: 'Precio de Venta', Valor: `C$ ${selectedArticulo.precio?.toFixed(2)}` },
+      { Campo: '', Valor: '' }, // Línea en blanco
+      { Campo: 'INVENTARIO', Valor: '' },
+      { Campo: 'Stock Actual', Valor: `${selectedArticulo.existencia} ${selectedArticulo.unidadMedida?.simbolo || ''}` },
+      { Campo: 'Stock Mínimo', Valor: selectedArticulo.existenciaMinima },
+      { Campo: 'Unidad de Medida', Valor: selectedArticulo.unidadMedida?.nombre || 'N/A' },
+      { Campo: '', Valor: '' }, // Línea en blanco
+      { Campo: 'VALORES TOTALES', Valor: '' },
+      { Campo: 'Inversión Total (Costo)', Valor: `C$ ${((selectedArticulo.existencia || 0) * (selectedArticulo.costo || 0)).toFixed(2)}` },
+      { Campo: 'Valor Total (Venta)', Valor: `C$ ${((selectedArticulo.existencia || 0) * (selectedArticulo.precio || 0)).toFixed(2)}` },
+    ];
+
+    // Crear libro de trabajo
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Producto');
+
+    // Ajustar ancho de columnas
+    ws['!cols'] = [{ wch: 25 }, { wch: 40 }];
+
+    // Generar archivo
+    const fileName = `Producto_${selectedArticulo.codigo}_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+  };
+
+  const exportAllToExcel = () => {
+    // Preparar datos de todos los productos filtrados
+    const data = articulosFiltrados.map(articulo => ({
+      ID: articulo.id,
+      Código: articulo.codigo,
+      Producto: articulo.nombre,
+      Estado: articulo.activo ? 'Activo' : 'Inactivo',
+      Stock: articulo.existencia,
+      'Stock Mínimo': articulo.existenciaMinima,
+      'Unidad': articulo.unidadMedida?.simbolo || '',
+      'Precio Compra': articulo.costo?.toFixed(2),
+      'Precio Venta': articulo.precio?.toFixed(2),
+      'Inversión Total': ((articulo.existencia || 0) * (articulo.costo || 0)).toFixed(2),
+      'Valor Total': ((articulo.existencia || 0) * (articulo.precio || 0)).toFixed(2),
+      Categoría: articulo.categoria?.nombre || 'General',
+      Descripción: articulo.descripcion || '',
+    }));
+
+    // Crear libro de trabajo
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
+
+    // Ajustar ancho de columnas
+    ws['!cols'] = [
+      { wch: 8 },  // ID
+      { wch: 15 }, // Código
+      { wch: 30 }, // Producto
+      { wch: 10 }, // Estado
+      { wch: 10 }, // Stock
+      { wch: 12 }, // Stock Mínimo
+      { wch: 10 }, // Unidad
+      { wch: 15 }, // Precio Compra
+      { wch: 15 }, // Precio Venta
+      { wch: 15 }, // Inversión Total
+      { wch: 15 }, // Valor Total
+      { wch: 20 }, // Categoría
+      { wch: 40 }, // Descripción
+    ];
+
+    // Generar archivo
+    const fileName = `Inventario_Completo_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+  };
+
   // Estilos "INASOFTWARE" Style
   const headerStyle = { backgroundColor: 'rgba(111, 66, 193, 1)', color: 'white' }; // Purple header from image
   const subHeaderStyle = { backgroundColor: '#343a40', color: 'white', fontSize: '0.85rem' };
@@ -116,6 +201,9 @@ export const ArticuloList = () => {
               <FontAwesomeIcon icon={faSearch} />
             </span>
           </div>
+          <Button color="success" size="sm" className="opacity-90" onClick={exportAllToExcel}>
+            <FontAwesomeIcon icon={faFileExcel} className="me-2" /> Exportar Todo
+          </Button>
           <Button color="secondary" size="sm" className="opacity-75" onClick={loadAll}>
             <FontAwesomeIcon icon={faSync} spin={loading} /> Restablecer
           </Button>
@@ -284,7 +372,7 @@ export const ArticuloList = () => {
                 <Button size="sm" color="info" outline onClick={() => loadHistorial(selectedArticulo.id)}>
                   <FontAwesomeIcon icon={faHistory} className="me-2" /> Historial
                 </Button>
-                <Button size="sm" color="success" outline>
+                <Button size="sm" color="success" outline onClick={exportToExcel}>
                   <FontAwesomeIcon icon={faFileExcel} className="me-2" /> Exportar
                 </Button>
                 <Button size="sm" color="secondary" className="ms-2" onClick={() => setSelectedArticulo(null)}>

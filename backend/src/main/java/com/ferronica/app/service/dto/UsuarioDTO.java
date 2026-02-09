@@ -5,14 +5,13 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * A DTO for the {@link com.ferronica.app.domain.Vendedor} entity.
+ * A DTO for the {@link com.ferronica.app.domain.Usuario} entity.
  */
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class VendedorDTO implements Serializable {
+public class UsuarioDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
     private String idKeycloak;
 
     @NotNull
@@ -30,6 +29,12 @@ public class VendedorDTO implements Serializable {
     private String telefono;
 
     private Boolean activo;
+
+    private String email;
+
+    private String password;
+
+    private String rol;
 
     public Long getId() {
         return id;
@@ -87,20 +92,44 @@ public class VendedorDTO implements Serializable {
         this.activo = activo;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getRol() {
+        return rol;
+    }
+
+    public void setRol(String rol) {
+        this.rol = rol;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof VendedorDTO)) {
+        if (!(o instanceof UsuarioDTO)) {
             return false;
         }
 
-        VendedorDTO vendedorDTO = (VendedorDTO) o;
+        UsuarioDTO usuarioDTO = (UsuarioDTO) o;
         if (this.id == null) {
             return false;
         }
-        return Objects.equals(this.id, vendedorDTO.id);
+        return Objects.equals(this.id, usuarioDTO.id);
     }
 
     @Override
@@ -111,14 +140,17 @@ public class VendedorDTO implements Serializable {
     // prettier-ignore
     @Override
     public String toString() {
-        return "VendedorDTO{" +
-            "id=" + getId() +
-            ", idKeycloak='" + getIdKeycloak() + "'" +
-            ", cedula='" + getCedula() + "'" +
-            ", nombre='" + getNombre() + "'" +
-            ", apellido='" + getApellido() + "'" +
-            ", telefono='" + getTelefono() + "'" +
-            ", activo='" + getActivo() + "'" +
-            "}";
+        return "UsuarioDTO{" +
+                "id=" + getId() +
+                ", idKeycloak='" + getIdKeycloak() + "'" +
+                ", cedula='" + getCedula() + "'" +
+                ", nombre='" + getNombre() + "'" +
+                ", apellido='" + getApellido() + "'" +
+                ", telefono='" + getTelefono() + "'" +
+                ", activo='" + getActivo() + "'" +
+                ", email='" + getEmail() + "'" +
+                ", password='" + (getPassword() != null ? "*****" : "null") + "'" +
+                ", rol='" + getRol() + "'" +
+                "}";
     }
 }

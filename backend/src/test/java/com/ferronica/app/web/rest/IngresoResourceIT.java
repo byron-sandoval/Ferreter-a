@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ferronica.app.IntegrationTest;
 import com.ferronica.app.domain.Ingreso;
 import com.ferronica.app.domain.Proveedor;
-import com.ferronica.app.domain.Vendedor;
+import com.ferronica.app.domain.Usuario;
 import com.ferronica.app.repository.IngresoRepository;
 import com.ferronica.app.service.dto.IngresoDTO;
 import com.ferronica.app.service.mapper.IngresoMapper;
@@ -90,11 +90,11 @@ class IngresoResourceIT {
      */
     public static Ingreso createEntity() {
         return new Ingreso()
-            .fecha(DEFAULT_FECHA)
-            .noDocumento(DEFAULT_NO_DOCUMENTO)
-            .total(DEFAULT_TOTAL)
-            .observaciones(DEFAULT_OBSERVACIONES)
-            .activo(DEFAULT_ACTIVO);
+                .fecha(DEFAULT_FECHA)
+                .noDocumento(DEFAULT_NO_DOCUMENTO)
+                .total(DEFAULT_TOTAL)
+                .observaciones(DEFAULT_OBSERVACIONES)
+                .activo(DEFAULT_ACTIVO);
     }
 
     /**
@@ -105,11 +105,11 @@ class IngresoResourceIT {
      */
     public static Ingreso createUpdatedEntity() {
         return new Ingreso()
-            .fecha(UPDATED_FECHA)
-            .noDocumento(UPDATED_NO_DOCUMENTO)
-            .total(UPDATED_TOTAL)
-            .observaciones(UPDATED_OBSERVACIONES)
-            .activo(UPDATED_ACTIVO);
+                .fecha(UPDATED_FECHA)
+                .noDocumento(UPDATED_NO_DOCUMENTO)
+                .total(UPDATED_TOTAL)
+                .observaciones(UPDATED_OBSERVACIONES)
+                .activo(UPDATED_ACTIVO);
     }
 
     @BeforeEach
@@ -132,16 +132,15 @@ class IngresoResourceIT {
         // Create the Ingreso
         IngresoDTO ingresoDTO = ingresoMapper.toDto(ingreso);
         var returnedIngresoDTO = om.readValue(
-            restIngresoMockMvc
-                .perform(
-                    post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(ingresoDTO))
-                )
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getContentAsString(),
-            IngresoDTO.class
-        );
+                restIngresoMockMvc
+                        .perform(
+                                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                                        .content(om.writeValueAsBytes(ingresoDTO)))
+                        .andExpect(status().isCreated())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString(),
+                IngresoDTO.class);
 
         // Validate the Ingreso in the database
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
@@ -162,8 +161,9 @@ class IngresoResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restIngresoMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(ingresoDTO)))
-            .andExpect(status().isBadRequest());
+                .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(ingresoDTO)))
+                .andExpect(status().isBadRequest());
 
         // Validate the Ingreso in the database
         assertSameRepositoryCount(databaseSizeBeforeCreate);
@@ -180,8 +180,9 @@ class IngresoResourceIT {
         IngresoDTO ingresoDTO = ingresoMapper.toDto(ingreso);
 
         restIngresoMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(ingresoDTO)))
-            .andExpect(status().isBadRequest());
+                .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(ingresoDTO)))
+                .andExpect(status().isBadRequest());
 
         assertSameRepositoryCount(databaseSizeBeforeTest);
     }
@@ -197,8 +198,9 @@ class IngresoResourceIT {
         IngresoDTO ingresoDTO = ingresoMapper.toDto(ingreso);
 
         restIngresoMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(ingresoDTO)))
-            .andExpect(status().isBadRequest());
+                .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(ingresoDTO)))
+                .andExpect(status().isBadRequest());
 
         assertSameRepositoryCount(databaseSizeBeforeTest);
     }
@@ -214,8 +216,9 @@ class IngresoResourceIT {
         IngresoDTO ingresoDTO = ingresoMapper.toDto(ingreso);
 
         restIngresoMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(ingresoDTO)))
-            .andExpect(status().isBadRequest());
+                .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(ingresoDTO)))
+                .andExpect(status().isBadRequest());
 
         assertSameRepositoryCount(databaseSizeBeforeTest);
     }
@@ -228,15 +231,15 @@ class IngresoResourceIT {
 
         // Get all the ingresoList
         restIngresoMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(ingreso.getId().intValue())))
-            .andExpect(jsonPath("$.[*].fecha").value(hasItem(DEFAULT_FECHA.toString())))
-            .andExpect(jsonPath("$.[*].noDocumento").value(hasItem(DEFAULT_NO_DOCUMENTO)))
-            .andExpect(jsonPath("$.[*].total").value(hasItem(sameNumber(DEFAULT_TOTAL))))
-            .andExpect(jsonPath("$.[*].observaciones").value(hasItem(DEFAULT_OBSERVACIONES)))
-            .andExpect(jsonPath("$.[*].activo").value(hasItem(DEFAULT_ACTIVO)));
+                .perform(get(ENTITY_API_URL + "?sort=id,desc"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.[*].id").value(hasItem(ingreso.getId().intValue())))
+                .andExpect(jsonPath("$.[*].fecha").value(hasItem(DEFAULT_FECHA.toString())))
+                .andExpect(jsonPath("$.[*].noDocumento").value(hasItem(DEFAULT_NO_DOCUMENTO)))
+                .andExpect(jsonPath("$.[*].total").value(hasItem(sameNumber(DEFAULT_TOTAL))))
+                .andExpect(jsonPath("$.[*].observaciones").value(hasItem(DEFAULT_OBSERVACIONES)))
+                .andExpect(jsonPath("$.[*].activo").value(hasItem(DEFAULT_ACTIVO)));
     }
 
     @Test
@@ -247,15 +250,15 @@ class IngresoResourceIT {
 
         // Get the ingreso
         restIngresoMockMvc
-            .perform(get(ENTITY_API_URL_ID, ingreso.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.id").value(ingreso.getId().intValue()))
-            .andExpect(jsonPath("$.fecha").value(DEFAULT_FECHA.toString()))
-            .andExpect(jsonPath("$.noDocumento").value(DEFAULT_NO_DOCUMENTO))
-            .andExpect(jsonPath("$.total").value(sameNumber(DEFAULT_TOTAL)))
-            .andExpect(jsonPath("$.observaciones").value(DEFAULT_OBSERVACIONES))
-            .andExpect(jsonPath("$.activo").value(DEFAULT_ACTIVO));
+                .perform(get(ENTITY_API_URL_ID, ingreso.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.id").value(ingreso.getId().intValue()))
+                .andExpect(jsonPath("$.fecha").value(DEFAULT_FECHA.toString()))
+                .andExpect(jsonPath("$.noDocumento").value(DEFAULT_NO_DOCUMENTO))
+                .andExpect(jsonPath("$.total").value(sameNumber(DEFAULT_TOTAL)))
+                .andExpect(jsonPath("$.observaciones").value(DEFAULT_OBSERVACIONES))
+                .andExpect(jsonPath("$.activo").value(DEFAULT_ACTIVO));
     }
 
     @Test
@@ -310,7 +313,8 @@ class IngresoResourceIT {
         insertedIngreso = ingresoRepository.saveAndFlush(ingreso);
 
         // Get all the ingresoList where noDocumento equals to
-        defaultIngresoFiltering("noDocumento.equals=" + DEFAULT_NO_DOCUMENTO, "noDocumento.equals=" + UPDATED_NO_DOCUMENTO);
+        defaultIngresoFiltering("noDocumento.equals=" + DEFAULT_NO_DOCUMENTO,
+                "noDocumento.equals=" + UPDATED_NO_DOCUMENTO);
     }
 
     @Test
@@ -321,9 +325,8 @@ class IngresoResourceIT {
 
         // Get all the ingresoList where noDocumento in
         defaultIngresoFiltering(
-            "noDocumento.in=" + DEFAULT_NO_DOCUMENTO + "," + UPDATED_NO_DOCUMENTO,
-            "noDocumento.in=" + UPDATED_NO_DOCUMENTO
-        );
+                "noDocumento.in=" + DEFAULT_NO_DOCUMENTO + "," + UPDATED_NO_DOCUMENTO,
+                "noDocumento.in=" + UPDATED_NO_DOCUMENTO);
     }
 
     @Test
@@ -343,7 +346,8 @@ class IngresoResourceIT {
         insertedIngreso = ingresoRepository.saveAndFlush(ingreso);
 
         // Get all the ingresoList where noDocumento contains
-        defaultIngresoFiltering("noDocumento.contains=" + DEFAULT_NO_DOCUMENTO, "noDocumento.contains=" + UPDATED_NO_DOCUMENTO);
+        defaultIngresoFiltering("noDocumento.contains=" + DEFAULT_NO_DOCUMENTO,
+                "noDocumento.contains=" + UPDATED_NO_DOCUMENTO);
     }
 
     @Test
@@ -353,7 +357,8 @@ class IngresoResourceIT {
         insertedIngreso = ingresoRepository.saveAndFlush(ingreso);
 
         // Get all the ingresoList where noDocumento does not contain
-        defaultIngresoFiltering("noDocumento.doesNotContain=" + UPDATED_NO_DOCUMENTO, "noDocumento.doesNotContain=" + DEFAULT_NO_DOCUMENTO);
+        defaultIngresoFiltering("noDocumento.doesNotContain=" + UPDATED_NO_DOCUMENTO,
+                "noDocumento.doesNotContain=" + DEFAULT_NO_DOCUMENTO);
     }
 
     @Test
@@ -393,7 +398,8 @@ class IngresoResourceIT {
         insertedIngreso = ingresoRepository.saveAndFlush(ingreso);
 
         // Get all the ingresoList where total is greater than or equal to
-        defaultIngresoFiltering("total.greaterThanOrEqual=" + DEFAULT_TOTAL, "total.greaterThanOrEqual=" + UPDATED_TOTAL);
+        defaultIngresoFiltering("total.greaterThanOrEqual=" + DEFAULT_TOTAL,
+                "total.greaterThanOrEqual=" + UPDATED_TOTAL);
     }
 
     @Test
@@ -433,7 +439,8 @@ class IngresoResourceIT {
         insertedIngreso = ingresoRepository.saveAndFlush(ingreso);
 
         // Get all the ingresoList where observaciones equals to
-        defaultIngresoFiltering("observaciones.equals=" + DEFAULT_OBSERVACIONES, "observaciones.equals=" + UPDATED_OBSERVACIONES);
+        defaultIngresoFiltering("observaciones.equals=" + DEFAULT_OBSERVACIONES,
+                "observaciones.equals=" + UPDATED_OBSERVACIONES);
     }
 
     @Test
@@ -444,9 +451,8 @@ class IngresoResourceIT {
 
         // Get all the ingresoList where observaciones in
         defaultIngresoFiltering(
-            "observaciones.in=" + DEFAULT_OBSERVACIONES + "," + UPDATED_OBSERVACIONES,
-            "observaciones.in=" + UPDATED_OBSERVACIONES
-        );
+                "observaciones.in=" + DEFAULT_OBSERVACIONES + "," + UPDATED_OBSERVACIONES,
+                "observaciones.in=" + UPDATED_OBSERVACIONES);
     }
 
     @Test
@@ -466,7 +472,8 @@ class IngresoResourceIT {
         insertedIngreso = ingresoRepository.saveAndFlush(ingreso);
 
         // Get all the ingresoList where observaciones contains
-        defaultIngresoFiltering("observaciones.contains=" + DEFAULT_OBSERVACIONES, "observaciones.contains=" + UPDATED_OBSERVACIONES);
+        defaultIngresoFiltering("observaciones.contains=" + DEFAULT_OBSERVACIONES,
+                "observaciones.contains=" + UPDATED_OBSERVACIONES);
     }
 
     @Test
@@ -477,9 +484,8 @@ class IngresoResourceIT {
 
         // Get all the ingresoList where observaciones does not contain
         defaultIngresoFiltering(
-            "observaciones.doesNotContain=" + UPDATED_OBSERVACIONES,
-            "observaciones.doesNotContain=" + DEFAULT_OBSERVACIONES
-        );
+                "observaciones.doesNotContain=" + UPDATED_OBSERVACIONES,
+                "observaciones.doesNotContain=" + DEFAULT_OBSERVACIONES);
     }
 
     @Test
@@ -514,24 +520,24 @@ class IngresoResourceIT {
 
     @Test
     @Transactional
-    void getAllIngresosByVendedorIsEqualToSomething() throws Exception {
-        Vendedor vendedor;
-        if (TestUtil.findAll(em, Vendedor.class).isEmpty()) {
+    void getAllIngresosByUsuarioIsEqualToSomething() throws Exception {
+        Usuario usuario;
+        if (TestUtil.findAll(em, Usuario.class).isEmpty()) {
             ingresoRepository.saveAndFlush(ingreso);
-            vendedor = VendedorResourceIT.createEntity();
+            usuario = UsuarioResourceIT.createEntity();
         } else {
-            vendedor = TestUtil.findAll(em, Vendedor.class).get(0);
+            usuario = TestUtil.findAll(em, Usuario.class).get(0);
         }
-        em.persist(vendedor);
+        em.persist(usuario);
         em.flush();
-        ingreso.setVendedor(vendedor);
+        ingreso.setUsuario(usuario);
         ingresoRepository.saveAndFlush(ingreso);
-        Long vendedorId = vendedor.getId();
-        // Get all the ingresoList where vendedor equals to vendedorId
-        defaultIngresoShouldBeFound("vendedorId.equals=" + vendedorId);
+        Long usuarioId = usuario.getId();
+        // Get all the ingresoList where usuario equals to usuarioId
+        defaultIngresoShouldBeFound("usuarioId.equals=" + usuarioId);
 
-        // Get all the ingresoList where vendedor equals to (vendedorId + 1)
-        defaultIngresoShouldNotBeFound("vendedorId.equals=" + (vendedorId + 1));
+        // Get all the ingresoList where usuario equals to (usuarioId + 1)
+        defaultIngresoShouldNotBeFound("usuarioId.equals=" + (usuarioId + 1));
     }
 
     @Test
@@ -566,22 +572,22 @@ class IngresoResourceIT {
      */
     private void defaultIngresoShouldBeFound(String filter) throws Exception {
         restIngresoMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(ingreso.getId().intValue())))
-            .andExpect(jsonPath("$.[*].fecha").value(hasItem(DEFAULT_FECHA.toString())))
-            .andExpect(jsonPath("$.[*].noDocumento").value(hasItem(DEFAULT_NO_DOCUMENTO)))
-            .andExpect(jsonPath("$.[*].total").value(hasItem(sameNumber(DEFAULT_TOTAL))))
-            .andExpect(jsonPath("$.[*].observaciones").value(hasItem(DEFAULT_OBSERVACIONES)))
-            .andExpect(jsonPath("$.[*].activo").value(hasItem(DEFAULT_ACTIVO)));
+                .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.[*].id").value(hasItem(ingreso.getId().intValue())))
+                .andExpect(jsonPath("$.[*].fecha").value(hasItem(DEFAULT_FECHA.toString())))
+                .andExpect(jsonPath("$.[*].noDocumento").value(hasItem(DEFAULT_NO_DOCUMENTO)))
+                .andExpect(jsonPath("$.[*].total").value(hasItem(sameNumber(DEFAULT_TOTAL))))
+                .andExpect(jsonPath("$.[*].observaciones").value(hasItem(DEFAULT_OBSERVACIONES)))
+                .andExpect(jsonPath("$.[*].activo").value(hasItem(DEFAULT_ACTIVO)));
 
         // Check, that the count call also returns 1
         restIngresoMockMvc
-            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(content().string("1"));
+                .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().string("1"));
     }
 
     /**
@@ -589,18 +595,18 @@ class IngresoResourceIT {
      */
     private void defaultIngresoShouldNotBeFound(String filter) throws Exception {
         restIngresoMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$").isArray())
-            .andExpect(jsonPath("$").isEmpty());
+                .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
 
         // Check, that the count call also returns 0
         restIngresoMockMvc
-            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(content().string("0"));
+                .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().string("0"));
     }
 
     @Test
@@ -620,24 +626,24 @@ class IngresoResourceIT {
 
         // Update the ingreso
         Ingreso updatedIngreso = ingresoRepository.findById(ingreso.getId()).orElseThrow();
-        // Disconnect from session so that the updates on updatedIngreso are not directly saved in db
+        // Disconnect from session so that the updates on updatedIngreso are not
+        // directly saved in db
         em.detach(updatedIngreso);
         updatedIngreso
-            .fecha(UPDATED_FECHA)
-            .noDocumento(UPDATED_NO_DOCUMENTO)
-            .total(UPDATED_TOTAL)
-            .observaciones(UPDATED_OBSERVACIONES)
-            .activo(UPDATED_ACTIVO);
+                .fecha(UPDATED_FECHA)
+                .noDocumento(UPDATED_NO_DOCUMENTO)
+                .total(UPDATED_TOTAL)
+                .observaciones(UPDATED_OBSERVACIONES)
+                .activo(UPDATED_ACTIVO);
         IngresoDTO ingresoDTO = ingresoMapper.toDto(updatedIngreso);
 
         restIngresoMockMvc
-            .perform(
-                put(ENTITY_API_URL_ID, ingresoDTO.getId())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(ingresoDTO))
-            )
-            .andExpect(status().isOk());
+                .perform(
+                        put(ENTITY_API_URL_ID, ingresoDTO.getId())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(om.writeValueAsBytes(ingresoDTO)))
+                .andExpect(status().isOk());
 
         // Validate the Ingreso in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
@@ -655,13 +661,12 @@ class IngresoResourceIT {
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restIngresoMockMvc
-            .perform(
-                put(ENTITY_API_URL_ID, ingresoDTO.getId())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(ingresoDTO))
-            )
-            .andExpect(status().isBadRequest());
+                .perform(
+                        put(ENTITY_API_URL_ID, ingresoDTO.getId())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(om.writeValueAsBytes(ingresoDTO)))
+                .andExpect(status().isBadRequest());
 
         // Validate the Ingreso in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
@@ -678,13 +683,12 @@ class IngresoResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restIngresoMockMvc
-            .perform(
-                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(ingresoDTO))
-            )
-            .andExpect(status().isBadRequest());
+                .perform(
+                        put(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(om.writeValueAsBytes(ingresoDTO)))
+                .andExpect(status().isBadRequest());
 
         // Validate the Ingreso in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
@@ -701,8 +705,9 @@ class IngresoResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restIngresoMockMvc
-            .perform(put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(ingresoDTO)))
-            .andExpect(status().isMethodNotAllowed());
+                .perform(put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(ingresoDTO)))
+                .andExpect(status().isMethodNotAllowed());
 
         // Validate the Ingreso in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
@@ -721,24 +726,24 @@ class IngresoResourceIT {
         partialUpdatedIngreso.setId(ingreso.getId());
 
         partialUpdatedIngreso
-            .fecha(UPDATED_FECHA)
-            .noDocumento(UPDATED_NO_DOCUMENTO)
-            .observaciones(UPDATED_OBSERVACIONES)
-            .activo(UPDATED_ACTIVO);
+                .fecha(UPDATED_FECHA)
+                .noDocumento(UPDATED_NO_DOCUMENTO)
+                .observaciones(UPDATED_OBSERVACIONES)
+                .activo(UPDATED_ACTIVO);
 
         restIngresoMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, partialUpdatedIngreso.getId())
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(partialUpdatedIngreso))
-            )
-            .andExpect(status().isOk());
+                .perform(
+                        patch(ENTITY_API_URL_ID, partialUpdatedIngreso.getId())
+                                .with(csrf())
+                                .contentType("application/merge-patch+json")
+                                .content(om.writeValueAsBytes(partialUpdatedIngreso)))
+                .andExpect(status().isOk());
 
         // Validate the Ingreso in the database
 
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
-        assertIngresoUpdatableFieldsEquals(createUpdateProxyForBean(partialUpdatedIngreso, ingreso), getPersistedIngreso(ingreso));
+        assertIngresoUpdatableFieldsEquals(createUpdateProxyForBean(partialUpdatedIngreso, ingreso),
+                getPersistedIngreso(ingreso));
     }
 
     @Test
@@ -754,20 +759,19 @@ class IngresoResourceIT {
         partialUpdatedIngreso.setId(ingreso.getId());
 
         partialUpdatedIngreso
-            .fecha(UPDATED_FECHA)
-            .noDocumento(UPDATED_NO_DOCUMENTO)
-            .total(UPDATED_TOTAL)
-            .observaciones(UPDATED_OBSERVACIONES)
-            .activo(UPDATED_ACTIVO);
+                .fecha(UPDATED_FECHA)
+                .noDocumento(UPDATED_NO_DOCUMENTO)
+                .total(UPDATED_TOTAL)
+                .observaciones(UPDATED_OBSERVACIONES)
+                .activo(UPDATED_ACTIVO);
 
         restIngresoMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, partialUpdatedIngreso.getId())
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(partialUpdatedIngreso))
-            )
-            .andExpect(status().isOk());
+                .perform(
+                        patch(ENTITY_API_URL_ID, partialUpdatedIngreso.getId())
+                                .with(csrf())
+                                .contentType("application/merge-patch+json")
+                                .content(om.writeValueAsBytes(partialUpdatedIngreso)))
+                .andExpect(status().isOk());
 
         // Validate the Ingreso in the database
 
@@ -786,13 +790,12 @@ class IngresoResourceIT {
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restIngresoMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, ingresoDTO.getId())
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(ingresoDTO))
-            )
-            .andExpect(status().isBadRequest());
+                .perform(
+                        patch(ENTITY_API_URL_ID, ingresoDTO.getId())
+                                .with(csrf())
+                                .contentType("application/merge-patch+json")
+                                .content(om.writeValueAsBytes(ingresoDTO)))
+                .andExpect(status().isBadRequest());
 
         // Validate the Ingreso in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
@@ -809,13 +812,12 @@ class IngresoResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restIngresoMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(ingresoDTO))
-            )
-            .andExpect(status().isBadRequest());
+                .perform(
+                        patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                                .with(csrf())
+                                .contentType("application/merge-patch+json")
+                                .content(om.writeValueAsBytes(ingresoDTO)))
+                .andExpect(status().isBadRequest());
 
         // Validate the Ingreso in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
@@ -832,10 +834,10 @@ class IngresoResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restIngresoMockMvc
-            .perform(
-                patch(ENTITY_API_URL).with(csrf()).contentType("application/merge-patch+json").content(om.writeValueAsBytes(ingresoDTO))
-            )
-            .andExpect(status().isMethodNotAllowed());
+                .perform(
+                        patch(ENTITY_API_URL).with(csrf()).contentType("application/merge-patch+json")
+                                .content(om.writeValueAsBytes(ingresoDTO)))
+                .andExpect(status().isMethodNotAllowed());
 
         // Validate the Ingreso in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
@@ -851,8 +853,8 @@ class IngresoResourceIT {
 
         // Delete the ingreso
         restIngresoMockMvc
-            .perform(delete(ENTITY_API_URL_ID, ingreso.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNoContent());
+                .perform(delete(ENTITY_API_URL_ID, ingreso.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
         assertDecrementedRepositoryCount(databaseSizeBeforeDelete);

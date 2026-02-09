@@ -42,7 +42,7 @@ public class DetalleIngreso implements Serializable {
     private Articulo articulo;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "detalles", "vendedor", "proveedor" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "detalles", "usuario", "proveedor" }, allowSetters = true)
     private Ingreso ingreso;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -125,7 +125,8 @@ public class DetalleIngreso implements Serializable {
         return this;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and
+    // setters here
 
     @Override
     public boolean equals(Object o) {
@@ -140,7 +141,8 @@ public class DetalleIngreso implements Serializable {
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        // see
+        // https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 
@@ -148,10 +150,10 @@ public class DetalleIngreso implements Serializable {
     @Override
     public String toString() {
         return "DetalleIngreso{" +
-            "id=" + getId() +
-            ", cantidad=" + getCantidad() +
-            ", costoUnitario=" + getCostoUnitario() +
-            ", monto=" + getMonto() +
-            "}";
+                "id=" + getId() +
+                ", cantidad=" + getCantidad() +
+                ", costoUnitario=" + getCostoUnitario() +
+                ", monto=" + getMonto() +
+                "}";
     }
 }

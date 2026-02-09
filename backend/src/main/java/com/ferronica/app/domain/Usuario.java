@@ -5,12 +5,12 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 
 /**
- * A Vendedor.
+ * A Usuario.
  */
 @Entity
-@Table(name = "vendedor")
+@Table(name = "usuario")
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class Vendedor implements Serializable {
+public class Usuario implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -20,8 +20,7 @@ public class Vendedor implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @NotNull
-    @Column(name = "id_keycloak", nullable = false, unique = true)
+    @Column(name = "id_keycloak", unique = true)
     private String idKeycloak;
 
     @NotNull
@@ -51,7 +50,7 @@ public class Vendedor implements Serializable {
         return this.id;
     }
 
-    public Vendedor id(Long id) {
+    public Usuario id(Long id) {
         this.setId(id);
         return this;
     }
@@ -64,7 +63,7 @@ public class Vendedor implements Serializable {
         return this.idKeycloak;
     }
 
-    public Vendedor idKeycloak(String idKeycloak) {
+    public Usuario idKeycloak(String idKeycloak) {
         this.setIdKeycloak(idKeycloak);
         return this;
     }
@@ -77,7 +76,7 @@ public class Vendedor implements Serializable {
         return this.cedula;
     }
 
-    public Vendedor cedula(String cedula) {
+    public Usuario cedula(String cedula) {
         this.setCedula(cedula);
         return this;
     }
@@ -90,7 +89,7 @@ public class Vendedor implements Serializable {
         return this.nombre;
     }
 
-    public Vendedor nombre(String nombre) {
+    public Usuario nombre(String nombre) {
         this.setNombre(nombre);
         return this;
     }
@@ -103,7 +102,7 @@ public class Vendedor implements Serializable {
         return this.apellido;
     }
 
-    public Vendedor apellido(String apellido) {
+    public Usuario apellido(String apellido) {
         this.setApellido(apellido);
         return this;
     }
@@ -116,7 +115,7 @@ public class Vendedor implements Serializable {
         return this.telefono;
     }
 
-    public Vendedor telefono(String telefono) {
+    public Usuario telefono(String telefono) {
         this.setTelefono(telefono);
         return this;
     }
@@ -129,7 +128,7 @@ public class Vendedor implements Serializable {
         return this.activo;
     }
 
-    public Vendedor activo(Boolean activo) {
+    public Usuario activo(Boolean activo) {
         this.setActivo(activo);
         return this;
     }
@@ -138,36 +137,38 @@ public class Vendedor implements Serializable {
         this.activo = activo;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and
+    // setters here
 
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Vendedor)) {
+        if (!(o instanceof Usuario)) {
             return false;
         }
-        return getId() != null && getId().equals(((Vendedor) o).getId());
+        return getId() != null && getId().equals(((Usuario) o).getId());
     }
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        // see
+        // https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 
     // prettier-ignore
     @Override
     public String toString() {
-        return "Vendedor{" +
-            "id=" + getId() +
-            ", idKeycloak='" + getIdKeycloak() + "'" +
-            ", cedula='" + getCedula() + "'" +
-            ", nombre='" + getNombre() + "'" +
-            ", apellido='" + getApellido() + "'" +
-            ", telefono='" + getTelefono() + "'" +
-            ", activo='" + getActivo() + "'" +
-            "}";
+        return "Usuario{" +
+                "id=" + getId() +
+                ", idKeycloak='" + getIdKeycloak() + "'" +
+                ", cedula='" + getCedula() + "'" +
+                ", nombre='" + getNombre() + "'" +
+                ", apellido='" + getApellido() + "'" +
+                ", telefono='" + getTelefono() + "'" +
+                ", activo='" + getActivo() + "'" +
+                "}";
     }
 }
