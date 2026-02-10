@@ -51,6 +51,8 @@ public class ArticuloDTO implements Serializable {
 
     private UnidadMedidaDTO unidadMedida;
 
+    private String priceChangeReason;
+
     public Long getId() {
         return id;
     }
@@ -155,6 +157,14 @@ public class ArticuloDTO implements Serializable {
         this.unidadMedida = unidadMedida;
     }
 
+    public String getPriceChangeReason() {
+        return priceChangeReason;
+    }
+
+    public void setPriceChangeReason(String priceChangeReason) {
+        this.priceChangeReason = priceChangeReason;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -180,18 +190,18 @@ public class ArticuloDTO implements Serializable {
     @Override
     public String toString() {
         return "ArticuloDTO{" +
-            "id=" + getId() +
-            ", codigo='" + getCodigo() + "'" +
-            ", nombre='" + getNombre() + "'" +
-            ", descripcion='" + getDescripcion() + "'" +
-            ", existencia=" + getExistencia() +
-            ", existenciaMinima=" + getExistenciaMinima() +
-            ", precio=" + getPrecio() +
-            ", costo=" + getCosto() +
-            ", imagen='" + getImagen() + "'" +
-            ", activo='" + getActivo() + "'" +
-            ", categoria=" + getCategoria() +
-            ", unidadMedida=" + getUnidadMedida() +
-            "}";
+                "id=" + getId() +
+                ", codigo='" + getCodigo() + "'" +
+                ", nombre='" + getNombre() + "'" +
+                ", descripcion='" + getDescripcion() + "'" +
+                ", existencia=" + getExistencia() +
+                ", existenciaMinima=" + getExistenciaMinima() +
+                ", precio=" + getPrecio() +
+                ", costo=" + getCosto() +
+                ", imagen='" + getImagen() + "'" +
+                ", activo='" + getActivo() + "'" +
+                ", categoria=" + getCategoria() +
+                ", unidadMedida=" + getUnidadMedida() +
+                "}";
     }
 }
