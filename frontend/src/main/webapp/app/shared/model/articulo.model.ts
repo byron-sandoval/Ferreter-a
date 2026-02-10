@@ -15,6 +15,7 @@ export interface IArticulo {
   activo?: boolean | null;
   categoria?: ICategoria | null;
   unidadMedida?: IUnidadMedida | null;
+  priceChangeReason?: string | null;
 }
 
 export const defaultArticulo: Readonly<IArticulo> = {
