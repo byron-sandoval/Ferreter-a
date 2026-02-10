@@ -22,7 +22,7 @@ import {
   faChevronRight,
 } from '@fortawesome/free-solid-svg-icons';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 
 export const ArticuloList = () => {
   const [articulos, setArticulos] = useState<IArticulo[]>([]);
@@ -92,36 +92,59 @@ export const ArticuloList = () => {
   const exportToExcel = () => {
     if (!selectedArticulo) return;
 
-    // Preparar datos para exportar
-    const data = [
-      { Campo: 'ID', Valor: selectedArticulo.id },
-      { Campo: 'Código', Valor: selectedArticulo.codigo },
-      { Campo: 'Nombre', Valor: selectedArticulo.nombre },
-      { Campo: 'Descripción', Valor: selectedArticulo.descripcion || 'Sin descripción' },
-      { Campo: 'Categoría', Valor: selectedArticulo.categoria?.nombre || 'General' },
-      { Campo: 'Estado', Valor: selectedArticulo.activo ? 'Activo' : 'Inactivo' },
-      { Campo: '', Valor: '' }, // Línea en blanco
-      { Campo: 'PRECIOS', Valor: '' },
-      { Campo: 'Precio de Compra', Valor: `C$ ${selectedArticulo.costo?.toFixed(2)}` },
-      { Campo: 'Precio de Venta', Valor: `C$ ${selectedArticulo.precio?.toFixed(2)}` },
-      { Campo: '', Valor: '' }, // Línea en blanco
-      { Campo: 'INVENTARIO', Valor: '' },
-      { Campo: 'Stock Actual', Valor: `${selectedArticulo.existencia} ${selectedArticulo.unidadMedida?.simbolo || ''}` },
-      { Campo: 'Stock Mínimo', Valor: selectedArticulo.existenciaMinima },
-      { Campo: 'Unidad de Medida', Valor: selectedArticulo.unidadMedida?.nombre || 'N/A' },
-      { Campo: '', Valor: '' }, // Línea en blanco
-      { Campo: 'VALORES TOTALES', Valor: '' },
-      { Campo: 'Inversión Total (Costo)', Valor: `C$ ${((selectedArticulo.existencia || 0) * (selectedArticulo.costo || 0)).toFixed(2)}` },
-      { Campo: 'Valor Total (Venta)', Valor: `C$ ${((selectedArticulo.existencia || 0) * (selectedArticulo.precio || 0)).toFixed(2)}` },
-    ];
+    // Preparar datos para exportar en formato horizontal (igual a exportAll)
+    const data = [{
+      ID: selectedArticulo.id,
+      Código: selectedArticulo.codigo,
+      Producto: selectedArticulo.nombre,
+      Estado: selectedArticulo.activo ? 'Activo' : 'Inactivo',
+      Stock: selectedArticulo.existencia,
+      'Stock Mínimo': selectedArticulo.existenciaMinima,
+      'Unidad': selectedArticulo.unidadMedida?.simbolo || '',
+      'Precio Compra': selectedArticulo.costo?.toFixed(2),
+      'Precio Venta': selectedArticulo.precio?.toFixed(2),
+      'Inversión Total': ((selectedArticulo.existencia || 0) * (selectedArticulo.costo || 0)).toFixed(2),
+      'Valor Total': ((selectedArticulo.existencia || 0) * (selectedArticulo.precio || 0)).toFixed(2),
+      Categoría: selectedArticulo.categoria?.nombre || 'General',
+      Descripción: selectedArticulo.descripcion || '',
+    }];
 
     // Crear libro de trabajo
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Producto');
 
+    // Aplicar estilos a los encabezados (Fila 1)
+    const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const address = XLSX.utils.encode_col(C) + '1';
+      if (!ws[address]) continue;
+      ws[address].s = {
+        font: { bold: true },
+        fill: { fgColor: { rgb: "EEEEEE" } },
+        alignment: { horizontal: "center" },
+        border: {
+          bottom: { style: "thin", color: { rgb: "000000" } }
+        }
+      };
+    }
+
     // Ajustar ancho de columnas
-    ws['!cols'] = [{ wch: 25 }, { wch: 40 }];
+    ws['!cols'] = [
+      { wch: 8 },  // ID
+      { wch: 15 }, // Código
+      { wch: 30 }, // Producto
+      { wch: 10 }, // Estado
+      { wch: 10 }, // Stock
+      { wch: 12 }, // Stock Mínimo
+      { wch: 10 }, // Unidad
+      { wch: 15 }, // Precio Compra
+      { wch: 15 }, // Precio Venta
+      { wch: 15 }, // Inversión Total
+      { wch: 15 }, // Valor Total
+      { wch: 20 }, // Categoría
+      { wch: 40 }, // Descripción
+    ];
 
     // Generar archivo
     const fileName = `Producto_${selectedArticulo.codigo}_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`;
@@ -150,6 +173,21 @@ export const ArticuloList = () => {
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
+
+    // Aplicar estilos a los encabezados (Fila 1)
+    const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const address = XLSX.utils.encode_col(C) + '1';
+      if (!ws[address]) continue;
+      ws[address].s = {
+        font: { bold: true },
+        fill: { fgColor: { rgb: "EEEEEE" } },
+        alignment: { horizontal: "center" },
+        border: {
+          bottom: { style: "thin", color: { rgb: "000000" } }
+        }
+      };
+    }
 
     // Ajustar ancho de columnas
     ws['!cols'] = [
@@ -429,7 +467,7 @@ export const ArticuloList = () => {
                     <Col md="4">
                       <div className="mb-2">
                         <label className="text-muted small text-uppercase fw-bold">Descripción</label>
-                        <p className="text-secondary small">{selectedArticulo.descripcion || 'Sin descripción detallada.'}</p>
+                        <p className="text-dark mb-0" style={{ lineHeight: '1.4' }}>{selectedArticulo.descripcion || 'Sin descripción detallada.'}</p>
                       </div>
                       <div>
                         <label className="text-muted small text-uppercase fw-bold">Categoría</label>
