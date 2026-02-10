@@ -23,6 +23,7 @@ export const ArticuloUpdate = () => {
   const [unidades, setUnidades] = useState<IUnidadMedida[]>([]);
   const [loadingObj, setLoadingObj] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [originalPrecio, setOriginalPrecio] = useState<number | null>(null);
 
   const {
     control,
@@ -56,6 +57,7 @@ export const ArticuloUpdate = () => {
         .then(res => {
           const articulo = res.data;
           reset(articulo);
+          setOriginalPrecio(articulo.precio || 0);
           if (articulo.imagen && articulo.imagenContentType) {
             setImagePreview(`data:${articulo.imagenContentType};base64,${articulo.imagen}`);
           }
@@ -209,10 +211,38 @@ export const ArticuloUpdate = () => {
                             render={({ field }) => <Input type="number" step="0.01" {...field} invalid={esPrecioBajo} />}
                           />
                           {esPrecioBajo && (
-                            <div className="text-danger small mt-1 fw-bold">
-                              <FontAwesomeIcon icon={faExclamationTriangle} className="me-1" />
+                            <div
+                              className="animate__animated animate__headShake p-2 mt-2"
+                              style={{
+                                backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                                borderLeft: '4px solid #dc3545',
+                                borderRadius: '4px',
+                                color: '#dc3545',
+                                fontSize: '0.85rem',
+                                fontWeight: 'bold'
+                              }}
+                            >
+                              <FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />
                               ¡Precio menor al costo! Perderás dinero.
                             </div>
+                          )}
+                          {!isNew && Number(watch('precio')) !== Number(originalPrecio) && (
+                            <Controller
+                              name="priceChangeReason"
+                              control={control}
+                              render={({ field }) => (
+                                <div className="mt-3 animate__animated animate__fadeIn">
+                                  <Label className="text-info fw-bold small text-uppercase">Motivo (Opcional)</Label>
+                                  <Input
+                                    {...field}
+                                    type="text"
+                                    placeholder="Ej: Aumento de costo de proveedor..."
+                                    className="border-info"
+                                    style={{ backgroundColor: 'rgba(13, 202, 240, 0.05)' }}
+                                  />
+                                </div>
+                              )}
+                            />
                           )}
                         </FormGroup>
                       </Col>
