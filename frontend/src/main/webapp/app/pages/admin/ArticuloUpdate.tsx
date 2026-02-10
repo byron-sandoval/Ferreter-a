@@ -365,7 +365,7 @@ export const ArticuloUpdate = () => {
                 <hr className="my-4" />
 
                 <div className="d-flex justify-content-end gap-3">
-                  <Button tag={Link} to="/admin/articulos" color="secondary" outline>
+                  <Button tag={Link} to="/admin/articulos" color="light" className="text-dark border bg-white fw-bold text-uppercase px-4">
                     Cancelar
                   </Button>
                   <Button color="primary" type="submit" disabled={isSubmitting} className="px-4">
