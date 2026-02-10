@@ -82,6 +82,17 @@ public class HistorialPrecioServiceImpl implements HistorialPrecioService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<HistorialPrecioDTO> findByArticulo(Long articuloId) {
+        LOG.debug("Request to get HistorialPrecios by Articulo : {}", articuloId);
+        return historialPrecioRepository
+                .findByArticuloIdOrderByFechaDesc(articuloId)
+                .stream()
+                .map(historialPrecioMapper::toDto)
+                .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<HistorialPrecioDTO> findOne(Long id) {
         LOG.debug("Request to get HistorialPrecio : {}", id);
         return historialPrecioRepository.findById(id).map(historialPrecioMapper::toDto);

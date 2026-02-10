@@ -157,8 +157,11 @@ public class HistorialPrecioResource {
      */
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
     @GetMapping("")
-    public List<HistorialPrecioDTO> getAllHistorialPrecios() {
+    public List<HistorialPrecioDTO> getAllHistorialPrecios(@RequestParam(required = false) Long articuloId) {
         LOG.debug("REST request to get all HistorialPrecios");
+        if (articuloId != null) {
+            return historialPrecioService.findByArticulo(articuloId);
+        }
         return historialPrecioService.findAll();
     }
 
