@@ -6,6 +6,8 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A Devolucion.
@@ -22,6 +24,10 @@ public class Devolucion implements Serializable {
     @SequenceGenerator(name = "sequenceGenerator")
     @Column(name = "id")
     private Long id;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "devolucion", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties(value = { "articulo", "devolucion" }, allowSetters = true)
+    private Set<DetalleDevolucion> detalles = new HashSet<>();
 
     @NotNull
     @Column(name = "fecha", nullable = false)
@@ -51,6 +57,37 @@ public class Devolucion implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Set<DetalleDevolucion> getDetalles() {
+        return this.detalles;
+    }
+
+    public void setDetalles(Set<DetalleDevolucion> detalleDevolucions) {
+        if (this.detalles != null) {
+            this.detalles.forEach(i -> i.setDevolucion(null));
+        }
+        if (detalleDevolucions != null) {
+            detalleDevolucions.forEach(i -> i.setDevolucion(this));
+        }
+        this.detalles = detalleDevolucions;
+    }
+
+    public Devolucion detalles(Set<DetalleDevolucion> detalleDevolucions) {
+        this.setDetalles(detalleDevolucions);
+        return this;
+    }
+
+    public Devolucion addDetalles(DetalleDevolucion detalleDevolucion) {
+        this.detalles.add(detalleDevolucion);
+        detalleDevolucion.setDevolucion(this);
+        return this;
+    }
+
+    public Devolucion removeDetalles(DetalleDevolucion detalleDevolucion) {
+        this.detalles.remove(detalleDevolucion);
+        detalleDevolucion.setDevolucion(null);
+        return this;
     }
 
     public Instant getFecha() {
