@@ -15,6 +15,7 @@ const ConfiguracionEmpresa = React.lazy(() => import('./configuracion/Configurac
 const GestionUnidadMedida = React.lazy(() => import('./GestionUnidadMedida'));
 const UsuarioList = React.lazy(() => import('./UsuarioList'));
 const UsuarioUpdate = React.lazy(() => import('./UsuarioUpdate'));
+const DevolucionList = React.lazy(() => import('./DevolucionList'));
 
 const Loadable = ({ children }: { children: React.ReactNode }) => (
   <Suspense
@@ -138,6 +139,15 @@ const AdminRoutes = () => (
         }
       />
     </Route>
+
+    <Route
+      path="devoluciones"
+      element={
+        <Loadable>
+          <DevolucionList />
+        </Loadable>
+      }
+    />
 
     <Route
       path="configuracion"

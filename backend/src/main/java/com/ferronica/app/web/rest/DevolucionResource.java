@@ -188,4 +188,18 @@ public class DevolucionResource {
                 .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
                 .build();
     }
+
+    /**
+     * {@code GET  /devolucions/venta/:ventaId} : get all the devolucions by venta.
+     *
+     * @param ventaId the id of the venta.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
+     *         of devolucions in body.
+     */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @GetMapping("/venta/{ventaId}")
+    public List<DevolucionDTO> getAllByVenta(@PathVariable("ventaId") Long ventaId) {
+        LOG.debug("REST request to get Devolucions by Venta : {}", ventaId);
+        return devolucionService.findAllByVenta(ventaId);
+    }
 }
