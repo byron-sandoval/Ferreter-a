@@ -6,6 +6,7 @@ import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import VentaService from 'app/services/venta.service';
 import DevolucionService from 'app/services/devolucion.service';
 import { IVenta, IDevolucion } from 'app/shared/model';
+import { IDetalleDevolucion } from 'app/shared/model/detalle-devolucion.model';
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
 import { VentaDetalleModal } from './components/VentaDetalleModal';
@@ -21,7 +22,6 @@ export const HistorialVentas = () => {
   const [showDevolucionModal, setShowDevolucionModal] = useState(false);
   const [showDetalleModal, setShowDetalleModal] = useState(false);
   const [ventaSeleccionada, setVentaSeleccionada] = useState<IVenta | null>(null);
-  const [motivo, setMotivo] = useState('');
   const [empresa, setEmpresa] = useState<IEmpresa | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -72,19 +72,19 @@ export const HistorialVentas = () => {
     return dayjs().diff(dayjs(fecha), 'hour') <= 72;
   };
 
-  const procesarDevolucion = async () => {
-    if (!ventaSeleccionada || !motivo) return;
+  const procesarDevolucion = async (total: number, detalles: IDetalleDevolucion[], motivoDev: string) => {
+    if (!ventaSeleccionada) return;
     try {
       const devData: IDevolucion = {
         fecha: dayjs(),
-        motivo,
-        total: ventaSeleccionada.total || 0,
+        motivo: motivoDev,
+        total: total,
         venta: ventaSeleccionada,
+        detalles: detalles
       };
       await DevolucionService.create(devData);
       toast.success('Devolución registrada correctamente');
       setShowDevolucionModal(false);
-      setMotivo('');
       loadVentas();
     } catch (e) {
       toast.error('Error al procesar devolución');
@@ -231,8 +231,6 @@ export const HistorialVentas = () => {
         isOpen={showDevolucionModal}
         toggle={() => setShowDevolucionModal(false)}
         venta={ventaSeleccionada}
-        motivo={motivo}
-        setMotivo={setMotivo}
         onConfirm={procesarDevolucion}
       />
 

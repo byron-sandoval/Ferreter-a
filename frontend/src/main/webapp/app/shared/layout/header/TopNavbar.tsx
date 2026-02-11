@@ -26,6 +26,7 @@ import {
   faClock,
   faRulerCombined,
   faUsers,
+  faUndoAlt,
 } from '@fortawesome/free-solid-svg-icons';
 
 export const TopNavbar = () => {
@@ -154,6 +155,15 @@ export const TopNavbar = () => {
               <NavItem className="nav-link-item">
                 <NavLink tag={Link} to="/vendedor/historial-ventas" style={navLinkStyle}>
                   <FontAwesomeIcon icon={faHistory} size="sm" /> Ventas
+                </NavLink>
+              </NavItem>
+            )}
+
+            {/* 4b. Devoluciones */}
+            {(isAdmin || isVendedor) && (
+              <NavItem className="nav-link-item">
+                <NavLink tag={Link} to="/admin/devoluciones" style={navLinkStyle}>
+                  <FontAwesomeIcon icon={faUndoAlt} size="sm" /> Devoluciones
                 </NavLink>
               </NavItem>
             )}
