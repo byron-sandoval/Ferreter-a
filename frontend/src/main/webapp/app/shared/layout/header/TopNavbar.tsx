@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink as Link } from 'react-router-dom';
+import { NavLink as Link, useLocation } from 'react-router-dom';
 import { Nav, NavItem, NavLink, Navbar, Container, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import { useAppSelector } from 'app/config/store';
 import { hasAnyAuthority } from 'app/shared/auth/private-route';
@@ -34,6 +34,9 @@ export const TopNavbar = () => {
   const isAdmin = hasAnyAuthority(account?.authorities || [], [AUTHORITIES.ADMIN]);
   const isVendedor = hasAnyAuthority(account?.authorities || [], [AUTHORITIES.VENDEDOR]);
   const isBodeguero = hasAnyAuthority(account?.authorities || [], [AUTHORITIES.BODEGUERO]);
+  const location = useLocation();
+
+  const isVentasActive = location.pathname === '/vendedor/historial-ventas' || location.pathname === '/admin/devoluciones';
 
   const [dateStr, setDateStr] = useState('');
   const [timeStr, setTimeStr] = useState('');
@@ -141,6 +144,8 @@ export const TopNavbar = () => {
               </NavLink>
             </NavItem>
 
+
+
             {/* 3. Facturar */}
             {(isAdmin || isVendedor) && (
               <NavItem className="nav-link-item">
@@ -153,20 +158,13 @@ export const TopNavbar = () => {
             {/* 4. Ventas */}
             {(isAdmin || isVendedor) && (
               <NavItem className="nav-link-item">
-                <NavLink tag={Link} to="/vendedor/historial-ventas" style={navLinkStyle}>
+                <NavLink tag={Link} to="/vendedor/historial-ventas" style={navLinkStyle} active={isVentasActive}>
                   <FontAwesomeIcon icon={faHistory} size="sm" /> Ventas
                 </NavLink>
               </NavItem>
             )}
 
-            {/* 4b. Devoluciones */}
-            {(isAdmin || isVendedor) && (
-              <NavItem className="nav-link-item">
-                <NavLink tag={Link} to="/admin/devoluciones" style={navLinkStyle}>
-                  <FontAwesomeIcon icon={faUndoAlt} size="sm" /> Devoluciones
-                </NavLink>
-              </NavItem>
-            )}
+
 
             {/* 5. Compras */}
             {(isAdmin || isBodeguero) && (

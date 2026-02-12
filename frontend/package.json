@@ -47,6 +47,8 @@
     "bootstrap": "5.3.6",
     "bootswatch": "5.3.5",
     "dayjs": "1.11.13",
+    "jspdf": "^4.1.0",
+    "jspdf-autotable": "^5.0.7",
     "lodash": "4.17.21",
     "path-browserify": "1.0.1",
     "react": "18.3.1",

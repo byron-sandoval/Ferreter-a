@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Table, Button, Badge, Card, CardBody, Input, Label } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHistory, faUndo, faEye, faSearch, faCalendarAlt, faSync, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faHistory, faUndo, faEye, faSearch, faCalendarAlt, faSync, faChevronLeft, faChevronRight, faUndoAlt, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import VentaService from 'app/services/venta.service';
 import DevolucionService from 'app/services/devolucion.service';
@@ -15,6 +16,7 @@ import { EmpresaService } from 'app/services/empresa.service';
 import { IEmpresa } from 'app/shared/model/empresa.model';
 
 export const HistorialVentas = () => {
+  const navigate = useNavigate();
   const [ventas, setVentas] = useState<IVenta[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
@@ -69,7 +71,7 @@ export const HistorialVentas = () => {
 
   const puedeDevolver = (fecha?: string | dayjs.Dayjs | null) => {
     if (!fecha) return false;
-    return dayjs().diff(dayjs(fecha), 'hour') <= 72;
+    return dayjs().diff(dayjs(fecha), 'hour') <= 24;
   };
 
   const procesarDevolucion = async (total: number, detalles: IDetalleDevolucion[], motivoDev: string) => {
@@ -106,12 +108,17 @@ export const HistorialVentas = () => {
   return (
     <div className="animate__animated animate__fadeIn p-1">
       <div className="d-flex justify-content-between align-items-center mb-2">
-        <h5 className="fw-bold text-secondary mb-0">
+        <h5 className="fw-bold text-dark mb-0">
           <FontAwesomeIcon icon={faHistory} className="me-2 text-primary" /> Historial de Ventas Recientes
         </h5>
-        <Button color="light" size="sm" onClick={loadVentas} disabled={loading} style={{ fontSize: '0.75rem' }}>
-          <FontAwesomeIcon icon={faSync} spin={loading} className="me-1" /> Actualizar
-        </Button>
+        <div>
+          <Button color="outline-primary" size="sm" className="me-2" onClick={() => navigate('/admin/devoluciones')} style={{ fontSize: '0.75rem' }}>
+            <FontAwesomeIcon icon={faUndoAlt} className="me-1" /> Devoluciones
+          </Button>
+          <Button color="light" size="sm" onClick={loadVentas} disabled={loading} style={{ fontSize: '0.75rem' }}>
+            <FontAwesomeIcon icon={faSync} spin={loading} className="me-1" /> Actualizar
+          </Button>
+        </div>
       </div>
 
       <Card className="shadow-sm border-0 mb-2 bg-light">
@@ -133,15 +140,15 @@ export const HistorialVentas = () => {
 
       <Card className="shadow-sm border-0 rounded-3 overflow-hidden">
         <Table hover responsive size="sm" className="mb-0 align-middle">
-          <thead className="bg-light text-muted small text-uppercase fw-bold" style={{ fontSize: '0.75rem' }}>
+          <thead className="bg-light text-dark small text-uppercase fw-bold" style={{ fontSize: '0.75rem' }}>
             <tr>
-              <th className="py-2 px-3">Folio</th>
-              <th className="py-2">Fecha</th>
-              <th className="py-2">Cliente</th>
-              <th className="py-2">Total</th>
-              <th className="py-2">Método</th>
-              <th className="py-2 text-center">Garantía</th>
-              <th className="py-2 text-end px-3">Acciones</th>
+              <th className="py-2 px-3 fw-bold">Folio</th>
+              <th className="py-2 fw-bold">Fecha</th>
+              <th className="py-2 fw-bold">Cliente</th>
+              <th className="py-2 fw-bold">Total</th>
+              <th className="py-2 fw-bold">Método</th>
+              <th className="py-2 text-center fw-bold">Garantía</th>
+              <th className="py-2 text-end px-3 fw-bold">Acciones</th>
             </tr>
           </thead>
           <tbody>
