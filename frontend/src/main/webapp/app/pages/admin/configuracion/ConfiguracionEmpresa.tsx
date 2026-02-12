@@ -318,7 +318,7 @@ export const ConfiguracionEmpresa = () => {
                           </div>
                         </div>
 
-                        <Alert color="info" className="small border-0 shadow-sm">
+                        <Alert color="info" className="small border-0 shadow-sm" fade={false}>
                           <FontAwesomeIcon icon={faInfoCircle} className="me-2" />
                           Esta información se verá reflejada en tus facturas impresas y reportes oficiales.
                         </Alert>
