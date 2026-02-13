@@ -6,6 +6,7 @@ import UsuarioService from 'app/services/usuario.service';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSync, faSearch, faPencilAlt, faTrash, faUsers, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
+import { toast } from 'react-toastify';
 
 export const UsuarioList = () => {
     const navigate = useNavigate();
@@ -52,6 +53,20 @@ export const UsuarioList = () => {
     const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
 
+    const handleDelete = (id: number) => {
+        if (window.confirm('¿Está seguro de que desea inactivar este usuario? No podrá iniciar sesión hasta que sea activado nuevamente.')) {
+            UsuarioService.delete(id)
+                .then(() => {
+                    toast.success('Usuario inactivado correctamente');
+                    loadAll();
+                })
+                .catch(err => {
+                    console.error(err);
+                    toast.error('Error al inactivar el usuario');
+                });
+        }
+    };
+
     const headerStyle = { backgroundColor: '#6f42c1', color: 'white' };
 
     return (
@@ -86,12 +101,11 @@ export const UsuarioList = () => {
 
             <Card className="shadow-sm border-0">
                 <Table hover responsive size="sm" className="mb-0">
-                    <thead className="text-center text-uppercase small" style={headerStyle}>
+                    <thead className="table-light text-dark text-center text-uppercase small fw-bold">
                         <tr>
-                            <th className="py-2">Cédula</th>
                             <th className="py-2">Nombre Completo</th>
                             <th className="py-2">Teléfono</th>
-                            <th className="py-2">Keycloak ID</th>
+                            <th className="py-2">Rol</th>
                             <th className="py-2">Estado</th>
                             <th className="py-2">Acciones</th>
                         </tr>
@@ -100,16 +114,17 @@ export const UsuarioList = () => {
                         {currentItems.length > 0 ? (
                             currentItems.map(v => (
                                 <tr key={v.id} className="text-center align-middle" style={{ fontSize: '0.8rem' }}>
-                                    <td className="fw-bold px-3">{v.cedula}</td>
-                                    <td className="text-start px-3">
+                                    <td className="text-center px-3">
                                         {v.nombre} {v.apellido}
                                     </td>
                                     <td>{v.telefono || '-'}</td>
-                                    <td className="small text-muted" style={{ maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                        {v.idKeycloak || '-'}
+                                    <td>
+                                        <Badge color="info" outline className="text-uppercase" style={{ fontSize: '0.65rem' }}>
+                                            {(v.rol || '').replace('ROLE_', '')}
+                                        </Badge>
                                     </td>
                                     <td>
-                                        <Badge color={v.activo ? 'success' : 'secondary'} pill style={{ fontSize: '0.65rem' }}>
+                                        <Badge color={v.activo ? 'success' : 'danger'} pill style={{ fontSize: '0.65rem' }}>
                                             {v.activo ? 'Activo' : 'Inactivo'}
                                         </Badge>
                                     </td>
@@ -117,7 +132,7 @@ export const UsuarioList = () => {
                                         <Button size="sm" color="info" outline className="p-1 me-1" onClick={() => navigate(`/admin/usuarios/${v.id}/edit`)}>
                                             <FontAwesomeIcon icon={faPencilAlt} fixedWidth />
                                         </Button>
-                                        <Button size="sm" color="danger" outline className="p-1">
+                                        <Button size="sm" color="danger" outline className="p-1" onClick={() => v.id && handleDelete(v.id)}>
                                             <FontAwesomeIcon icon={faTrash} fixedWidth />
                                         </Button>
                                     </td>
@@ -125,7 +140,7 @@ export const UsuarioList = () => {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={6} className="text-center py-5 text-muted">
+                                <td colSpan={5} className="text-center py-5 text-muted">
                                     {loading ? 'Cargando usuarios...' : 'No se encontraron usuarios'}
                                 </td>
                             </tr>
