@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Table, Button, Input, Badge, Card, CardBody } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faSync, faPencilAlt, faTrash, faTags, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSync, faPencilAlt, faTrash, faTags, faChevronLeft, faChevronRight, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import { ICategoria } from 'app/shared/model/categoria.model';
 import CategoriaService from 'app/services/categoria.service';
@@ -75,14 +75,20 @@ export const CategoriaList = () => {
 
       <Card className="shadow-sm border-0 mb-2 bg-light">
         <CardBody className="p-2">
-          <Input
-            bsSize="sm"
-            type="text"
-            placeholder="Buscar categoría..."
-            value={filter}
-            onChange={e => setFilter(e.target.value)}
-            style={{ maxWidth: '300px', fontSize: '0.8rem' }}
-          />
+          <div className="d-flex align-items-center" style={{
+            maxWidth: '300px',
+            borderBottom: '2px solid #18a1bcff',
+            paddingBottom: '2px'
+          }}>
+            <FontAwesomeIcon icon={faSearch} className="text-info opacity-75 me-2" />
+            <Input
+              placeholder="Buscar categoría..."
+              value={filter}
+              onChange={e => setFilter(e.target.value)}
+              className="border-0 shadow-none p-0 bg-transparent"
+              style={{ fontSize: '0.8rem' }}
+            />
+          </div>
         </CardBody>
       </Card>
 
@@ -112,7 +118,7 @@ export const CategoriaList = () => {
                         Activo
                       </Badge>
                     ) : (
-                      <Badge color="secondary" pill style={{ fontSize: '0.65rem' }}>
+                      <Badge color="danger" pill style={{ fontSize: '0.65rem' }}>
                         Inactivo
                       </Badge>
                     )}
