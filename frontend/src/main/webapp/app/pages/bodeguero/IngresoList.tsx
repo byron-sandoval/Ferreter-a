@@ -98,7 +98,7 @@ export const IngresoList = () => {
 
       <Card className="shadow-sm border-0">
         <Table hover responsive size="sm" className="mb-0">
-          <thead className="text-center text-uppercase small" style={headerStyle}>
+          <thead className="table-light text-dark text-center text-uppercase small fw-bold">
             <tr>
               <th className="py-2">Fecha</th>
               <th className="py-2">No. Documento</th>
@@ -173,7 +173,12 @@ export const IngresoList = () => {
             <div>
               <Label className="text-muted small text-uppercase fw-bold mb-0">Proveedor</Label>
               <div className="fw-bold fs-5 text-dark">{ingresoSeleccionado?.proveedor?.nombre}</div>
-              <small className="text-muted">{ingresoSeleccionado?.proveedor?.telefono}</small>
+              <small className="d-block text-dark">
+                <span className="fw-bold">RUC:</span> {ingresoSeleccionado?.proveedor?.ruc || 'N/D'}
+              </small>
+              <small className="text-dark">
+                <span className="fw-bold">Teléfono:</span> {ingresoSeleccionado?.proveedor?.telefono || 'N/D'}
+              </small>
             </div>
             <div className="text-end">
               <Label className="text-muted small text-uppercase fw-bold mb-0">Fecha de Ingreso</Label>
@@ -220,18 +225,15 @@ export const IngresoList = () => {
           </div>
 
           {ingresoSeleccionado?.observaciones && (
-            <div className="mt-3 p-2 bg-warning bg-opacity-10 border-start border-warning border-3 rounded">
-              <small className="fw-bold text-muted d-block text-uppercase">Observaciones:</small>
-              {ingresoSeleccionado.observaciones}
+            <div className="mt-4 p-3 bg-warning bg-opacity-10 border-start border-4 border-warning rounded">
+              <h6 className="fw-bold text-dark mb-1">OBSERVACIONES:</h6>
+              <p className="mb-0 text-dark fst-italic">{ingresoSeleccionado.observaciones}</p>
             </div>
           )}
         </ModalBody>
         <ModalFooter className="border-0">
           <Button color="secondary" size="sm" onClick={() => setShowDetalleModal(false)}>
             Cerrar
-          </Button>
-          <Button color="dark" size="sm">
-            <FontAwesomeIcon icon={faEye} className="me-2 text-info" /> Imprimir Comprobante
           </Button>
         </ModalFooter>
       </Modal>
