@@ -17,8 +17,10 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import ArticuloService from 'app/services/articulo.service';
 import VentaService from 'app/services/venta.service';
+import DevolucionService from 'app/services/devolucion.service';
 import { IArticulo } from 'app/shared/model/articulo.model';
 import { IVenta } from 'app/shared/model/venta.model';
+import { IDevolucion } from 'app/shared/model/devolucion.model';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import dayjs from 'dayjs';
 import { IDetalleVenta } from 'app/shared/model/detalle-venta.model';
@@ -34,6 +36,7 @@ export const AdminDashboard = () => {
   const navigate = useNavigate();
   const [bajoStock, setBajoStock] = useState<IArticulo[]>([]);
   const [ventasRecientes, setVentasRecientes] = useState<IVenta[]>([]);
+  const [devolucionesRecientes, setDevolucionesRecientes] = useState<IDevolucion[]>([]);
   const [categoryData, setCategoryData] = useState<ICategoryData[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -42,11 +45,13 @@ export const AdminDashboard = () => {
       ArticuloService.getAll(),
       VentaService.getAll({ size: 1000, sort: 'fecha,desc' }),
       VentaService.getAllDetalles({ size: 1000 }),
+      DevolucionService.getAll(),
     ])
-      .then(([artRes, venRes, detRes]) => {
+      .then(([artRes, venRes, detRes, devRes]) => {
         const low = artRes.data.filter(a => a.activo && (a.existencia || 0) <= (a.existenciaMinima || 0));
         setBajoStock(low);
         setVentasRecientes(venRes.data);
+        setDevolucionesRecientes(devRes.data);
 
         // Procesar datos para la gráfica de pastel (Ventas por Categoría)
         const details: IDetalleVenta[] = detRes.data;
@@ -91,8 +96,8 @@ export const AdminDashboard = () => {
       </div>
 
       {/* KPI Cards */}
-      <Row className="mb-4">
-        <Col md="4">
+      <Row className="mb-4 g-3">
+        <Col md="3">
           <Card className="kpi-palette-cyan h-100">
             <CardBody className="py-2 px-3">
               <div className="d-flex justify-content-between align-items-center">
@@ -112,7 +117,7 @@ export const AdminDashboard = () => {
             </CardBody>
           </Card>
         </Col>
-        <Col md="4">
+        <Col md="3">
           <Card className="kpi-palette-grey h-100">
             <CardBody className="py-2 px-3">
               <div className="d-flex justify-content-between align-items-center">
@@ -132,7 +137,7 @@ export const AdminDashboard = () => {
             </CardBody>
           </Card>
         </Col>
-        <Col md="4">
+        <Col md="3">
           <Card className="kpi-palette-cyan h-100">
             <CardBody className="py-2 px-3">
               <div className="d-flex justify-content-between align-items-center">
@@ -149,17 +154,32 @@ export const AdminDashboard = () => {
             </CardBody>
           </Card>
         </Col>
+        <Col md="3">
+          <Card className="kpi-palette-grey h-100">
+            <CardBody className="py-2 px-3">
+              <div className="d-flex justify-content-between align-items-center">
+                <div className="kpi-icon-palette">
+                  <FontAwesomeIcon icon={faHistory} />
+                </div>
+                <div className="text-end">
+                  <div className="stat-value-palette">
+                    {devolucionesRecientes
+                      .filter(d => dayjs(d.fecha).isSame(dayjs(), 'day')).length}
+                  </div>
+                  <div className="stat-label-palette">Devoluciones Hoy</div>
+                </div>
+              </div>
+            </CardBody>
+          </Card>
+        </Col>
       </Row>
 
       <Row>
         <Col md="8">
           <Card className="shadow mb-4">
             <CardBody>
-              <CardTitle tag="h6" className="text-secondary border-bottom pb-2 mb-3 d-flex justify-content-between align-items-center">
+              <CardTitle tag="h6" className="text-black border-bottom pb-2 mb-3">
                 <span> Tendencia de Ventas (Últimos 7 días)</span>
-                <Badge color="primary" pill style={{ fontSize: '0.7rem' }}>
-                  C$ {ventasRecientes.reduce((acc, v) => acc + (v.total || 0), 0).toLocaleString()}
-                </Badge>
               </CardTitle>
               <div style={{ height: '220px', width: '100%' }}>
                 <ResponsiveContainer width="100%" height="100%">
@@ -238,7 +258,7 @@ export const AdminDashboard = () => {
         <Col md="8">
           <Card className="shadow mb-4">
             <CardBody>
-              <CardTitle tag="h6" className="text-secondary border-bottom pb-2 mb-3">
+              <CardTitle tag="h6" className="text-black border-bottom pb-2 mb-3">
                 Ventas por Categoría
               </CardTitle>
               <div style={{ height: '300px', width: '100%' }}>

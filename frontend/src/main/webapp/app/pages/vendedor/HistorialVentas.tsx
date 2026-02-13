@@ -123,15 +123,17 @@ export const HistorialVentas = () => {
 
       <Card className="shadow-sm border-0 mb-2 bg-light">
         <CardBody className="p-2">
-          <div className="input-group input-group-sm" style={{ maxWidth: '350px' }}>
-            <span className="input-group-text bg-white border-end-0">
-              <FontAwesomeIcon icon={faSearch} className="text-muted" />
-            </span>
+          <div className="d-flex align-items-center" style={{
+            maxWidth: '350px',
+            borderBottom: '2px solid #18a1bcff',
+            paddingBottom: '2px'
+          }}>
+            <FontAwesomeIcon icon={faSearch} className="text-info opacity-75 me-2" />
             <Input
               placeholder="Buscar por Folio o Cliente..."
-              className="border-start-0"
               value={filter}
               onChange={e => setFilter(e.target.value)}
+              className="border-0 shadow-none p-0 bg-transparent"
               style={{ fontSize: '0.8rem' }}
             />
           </div>

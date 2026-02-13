@@ -183,10 +183,10 @@ export const GestionClientes = () => {
   return (
     <div className="animate__animated animate__fadeIn p-1">
       <div className="d-flex justify-content-between align-items-center mb-2 px-1">
-        <h5 className="fw-bold text-secondary mb-0">
-          <FontAwesomeIcon icon={faUsers} className="me-2 text-primary" /> Clientes registrados
+        <h5 className="fw-bold text-dark mb-0">
+          <FontAwesomeIcon icon={faUsers} className="me-2 text-info" /> Clientes registrados
         </h5>
-        <Button color="primary" size="sm" outline style={{ fontSize: '0.75rem' }} onClick={abrirNuevo}>
+        <Button color="black" size="sm" outline style={{ fontSize: '0.75rem' }} onClick={abrirNuevo}>
           <FontAwesomeIcon icon={faPlus} className="me-1" /> Nuevo Cliente
         </Button>
       </div>
@@ -195,17 +195,17 @@ export const GestionClientes = () => {
         <Col md="7">
           <Card className="shadow-sm border-0 mb-2 bg-white rounded-3 overflow-hidden">
             <CardBody className="p-0">
-              <div className="p-2 bg-light border-bottom">
-                <div className="input-group input-group-sm" style={{ maxWidth: '300px' }}>
-                  <span className="input-group-text bg-white border-end-0">
-                    <FontAwesomeIcon icon={faSearch} className="text-muted" />
+              <div className="p-2 bg-white border-bottom d-flex justify-content-start">
+                <div className="input-group shadow-sm rounded-pill overflow-hidden border" style={{ maxWidth: '320px', borderColor: '#18a1bcff' }}>
+                  <span className="input-group-text bg-white border-0 ps-3">
+                    <FontAwesomeIcon icon={faSearch} className="text-info opacity-75" />
                   </span>
                   <Input
                     placeholder="Buscar cliente..."
-                    className="border-start-0"
+                    className="border-0 shadow-none ps-0"
                     value={filter}
                     onChange={e => setFilter(e.target.value)}
-                    style={{ fontSize: '0.8rem' }}
+                    style={{ fontSize: '0.85rem', height: '34px' }}
                   />
                 </div>
               </div>

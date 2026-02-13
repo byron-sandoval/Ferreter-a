@@ -124,9 +124,9 @@ export const IngresoUpdate = () => {
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h4 className="fw-bold text-dark m-0">
           <FontAwesomeIcon icon={faShoppingCart} className="me-2 text-primary" />
-          Nueva Compra (Ingreso de Mercancía)
+          Nueva Compra
         </h4>
-        <Button color="secondary" size="sm" outline onClick={() => navigate('/bodeguero/ingresos')}>
+        <Button color="black" size="sm" outline className="fw-bold" onClick={() => navigate('/bodeguero/ingresos')}>
           <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Volver
         </Button>
       </div>
@@ -143,11 +143,13 @@ export const IngresoUpdate = () => {
                   </Label>
                   <Input type="select" id="proveedor" value={proveedorId} onChange={e => setProveedorId(e.target.value)} required>
                     <option value="">Seleccione un proveedor...</option>
-                    {proveedores.map(p => (
-                      <option key={p.id} value={p.id}>
-                        {p.nombre}
-                      </option>
-                    ))}
+                    {proveedores
+                      .filter(p => p.activo)
+                      .map(p => (
+                        <option key={p.id} value={p.id}>
+                          {p.nombre}
+                        </option>
+                      ))}
                   </Input>
                 </FormGroup>
                 <FormGroup>
@@ -176,11 +178,11 @@ export const IngresoUpdate = () => {
                   />
                 </FormGroup>
                 <div className="p-3 bg-primary bg-opacity-10 rounded text-center mb-3">
-                  <small className="text-muted d-block fw-bold text-uppercase">Total de la Compra</small>
-                  <h3 className="fw-bold text-primary m-0">C$ {calcularTotal().toLocaleString()}</h3>
+                  <span className="text-dark fw-bold me-2 fs-6">TOTAL A PAGAR:</span>
+                  <span className="fw-bold text-primary fs-4">C$ {calcularTotal().toLocaleString()}</span>
                 </div>
-                <Button color="success" block type="submit" className="fw-bold shadow-sm">
-                  <FontAwesomeIcon icon={faSave} className="me-2" /> Procesar Compra
+                <Button color="success" block type="submit" className="fw-bolder shadow-sm py-3 fs-7">
+                  <FontAwesomeIcon icon={faSave} className="me-3" /> PROCESAR COMPRA
                 </Button>
               </Form>
             </CardBody>
