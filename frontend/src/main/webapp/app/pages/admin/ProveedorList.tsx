@@ -81,9 +81,9 @@ export const ProveedorList = () => {
 
       <Card className="shadow-sm border-0">
         <Table hover responsive size="sm" className="mb-0">
-          <thead className="text-center text-uppercase small" style={headerStyle}>
+          <thead className="table-light text-dark text-center text-uppercase small fw-bold">
             <tr>
-              <th className="py-2">Nombre</th>
+              <th className="py-2">Proveedores</th>
               <th className="py-2">RUC / ID</th>
               <th className="py-2">Dirección</th>
               <th className="py-2">Teléfono</th>
@@ -104,15 +104,31 @@ export const ProveedorList = () => {
                   <td>{p.telefono || '-'}</td>
                   <td style={{ fontSize: '0.75rem' }}>{p.email || '-'}</td>
                   <td>
-                    <Badge color={p.activo ? 'success' : 'secondary'} pill style={{ fontSize: '0.65rem' }}>
+                    <Badge color={p.activo ? 'success' : 'danger'} pill style={{ fontSize: '0.65rem' }}>
                       {p.activo ? 'Activo' : 'Inactivo'}
                     </Badge>
                   </td>
                   <td className="px-3">
-                    <Button size="sm" color="info" outline className="p-1 me-1">
+                    <Button
+                      size="sm"
+                      color="info"
+                      outline
+                      className="p-1 me-1"
+                      onClick={() => p.id && navigate(`/admin/proveedores/${p.id}/edit`)}
+                    >
                       <FontAwesomeIcon icon={faPencilAlt} fixedWidth />
                     </Button>
-                    <Button size="sm" color="danger" outline className="p-1">
+                    <Button
+                      size="sm"
+                      color="danger"
+                      outline
+                      className="p-1"
+                      onClick={() => {
+                        if (p.id && window.confirm(`¿Está seguro de eliminar al proveedor "${p.nombre}"?`)) {
+                          ProveedorService.delete(p.id).then(() => loadAll());
+                        }
+                      }}
+                    >
                       <FontAwesomeIcon icon={faTrash} fixedWidth />
                     </Button>
                   </td>

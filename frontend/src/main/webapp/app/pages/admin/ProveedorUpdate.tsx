@@ -69,13 +69,13 @@ export const ProveedorUpdate = () => {
           <FontAwesomeIcon icon={faTruck} className="me-2 text-primary" />
           {isNew ? 'Nuevo Proveedor' : 'Editar Proveedor'}
         </h4>
-        <Button color="secondary" size="sm" outline onClick={() => navigate('/admin/proveedores')}>
+        <Button color="black" size="sm" outline onClick={() => navigate('/admin/proveedores')}>
           <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Volver
         </Button>
       </div>
 
       <Row className="justify-content-center">
-        <Col md="8">
+        <Col md="5">
           <Card className="shadow-sm border-0">
             <CardBody>
               <Form onSubmit={handleSubmit}>
@@ -169,7 +169,7 @@ export const ProveedorUpdate = () => {
                     <FontAwesomeIcon icon={faSave} className="me-2" />
                     {isNew ? 'Crear Proveedor' : 'Guardar Cambios'}
                   </Button>
-                  <Button color="secondary" outline onClick={() => navigate('/admin/proveedores')}>
+                  <Button color="black" outline onClick={() => navigate('/admin/proveedores')}>
                     Cancelar
                   </Button>
                 </div>
