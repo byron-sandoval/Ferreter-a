@@ -1,7 +1,9 @@
 package com.ferronica.app.service.impl;
 
 import com.ferronica.app.domain.Usuario;
+import com.ferronica.app.repository.IngresoRepository;
 import com.ferronica.app.repository.UsuarioRepository;
+import com.ferronica.app.repository.VentaRepository;
 import com.ferronica.app.service.KeycloakService;
 import com.ferronica.app.service.UsuarioService;
 import com.ferronica.app.service.dto.UsuarioDTO;
@@ -30,11 +32,17 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     private final KeycloakService keycloakService;
 
+    private final VentaRepository ventaRepository;
+
+    private final IngresoRepository ingresoRepository;
+
     public UsuarioServiceImpl(UsuarioRepository usuarioRepository, UsuarioMapper usuarioMapper,
-            KeycloakService keycloakService) {
+            KeycloakService keycloakService, VentaRepository ventaRepository, IngresoRepository ingresoRepository) {
         this.usuarioRepository = usuarioRepository;
         this.usuarioMapper = usuarioMapper;
         this.keycloakService = keycloakService;
+        this.ventaRepository = ventaRepository;
+        this.ingresoRepository = ingresoRepository;
     }
 
     @Override
@@ -140,17 +148,41 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public void delete(Long id) {
-        LOG.debug("Request to delete Usuario (Logical) : {}", id);
-        usuarioRepository.findById(id).ifPresent(usuario -> {
-            usuario.setActivo(false);
-            usuarioRepository.save(usuario);
+    public boolean delete(Long id) {
+        LOG.debug("Request to delete Usuario (Smart Delete) : {}", id);
+        return usuarioRepository.findById(id).map(usuario -> {
+            // Contar si tiene ventas o ingresos asociados
+            long ventasCount = ventaRepository.countByUsuarioId(id);
+            long ingresosCount = ingresoRepository.countByUsuarioId(id);
 
-            // También desactivar en Keycloak si tiene ID
-            if (usuario.getIdKeycloak() != null) {
-                keycloakService.updateUserStatus(usuario.getIdKeycloak(), false);
+            if (ventasCount > 0 || ingresosCount > 0) {
+                // TIENE HISTORIAL: Borrado Lógico (Inactivar)
+                usuario.setActivo(false);
+                usuarioRepository.save(usuario);
+
+                // Desactivar en Keycloak
+                if (usuario.getIdKeycloak() != null) {
+                    keycloakService.updateUserStatus(usuario.getIdKeycloak(), false);
+                }
+                LOG.info(">>> SMART DELETE: User {} has history ({} sales, {} entries). Marked as INACTIVE.",
+                        usuario.getNombre(), ventasCount, ingresosCount);
+                return false; // Borrado lógico
+            } else {
+                // NO TIENE HISTORIAL: Borrado Físico total
+                String keycloakId = usuario.getIdKeycloak();
+
+                // 1. Borrar de la DB local
+                usuarioRepository.deleteById(id);
+
+                // 2. Borrar de Keycloak
+                if (keycloakId != null && !keycloakId.isEmpty()) {
+                    keycloakService.deleteKeycloakUser(keycloakId);
+                }
+                LOG.info(">>> SMART DELETE: User {} was a test user (no history). DELETED physically.",
+                        usuario.getNombre());
+                return true; // Borrado físico
             }
-        });
+        }).orElse(false);
     }
 
     private UsuarioDTO enrichWithRole(Usuario usuario) {
