@@ -38,12 +38,12 @@ export const UsuarioList = () => {
         loadAll();
     }, []);
 
-    const filtrados = usuarios.filter(
+    const filtrados = Array.isArray(usuarios) ? usuarios.filter(
         v =>
             (v.nombre || '').toLowerCase().includes(filter.toLowerCase()) ||
             (v.apellido || '').toLowerCase().includes(filter.toLowerCase()) ||
             (v.cedula || '').toLowerCase().includes(filter.toLowerCase())
-    );
+    ) : [];
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
