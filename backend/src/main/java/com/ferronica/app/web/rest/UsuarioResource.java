@@ -191,11 +191,13 @@ public class UsuarioResource {
      */
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUsuario(@PathVariable("id") Long id) {
+    public ResponseEntity<Boolean> deleteUsuario(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Usuario : {}", id);
-        usuarioService.delete(id);
-        return ResponseEntity.noContent()
+        boolean deletedPhysically = usuarioService.delete(id);
+
+        // Si fue borrado físicamente mandamos 200 OK con true, si no 200 OK con false
+        return ResponseEntity.ok()
                 .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-                .build();
+                .body(deletedPhysically);
     }
 }
