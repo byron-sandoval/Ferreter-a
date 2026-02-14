@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -84,22 +83,62 @@ public class KeycloakService {
     }
 
     private void assignRole(String userId, String roleName) {
+        log.debug("Assigning role {} to user {}", roleName, userId);
         try {
             String targetRealm = applicationProperties.getKeycloakAdmin().getTargetRealm();
-            // Remove ROLE_ prefix if present in Keycloak roles configuration, but strictly
-            // we use EXACT match
-            // However, JHipster roles are usually ROLE_ADMIN, but Keycloak realm roles
-            // might be 'ROLE_ADMIN' or just 'admin'.
-            // Let's assume exact match from DTO.
-
             RealmResource realmResource = keycloak.realm(targetRealm);
-            var roleRepresentation = realmResource.roles().get(roleName).toRepresentation();
 
+            // Log available roles for debugging
+            log.trace("Available roles in realm: {}", realmResource.roles().list().stream().map(r -> r.getName())
+                    .collect(java.util.stream.Collectors.toList()));
+
+            var roleRepresentation = realmResource.roles().get(roleName).toRepresentation();
             realmResource.users().get(userId).roles().realmLevel().add(List.of(roleRepresentation));
-            log.debug("Assigned role {} to user {}", roleName, userId);
+            log.info(">>> ROLE SUCCESS: Assigned {} to user {}", roleName, userId);
         } catch (Exception e) {
-            log.error("Failed to assign role {} to user {}", roleName, userId, e);
-            // Non-blocking error?
+            log.error(">>> ROLE ERROR: Failed to assign role {} to user {}: {}", roleName, userId, e.getMessage());
+        }
+    }
+
+    public void updateUserStatus(String userId, boolean active) {
+        if (userId == null || userId.isEmpty()) {
+            return;
+        }
+        try {
+            String targetRealm = applicationProperties.getKeycloakAdmin().getTargetRealm();
+            UserRepresentation user = new UserRepresentation();
+            user.setEnabled(active);
+            keycloak.realm(targetRealm).users().get(userId).update(user);
+            log.info(">>> KEYCLOAK: Usuario {} ahora está {}", userId, active ? "HABILITADO" : "DESHABILITADO");
+        } catch (Exception e) {
+            log.error(">>> KEYCLOAK ERROR: No se pudo actualizar estado para {}: {}", userId, e.getMessage());
+        }
+    }
+
+    public String getUserRole(String userId) {
+        if (userId == null || userId.isEmpty()) {
+            return null;
+        }
+        try {
+            String targetRealm = applicationProperties.getKeycloakAdmin().getTargetRealm();
+            RealmResource realmResource = keycloak.realm(targetRealm);
+            List<String> roles = realmResource.users().get(userId).roles().realmLevel().listAll().stream()
+                    .map(role -> role.getName())
+                    .collect(java.util.stream.Collectors.toList());
+
+            log.debug("Roles for user {}: {}", userId, roles);
+
+            return roles.stream()
+                    .filter(name -> name.startsWith("ROLE_")) // JHipster standard roles
+                    .findFirst()
+                    .orElseGet(() -> roles.stream()
+                            .filter(name -> !name.equals("offline_access") && !name.equals("uma_authorization")
+                                    && !name.contains("default-roles"))
+                            .findFirst()
+                            .orElse(null));
+        } catch (Exception e) {
+            log.warn(">>> KEYCLOAK ERROR: Could not get role for {}: {}", userId, e.getMessage());
+            return null;
         }
     }
 }

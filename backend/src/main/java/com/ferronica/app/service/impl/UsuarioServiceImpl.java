@@ -61,8 +61,14 @@ public class UsuarioServiceImpl implements UsuarioService {
             usuarioDTO.setIdKeycloak(null);
         }
         Usuario usuario = usuarioMapper.toEntity(usuarioDTO);
+
+        // Asegurar que el ID de Keycloak se guarde realmente
+        if (usuarioDTO.getIdKeycloak() != null) {
+            usuario.setIdKeycloak(usuarioDTO.getIdKeycloak());
+        }
+
         usuario = usuarioRepository.save(usuario);
-        return usuarioMapper.toDto(usuario);
+        return enrichWithRole(usuario);
     }
 
     @Override
@@ -71,9 +77,22 @@ public class UsuarioServiceImpl implements UsuarioService {
         if (usuarioDTO.getIdKeycloak() != null && usuarioDTO.getIdKeycloak().trim().isEmpty()) {
             usuarioDTO.setIdKeycloak(null);
         }
+
+        // Sincronizar estado activo con Keycloak si tiene ID
+        if (usuarioDTO.getIdKeycloak() != null) {
+            keycloakService.updateUserStatus(usuarioDTO.getIdKeycloak(),
+                    Boolean.TRUE.equals(usuarioDTO.getActivo()));
+        }
+
         Usuario usuario = usuarioMapper.toEntity(usuarioDTO);
+
+        // Asegurar que el ID de Keycloak se mantenga
+        if (usuarioDTO.getIdKeycloak() != null) {
+            usuario.setIdKeycloak(usuarioDTO.getIdKeycloak());
+        }
+
         usuario = usuarioRepository.save(usuario);
-        return usuarioMapper.toDto(usuario);
+        return enrichWithRole(usuario);
     }
 
     @Override
@@ -85,24 +104,29 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .map(existingUsuario -> {
                     usuarioMapper.partialUpdate(existingUsuario, usuarioDTO);
 
+                    // Sincronizar estado activo con Keycloak si cambia
+                    if (existingUsuario.getIdKeycloak() != null && usuarioDTO.getActivo() != null) {
+                        keycloakService.updateUserStatus(existingUsuario.getIdKeycloak(), existingUsuario.getActivo());
+                    }
+
                     return existingUsuario;
                 })
                 .map(usuarioRepository::save)
-                .map(usuarioMapper::toDto);
+                .map(this::enrichWithRole);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<UsuarioDTO> findAll(Pageable pageable) {
         LOG.debug("Request to get all Usuarios");
-        return usuarioRepository.findAll(pageable).map(usuarioMapper::toDto);
+        return usuarioRepository.findAll(pageable).map(this::enrichWithRole);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<UsuarioDTO> findOne(Long id) {
         LOG.debug("Request to get Usuario : {}", id);
-        return usuarioRepository.findById(id).map(usuarioMapper::toDto);
+        return usuarioRepository.findById(id).map(this::enrichWithRole);
     }
 
     @Override
@@ -111,6 +135,30 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuarioRepository.findById(id).ifPresent(usuario -> {
             usuario.setActivo(false);
             usuarioRepository.save(usuario);
+
+            // También desactivar en Keycloak si tiene ID
+            if (usuario.getIdKeycloak() != null) {
+                keycloakService.updateUserStatus(usuario.getIdKeycloak(), false);
+            }
         });
+    }
+
+    private UsuarioDTO enrichWithRole(Usuario usuario) {
+        UsuarioDTO dto = usuarioMapper.toDto(usuario);
+        String keycloakId = usuario.getIdKeycloak();
+
+        if (keycloakId != null && !keycloakId.trim().isEmpty()) {
+            LOG.debug("Fetching role for user {} from Keycloak ID: {}", usuario.getNombre(), keycloakId);
+            String role = keycloakService.getUserRole(keycloakId);
+            if (role != null) {
+                dto.setRol(role);
+                LOG.info(">>> ROLE FOUND: User {} has role {}", usuario.getNombre(), role);
+            } else {
+                LOG.warn(">>> ROLE MISSING: Keycloak returned no role for user {}", usuario.getNombre());
+            }
+        } else {
+            LOG.debug("Skipping role enrichment for user {} (No Keycloak ID)", usuario.getNombre());
+        }
+        return dto;
     }
 }

@@ -74,27 +74,28 @@ export const UsuarioUpdate = () => {
                     <FontAwesomeIcon icon={faUsers} className="me-2 text-primary" />
                     {isNew ? 'Nuevo Usuario' : 'Editar Usuario'}
                 </h4>
-                <Button color="secondary" size="sm" outline onClick={() => navigate('/admin/usuarios')}>
+                <Button color="black" size="sm" outline onClick={() => navigate('/admin/usuarios')}>
                     <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Volver
                 </Button>
             </div>
 
             <Row className="justify-content-center">
-                <Col md="8">
+                <Col md="6" lg="5">
                     <Card className="shadow-sm border-0">
-                        <CardBody>
+                        <CardBody className="p-4">
                             <Form onSubmit={handleSubmit}>
                                 <Row>
                                     <Col md="6">
-                                        <FormGroup>
+                                        <FormGroup className="mb-4">
                                             <Label for="nombre" className="fw-bold">
                                                 Nombre <span className="text-danger">*</span>
                                             </Label>
                                             <Input
+                                                bsSize="sm"
                                                 type="text"
                                                 id="nombre"
                                                 name="nombre"
-                                                placeholder="Ej: Juan"
+                                                placeholder="Juan"
                                                 value={usuario.nombre}
                                                 onChange={handleChange}
                                                 required
@@ -102,15 +103,16 @@ export const UsuarioUpdate = () => {
                                         </FormGroup>
                                     </Col>
                                     <Col md="6">
-                                        <FormGroup>
+                                        <FormGroup className="mb-4">
                                             <Label for="apellido" className="fw-bold">
                                                 Apellido
                                             </Label>
                                             <Input
+                                                bsSize="sm"
                                                 type="text"
                                                 id="apellido"
                                                 name="apellido"
-                                                placeholder="Ej: Pérez"
+                                                placeholder="Pérez"
                                                 value={usuario.apellido || ''}
                                                 onChange={handleChange}
                                             />
@@ -118,68 +120,51 @@ export const UsuarioUpdate = () => {
                                     </Col>
                                 </Row>
 
-                                <FormGroup>
+                                <FormGroup className="mb-4">
                                     <Label for="cedula" className="fw-bold">
                                         Cédula / Identificación <span className="text-danger">*</span>
                                     </Label>
                                     <Input
+                                        bsSize="sm"
                                         type="text"
                                         id="cedula"
                                         name="cedula"
-                                        placeholder="Ej: 001-000000-0000A"
+                                        placeholder="001-000000-0000A"
                                         value={usuario.cedula}
                                         onChange={handleChange}
                                         required
                                     />
                                 </FormGroup>
 
-                                <Row>
-                                    <Col md="6">
-                                        <FormGroup>
-                                            <Label for="telefono" className="fw-bold">
-                                                Teléfono
-                                            </Label>
-                                            <Input
-                                                type="tel"
-                                                id="telefono"
-                                                name="telefono"
-                                                placeholder="Ej: 8888-8888"
-                                                value={usuario.telefono || ''}
-                                                onChange={handleChange}
-                                            />
-                                        </FormGroup>
-                                    </Col>
-                                    <Col md="6">
-                                        <FormGroup>
-                                            <Label for="idKeycloak" className="fw-bold">
-                                                Keycloak ID (Opcional)
-                                            </Label>
-                                            <Input
-                                                type="text"
-                                                id="idKeycloak"
-                                                name="idKeycloak"
-                                                placeholder="ID de usuario de Keycloak"
-                                                value={usuario.idKeycloak || ''}
-                                                onChange={handleChange}
-                                            />
-                                        </FormGroup>
-                                    </Col>
-                                </Row>
+                                <FormGroup className="mb-4">
+                                    <Label for="telefono" className="fw-bold">
+                                        Teléfono de Contacto
+                                    </Label>
+                                    <Input
+                                        bsSize="sm"
+                                        type="tel"
+                                        id="telefono"
+                                        name="telefono"
+                                        placeholder="8888-8888"
+                                        value={usuario.telefono || ''}
+                                        onChange={handleChange}
+                                    />
+                                </FormGroup>
 
                                 {isNew && (
-                                    <>
-                                        <div className="border-top my-3"></div>
-                                        <h5 className="mb-3 text-secondary">
+                                    <div className="bg-light p-3 rounded mb-4 border shadow-sm">
+                                        <h6 className="mb-3 text-primary fw-bold border-bottom pb-2">
                                             <FontAwesomeIcon icon={faUsers} className="me-2" />
-                                            Cuenta de Acceso (Keycloak)
-                                        </h5>
+                                            Credenciales de Acceso
+                                        </h6>
                                         <Row>
                                             <Col md="6">
-                                                <FormGroup>
-                                                    <Label for="email" className="fw-bold">
-                                                        Usuario / Email <span className="text-danger">*</span>
+                                                <FormGroup className="mb-3">
+                                                    <Label for="email" className="fw-bold small mb-1">
+                                                        Usuario *
                                                     </Label>
                                                     <Input
+                                                        bsSize="sm"
                                                         type="text"
                                                         id="email"
                                                         name="email"
@@ -191,11 +176,12 @@ export const UsuarioUpdate = () => {
                                                 </FormGroup>
                                             </Col>
                                             <Col md="6">
-                                                <FormGroup>
-                                                    <Label for="password" className="fw-bold">
-                                                        Contraseña <span className="text-danger">*</span>
+                                                <FormGroup className="mb-3">
+                                                    <Label for="password" className="fw-bold small mb-1">
+                                                        Contraseña *
                                                     </Label>
                                                     <Input
+                                                        bsSize="sm"
                                                         type="password"
                                                         id="password"
                                                         name="password"
@@ -207,34 +193,33 @@ export const UsuarioUpdate = () => {
                                                 </FormGroup>
                                             </Col>
                                         </Row>
-                                        <FormGroup>
-                                            <Label for="rol" className="fw-bold">
-                                                Rol de Usuario <span className="text-danger">*</span>
+                                        <FormGroup className="mb-0">
+                                            <Label for="rol" className="fw-bold small mb-1">
+                                                Rol Asignado *
                                             </Label>
-                                            <Input type="select" id="rol" name="rol" value={usuario.rol || 'ROLE_VENDEDOR'} onChange={handleChange}>
+                                            <Input bsSize="sm" type="select" id="rol" name="rol" value={usuario.rol || 'ROLE_VENDEDOR'} onChange={handleChange}>
                                                 <option value="ROLE_VENDEDOR">Vendedor</option>
                                                 <option value="ROLE_BODEGUERO">Bodeguero</option>
                                                 <option value="ROLE_ADMIN">Administrador</option>
                                             </Input>
                                         </FormGroup>
-                                        <div className="border-bottom my-3"></div>
-                                    </>
+                                    </div>
                                 )}
 
-                                <FormGroup check className="mb-3">
-                                    <Input type="checkbox" id="activo" name="activo" checked={usuario.activo || false} onChange={handleChange} />
-                                    <Label check for="activo" className="fw-bold">
-                                        Usuario Activo
+                                <FormGroup check className="mb-4">
+                                    <Input type="checkbox" id="activo" name="activo" checked={usuario.activo || false} onChange={handleChange} className="mt-1" />
+                                    <Label check for="activo" className="fw-bold ms-1">
+                                        Usuario Activo en el Sistema
                                     </Label>
                                 </FormGroup>
 
-                                <div className="d-flex gap-2 mt-4">
-                                    <Button color="success" type="submit" className="fw-bold flex-fill">
+                                <div className="d-flex gap-2">
+                                    <Button color="success" size="lg" type="submit" className="fw-bold flex-fill shadow-sm">
                                         <FontAwesomeIcon icon={faSave} className="me-2" />
-                                        {isNew ? 'Crear Usuario' : 'Guardar Cambios'}
+                                        {isNew ? 'CREAR USUARIO' : 'GUARDAR CAMBIOS'}
                                     </Button>
-                                    <Button color="secondary" outline onClick={() => navigate('/admin/usuarios')}>
-                                        Cancelar
+                                    <Button color="black" outline onClick={() => navigate('/admin/usuarios')} className="px-4">
+                                        CANCELAR
                                     </Button>
                                 </div>
                             </Form>
