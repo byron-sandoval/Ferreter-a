@@ -132,7 +132,27 @@ export const UsuarioUpdate = () => {
                                         name="cedula"
                                         placeholder="001-000000-0000A"
                                         value={usuario.cedula}
-                                        onChange={handleChange}
+                                        maxLength={16}
+                                        onChange={e => {
+                                            const raw = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
+                                            const digitsOnly = raw.substring(0, 13).replace(/[^0-9]/g, '');
+                                            const lastChar =
+                                                raw.length > 13
+                                                    ? raw
+                                                        .substring(13, 14)
+                                                        .replace(/[^a-zA-Z]/g, '')
+                                                        .toUpperCase()
+                                                    : '';
+                                            const input = digitsOnly + lastChar;
+
+                                            let formatted = input;
+                                            if (input.length > 3 && input.length <= 9) {
+                                                formatted = `${input.substring(0, 3)}-${input.substring(3)}`;
+                                            } else if (input.length > 9) {
+                                                formatted = `${input.substring(0, 3)}-${input.substring(3, 9)}-${input.substring(9)}`;
+                                            }
+                                            setUsuario({ ...usuario, cedula: formatted });
+                                        }}
                                         required
                                     />
                                 </FormGroup>
@@ -148,7 +168,15 @@ export const UsuarioUpdate = () => {
                                         name="telefono"
                                         placeholder="8888-8888"
                                         value={usuario.telefono || ''}
-                                        onChange={handleChange}
+                                        maxLength={9}
+                                        onChange={e => {
+                                            const input = e.target.value.replace(/[^0-9]/g, '').substring(0, 8);
+                                            let formatted = input;
+                                            if (input.length > 4) {
+                                                formatted = `${input.substring(0, 4)}-${input.substring(4)}`;
+                                            }
+                                            setUsuario({ ...usuario, telefono: formatted });
+                                        }}
                                     />
                                 </FormGroup>
 

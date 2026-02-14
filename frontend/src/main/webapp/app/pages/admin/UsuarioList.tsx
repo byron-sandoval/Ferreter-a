@@ -60,7 +60,7 @@ export const UsuarioList = () => {
                     if (res.data === true) {
                         toast.success('Usuario eliminado físicamente del sistema.');
                     } else {
-                        toast.info('Usuario inactivado correctamente. Se conservó por tener historial de ventas.');
+                        toast.info('Usuario inactivado correctamente. Se conservó por tener historial.');
                     }
                     loadAll();
                 })
