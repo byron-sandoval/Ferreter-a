@@ -62,6 +62,11 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
         Usuario usuario = usuarioMapper.toEntity(usuarioDTO);
 
+        // Asegurar que los nuevos campos se guarden localmente
+        usuario.setEmail(usuarioDTO.getEmail());
+        usuario.setUsername(usuarioDTO.getUsername());
+        usuario.setRol(usuarioDTO.getRol());
+
         // Asegurar que el ID de Keycloak se guarde realmente
         if (usuarioDTO.getIdKeycloak() != null) {
             usuario.setIdKeycloak(usuarioDTO.getIdKeycloak());
@@ -78,13 +83,17 @@ public class UsuarioServiceImpl implements UsuarioService {
             usuarioDTO.setIdKeycloak(null);
         }
 
-        // Sincronizar estado activo con Keycloak si tiene ID
+        // Sincronizar perfil completo con Keycloak si tiene ID
         if (usuarioDTO.getIdKeycloak() != null) {
-            keycloakService.updateUserStatus(usuarioDTO.getIdKeycloak(),
-                    Boolean.TRUE.equals(usuarioDTO.getActivo()));
+            keycloakService.updateUserProfile(usuarioDTO);
         }
 
         Usuario usuario = usuarioMapper.toEntity(usuarioDTO);
+
+        // Sincronizar campos locales en actualización
+        usuario.setEmail(usuarioDTO.getEmail());
+        usuario.setUsername(usuarioDTO.getUsername());
+        usuario.setRol(usuarioDTO.getRol());
 
         // Asegurar que el ID de Keycloak se mantenga
         if (usuarioDTO.getIdKeycloak() != null) {
@@ -104,9 +113,10 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .map(existingUsuario -> {
                     usuarioMapper.partialUpdate(existingUsuario, usuarioDTO);
 
-                    // Sincronizar estado activo con Keycloak si cambia
-                    if (existingUsuario.getIdKeycloak() != null && usuarioDTO.getActivo() != null) {
-                        keycloakService.updateUserStatus(existingUsuario.getIdKeycloak(), existingUsuario.getActivo());
+                    // Sincronizar cambios con Keycloak
+                    if (existingUsuario.getIdKeycloak() != null) {
+                        UsuarioDTO updatedDto = usuarioMapper.toDto(existingUsuario);
+                        keycloakService.updateUserProfile(updatedDto);
                     }
 
                     return existingUsuario;
@@ -145,19 +155,22 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     private UsuarioDTO enrichWithRole(Usuario usuario) {
         UsuarioDTO dto = usuarioMapper.toDto(usuario);
-        String keycloakId = usuario.getIdKeycloak();
 
+        // Si ya tenemos el rol en la base de datos local, lo usamos directamente para
+        // ahorrar tiempo
+        if (usuario.getRol() != null && !usuario.getRol().isEmpty()) {
+            dto.setRol(usuario.getRol());
+            return dto;
+        }
+
+        String keycloakId = usuario.getIdKeycloak();
         if (keycloakId != null && !keycloakId.trim().isEmpty()) {
             LOG.debug("Fetching role for user {} from Keycloak ID: {}", usuario.getNombre(), keycloakId);
             String role = keycloakService.getUserRole(keycloakId);
             if (role != null) {
                 dto.setRol(role);
-                LOG.info(">>> ROLE FOUND: User {} has role {}", usuario.getNombre(), role);
-            } else {
-                LOG.warn(">>> ROLE MISSING: Keycloak returned no role for user {}", usuario.getNombre());
+                LOG.info(">>> ROLE FOUND: User {} role fetched from Keycloak", usuario.getNombre());
             }
-        } else {
-            LOG.debug("Skipping role enrichment for user {} (No Keycloak ID)", usuario.getNombre());
         }
         return dto;
     }
