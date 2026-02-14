@@ -19,6 +19,7 @@ export const UsuarioUpdate = () => {
         telefono: '',
         idKeycloak: '',
         activo: true,
+        username: '',
         email: '',
         password: '',
         rol: 'ROLE_VENDEDOR',
@@ -151,34 +152,55 @@ export const UsuarioUpdate = () => {
                                     />
                                 </FormGroup>
 
-                                {isNew && (
-                                    <div className="bg-light p-3 rounded mb-4 border shadow-sm">
-                                        <h6 className="mb-3 text-primary fw-bold border-bottom pb-2">
-                                            <FontAwesomeIcon icon={faUsers} className="me-2" />
-                                            Credenciales de Acceso
-                                        </h6>
-                                        <Row>
-                                            <Col md="6">
-                                                <FormGroup className="mb-3">
-                                                    <Label for="email" className="fw-bold small mb-1">
-                                                        Usuario *
-                                                    </Label>
-                                                    <Input
-                                                        bsSize="sm"
-                                                        type="text"
-                                                        id="email"
-                                                        name="email"
-                                                        placeholder="nombre.usuario"
-                                                        value={usuario.email || ''}
-                                                        onChange={handleChange}
-                                                        required={isNew}
-                                                    />
-                                                </FormGroup>
-                                            </Col>
+                                <div className="bg-light p-3 rounded mb-4 border shadow-sm">
+                                    <h6 className="mb-3 text-primary fw-bold border-bottom pb-2">
+                                        <FontAwesomeIcon icon={faUsers} className="me-2" />
+                                        Credenciales de Acceso
+                                    </h6>
+                                    <Row>
+                                        <Col md="6">
+                                            <FormGroup className="mb-3">
+                                                <Label for="username" className="fw-bold small mb-1">
+                                                    Nombre de Usuario {isNew && '*'}
+                                                </Label>
+                                                <Input
+                                                    bsSize="sm"
+                                                    type="text"
+                                                    id="username"
+                                                    name="username"
+                                                    placeholder="nombre.usuario"
+                                                    value={usuario.username || ''}
+                                                    onChange={handleChange}
+                                                    required={isNew}
+                                                    disabled={!isNew}
+                                                />
+                                                {!isNew && <div className="text-muted" style={{ fontSize: '0.75rem' }}>El nombre de usuario no se puede cambiar.</div>}
+                                            </FormGroup>
+                                        </Col>
+                                        <Col md="6">
+                                            <FormGroup className="mb-3">
+                                                <Label for="email" className="fw-bold small mb-1">
+                                                    Correo Electrónico (Gmail) *
+                                                </Label>
+                                                <Input
+                                                    bsSize="sm"
+                                                    type="email"
+                                                    id="email"
+                                                    name="email"
+                                                    placeholder="ejemplo@gmail.com"
+                                                    value={usuario.email || ''}
+                                                    onChange={handleChange}
+                                                    required
+                                                />
+                                            </FormGroup>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        {isNew && (
                                             <Col md="6">
                                                 <FormGroup className="mb-3">
                                                     <Label for="password" className="fw-bold small mb-1">
-                                                        Contraseña *
+                                                        Contraseña Temporal *
                                                     </Label>
                                                     <Input
                                                         bsSize="sm"
@@ -192,19 +214,21 @@ export const UsuarioUpdate = () => {
                                                     />
                                                 </FormGroup>
                                             </Col>
-                                        </Row>
-                                        <FormGroup className="mb-0">
-                                            <Label for="rol" className="fw-bold small mb-1">
-                                                Rol Asignado *
-                                            </Label>
-                                            <Input bsSize="sm" type="select" id="rol" name="rol" value={usuario.rol || 'ROLE_VENDEDOR'} onChange={handleChange}>
-                                                <option value="ROLE_VENDEDOR">Vendedor</option>
-                                                <option value="ROLE_BODEGUERO">Bodeguero</option>
-                                                <option value="ROLE_ADMIN">Administrador</option>
-                                            </Input>
-                                        </FormGroup>
-                                    </div>
-                                )}
+                                        )}
+                                        <Col md={isNew ? "6" : "12"}>
+                                            <FormGroup className="mb-0">
+                                                <Label for="rol" className="fw-bold small mb-1">
+                                                    Rol Asignado *
+                                                </Label>
+                                                <Input bsSize="sm" type="select" id="rol" name="rol" value={usuario.rol || 'ROLE_VENDEDOR'} onChange={handleChange}>
+                                                    <option value="ROLE_VENDEDOR">Vendedor</option>
+                                                    <option value="ROLE_BODEGUERO">Bodeguero</option>
+                                                    <option value="ROLE_ADMIN">Administrador</option>
+                                                </Input>
+                                            </FormGroup>
+                                        </Col>
+                                    </Row>
+                                </div>
 
                                 <FormGroup check className="mb-4">
                                     <Input type="checkbox" id="activo" name="activo" checked={usuario.activo || false} onChange={handleChange} className="mt-1" />
