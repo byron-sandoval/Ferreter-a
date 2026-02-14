@@ -35,10 +35,15 @@ public class KeycloakService {
         }
 
         UserRepresentation user = new UserRepresentation();
-        user.setUsername(usuarioDTO.getEmail());
+        // Usar username si viene, sino usar email
+        String username = (usuarioDTO.getUsername() != null && !usuarioDTO.getUsername().isEmpty())
+                ? usuarioDTO.getUsername()
+                : usuarioDTO.getEmail();
+
+        user.setUsername(username);
 
         // Solo asignar email si parece un correo válido
-        if (usuarioDTO.getEmail().contains("@")) {
+        if (usuarioDTO.getEmail() != null && usuarioDTO.getEmail().contains("@")) {
             user.setEmail(usuarioDTO.getEmail());
             user.setEmailVerified(true);
         }
@@ -46,9 +51,11 @@ public class KeycloakService {
         user.setFirstName(usuarioDTO.getNombre());
         user.setLastName(usuarioDTO.getApellido());
         user.setEnabled(true);
+        // Obliga al usuario a cambiar contraseña en su primer inicio de sesión
+        user.setRequiredActions(List.of("UPDATE_PASSWORD"));
 
         CredentialRepresentation credential = new CredentialRepresentation();
-        credential.setTemporary(false);
+        credential.setTemporary(true); // La contraseña es temporal
         credential.setType(CredentialRepresentation.PASSWORD);
         credential.setValue(usuarioDTO.getPassword());
 
@@ -112,6 +119,34 @@ public class KeycloakService {
             log.info(">>> KEYCLOAK: Usuario {} ahora está {}", userId, active ? "HABILITADO" : "DESHABILITADO");
         } catch (Exception e) {
             log.error(">>> KEYCLOAK ERROR: No se pudo actualizar estado para {}: {}", userId, e.getMessage());
+        }
+    }
+
+    public void updateUserProfile(UsuarioDTO usuarioDTO) {
+        String userId = usuarioDTO.getIdKeycloak();
+        if (userId == null || userId.isEmpty()) {
+            return;
+        }
+        try {
+            String targetRealm = applicationProperties.getKeycloakAdmin().getTargetRealm();
+            UserRepresentation user = new UserRepresentation();
+            user.setFirstName(usuarioDTO.getNombre());
+            user.setLastName(usuarioDTO.getApellido());
+            user.setEnabled(Boolean.TRUE.equals(usuarioDTO.getActivo()));
+
+            if (usuarioDTO.getEmail() != null && usuarioDTO.getEmail().contains("@")) {
+                user.setEmail(usuarioDTO.getEmail());
+            }
+
+            // Si el rol cambió, también lo actualizamos en Keycloak
+            if (usuarioDTO.getRol() != null) {
+                assignRole(userId, usuarioDTO.getRol());
+            }
+
+            keycloak.realm(targetRealm).users().get(userId).update(user);
+            log.info(">>> KEYCLOAK: Perfil actualizado para el usuario {}", userId);
+        } catch (Exception e) {
+            log.error(">>> KEYCLOAK ERROR: No se pudo actualizar el perfil para {}: {}", userId, e.getMessage());
         }
     }
 
