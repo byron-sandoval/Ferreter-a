@@ -150,6 +150,19 @@ public class KeycloakService {
         }
     }
 
+    public void deleteKeycloakUser(String userId) {
+        if (userId == null || userId.isEmpty()) {
+            return;
+        }
+        try {
+            String targetRealm = applicationProperties.getKeycloakAdmin().getTargetRealm();
+            keycloak.realm(targetRealm).users().get(userId).remove();
+            log.info(">>> KEYCLOAK: Usuario {} eliminado físicamente", userId);
+        } catch (Exception e) {
+            log.error(">>> KEYCLOAK ERROR: No se pudo eliminar el usuario {}: {}", userId, e.getMessage());
+        }
+    }
+
     public String getUserRole(String userId) {
         if (userId == null || userId.isEmpty()) {
             return null;
