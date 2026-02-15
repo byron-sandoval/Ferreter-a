@@ -18,6 +18,9 @@ public class UsuarioDTO implements Serializable {
     @Size(max = 20)
     private String cedula;
 
+    @Size(max = 50)
+    private String username;
+
     @NotNull
     @Size(max = 50)
     private String nombre;
@@ -58,6 +61,14 @@ public class UsuarioDTO implements Serializable {
 
     public void setCedula(String cedula) {
         this.cedula = cedula;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getNombre() {
@@ -144,6 +155,7 @@ public class UsuarioDTO implements Serializable {
                 "id=" + getId() +
                 ", idKeycloak='" + getIdKeycloak() + "'" +
                 ", cedula='" + getCedula() + "'" +
+                ", username='" + getUsername() + "'" +
                 ", nombre='" + getNombre() + "'" +
                 ", apellido='" + getApellido() + "'" +
                 ", telefono='" + getTelefono() + "'" +

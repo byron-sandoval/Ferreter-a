@@ -85,7 +85,7 @@ public class DetalleVentaServiceImpl implements DetalleVentaService {
     @Transactional(readOnly = true)
     public List<DetalleVentaDTO> findAll() {
         LOG.debug("Request to get all DetalleVentas");
-        return detalleVentaRepository.findAll().stream().map(detalleVentaMapper::toDto)
+        return detalleVentaRepository.findAllEager().stream().map(detalleVentaMapper::toDto)
                 .collect(Collectors.toCollection(LinkedList::new));
     }
 

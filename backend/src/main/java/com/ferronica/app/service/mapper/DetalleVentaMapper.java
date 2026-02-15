@@ -24,6 +24,8 @@ public interface DetalleVentaMapper extends EntityMapper<DetalleVentaDTO, Detall
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
     @Mapping(target = "nombre", source = "nombre")
+    @Mapping(target = "codigo", source = "codigo")
+    @Mapping(target = "costo", source = "costo")
     @Mapping(target = "categoria", source = "categoria", qualifiedByName = "articuloCategoriaId")
     ArticuloDTO toDtoArticuloId(Articulo articulo);
 
@@ -36,5 +38,8 @@ public interface DetalleVentaMapper extends EntityMapper<DetalleVentaDTO, Detall
     @Named("ventaId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "fecha", source = "fecha")
+    @Mapping(target = "anulada", source = "anulada")
+    @Mapping(target = "noFactura", source = "noFactura")
     VentaDTO toDtoVentaId(Venta venta);
 }

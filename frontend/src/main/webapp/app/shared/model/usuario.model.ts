@@ -6,6 +6,7 @@ export interface IUsuario {
     apellido?: string | null;
     telefono?: string | null;
     activo?: boolean | null;
+    username?: string;
     email?: string;
     password?: string;
     rol?: string; // 'ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR'

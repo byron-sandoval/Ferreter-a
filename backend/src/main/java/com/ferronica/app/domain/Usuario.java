@@ -44,6 +44,18 @@ public class Usuario implements Serializable {
     @Column(name = "activo")
     private Boolean activo;
 
+    @Size(max = 254)
+    @Column(name = "email", length = 254)
+    private String email;
+
+    @Size(max = 50)
+    @Column(name = "username", length = 50)
+    private String username;
+
+    @Size(max = 50)
+    @Column(name = "rol", length = 50)
+    private String rol;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -137,6 +149,45 @@ public class Usuario implements Serializable {
         this.activo = activo;
     }
 
+    public String getEmail() {
+        return this.email;
+    }
+
+    public Usuario email(String email) {
+        this.setEmail(email);
+        return this;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getUsername() {
+        return this.username;
+    }
+
+    public Usuario username(String username) {
+        this.setUsername(username);
+        return this;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getRol() {
+        return this.rol;
+    }
+
+    public Usuario rol(String rol) {
+        this.setRol(rol);
+        return this;
+    }
+
+    public void setRol(String rol) {
+        this.rol = rol;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and
     // setters here
 
@@ -169,6 +220,9 @@ public class Usuario implements Serializable {
                 ", apellido='" + getApellido() + "'" +
                 ", telefono='" + getTelefono() + "'" +
                 ", activo='" + getActivo() + "'" +
+                ", email='" + getEmail() + "'" +
+                ", username='" + getUsername() + "'" +
+                ", rol='" + getRol() + "'" +
                 "}";
     }
 }

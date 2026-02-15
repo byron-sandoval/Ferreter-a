@@ -38,12 +38,12 @@ export const UsuarioList = () => {
         loadAll();
     }, []);
 
-    const filtrados = usuarios.filter(
+    const filtrados = Array.isArray(usuarios) ? usuarios.filter(
         v =>
             (v.nombre || '').toLowerCase().includes(filter.toLowerCase()) ||
             (v.apellido || '').toLowerCase().includes(filter.toLowerCase()) ||
             (v.cedula || '').toLowerCase().includes(filter.toLowerCase())
-    );
+    ) : [];
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -54,15 +54,19 @@ export const UsuarioList = () => {
 
 
     const handleDelete = (id: number) => {
-        if (window.confirm('¿Está seguro de que desea inactivar este usuario? No podrá iniciar sesión hasta que sea activado nuevamente.')) {
+        if (window.confirm('¿Está seguro de que desea eliminar/inactivar este usuario? El sistema decidirá si borrarlo o solo inactivarlo según su historial.')) {
             UsuarioService.delete(id)
-                .then(() => {
-                    toast.success('Usuario inactivado correctamente');
+                .then(res => {
+                    if (res.data === true) {
+                        toast.success('Usuario eliminado físicamente del sistema.');
+                    } else {
+                        toast.info('Usuario inactivado correctamente. Se conservó por tener historial.');
+                    }
                     loadAll();
                 })
                 .catch(err => {
                     console.error(err);
-                    toast.error('Error al inactivar el usuario');
+                    toast.error('Error al procesar la eliminación del usuario');
                 });
         }
     };
@@ -103,6 +107,7 @@ export const UsuarioList = () => {
                 <Table hover responsive size="sm" className="mb-0">
                     <thead className="table-light text-dark text-center text-uppercase small fw-bold">
                         <tr>
+                            <th className="py-2">ID</th>
                             <th className="py-2">Nombre Completo</th>
                             <th className="py-2">Teléfono</th>
                             <th className="py-2">Rol</th>
@@ -114,6 +119,7 @@ export const UsuarioList = () => {
                         {currentItems.length > 0 ? (
                             currentItems.map(v => (
                                 <tr key={v.id} className="text-center align-middle" style={{ fontSize: '0.8rem' }}>
+                                    <td className="fw-bold text-muted">{v.id}</td>
                                     <td className="text-center px-3">
                                         {v.nombre} {v.apellido}
                                     </td>

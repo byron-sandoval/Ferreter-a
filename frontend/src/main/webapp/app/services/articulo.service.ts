@@ -4,7 +4,12 @@ import { IArticulo } from '../shared/model/articulo.model';
 const API_URL = 'api/articulos';
 
 const getAll = (page?: number, size?: number, sort?: string) => {
-  return axios.get<IArticulo[]>(`${API_URL}${page ? `?page=${page}&size=${size}&sort=${sort}` : ''}`);
+  const params = new URLSearchParams();
+  if (page !== undefined) params.append('page', page.toString());
+  if (size !== undefined) params.append('size', size.toString());
+  if (sort !== undefined) params.append('sort', sort);
+  const queryString = params.toString();
+  return axios.get<IArticulo[]>(`${API_URL}${queryString ? `?${queryString}` : ''}`);
 };
 
 const getById = (id: number) => {

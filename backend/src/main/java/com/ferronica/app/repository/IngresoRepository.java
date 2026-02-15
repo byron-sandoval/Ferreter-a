@@ -14,4 +14,6 @@ public interface IngresoRepository extends JpaRepository<Ingreso, Long>, JpaSpec
     @EntityGraph(attributePaths = { "proveedor", "usuario", "detalles", "detalles.articulo" })
     @Query("select ingreso from Ingreso ingreso where ingreso.id = :id")
     Optional<Ingreso> findOneWithEagerRelationships(@org.springframework.data.repository.query.Param("id") Long id);
+
+    long countByUsuarioId(Long usuarioId);
 }

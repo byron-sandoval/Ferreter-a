@@ -14,4 +14,6 @@ public interface VentaRepository extends JpaRepository<Venta, Long>, JpaSpecific
     @EntityGraph(attributePaths = { "cliente", "usuario", "moneda", "detalles", "detalles.articulo" })
     @Query("select venta from Venta venta where venta.id = :id")
     Optional<Venta> findOneWithEagerRelationships(@org.springframework.data.repository.query.Param("id") Long id);
+
+    long countByUsuarioId(Long usuarioId);
 }

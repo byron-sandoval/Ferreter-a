@@ -3,6 +3,8 @@ package com.ferronica.app.service.impl;
 import com.ferronica.app.domain.Ingreso;
 import com.ferronica.app.repository.IngresoRepository;
 import com.ferronica.app.repository.ArticuloRepository;
+import com.ferronica.app.repository.UsuarioRepository;
+import com.ferronica.app.security.SecurityUtils;
 import com.ferronica.app.service.IngresoService;
 import com.ferronica.app.service.dto.IngresoDTO;
 import com.ferronica.app.service.mapper.IngresoMapper;
@@ -28,17 +30,20 @@ public class IngresoServiceImpl implements IngresoService {
 
     private final ArticuloRepository articuloRepository;
 
+    private final UsuarioRepository usuarioRepository;
+
     public IngresoServiceImpl(IngresoRepository ingresoRepository, IngresoMapper ingresoMapper,
-            ArticuloRepository articuloRepository) {
+            ArticuloRepository articuloRepository, UsuarioRepository usuarioRepository) {
         this.ingresoRepository = ingresoRepository;
         this.ingresoMapper = ingresoMapper;
         this.articuloRepository = articuloRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Override
     public IngresoDTO save(IngresoDTO ingresoDTO) {
         LOG.debug("Request to save Ingreso : {}", ingresoDTO);
-        Ingreso ingreso = ingresoMapper.toEntity(ingresoDTO);
+        final Ingreso ingreso = ingresoMapper.toEntity(ingresoDTO);
 
         // Automatización de Fecha
         ingreso.setFecha(java.time.Instant.now());
@@ -48,11 +53,16 @@ public class IngresoServiceImpl implements IngresoService {
             ingreso.setActivo(true);
         }
 
-        ingreso = ingresoRepository.save(ingreso);
+        // Automatización de Usuario por Usuario Autenticado
+        SecurityUtils.getCurrentUserKeycloakId().ifPresent(idKeycloak -> {
+            usuarioRepository.findByIdKeycloak(idKeycloak).ifPresent(ingreso::setUsuario);
+        });
+
+        Ingreso savedIngreso = ingresoRepository.save(ingreso);
 
         // Actualizar stock de productos
-        if (ingreso.getDetalles() != null && !ingreso.getDetalles().isEmpty()) {
-            ingreso.getDetalles().forEach(detalle -> {
+        if (savedIngreso.getDetalles() != null && !savedIngreso.getDetalles().isEmpty()) {
+            savedIngreso.getDetalles().forEach(detalle -> {
                 if (detalle.getArticulo() != null && detalle.getArticulo().getId() != null) {
                     articuloRepository.findById(detalle.getArticulo().getId()).ifPresent(articulo -> {
                         BigDecimal existenciaActual = articulo.getExistencia() != null ? articulo.getExistencia()
@@ -68,7 +78,7 @@ public class IngresoServiceImpl implements IngresoService {
             });
         }
 
-        return ingresoMapper.toDto(ingreso);
+        return ingresoMapper.toDto(savedIngreso);
     }
 
     @Override

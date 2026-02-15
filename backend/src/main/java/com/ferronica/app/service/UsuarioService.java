@@ -53,6 +53,7 @@ public interface UsuarioService {
      * Delete the "id" usuario.
      *
      * @param id the id of the entity.
+     * @return true if physically deleted, false if logically inactivated.
      */
-    void delete(Long id);
+    boolean delete(Long id);
 }

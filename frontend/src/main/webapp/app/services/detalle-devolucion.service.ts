@@ -7,8 +7,8 @@ export const DetalleDevolucionService = {
     create(detalle: IDetalleDevolucion) {
         return axios.post<IDetalleDevolucion>(API_URL, detalle);
     },
-    getAll() {
-        return axios.get<IDetalleDevolucion[]>(API_URL);
+    getAll(params?: any) {
+        return axios.get<IDetalleDevolucion[]>(API_URL, { params });
     },
     getById(id: number) {
         return axios.get<IDetalleDevolucion>(`${API_URL}/${id}`);

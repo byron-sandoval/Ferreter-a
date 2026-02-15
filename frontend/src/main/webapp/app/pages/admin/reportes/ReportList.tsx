@@ -57,7 +57,7 @@ const reports = [
     description: 'Margen de utilidad calculado entre costo y precio de venta.',
     icon: faMoneyBillWave,
     color: 'secondary',
-    path: null,
+    path: '/admin/reportes/ganancias',
   },
   {
     title: 'Estado de Cuenta Clientes',
