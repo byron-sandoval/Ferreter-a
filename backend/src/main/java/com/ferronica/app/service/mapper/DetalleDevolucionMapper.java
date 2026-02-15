@@ -28,5 +28,6 @@ public interface DetalleDevolucionMapper extends EntityMapper<DetalleDevolucionD
     @Named("devolucionId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "fecha", source = "fecha")
     DevolucionDTO toDtoDevolucionId(Devolucion devolucion);
 }
