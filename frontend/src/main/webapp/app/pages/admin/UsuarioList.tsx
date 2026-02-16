@@ -40,11 +40,11 @@ export const UsuarioList = () => {
 
   const filtrados = Array.isArray(usuarios)
     ? usuarios.filter(
-        v =>
-          (v.nombre || '').toLowerCase().includes(filter.toLowerCase()) ||
-          (v.apellido || '').toLowerCase().includes(filter.toLowerCase()) ||
-          (v.cedula || '').toLowerCase().includes(filter.toLowerCase()),
-      )
+      v =>
+        (v.nombre || '').toLowerCase().includes(filter.toLowerCase()) ||
+        (v.apellido || '').toLowerCase().includes(filter.toLowerCase()) ||
+        (v.cedula || '').toLowerCase().includes(filter.toLowerCase()),
+    )
     : [];
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -130,7 +130,7 @@ export const UsuarioList = () => {
                   </td>
                   <td>{v.telefono || '-'}</td>
                   <td>
-                    <Badge color="info" outline className="text-uppercase" style={{ fontSize: '0.65rem' }}>
+                    <Badge color="info" className="text-uppercase" style={{ fontSize: '0.65rem' }}>
                       {(v.rol || '').replace('ROLE_', '')}
                     </Badge>
                   </td>
