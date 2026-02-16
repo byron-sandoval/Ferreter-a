@@ -163,8 +163,7 @@ export const AdminDashboard = () => {
                 </div>
                 <div className="text-end">
                   <div className="stat-value-palette">
-                    {devolucionesRecientes
-                      .filter(d => dayjs(d.fecha).isSame(dayjs(), 'day')).length}
+                    {devolucionesRecientes.filter(d => dayjs(d.fecha).isSame(dayjs(), 'day')).length}
                   </div>
                   <div className="stat-label-palette">Devoluciones Hoy</div>
                 </div>

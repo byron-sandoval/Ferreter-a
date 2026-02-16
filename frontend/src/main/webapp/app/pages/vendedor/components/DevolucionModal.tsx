@@ -64,7 +64,7 @@ export const DevolucionModal: React.FC<DevolucionModalProps> = ({ isOpen, toggle
     // Calcular nuevo total
     let newTotal = 0;
     venta.detalles?.forEach(det => {
-      const q = newCantidades[det.id!] || 0;
+      const q = newCantidades[det.id] || 0;
       newTotal += q * (det.precioVenta || 0);
     });
     setTotalDevolucion(newTotal);
@@ -73,13 +73,13 @@ export const DevolucionModal: React.FC<DevolucionModalProps> = ({ isOpen, toggle
   const handleConfirm = () => {
     const detalles: IDetalleDevolucion[] = [];
     venta.detalles?.forEach(det => {
-      const q = cantidadesParaDevolver[det.id!] || 0;
+      const q = cantidadesParaDevolver[det.id] || 0;
       if (q > 0) {
         detalles.push({
           cantidad: q,
           precioUnitario: det.precioVenta,
           montoTotal: q * (det.precioVenta || 0),
-          articulo: det.articulo
+          articulo: det.articulo,
         });
       }
     });
@@ -93,12 +93,17 @@ export const DevolucionModal: React.FC<DevolucionModalProps> = ({ isOpen, toggle
     <Modal isOpen={isOpen} toggle={toggle} size="lg" centered shadow="lg">
       <ModalHeader toggle={toggle} className="bg-danger text-white border-0 py-3">
         <div className="d-flex align-items-center">
-          <div className="bg-white bg-opacity-25 rounded-circle p-2 me-3" style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div
+            className="bg-white bg-opacity-25 rounded-circle p-2 me-3"
+            style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
             <FontAwesomeIcon icon={faUndo} />
           </div>
           <div>
             <h5 className="m-0 fw-bold">Procesar Devolución</h5>
-            <small className="opacity-75">Factura #{venta.noFactura} - {venta.cliente?.nombre || 'General'}</small>
+            <small className="opacity-75">
+              Factura #{venta.noFactura} - {venta.cliente?.nombre || 'General'}
+            </small>
           </div>
         </div>
       </ModalHeader>
@@ -140,7 +145,7 @@ export const DevolucionModal: React.FC<DevolucionModalProps> = ({ isOpen, toggle
                   </thead>
                   <tbody>
                     {venta.detalles?.map((det, i) => {
-                      const yaDevuelto = cantidadesDevueltasPrevias[det.articulo?.id!] || 0;
+                      const yaDevuelto = cantidadesDevueltasPrevias[det.articulo?.id] || 0;
                       const maxDisponible = (det.cantidad || 0) - yaDevuelto;
 
                       return (
@@ -155,14 +160,20 @@ export const DevolucionModal: React.FC<DevolucionModalProps> = ({ isOpen, toggle
                             </div>
                             {yaDevuelto > 0 && maxDisponible > 0 && (
                               <div className="mt-1">
-                                <span className="badge rounded-pill bg-info bg-opacity-10 text-info border border-info border-opacity-25" style={{ fontSize: '0.7rem' }}>
+                                <span
+                                  className="badge rounded-pill bg-info bg-opacity-10 text-info border border-info border-opacity-25"
+                                  style={{ fontSize: '0.7rem' }}
+                                >
                                   {maxDisponible} disponibles
                                 </span>
                               </div>
                             )}
                             {maxDisponible <= 0 && (
                               <div className="mt-1">
-                                <span className="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25" style={{ fontSize: '0.7rem' }}>
+                                <span
+                                  className="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25"
+                                  style={{ fontSize: '0.7rem' }}
+                                >
                                   Devolución Completa
                                 </span>
                               </div>
@@ -177,13 +188,15 @@ export const DevolucionModal: React.FC<DevolucionModalProps> = ({ isOpen, toggle
                                 disabled={maxDisponible <= 0}
                                 className={`text-center border-0 fw-bold ${maxDisponible <= 0 ? 'bg-light text-muted' : 'bg-light text-danger'}`}
                                 style={{ width: '80px', borderRadius: '8px', opacity: maxDisponible <= 0 ? 0.5 : 1 }}
-                                value={cantidadesParaDevolver[det.id!] || 0}
-                                onChange={e => handleCantidadChange(det.id!, parseFloat(e.target.value), maxDisponible, det.precioVenta || 0)}
+                                value={cantidadesParaDevolver[det.id] || 0}
+                                onChange={e =>
+                                  handleCantidadChange(det.id, parseFloat(e.target.value), maxDisponible, det.precioVenta || 0)
+                                }
                               />
                             </div>
                           </td>
                           <td className="text-end pe-4 fw-bold text-dark">
-                            C$ {((cantidadesParaDevolver[det.id!] || 0) * (det.precioVenta || 0)).toFixed(2)}
+                            C$ {((cantidadesParaDevolver[det.id] || 0) * (det.precioVenta || 0)).toFixed(2)}
                           </td>
                         </tr>
                       );
@@ -193,7 +206,10 @@ export const DevolucionModal: React.FC<DevolucionModalProps> = ({ isOpen, toggle
               </div>
             </div>
 
-            <div className="d-flex justify-content-between align-items-center p-3 rounded-4" style={{ backgroundColor: '#fff5f5', border: '1px dashed #feb2b2' }}>
+            <div
+              className="d-flex justify-content-between align-items-center p-3 rounded-4"
+              style={{ backgroundColor: '#fff5f5', border: '1px dashed #feb2b2' }}
+            >
               <div className="d-flex align-items-center text-danger">
                 <FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />
                 <span className="small fw-medium">Se ajustará el inventario automáticamente.</span>
@@ -218,7 +234,7 @@ export const DevolucionModal: React.FC<DevolucionModalProps> = ({ isOpen, toggle
             backgroundColor: '#f56565',
             borderColor: '#f56565',
             borderRadius: '10px',
-            padding: '10px 30px'
+            padding: '10px 30px',
           }}
           className="fw-bold shadow-sm"
         >

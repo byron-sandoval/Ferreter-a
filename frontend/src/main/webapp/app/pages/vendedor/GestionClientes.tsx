@@ -179,7 +179,6 @@ export const GestionClientes = () => {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-
   return (
     <div className="animate__animated animate__fadeIn p-1">
       <div className="d-flex justify-content-between align-items-center mb-2 px-1">
@@ -196,7 +195,10 @@ export const GestionClientes = () => {
           <Card className="shadow-sm border-0 mb-2 bg-white rounded-3 overflow-hidden">
             <CardBody className="p-0">
               <div className="p-2 bg-white border-bottom d-flex justify-content-start">
-                <div className="input-group shadow-sm rounded-pill overflow-hidden border" style={{ maxWidth: '320px', borderColor: '#18a1bcff' }}>
+                <div
+                  className="input-group shadow-sm rounded-pill overflow-hidden border"
+                  style={{ maxWidth: '320px', borderColor: '#18a1bcff' }}
+                >
                   <span className="input-group-text bg-white border-0 ps-3">
                     <FontAwesomeIcon icon={faSearch} className="text-info opacity-75" />
                   </span>
@@ -388,9 +390,9 @@ export const GestionClientes = () => {
                       const lastChar =
                         raw.length > 13
                           ? raw
-                            .substring(13, 14)
-                            .replace(/[^a-zA-Z]/g, '')
-                            .toUpperCase()
+                              .substring(13, 14)
+                              .replace(/[^a-zA-Z]/g, '')
+                              .toUpperCase()
                           : '';
                       const input = digitsOnly + lastChar;
 

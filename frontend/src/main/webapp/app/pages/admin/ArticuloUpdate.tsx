@@ -219,7 +219,7 @@ export const ArticuloUpdate = () => {
                                 borderRadius: '4px',
                                 color: '#dc3545',
                                 fontSize: '0.85rem',
-                                fontWeight: 'bold'
+                                fontWeight: 'bold',
                               }}
                             >
                               <FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />

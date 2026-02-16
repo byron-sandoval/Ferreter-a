@@ -144,8 +144,6 @@ export const TopNavbar = () => {
               </NavLink>
             </NavItem>
 
-
-
             {/* 3. Facturar */}
             {(isAdmin || isVendedor) && (
               <NavItem className="nav-link-item">
@@ -164,8 +162,6 @@ export const TopNavbar = () => {
               </NavItem>
             )}
 
-
-
             {/* 5. Compras */}
             {(isAdmin || isBodeguero) && (
               <NavItem className="nav-link-item">
@@ -174,7 +170,6 @@ export const TopNavbar = () => {
                 </NavLink>
               </NavItem>
             )}
-
 
             {/* 7. Productos */}
             {(isAdmin || isBodeguero) && (
@@ -220,7 +215,6 @@ export const TopNavbar = () => {
                 </NavLink>
               </NavItem>
             )}
-
 
             {/* 11. Reportes */}
             {isAdmin && (

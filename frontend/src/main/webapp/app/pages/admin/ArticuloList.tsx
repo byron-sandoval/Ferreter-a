@@ -71,7 +71,6 @@ export const ArticuloList = () => {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-
   const handleDelete = (id: number) => {
     if (window.confirm('¿Estás seguro de eliminar este artículo?')) {
       ArticuloService.delete(id).then(() => {
@@ -96,21 +95,23 @@ export const ArticuloList = () => {
     if (!selectedArticulo) return;
 
     // Preparar datos para exportar en formato horizontal (igual a exportAll)
-    const data = [{
-      ID: selectedArticulo.id,
-      Código: selectedArticulo.codigo,
-      Producto: selectedArticulo.nombre,
-      Estado: selectedArticulo.activo ? 'Activo' : 'Inactivo',
-      Stock: selectedArticulo.existencia,
-      'Stock Mínimo': selectedArticulo.existenciaMinima,
-      'Unidad': selectedArticulo.unidadMedida?.simbolo || '',
-      'Precio Compra': selectedArticulo.costo?.toFixed(2),
-      'Precio Venta': selectedArticulo.precio?.toFixed(2),
-      'Inversión Total': ((selectedArticulo.existencia || 0) * (selectedArticulo.costo || 0)).toFixed(2),
-      'Valor Total': ((selectedArticulo.existencia || 0) * (selectedArticulo.precio || 0)).toFixed(2),
-      Categoría: selectedArticulo.categoria?.nombre || 'General',
-      Descripción: selectedArticulo.descripcion || '',
-    }];
+    const data = [
+      {
+        ID: selectedArticulo.id,
+        Código: selectedArticulo.codigo,
+        Producto: selectedArticulo.nombre,
+        Estado: selectedArticulo.activo ? 'Activo' : 'Inactivo',
+        Stock: selectedArticulo.existencia,
+        'Stock Mínimo': selectedArticulo.existenciaMinima,
+        Unidad: selectedArticulo.unidadMedida?.simbolo || '',
+        'Precio Compra': selectedArticulo.costo?.toFixed(2),
+        'Precio Venta': selectedArticulo.precio?.toFixed(2),
+        'Inversión Total': ((selectedArticulo.existencia || 0) * (selectedArticulo.costo || 0)).toFixed(2),
+        'Valor Total': ((selectedArticulo.existencia || 0) * (selectedArticulo.precio || 0)).toFixed(2),
+        Categoría: selectedArticulo.categoria?.nombre || 'General',
+        Descripción: selectedArticulo.descripcion || '',
+      },
+    ];
 
     // Crear libro de trabajo
     const ws = XLSX.utils.json_to_sheet(data);
@@ -124,17 +125,17 @@ export const ArticuloList = () => {
       if (!ws[address]) continue;
       ws[address].s = {
         font: { bold: true },
-        fill: { fgColor: { rgb: "EEEEEE" } },
-        alignment: { horizontal: "center" },
+        fill: { fgColor: { rgb: 'EEEEEE' } },
+        alignment: { horizontal: 'center' },
         border: {
-          bottom: { style: "thin", color: { rgb: "000000" } }
-        }
+          bottom: { style: 'thin', color: { rgb: '000000' } },
+        },
       };
     }
 
     // Ajustar ancho de columnas
     ws['!cols'] = [
-      { wch: 8 },  // ID
+      { wch: 8 }, // ID
       { wch: 15 }, // Código
       { wch: 30 }, // Producto
       { wch: 10 }, // Estado
@@ -163,7 +164,7 @@ export const ArticuloList = () => {
       Estado: articulo.activo ? 'Activo' : 'Inactivo',
       Stock: articulo.existencia,
       'Stock Mínimo': articulo.existenciaMinima,
-      'Unidad': articulo.unidadMedida?.simbolo || '',
+      Unidad: articulo.unidadMedida?.simbolo || '',
       'Precio Compra': articulo.costo?.toFixed(2),
       'Precio Venta': articulo.precio?.toFixed(2),
       'Inversión Total': ((articulo.existencia || 0) * (articulo.costo || 0)).toFixed(2),
@@ -184,17 +185,17 @@ export const ArticuloList = () => {
       if (!ws[address]) continue;
       ws[address].s = {
         font: { bold: true },
-        fill: { fgColor: { rgb: "EEEEEE" } },
-        alignment: { horizontal: "center" },
+        fill: { fgColor: { rgb: 'EEEEEE' } },
+        alignment: { horizontal: 'center' },
         border: {
-          bottom: { style: "thin", color: { rgb: "000000" } }
-        }
+          bottom: { style: 'thin', color: { rgb: '000000' } },
+        },
       };
     }
 
     // Ajustar ancho de columnas
     ws['!cols'] = [
-      { wch: 8 },  // ID
+      { wch: 8 }, // ID
       { wch: 15 }, // Código
       { wch: 30 }, // Producto
       { wch: 10 }, // Estado
@@ -285,7 +286,7 @@ export const ArticuloList = () => {
     const splitDesc = doc.splitTextToSize(desc, 180);
     doc.text(splitDesc, 14, descY + 6);
 
-    const descHeight = (splitDesc.length * 5) + 15;
+    const descHeight = splitDesc.length * 5 + 15;
 
     // Sección de Precios
     const priceY = descY + descHeight;
@@ -307,8 +308,6 @@ export const ArticuloList = () => {
     doc.setTextColor(40, 167, 69); // Green
     doc.text(`C$ ${selectedArticulo.precio?.toFixed(2)}`, 110, pY + 8);
     doc.setTextColor(0, 0, 0);
-
-
 
     // Footer
     const footerY = 280;
@@ -578,7 +577,9 @@ export const ArticuloList = () => {
                     <Col md="4">
                       <div className="mb-2">
                         <label className="text-muted small text-uppercase fw-bold">Descripción</label>
-                        <p className="text-dark mb-0" style={{ lineHeight: '1.4' }}>{selectedArticulo.descripcion || 'Sin descripción detallada.'}</p>
+                        <p className="text-dark mb-0" style={{ lineHeight: '1.4' }}>
+                          {selectedArticulo.descripcion || 'Sin descripción detallada.'}
+                        </p>
                       </div>
                       <div>
                         <label className="text-muted small text-uppercase fw-bold">Categoría</label>
