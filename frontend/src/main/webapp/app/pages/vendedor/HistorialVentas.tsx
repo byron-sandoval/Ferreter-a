@@ -2,7 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, Button, Badge, Card, CardBody, Input, Label } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHistory, faUndo, faEye, faSearch, faCalendarAlt, faSync, faChevronLeft, faChevronRight, faUndoAlt, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import {
+  faHistory,
+  faUndo,
+  faEye,
+  faSearch,
+  faCalendarAlt,
+  faSync,
+  faChevronLeft,
+  faChevronRight,
+  faUndoAlt,
+  faPlusCircle,
+} from '@fortawesome/free-solid-svg-icons';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import VentaService from 'app/services/venta.service';
 import DevolucionService from 'app/services/devolucion.service';
@@ -80,9 +91,9 @@ export const HistorialVentas = () => {
       const devData: IDevolucion = {
         fecha: dayjs(),
         motivo: motivoDev,
-        total: total,
+        total,
         venta: ventaSeleccionada,
-        detalles: detalles
+        detalles,
       };
       await DevolucionService.create(devData);
       toast.success('Devolución registrada correctamente');
@@ -104,7 +115,6 @@ export const HistorialVentas = () => {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-
   return (
     <div className="animate__animated animate__fadeIn p-1">
       <div className="d-flex justify-content-between align-items-center mb-2">
@@ -112,7 +122,13 @@ export const HistorialVentas = () => {
           <FontAwesomeIcon icon={faHistory} className="me-2 text-primary" /> Historial de Ventas Recientes
         </h5>
         <div>
-          <Button color="outline-primary" size="sm" className="me-2" onClick={() => navigate('/admin/devoluciones')} style={{ fontSize: '0.75rem' }}>
+          <Button
+            color="outline-primary"
+            size="sm"
+            className="me-2"
+            onClick={() => navigate('/admin/devoluciones')}
+            style={{ fontSize: '0.75rem' }}
+          >
             <FontAwesomeIcon icon={faUndoAlt} className="me-1" /> Devoluciones
           </Button>
           <Button color="light" size="sm" onClick={loadVentas} disabled={loading} style={{ fontSize: '0.75rem' }}>
@@ -123,11 +139,14 @@ export const HistorialVentas = () => {
 
       <Card className="shadow-sm border-0 mb-2 bg-light">
         <CardBody className="p-2">
-          <div className="d-flex align-items-center" style={{
-            maxWidth: '350px',
-            borderBottom: '2px solid #18a1bcff',
-            paddingBottom: '2px'
-          }}>
+          <div
+            className="d-flex align-items-center"
+            style={{
+              maxWidth: '350px',
+              borderBottom: '2px solid #18a1bcff',
+              paddingBottom: '2px',
+            }}
+          >
             <FontAwesomeIcon icon={faSearch} className="text-info opacity-75 me-2" />
             <Input
               placeholder="Buscar por Folio o Cliente..."

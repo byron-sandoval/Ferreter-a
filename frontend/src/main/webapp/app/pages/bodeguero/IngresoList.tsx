@@ -63,7 +63,6 @@ export const IngresoList = () => {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-
   const headerStyle = { backgroundColor: '#2d0a4e', color: 'white' };
 
   return (

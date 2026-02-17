@@ -24,6 +24,8 @@ import { IDevolucion } from 'app/shared/model/devolucion.model';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import dayjs from 'dayjs';
 import { IDetalleVenta } from 'app/shared/model/detalle-venta.model';
+import DetalleDevolucionService from 'app/services/detalle-devolucion.service';
+import { IDetalleDevolucion } from 'app/shared/model/detalle-devolucion.model';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658'];
 
@@ -46,40 +48,70 @@ export const AdminDashboard = () => {
       VentaService.getAll({ size: 1000, sort: 'fecha,desc' }),
       VentaService.getAllDetalles({ size: 1000 }),
       DevolucionService.getAll(),
+      DetalleDevolucionService.getAll({ size: 1000 }),
     ])
-      .then(([artRes, venRes, detRes, devRes]) => {
-        const low = artRes.data.filter(a => a.activo && (a.existencia || 0) <= (a.existenciaMinima || 0));
+      .then(([artRes, venRes, detRes, devRes, detDevRes]) => {
+        const allArticulos = artRes.data;
+        const low = allArticulos.filter(a => a.activo && (a.existencia || 0) <= (a.existenciaMinima || 0));
         setBajoStock(low);
         setVentasRecientes(venRes.data);
         setDevolucionesRecientes(devRes.data);
 
-        // Procesar datos para la gráfica de pastel (Ventas por Categoría)
+        // Crear mapa de categorías por ID de artículo para máxima precisión
+        const catMap: Record<number, string> = {};
+        allArticulos.forEach(a => {
+          if (a.id) catMap[a.id] = a.categoria?.nombre || 'Sin Categoría';
+        });
+
+        const groupByCategory: Record<string, number> = {};
+
+        // 1. Sumar Ventas (solo las no anuladas)
         const details: IDetalleVenta[] = detRes.data;
-        const groupByCategory = details.reduce((acc: Record<string, number>, det) => {
-          const catName = det.articulo?.categoria?.nombre || 'Sin Categoría';
+        details.forEach(det => {
+          if (det.venta?.anulada) return;
+          const catName = (det.articulo?.id ? catMap[det.articulo.id] : det.articulo?.categoria?.nombre) || 'Sin Categoría';
           const monto = det.monto || 0;
-          acc[catName] = (acc[catName] || 0) + monto;
-          return acc;
-        }, {});
+          groupByCategory[catName] = (groupByCategory[catName] || 0) + monto;
+        });
+
+        // 2. Restar Devoluciones (Solo el monto NETO para que coincida con la suma de ventas)
+        const detailsDev: IDetalleDevolucion[] = detDevRes.data;
+        detailsDev.forEach(det => {
+          const catName = (det.articulo?.id ? catMap[det.articulo.id] : det.articulo?.categoria?.nombre) || 'Sin Categoría';
+          // Usamos cantidad * precioUnitario para tener el valor neto (sin IVA)
+          const montoNeto = (det.cantidad || 0) * (det.precioUnitario || 0);
+
+          if (groupByCategory[catName] !== undefined) {
+            groupByCategory[catName] -= montoNeto;
+            if (groupByCategory[catName] < 0) groupByCategory[catName] = 0;
+          }
+        });
 
         const pieData: ICategoryData[] = Object.keys(groupByCategory).map(name => ({
           name,
           value: groupByCategory[name],
         }));
 
-        setCategoryData(pieData.sort((a, b) => b.value - a.value));
+        setCategoryData(pieData.sort((a, b) => b.value - a.value).filter(d => d.value > 0));
         setLoading(false);
       })
       .catch(console.error);
   }, []);
 
-  // Procesar datos para la gráfica (Ventas últimos 7 días)
+  // Procesar datos para la gráfica (Ventas Netas últimos 7 días)
   const chartData = [6, 5, 4, 3, 2, 1, 0].map(daysAgo => {
     const date = dayjs().subtract(daysAgo, 'day');
-    const total = ventasRecientes.filter(v => dayjs(v.fecha).isSame(date, 'day')).reduce((acc, v) => acc + (v.total || 0), 0);
+    const totalVentas = ventasRecientes
+      .filter(v => dayjs(v.fecha).isSame(date, 'day') && !v.anulada)
+      .reduce((acc, v) => acc + (v.total || 0), 0);
+    const totalDevoluciones = devolucionesRecientes
+      .filter(d => dayjs(d.fecha).isSame(date, 'day'))
+      .reduce((acc, d) => acc + (d.total || 0), 0);
+
+    const balance = totalVentas - totalDevoluciones;
     return {
       name: date.format('ddd'),
-      total,
+      total: balance < 0 ? 0 : balance, // Evitar valores negativos en la gráfica
     };
   });
 
@@ -106,10 +138,15 @@ export const AdminDashboard = () => {
                 </div>
                 <div className="text-end">
                   <div className="stat-value-palette">
-                    {ventasRecientes
-                      .filter(v => dayjs(v.fecha).isSame(dayjs(), 'day') && !v.anulada)
-                      .reduce((acc, v) => acc + (v.total || 0), 0)
-                      .toLocaleString('es-NI', { style: 'currency', currency: 'NIO', currencyDisplay: 'narrowSymbol' })}
+                    {(() => {
+                      const vHoy = ventasRecientes
+                        .filter(v => dayjs(v.fecha).isSame(dayjs(), 'day') && !v.anulada)
+                        .reduce((acc, v) => acc + (v.total || 0), 0);
+                      const dHoy = devolucionesRecientes
+                        .filter(d => dayjs(d.fecha).isSame(dayjs(), 'day'))
+                        .reduce((acc, d) => acc + (d.total || 0), 0);
+                      return (vHoy - dHoy).toLocaleString('es-NI', { style: 'currency', currency: 'NIO', currencyDisplay: 'narrowSymbol' });
+                    })()}
                   </div>
                   <div className="stat-label-palette">Ventas del Día</div>
                 </div>
@@ -126,10 +163,15 @@ export const AdminDashboard = () => {
                 </div>
                 <div className="text-end">
                   <div className="stat-value-palette">
-                    {ventasRecientes
-                      .filter(v => dayjs(v.fecha).isSame(dayjs(), 'month') && !v.anulada)
-                      .reduce((acc, v) => acc + (v.total || 0), 0)
-                      .toLocaleString('es-NI', { style: 'currency', currency: 'NIO', currencyDisplay: 'narrowSymbol' })}
+                    {(() => {
+                      const vMes = ventasRecientes
+                        .filter(v => dayjs(v.fecha).isSame(dayjs(), 'month') && !v.anulada)
+                        .reduce((acc, v) => acc + (v.total || 0), 0);
+                      const dMes = devolucionesRecientes
+                        .filter(d => dayjs(d.fecha).isSame(dayjs(), 'month'))
+                        .reduce((acc, d) => acc + (d.total || 0), 0);
+                      return (vMes - dMes).toLocaleString('es-NI', { style: 'currency', currency: 'NIO', currencyDisplay: 'narrowSymbol' });
+                    })()}
                   </div>
                   <div className="stat-label-palette">Ventas del Mes</div>
                 </div>
@@ -163,8 +205,7 @@ export const AdminDashboard = () => {
                 </div>
                 <div className="text-end">
                   <div className="stat-value-palette">
-                    {devolucionesRecientes
-                      .filter(d => dayjs(d.fecha).isSame(dayjs(), 'day')).length}
+                    {devolucionesRecientes.filter(d => dayjs(d.fecha).isSame(dayjs(), 'day')).length}
                   </div>
                   <div className="stat-label-palette">Devoluciones Hoy</div>
                 </div>

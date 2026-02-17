@@ -16,7 +16,16 @@ import {
   Label,
 } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRulerCombined, faPlus, faEdit, faTrash, faSave, faTimes, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import {
+  faRulerCombined,
+  faPlus,
+  faEdit,
+  faTrash,
+  faSave,
+  faTimes,
+  faChevronLeft,
+  faChevronRight,
+} from '@fortawesome/free-solid-svg-icons';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import UnidadMedidaService from '../../services/unidad-medida.service';
 import { IUnidadMedida } from '../../shared/model/unidad-medida.model';
@@ -37,7 +46,6 @@ export const GestionUnidadMedida = () => {
   const totalPages = Math.ceil(unidades.length / itemsPerPage);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-
 
   useEffect(() => {
     loadUnidades();

@@ -18,7 +18,7 @@ export const DevolucionService = {
   },
   getByVenta(ventaId: number) {
     return axios.get<IDevolucion[]>(`${API_URL}/venta/${ventaId}`);
-  }
+  },
 };
 
 export default DevolucionService;

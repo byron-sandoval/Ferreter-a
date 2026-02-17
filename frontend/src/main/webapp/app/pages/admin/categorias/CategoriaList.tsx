@@ -50,7 +50,6 @@ export const CategoriaList = () => {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-
   const handleDelete = (id: number) => {
     if (window.confirm('¿Eliminar categoría?')) {
       import('axios').then(axios => axios.default.delete(`api/categorias/${id}`).then(loadAll));
@@ -75,11 +74,14 @@ export const CategoriaList = () => {
 
       <Card className="shadow-sm border-0 mb-2 bg-light">
         <CardBody className="p-2">
-          <div className="d-flex align-items-center" style={{
-            maxWidth: '300px',
-            borderBottom: '2px solid #18a1bcff',
-            paddingBottom: '2px'
-          }}>
+          <div
+            className="d-flex align-items-center"
+            style={{
+              maxWidth: '300px',
+              borderBottom: '2px solid #18a1bcff',
+              paddingBottom: '2px',
+            }}
+          >
             <FontAwesomeIcon icon={faSearch} className="text-info opacity-75 me-2" />
             <Input
               placeholder="Buscar categoría..."

@@ -46,7 +46,6 @@ export const ProveedorList = () => {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-
   const headerStyle = { backgroundColor: '#6f42c1', color: 'white' };
 
   return (
