@@ -11,6 +11,7 @@ import { IDetalleVenta } from 'app/shared/model/detalle-venta.model';
 import { IArticulo } from 'app/shared/model/articulo.model';
 import dayjs from 'dayjs';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import * as XLSX from 'xlsx-js-style';
 
 export const ReporteGanancias = () => {
     const navigate = useNavigate();
@@ -123,6 +124,107 @@ export const ReporteGanancias = () => {
         }))
         .sort((a, b) => b.utilidad - a.utilidad);
 
+    const rankingArticulos = (() => {
+        const accArt = processedData.reduce((acc, d) => {
+            const id = d.articulo?.id;
+            const existing = acc.find(item => item.id === id);
+            const ventaMonto = d.monto || 0;
+            if (existing) {
+                existing.cant += d.cantidad || 0;
+                existing.ganancia += d.utilidad;
+                existing.ventaTotal += ventaMonto;
+            } else {
+                acc.push({
+                    id,
+                    nombre: d.articulo?.nombre,
+                    codigo: d.articulo?.codigo,
+                    cant: d.cantidad || 0,
+                    ganancia: d.utilidad,
+                    ventaTotal: ventaMonto,
+                });
+            }
+            return acc;
+        }, [] as any[]);
+
+        // Restar devoluciones de la tabla de rentabilidad (Usando montos netos)
+        filteredDevoluciones.forEach(dev => {
+            const articulo = articulos.find(a => a.id === dev.articulo?.id);
+            const montoNetoDev = (dev.cantidad || 0) * (dev.precioUnitario || 0);
+            const costoTotalDev = (articulo?.costo || 0) * (dev.cantidad || 0);
+            const utilidadPerdida = montoNetoDev - costoTotalDev;
+
+            const item = accArt.find(a => a.id === dev.articulo?.id);
+            if (item) {
+                item.ganancia -= utilidadPerdida;
+                item.ventaTotal -= montoNetoDev;
+                item.cant -= dev.cantidad || 0;
+            }
+        });
+
+        return accArt.sort((a, b) => b.ganancia - a.ganancia);
+    })();
+
+    const exportToExcel = () => {
+        // 1. Preparar encabezados y metadatos
+        const wb = XLSX.utils.book_new();
+
+        // Hoja de Resumen
+        const resumenData = [
+            ['REPORTE DE GANANCIAS'],
+            ['FECHA INICIO', filterRange.start],
+            ['FECHA FIN', filterRange.end],
+            [''],
+            ['INDICADORES GENERALES'],
+            ['Utilidad Real', Number(totalUtilidad || 0)],
+            ['Margen Promedio', `${(margenPromedio || 0).toFixed(2)}%`],
+            [''],
+            ['DETALLE DE RENTABILIDAD POR ARTÍCULO']
+        ];
+
+        // 2. Preparar tabla de artículos
+        const tablaArticulos = rankingArticulos.map(item => ({
+            'Código': item.codigo,
+            'Artículo': item.nombre,
+            'Vendidos (Neto)': item.cant,
+            'Venta Total (C$)': item.ventaTotal,
+            'Utilidad (C$)': item.ganancia,
+            'Margen (%)': item.ventaTotal > 0 ? ((item.ganancia / item.ventaTotal) * 100).toFixed(2) : '0.00'
+        }));
+
+        const ws = XLSX.utils.aoa_to_sheet(resumenData);
+        XLSX.utils.sheet_add_json(ws, tablaArticulos, { origin: 'A12' });
+
+        // Estilos
+        const headerStyle = {
+            font: { bold: true, color: { rgb: "FFFFFF" } },
+            fill: { fgColor: { rgb: "4B0082" } }, // Indigo/Purple
+            alignment: { horizontal: "center" }
+        };
+
+        // Aplicar estilos a encabezados de tabla
+        const tableHeaderRow = 12;
+        ['A', 'B', 'C', 'D', 'E', 'F'].forEach(col => {
+            if (ws[col + tableHeaderRow]) {
+                ws[col + tableHeaderRow].s = headerStyle;
+            }
+        });
+
+        // Configurar anchos de columna
+        ws['!cols'] = [
+            { wch: 15 }, // Código
+            { wch: 40 }, // Artículo
+            { wch: 15 }, // Vendidos
+            { wch: 18 }, // Venta Total
+            { wch: 18 }, // Utilidad
+            { wch: 12 }  // Margen
+        ];
+
+        XLSX.utils.book_append_sheet(wb, ws, 'Ganancias');
+
+        const fileName = `Reporte_Ganancias_${filterRange.start}_a_${filterRange.end}.xlsx`;
+        XLSX.writeFile(wb, fileName);
+    };
+
     return (
         <div className="p-3 animate__animated animate__fadeIn">
             <div className="d-flex justify-content-between align-items-center mb-4">
@@ -132,7 +234,7 @@ export const ReporteGanancias = () => {
                 <h4 className="text-primary fw-bold m-0">
                     <FontAwesomeIcon icon={faMoneyBillWave} className="me-2" /> Reporte de Ganancias
                 </h4>
-                <Button color="success" size="sm" className="shadow-sm">
+                <Button color="success" size="sm" className="shadow-sm" onClick={exportToExcel}>
                     <FontAwesomeIcon icon={faDownload} className="me-2" /> Exportar Excel
                 </Button>
             </div>
@@ -236,78 +338,37 @@ export const ReporteGanancias = () => {
                                 </Badge>
                             </div>
                             <Row className="g-4">
-                                {(() => {
-                                    const accArt = processedData.reduce((acc, d) => {
-                                        const id = d.articulo?.id;
-                                        const existing = acc.find(item => item.id === id);
-                                        const ventaMonto = d.monto || 0;
-                                        if (existing) {
-                                            existing.cant += d.cantidad || 0;
-                                            existing.ganancia += d.utilidad;
-                                            existing.ventaTotal += ventaMonto;
-                                        } else {
-                                            acc.push({
-                                                id,
-                                                nombre: d.articulo?.nombre,
-                                                codigo: d.articulo?.codigo,
-                                                cant: d.cantidad || 0,
-                                                ganancia: d.utilidad,
-                                                ventaTotal: ventaMonto,
-                                            });
-                                        }
-                                        return acc;
-                                    }, [] as any[]);
-
-                                    // Restar devoluciones de la tabla de rentabilidad (Usando montos netos)
-                                    filteredDevoluciones.forEach(dev => {
-                                        const articulo = articulos.find(a => a.id === dev.articulo?.id);
-                                        const montoNetoDev = (dev.cantidad || 0) * (dev.precioUnitario || 0);
-                                        const costoTotalDev = (articulo?.costo || 0) * (dev.cantidad || 0);
-                                        const utilidadPerdida = montoNetoDev - costoTotalDev;
-
-                                        const item = accArt.find(a => a.id === dev.articulo?.id);
-                                        if (item) {
-                                            item.ganancia -= utilidadPerdida;
-                                            item.ventaTotal -= montoNetoDev;
-                                            item.cant -= dev.cantidad || 0;
-                                        }
-                                    });
-
-                                    return accArt
-                                        .sort((a, b) => b.ganancia - a.ganancia)
-                                        .slice(0, 8)
-                                        .map((item, idx) => {
-                                            const margenArt = item.ventaTotal > 0 ? (item.ganancia / item.ventaTotal) * 100 : 0;
-                                            return (
-                                                <Col md="3" key={idx}>
-                                                    <div className="p-3 border-0 rounded shadow-sm bg-light position-relative overflow-hidden h-100">
-                                                        <div className="text-muted small fw-bold mb-2 text-truncate pe-4" title={item.nombre}>
-                                                            {item.nombre}
-                                                        </div>
-                                                        <div className="d-flex justify-content-between align-items-end">
-                                                            <div>
-                                                                <div className="h4 fw-bold text-success mb-1">C$ {item.ganancia.toLocaleString()}</div>
-                                                                <div className="text-muted x-small">
-                                                                    Vendidos: <span className="fw-bold">{item.cant}</span>
-                                                                </div>
-                                                            </div>
-                                                            <div className="text-end">
-                                                                <Badge color={margenArt > 25 ? 'success' : 'warning'} className="mb-1">
-                                                                    {margenArt.toFixed(1)}%
-                                                                </Badge>
-                                                                <div className="text-muted" style={{ fontSize: '0.6rem' }}>
-                                                                    MARGEN
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="position-absolute" style={{ right: '-10px', top: '-10px', opacity: 0.05 }}>
-                                                            <FontAwesomeIcon icon={faMoneyBillWave} size="4x" />
+                                {rankingArticulos.slice(0, 8).map((item, idx) => {
+                                    const margenArt = item.ventaTotal > 0 ? (item.ganancia / item.ventaTotal) * 100 : 0;
+                                    return (
+                                        <Col md="3" key={idx}>
+                                            <div className="p-3 border-0 rounded shadow-sm bg-light position-relative overflow-hidden h-100">
+                                                <div className="text-muted small fw-bold mb-2 text-truncate pe-4" title={item.nombre}>
+                                                    {item.nombre}
+                                                </div>
+                                                <div className="d-flex justify-content-between align-items-end">
+                                                    <div>
+                                                        <div className="h4 fw-bold text-success mb-1">C$ {item.ganancia.toLocaleString()}</div>
+                                                        <div className="text-muted x-small">
+                                                            Vendidos: <span className="fw-bold">{item.cant}</span>
                                                         </div>
                                                     </div>
-                                                </Col>
-                                            );
-                                        });
-                                })()}
+                                                    <div className="text-end">
+                                                        <Badge color={margenArt > 25 ? 'success' : 'warning'} className="mb-1">
+                                                            {margenArt.toFixed(1)}%
+                                                        </Badge>
+                                                        <div className="text-muted" style={{ fontSize: '0.6rem' }}>
+                                                            MARGEN
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="position-absolute" style={{ right: '-10px', top: '-10px', opacity: 0.05 }}>
+                                                    <FontAwesomeIcon icon={faMoneyBillWave} size="4x" />
+                                                </div>
+                                            </div>
+                                        </Col>
+                                    );
+                                })}
                                 {processedData.length === 0 && !loading && (
                                     <Col className="text-center py-4 text-muted small">No hay datos de ventas para mostrar el ranking.</Col>
                                 )}
