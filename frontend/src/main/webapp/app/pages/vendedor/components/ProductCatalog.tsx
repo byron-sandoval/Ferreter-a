@@ -153,7 +153,7 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
                         justifyContent: 'center'
                       }}
                     >
-                      <div className="fw-bold text-white text-truncate text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }} title={prod.nombre}>
+                      <div className="fw-bold text-white text-truncate text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px', textShadow: '1px 1px 4px rgba(0,0,0,0.9)' }} title={prod.nombre}>
                         {prod.nombre}
                       </div>
                       <div className="fw-bold mt-1" style={{ color: '#ffeb3b', fontSize: '1.05rem', textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
