@@ -114,7 +114,22 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
                     e.currentTarget.style.boxShadow = '0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)';
                   }}
                 >
-                  <div className="position-relative text-center d-flex align-items-center justify-content-center bg-white" style={{ height: '160px', padding: '15px' }}>
+                  {/* Top Bar with Code and Stock */}
+                  <div className="d-flex justify-content-between align-items-center px-2 pt-1">
+                    <div className="text-muted fw-bold" style={{ fontSize: '0.55rem' }}>
+                      #{prod.codigo}
+                    </div>
+                    <Badge
+                      color={(prod.existencia || 0) > 0 ? 'success' : 'danger'}
+                      className="px-2 py-1 shadow-sm"
+                      style={{ fontSize: '0.70rem', borderRadius: '5px' }}
+                    >
+                      Stock: {prod.existencia}
+                    </Badge>
+                  </div>
+
+                  {/* Image Container */}
+                  <div className="text-center d-flex align-items-center justify-content-center bg-white" style={{ height: '100px', padding: '5px' }}>
                     {prod.imagen ? (
                       <img
                         src={`data:${prod.imagenContentType};base64,${prod.imagen}`}
@@ -122,43 +137,32 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
                         style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }}
                       />
                     ) : (
-                      <FontAwesomeIcon icon={faBoxOpen} size="3x" className="text-muted opacity-50" />
+                      <FontAwesomeIcon icon={faBoxOpen} size="lg" className="text-muted opacity-50" />
                     )}
+                  </div>
 
-                    {/* Stock Badge (Keeping it visible at top) */}
-                    <Badge
-                      color={(prod.existencia || 0) > 0 ? 'success' : 'danger'}
-                      className="position-absolute top-0 end-0 m-2 px-2 py-1 shadow-sm"
-                      style={{ fontSize: '0.65rem', borderRadius: '5px', zIndex: 10 }}
-                    >
-                      Stock: {prod.existencia}
-                    </Badge>
-
-                    {/* Product Code Badge (Top-Left) */}
+                  {/* Info Section */}
+                  <div className="px-2 pb-1 pt-0 text-start bg-white">
                     <div
-                      className="position-absolute top-0 start-0 m-2 text-muted fw-bold"
-                      style={{ fontSize: '0.60rem', zIndex: 10, textShadow: '1px 1px 0px rgba(255,255,255,0.7)' }}
-                    >
-                      #{prod.codigo}
-                    </div>
-
-                    {/* Dark Infobox Overlay */}
-                    <div className="position-absolute bottom-0 start-0 end-0 p-2 text-start"
+                      className="fw-bold text-uppercase"
                       style={{
-                        background: 'linear-gradient(to top, rgba(0,0,0,0.85), rgba(0,0,0,0))',
-
-                        minHeight: '70px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center'
+                        fontSize: '0.65rem',
+                        letterSpacing: '0.4px',
+                        color: '#444',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        lineHeight: '1.2',
+                        height: '2.4em',
+                        wordBreak: 'break-word'
                       }}
+                      title={prod.nombre}
                     >
-                      <div className="fw-bold text-white text-truncate text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px', textShadow: '1px 1px 4px rgba(0,0,0,0.9)' }} title={prod.nombre}>
-                        {prod.nombre}
-                      </div>
-                      <div className="fw-bold mt-1" style={{ color: '#ffeb3b', fontSize: '1.05rem', textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
-                        C$ {prod.precio?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </div>
+                      {prod.nombre}
+                    </div>
+                    <div className="fw-bold" style={{ color: '#007bff', fontSize: '0.90rem' }}>
+                      C$ {prod.precio?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
                   </div>
                 </Card>
