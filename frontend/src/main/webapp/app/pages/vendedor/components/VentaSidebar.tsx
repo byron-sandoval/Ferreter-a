@@ -105,7 +105,9 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
                 placeholder="Buscar por Nombre o Cédula..."
                 value={busquedaCedula}
                 className="bg-light border-0"
-                onChange={e => setBusquedaCedula(e.target.value)}
+                autoComplete="off"
+                maxLength={/^[\d\-]*[a-zA-Z]?$/.test(busquedaCedula) && busquedaCedula.length > 0 ? (busquedaCedula.includes('-') ? 16 : 14) : undefined}
+                onChange={e => setBusquedaCedula(/^[\d\-]*[a-zA-Z]?$/.test(e.target.value) ? e.target.value.toUpperCase() : e.target.value)}
                 onKeyPress={e => e.key === 'Enter' && buscarCliente()}
               />
               <Button color="dark" onClick={buscarCliente} className="px-3">
@@ -158,7 +160,7 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
           <Table borderless hover className="align-middle" style={{ fontSize: '0.8rem' }}>
             <thead>
               <tr className="border-bottom">
-                <th className="py-2 text-muted">Items</th>
+                <th className="py-2 text-muted">Productos ({carrito.length})</th>
                 <th className="text-center py-2 text-muted">Cant.</th>
                 <th className="text-end py-2 text-muted">Subt.</th>
                 <th></th>
@@ -288,10 +290,12 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
                   />
                 </Col>
               </Row>
-              <div className={`d-flex justify-content-between mt-2 px-2 ${cambio >= 0 ? 'text-success' : 'text-danger'}`}>
-                <span className="fw-bold">Cambio:</span>
-                <span className="fw-bold fs-5">C$ {cambio.toFixed(2)}</span>
-              </div>
+              {parseFloat(montoPagado) >= total && (
+                <div className="d-flex justify-content-between mt-2 px-2 text-success">
+                  <span className="fw-bold">Cambio:</span>
+                  <span className="fw-bold fs-5">C$ {cambio.toFixed(2)}</span>
+                </div>
+              )}
               {parseFloat(montoPagado) > 0 && cambio < 0 && (
                 <div className="text-danger small fw-bold text-center mt-2 animate__animated animate__shakeX">
                   <FontAwesomeIcon icon={faExclamationTriangle} className="me-1" />
