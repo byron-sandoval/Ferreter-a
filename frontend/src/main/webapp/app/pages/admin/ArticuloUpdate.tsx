@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Row, Col, Form, FormGroup, Label, Input, Card, CardBody, CardHeader, CardTitle, Badge } from 'reactstrap';
 import { useForm, Controller } from 'react-hook-form';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faSave, faImage, faTimes, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faSave, faImage, faTimes, faExclamationTriangle, faBarcode } from '@fortawesome/free-solid-svg-icons';
 import { useAppDispatch } from 'app/config/store';
 import ArticuloService from 'app/services/articulo.service';
 import CategoriaService from 'app/services/categoria.service';
@@ -137,12 +137,25 @@ export const ArticuloUpdate = () => {
                           <Label for="codigo" className="fw-bold">
                             Código *
                           </Label>
-                          <Controller
-                            name="codigo"
-                            control={control}
-                            rules={{ required: 'El código es obligatorio' }}
-                            render={({ field }) => <Input {...field} invalid={!!errors.codigo} />}
-                          />
+                          <div className="input-group">
+                            <span className="input-group-text bg-light text-muted">
+                              <FontAwesomeIcon icon={faBarcode} />
+                            </span>
+                            <Controller
+                              name="codigo"
+                              control={control}
+                              rules={{ required: 'El código es obligatorio' }}
+                              render={({ field }) => (
+                                <Input
+                                  {...field}
+                                  value={field.value || ''}
+                                  invalid={!!errors.codigo}
+                                  readOnly={!isNew}
+                                  className={!isNew ? 'bg-white fw-bold text-dark' : ''}
+                                />
+                              )}
+                            />
+                          </div>
                           {errors.codigo && <div className="invalid-feedback d-block">{errors.codigo.message}</div>}
                         </FormGroup>
                       </Col>
@@ -186,7 +199,7 @@ export const ArticuloUpdate = () => {
                         name="nombre"
                         control={control}
                         rules={{ required: 'El nombre es obligatorio' }}
-                        render={({ field }) => <Input {...field} invalid={!!errors.nombre} />}
+                        render={({ field }) => <Input {...field} value={field.value || ''} invalid={!!errors.nombre} />}
                       />
                       {errors.nombre && <div className="invalid-feedback d-block">{errors.nombre.message}</div>}
                     </FormGroup>
@@ -196,7 +209,7 @@ export const ArticuloUpdate = () => {
                       <Controller
                         name="descripcion"
                         control={control}
-                        render={({ field }) => <Input type="textarea" {...field} rows="3" />}
+                        render={({ field }) => <Input type="textarea" {...field} value={field.value || ''} rows="3" />}
                       />
                     </FormGroup>
 
