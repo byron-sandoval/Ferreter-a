@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardBody, Form, FormGroup, Label, Input, Button, Row, Col, Table, Badge } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faArrowLeft, faPlus, faTrash, faSearch, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
+import { faSave, faArrowLeft, faPlus, faTrash, faBoxes, faShoppingCart, faClipboardList, faBarcode, faBoxOpen } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
 import { useAppSelector } from 'app/config/store';
 import UsuarioService from 'app/services/usuario.service';
@@ -32,13 +32,13 @@ export const IngresoUpdate = () => {
   const [articuloSeleccionado, setArticuloSeleccionado] = useState<string>('');
   const [cantidad, setCantidad] = useState<number>(1);
   const [costoUnitario, setCostoUnitario] = useState<number>(0);
+  const [precioVenta, setPrecioVenta] = useState<number>(0);
+  const [cambiarPrecio, setCambiarPrecio] = useState(false);
 
   useEffect(() => {
-    // Cargar proveedores y artículos
     ProveedorService.getAll().then(res => setProveedores(res.data));
     ArticuloService.getAll().then(res => setArticulos(res.data));
 
-    // Cargar usuario actual
     if (account?.id) {
       UsuarioService.getByKeycloakId(account.id).then(res => {
         if (res.data.length > 0) setUsuarioActual(res.data[0]);
@@ -46,7 +46,7 @@ export const IngresoUpdate = () => {
     }
   }, [account]);
 
-  const agregarDetalle = () => {
+  const agregarDetalle = async () => {
     if (!articuloSeleccionado || cantidad <= 0 || costoUnitario < 0) {
       toast.error('Por favor complete los datos del producto correctamente');
       return;
@@ -55,11 +55,20 @@ export const IngresoUpdate = () => {
     const articulo = articulos.find(a => a.id?.toString() === articuloSeleccionado);
     if (!articulo) return;
 
-    // Verificar si ya existe en la lista
     const existe = detalles.find(d => d.articulo?.id === articulo.id);
     if (existe) {
       toast.warning('Este producto ya está en la lista de la compra');
       return;
+    }
+
+    if (cambiarPrecio) {
+      try {
+        await ArticuloService.update({ ...articulo, costo: costoUnitario, precio: precioVenta });
+        articulo.costo = costoUnitario;
+        articulo.precio = precioVenta;
+      } catch (err) {
+        toast.error('Error al actualizar precio del producto');
+      }
     }
 
     const nuevoDetalle: IDetalleIngreso = {
@@ -70,10 +79,11 @@ export const IngresoUpdate = () => {
     };
 
     setDetalles([...detalles, nuevoDetalle]);
-    // Limpiar campos
     setArticuloSeleccionado('');
     setCantidad(1);
     setCostoUnitario(0);
+    setPrecioVenta(0);
+    setCambiarPrecio(false);
   };
 
   const eliminarDetalle = (index: number) => {
@@ -111,23 +121,26 @@ export const IngresoUpdate = () => {
 
     try {
       await IngresoService.create(nuevoIngreso);
-      toast.success('Compra registrada exitosamente. El stock ha sido actualizado.');
+      toast.success('Stock actualizado exitosamente.');
       navigate('/bodeguero/ingresos');
     } catch (error) {
       console.error(error);
-      toast.error('Ocurrió un error al guardar la compra');
+      toast.error('Ocurrió un error al guardar');
     }
   };
 
   return (
     <div className="animate__animated animate__fadeIn p-3">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4 className="fw-bold text-dark m-0">
-          <FontAwesomeIcon icon={faShoppingCart} className="me-2 text-primary" />
-          Nueva Compra
-        </h4>
-        <Button color="black" size="sm" outline className="fw-bold" onClick={() => navigate('/bodeguero/ingresos')}>
-          <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Volver
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h4 className="fw-bold text-dark m-0">
+            <FontAwesomeIcon icon={faBoxes} className="me-2 text-primary" />
+            Actualizar Stock
+          </h4>
+          <p className="text-muted small m-0">Incremente las existencias de productos ya registrados</p>
+        </div>
+        <Button color="dark" size="sm" outline className="fw-bold px-3" onClick={() => navigate('/bodeguero/ingresos')}>
+          <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Volver al Historial
         </Button>
       </div>
 
@@ -139,22 +152,18 @@ export const IngresoUpdate = () => {
               <Form onSubmit={handleSave}>
                 <FormGroup>
                   <Label for="proveedor" className="small fw-bold">
-                    Proveedor
+                    <FontAwesomeIcon icon={faPlus} className="me-1 text-primary small" /> Proveedor
                   </Label>
-                  <Input type="select" id="proveedor" value={proveedorId} onChange={e => setProveedorId(e.target.value)} required>
+                  <Input type="select" id="proveedor" value={proveedorId} onChange={e => setProveedorId(e.target.value)} required className="form-select-sm">
                     <option value="">Seleccione un proveedor...</option>
-                    {proveedores
-                      .filter(p => p.activo)
-                      .map(p => (
-                        <option key={p.id} value={p.id}>
-                          {p.nombre}
-                        </option>
-                      ))}
+                    {proveedores.filter(p => p.activo).map(p => (
+                      <option key={p.id} value={p.id}>{p.nombre}</option>
+                    ))}
                   </Input>
                 </FormGroup>
                 <FormGroup>
                   <Label for="noDocumento" className="small fw-bold">
-                    No. Factura / Documento
+                    <FontAwesomeIcon icon={faClipboardList} className="me-1 text-primary small" /> No. Factura / Documento
                   </Label>
                   <Input
                     type="text"
@@ -163,26 +172,25 @@ export const IngresoUpdate = () => {
                     value={noDocumento}
                     onChange={e => setNoDocumento(e.target.value)}
                     required
+                    className="form-control-sm"
                   />
                 </FormGroup>
                 <FormGroup>
-                  <Label for="observaciones" className="small fw-bold">
-                    Observaciones
-                  </Label>
+                  <Label for="observaciones" className="small fw-bold">Observaciones</Label>
                   <Input
                     type="textarea"
                     id="observaciones"
                     rows="3"
-                    value={observaciones}
+                    value={observaciones || ''}
                     onChange={e => setObservaciones(e.target.value)}
                   />
                 </FormGroup>
                 <div className="p-3 bg-primary bg-opacity-10 rounded text-center mb-3">
-                  <span className="text-dark fw-bold me-2 fs-6">TOTAL A PAGAR:</span>
+                  <span className="text-dark fw-bold me-2 fs-6">TOTAL COMPRA:</span>
                   <span className="fw-bold text-primary fs-4">C$ {calcularTotal().toLocaleString()}</span>
                 </div>
-                <Button color="success" block type="submit" className="fw-bolder shadow-sm py-3 fs-7">
-                  <FontAwesomeIcon icon={faSave} className="me-3" /> PROCESAR COMPRA
+                <Button color="primary" block type="submit" className="fw-bolder shadow-sm py-3 fs-7">
+                  <FontAwesomeIcon icon={faSave} className="me-3" /> PROCESAR ACTUALIZACIÓN
                 </Button>
               </Form>
             </CardBody>
@@ -192,40 +200,90 @@ export const IngresoUpdate = () => {
         <Col md="8">
           <Card className="shadow-sm border-0 mb-3">
             <CardBody>
-              <h6 className="fw-bold border-bottom pb-2">Agregar Productos al Detalle</h6>
+              <h6 className="fw-bold border-bottom pb-2">
+                <FontAwesomeIcon icon={faBoxes} className="me-2 text-primary" />
+                Añadir Productos al Inventario
+              </h6>
+
               <Row className="mb-3 g-2 align-items-end">
-                <Col md="5">
-                  <Label className="small fw-bold">Producto</Label>
+                <Col md="6" className="mb-2">
+                  <Label className="small fw-bold">Buscar Producto Existente</Label>
                   <Input
                     type="select"
                     value={articuloSeleccionado}
                     onChange={e => {
                       setArticuloSeleccionado(e.target.value);
                       const art = articulos.find(a => a.id?.toString() === e.target.value);
-                      if (art) setCostoUnitario(art.costo || 0);
+                      if (art) {
+                        setCostoUnitario(art.costo || 0);
+                        setPrecioVenta(art.precio || 0);
+                      }
                     }}
+                    className="form-select-sm"
                   >
-                    <option value="">Buscar producto...</option>
-                    {articulos
-                      .filter(a => a.activo)
-                      .map(a => (
-                        <option key={a.id} value={a.id}>
-                          {a.nombre}
-                        </option>
-                      ))}
+                    <option value="">Seleccione un producto...</option>
+                    {articulos.filter(a => a.activo).map(a => (
+                      <option key={a.id} value={a.id}>
+                        {a.nombre}
+                      </option>
+                    ))}
                   </Input>
                 </Col>
-                <Col md="2">
-                  <Label className="small fw-bold">Cant.</Label>
+                <Col md="3" className="mb-2">
+                  <Label className="small fw-bold">Código</Label>
+                  <div className="input-group input-group-sm">
+                    <span className="input-group-text bg-light"><FontAwesomeIcon icon={faBarcode} /></span>
+                    <Input
+                      type="text"
+                      readOnly
+                      placeholder="----"
+                      value={articulos.find(a => a.id?.toString() === articuloSeleccionado)?.codigo || ''}
+                      className="bg-white fw-bold text-dark border-start-0"
+                    />
+                  </div>
+                </Col>
+                <Col md="3" className="mb-2">
+                  <Label className="small fw-bold">Stock Actual</Label>
+                  <div className="input-group input-group-sm">
+                    <span className="input-group-text bg-light text-primary"><FontAwesomeIcon icon={faBoxOpen} /></span>
+                    <Input
+                      type="text"
+                      readOnly
+                      placeholder="0"
+                      value={articulos.find(a => a.id?.toString() === articuloSeleccionado)?.existencia || ''}
+                      className="bg-white fw-bold text-primary border-start-0"
+                    />
+                  </div>
+                </Col>
+
+                <Col md="3">
+                  <Label className="small fw-bold">Cantidad</Label>
                   <Input type="number" min="1" value={cantidad} onChange={e => setCantidad(parseInt(e.target.value, 10))} />
                 </Col>
                 <Col md="3">
-                  <Label className="small fw-bold">Costo Unit.</Label>
+                  <Label className="small fw-bold">Costo Unitario</Label>
                   <Input type="number" step="0.01" value={costoUnitario} onChange={e => setCostoUnitario(parseFloat(e.target.value))} />
                 </Col>
+                <Col md="4">
+                  <FormGroup check className="mb-2">
+                    <Label check className="small fw-bold">
+                      <Input type="checkbox" checked={cambiarPrecio} onChange={e => setCambiarPrecio(e.target.checked)} />{' '}
+                      ¿Actualizar precios?
+                    </Label>
+                  </FormGroup>
+                  {cambiarPrecio && (
+                    <Input
+                      type="number"
+                      placeholder="Nuevo precio venta"
+                      value={precioVenta}
+                      onChange={e => setPrecioVenta(parseFloat(e.target.value))}
+                      bsSize="sm"
+                    />
+                  )}
+                </Col>
                 <Col md="2">
-                  <Button color="primary" block onClick={agregarDetalle}>
-                    <FontAwesomeIcon icon={faPlus} />
+                  <Button color="primary" block onClick={agregarDetalle} className="fw-bold">
+                    <FontAwesomeIcon icon={faPlus} className="me-1" /> Añadir
                   </Button>
                 </Col>
               </Row>
@@ -248,9 +306,7 @@ export const IngresoUpdate = () => {
                         <td className="small">{d.articulo?.codigo}</td>
                         <td className="fw-bold">{d.articulo?.nombre}</td>
                         <td className="text-center">
-                          <Badge color="info" outline>
-                            {d.cantidad}
-                          </Badge>
+                          <Badge color="info" pill>{d.cantidad}</Badge>
                         </td>
                         <td className="text-end text-muted small">C$ {d.costoUnitario?.toLocaleString()}</td>
                         <td className="text-end fw-bold">C$ {d.monto?.toLocaleString()}</td>
@@ -264,7 +320,7 @@ export const IngresoUpdate = () => {
                   ) : (
                     <tr>
                       <td colSpan={6} className="text-center py-4 text-muted small italic">
-                        No hay productos agregados a esta compra todavía.
+                        No hay productos agregados.
                       </td>
                     </tr>
                   )}
