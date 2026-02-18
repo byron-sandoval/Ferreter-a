@@ -4,7 +4,7 @@ import { Table, Button, Input, Card, Badge, Modal, ModalHeader, ModalBody, Modal
 import { IIngreso } from 'app/shared/model/ingreso.model';
 import IngresoService from 'app/services/ingreso.service';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faSync, faSearch, faEye, faFileInvoice, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSync, faSearch, faEye, faFileInvoice, faChevronLeft, faChevronRight, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import dayjs from 'dayjs';
 
@@ -89,8 +89,11 @@ export const IngresoList = () => {
               <FontAwesomeIcon icon={faSearch} size="sm" />
             </span>
           </div>
-          <Button color="success" size="sm" onClick={() => navigate('/bodeguero/ingresos/nuevo')} style={{ fontSize: '0.75rem' }}>
-            <FontAwesomeIcon icon={faPlus} className="me-1" /> Nueva Compra
+          <Button color="primary" size="sm" onClick={() => navigate('/bodeguero/ingresos/nuevo')} style={{ fontSize: '0.75rem' }} className="fw-bold">
+            <FontAwesomeIcon icon={faPlus} className="me-1" /> ACTUALIZAR STOCK
+          </Button>
+          <Button color="success" size="sm" onClick={() => navigate('/bodeguero/ingresos/nueva-compra')} style={{ fontSize: '0.75rem' }} className="fw-bold">
+            <FontAwesomeIcon icon={faShoppingCart} className="me-1" /> NUEVA COMPRA
           </Button>
         </div>
       </div>
@@ -205,7 +208,7 @@ export const IngresoList = () => {
                     <small className="text-muted">{det.articulo?.codigo}</small>
                   </td>
                   <td className="text-center">
-                    <Badge color="info" outline className="px-3">
+                    <Badge color="info" pill className="px-3">
                       {det.cantidad}
                     </Badge>
                   </td>
