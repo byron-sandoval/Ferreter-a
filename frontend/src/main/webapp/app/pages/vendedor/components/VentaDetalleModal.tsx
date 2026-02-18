@@ -217,15 +217,15 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                   </span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px' }}>
-                  <strong>No. VENTA:</strong>
+                  <strong>Nº:</strong>
                   <span style={{ color: '#fd7e14', fontWeight: 'bold' }}>#{venta.noFactura}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px' }}>
                   <strong>FECHA:</strong>
-                  <span>{dayjs(venta.fecha).format('DD/MM/YYYY')}</span>
+                  <span>{dayjs(venta.fecha).format('DD/MM/YYYY - HH:mm')}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                  <strong>USUARIO:</strong>
+                  <strong>VENDEDOR:</strong>
                   <span>{venta.usuario?.nombre || 'Administrador'}</span>
                 </div>
               </div>
