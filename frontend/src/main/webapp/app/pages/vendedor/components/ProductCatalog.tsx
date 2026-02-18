@@ -98,38 +98,69 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
             .map(prod => (
               <Col md="3" key={prod.id}>
                 <Card
-                  className="h-100 shadow-sm border-0 product-card cursor-pointer"
+                  className="h-100 shadow-sm border-0 product-card cursor-pointer overflow-hidden"
                   onClick={() => agregarAlCarrito(prod)}
-                  style={{ transition: '0.2s' }}
+                  style={{
+                    transition: 'all 0.3s ease',
+                    borderRadius: '12px',
+                    backgroundColor: '#fff'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-5px)';
+                    e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.15)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)';
+                  }}
                 >
-                  <div className="position-relative text-center p-3 bg-light">
+                  <div className="position-relative text-center d-flex align-items-center justify-content-center bg-white" style={{ height: '160px', padding: '15px' }}>
                     {prod.imagen ? (
                       <img
                         src={`data:${prod.imagenContentType};base64,${prod.imagen}`}
                         alt={prod.nombre}
-                        style={{ height: '75px', objectFit: 'contain' }}
+                        style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }}
                       />
                     ) : (
                       <FontAwesomeIcon icon={faBoxOpen} size="3x" className="text-muted opacity-50" />
                     )}
+
+                    {/* Stock Badge (Keeping it visible at top) */}
                     <Badge
                       color={(prod.existencia || 0) > 0 ? 'success' : 'danger'}
-                      className="position-absolute top-0 end-0 m-2 px-2 py-1"
+                      className="position-absolute top-0 end-0 m-2 px-2 py-1 shadow-sm"
+                      style={{ fontSize: '0.65rem', borderRadius: '5px', zIndex: 10 }}
                     >
                       Stock: {prod.existencia}
                     </Badge>
+
+                    {/* Product Code Badge (Top-Left) */}
+                    <div
+                      className="position-absolute top-0 start-0 m-2 text-muted fw-bold"
+                      style={{ fontSize: '0.60rem', zIndex: 10, textShadow: '1px 1px 0px rgba(255,255,255,0.7)' }}
+                    >
+                      #{prod.codigo}
+                    </div>
+
+                    {/* Dark Infobox Overlay */}
+                    <div className="position-absolute bottom-0 start-0 end-0 p-2 text-start"
+                      style={{
+                        background: 'linear-gradient(to top, rgba(0,0,0,0.85), rgba(0,0,0,0))',
+
+                        minHeight: '70px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <div className="fw-bold text-white text-truncate text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }} title={prod.nombre}>
+                        {prod.nombre}
+                      </div>
+                      <div className="fw-bold mt-1" style={{ color: '#ffeb3b', fontSize: '1.05rem', textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
+                        C$ {prod.precio?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </div>
+                    </div>
                   </div>
-                  <CardBody className="p-2">
-                    <div className="fw-bold text-dark text-truncate small" title={prod.nombre}>
-                      {prod.nombre}
-                    </div>
-                    <div className="d-flex justify-content-between align-items-center mt-1">
-                      <span className="text-primary fw-bold">C$ {prod.precio?.toFixed(2)}</span>
-                      <small className="text-muted" style={{ fontSize: '0.7rem' }}>
-                        {prod.codigo}
-                      </small>
-                    </div>
-                  </CardBody>
                 </Card>
               </Col>
             ))}
