@@ -148,18 +148,18 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                 }}
               >
                 <div style={{ textAlign: 'center', marginBottom: '6px', borderBottom: '1px solid #eee', paddingBottom: '4px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase' }}>Factura Pro-Forma</span>
+                  <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase' }}>Factura de venta</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px' }}>
-                  <strong>No. VENTA:</strong>
+                  <strong>Nº:</strong>
                   <span style={{ color: '#fd7e14', fontWeight: 'bold' }}>#{ventaExitosa?.noFactura}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px' }}>
                   <strong>FECHA:</strong>
-                  <span>{dayjs(ventaExitosa?.fecha).format('DD/MM/YYYY')}</span>
+                  <span>{dayjs(ventaExitosa?.fecha).format('DD/MM/YYYY - HH:mm')}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                  <strong>USUARIO:</strong>
+                  <strong>VENDEDOR:</strong>
                   <span>{ventaExitosa?.usuario?.nombre || 'Administrador'}</span>
                 </div>
               </div>
