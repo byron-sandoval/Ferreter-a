@@ -27,6 +27,7 @@ import {
   faRulerCombined,
   faUsers,
   faUndoAlt,
+  faCalendarAlt,
 } from '@fortawesome/free-solid-svg-icons';
 
 export const TopNavbar = () => {
@@ -98,9 +99,8 @@ export const TopNavbar = () => {
 
           {/* Clock & User Section (Right Corner) */}
           <div className="d-flex align-items-center gap-4">
-            {/* Reloj Dinámico */}
             <div className="d-none d-md-flex align-items-center text-white opacity-75 gap-3 border-end pe-4 border-light border-opacity-10">
-              <FontAwesomeIcon icon={faClock} className="text-info fs-5" />
+              <FontAwesomeIcon icon={faCalendarAlt} className="text-info fs-5" />
               <div className="text-end" style={{ lineHeight: '1.2' }}>
                 <div className="fw-bold small text-capitalize" style={{ fontSize: '0.75rem' }}>
                   {dateStr}

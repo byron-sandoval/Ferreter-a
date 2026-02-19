@@ -13,6 +13,7 @@ import {
   faChevronRight,
   faUndoAlt,
   faPlusCircle,
+  faBan,
 } from '@fortawesome/free-solid-svg-icons';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import VentaService from 'app/services/venta.service';
@@ -104,6 +105,18 @@ export const HistorialVentas = () => {
     }
   };
 
+  const handleAnular = async (id: number, noFactura: number) => {
+    if (window.confirm(`¿Está seguro de ANULAR la factura #${noFactura}? \n\nEsto devolverá los productos al inventario y la venta ya no contará en sus reportes.`)) {
+      try {
+        await VentaService.anular(id);
+        toast.success(`Factura #${noFactura} anulada correctamente`);
+        loadVentas();
+      } catch (e) {
+        toast.error('Error al anular la factura. Verifique sus permisos de Administrador.');
+      }
+    }
+  };
+
   const filtered = ventas.filter(
     v => (v.noFactura?.toString() || '').includes(filter) || (v.cliente?.nombre || '').toLowerCase().includes(filter.toLowerCase()),
   );
@@ -168,8 +181,8 @@ export const HistorialVentas = () => {
               <th className="py-2 fw-bold">Cliente</th>
               <th className="py-2 fw-bold">Total</th>
               <th className="py-2 fw-bold">Método</th>
-              <th className="py-2 text-center fw-bold">Garantía</th>
-              <th className="py-2 text-end px-3 fw-bold">Acciones</th>
+              <th className="py-2 text-center fw-bold">Estado / Garantía</th>
+              <th className="py-2 text-center fw-bold">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -196,7 +209,11 @@ export const HistorialVentas = () => {
                     </Badge>
                   </td>
                   <td className="text-center">
-                    {activa ? (
+                    {v.anulada ? (
+                      <Badge color="soft-danger" style={{ backgroundColor: '#ffebee', color: '#c62828', fontSize: '0.65rem' }}>
+                        ANULADA
+                      </Badge>
+                    ) : activa ? (
                       <Badge color="soft-success" style={{ backgroundColor: '#e8f5e9', color: '#2e7d32', fontSize: '0.65rem' }}>
                         Activa
                       </Badge>
@@ -206,7 +223,7 @@ export const HistorialVentas = () => {
                       </Badge>
                     )}
                   </td>
-                  <td className="text-end px-3">
+                  <td className="text-center">
                     <Button color="light" size="sm" className="me-1 p-1" onClick={() => v.id && verDetalles(v.id)}>
                       <FontAwesomeIcon icon={faEye} fixedWidth />
                     </Button>
@@ -215,7 +232,7 @@ export const HistorialVentas = () => {
                       size="sm"
                       className="p-1 px-2"
                       style={{ fontSize: '0.7rem' }}
-                      disabled={!activa}
+                      disabled={!activa || v.anulada}
                       onClick={() => {
                         setVentaSeleccionada(v);
                         setShowDevolucionModal(true);
@@ -223,6 +240,17 @@ export const HistorialVentas = () => {
                     >
                       Devolución
                     </Button>
+                    {!v.anulada && (
+                      <Button
+                        color="danger"
+                        size="sm"
+                        className="ms-1 p-1"
+                        title="Anular Factura"
+                        onClick={() => v.id && v.noFactura && handleAnular(v.id as number, v.noFactura as number)}
+                      >
+                        <FontAwesomeIcon icon={faBan} fixedWidth />
+                      </Button>
+                    )}
                   </td>
                 </tr>
               );

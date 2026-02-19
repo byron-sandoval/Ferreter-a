@@ -249,7 +249,12 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                 <p style={{ margin: '0 0 8px 0', fontWeight: 'bold', fontSize: '11px', textTransform: 'uppercase', color: '#666' }}>
                   Observaciones:
                 </p>
-                <div style={{ textAlign: 'center', marginTop: '20px', fontSize: '13px', fontWeight: '500' }}>Gracias por su compra.</div>
+                <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '12px', fontWeight: '500' }}>
+                  <div>Gracias por su compra.</div>
+                  <div style={{ marginTop: '5px', fontSize: '11px', color: '#555' }}>
+                    Cambios únicamente con factura y dentro de 24 horas.
+                  </div>
+                </div>
               </div>
 
               {/* Totals Grid Box */}
