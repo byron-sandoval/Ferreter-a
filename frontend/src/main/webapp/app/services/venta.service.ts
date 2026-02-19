@@ -34,6 +34,11 @@ export const VentaService = {
   getAllDetalles(params?: any) {
     return axios.get<IDetalleVenta[]>(API_DETALLES, { params });
   },
+
+  // Anular una venta (Llamada al Delete que implementamos en el backend)
+  anular(id: number) {
+    return axios.delete(`${API_VENTAS}/${id}`);
+  },
 };
 
 export default VentaService;
