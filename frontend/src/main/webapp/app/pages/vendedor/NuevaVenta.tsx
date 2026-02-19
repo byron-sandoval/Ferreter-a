@@ -383,6 +383,7 @@ export const NuevaVenta = () => {
           ventaExitosa={ventaExitosa}
           quitarUnoDelCarrito={quitarUnoDelCarrito}
           agregarAlCarrito={agregarAlCarrito}
+          limpiarTodo={finalizarVentaYLimpiar}
         />
       </Row>
 

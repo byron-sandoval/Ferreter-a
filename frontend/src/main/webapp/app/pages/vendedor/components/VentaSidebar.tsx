@@ -11,6 +11,7 @@ import {
   faMoneyBillWave,
   faPlus,
   faMinus,
+  faTrashAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { IArticulo } from 'app/shared/model/articulo.model';
 import { ICliente } from 'app/shared/model/cliente.model';
@@ -50,6 +51,7 @@ interface IVentaSidebarProps {
   ventaExitosa: IVenta | null;
   quitarUnoDelCarrito: (id: number) => void;
   agregarAlCarrito: (prod: IArticulo) => void;
+  limpiarTodo: () => void;
 }
 
 export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
@@ -84,6 +86,7 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
   ventaExitosa,
   quitarUnoDelCarrito,
   agregarAlCarrito,
+  limpiarTodo,
 }) => {
   return (
     <Col md="5" className="sticky-top" style={{ top: '20px', height: 'fit-content' }}>
@@ -120,8 +123,8 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
           ) : (
             <div className="d-flex justify-content-between align-items-start border border-primary border-opacity-25 p-2 rounded-3 bg-light">
               <div>
-                <div className="fw-bold text-primary fs-5">{cliente.nombre}</div>
-                <div className="text-muted small">
+                <div className="fw-bold text-primary fs-6">{cliente.nombre}</div>
+                <div className="text-muted small" style={{ fontSize: '0.75rem' }}>
                   <FontAwesomeIcon icon={faUserCheck} className="me-1" /> {cliente.cedula}
                 </div>
               </div>
@@ -252,7 +255,7 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
           </div>
 
           <div className="d-flex justify-content-between align-items-center mb-3 bg-primary bg-opacity-10 p-2 px-3 rounded-3">
-            <span className="fw-bold text-dark m-0 small">Total Final</span>
+            <span className="fw-bold text-white m-0 small">Total Final</span>
             <div className="text-end">
               <h4 className="fw-bold text-primary m-0">C$ {total.toFixed(2)}</h4>
               {monedaSeleccionada?.simbolo !== 'C$' && (
@@ -317,30 +320,47 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
             </div>
           )}
 
-          <Button
-            color={metodoPago === MetodoPagoEnum.EFECTIVO && (parseFloat(montoPagado) || 0) < total ? 'secondary' : 'primary'}
-            size="md"
-            block
-            className="w-100 py-2 fw-bold shadow-sm"
-            style={{ borderRadius: '10px' }}
-            onClick={procesarVenta}
-            disabled={
-              carrito.length === 0 ||
-              loading ||
-              !!ventaExitosa ||
-              (metodoPago === MetodoPagoEnum.EFECTIVO && (parseFloat(montoPagado) || 0) < total)
-            }
-          >
-            {loading ? (
-              'Validando...'
-            ) : metodoPago === MetodoPagoEnum.EFECTIVO && (parseFloat(montoPagado) || 0) < total ? (
-              'ESPERANDO PAGO...'
-            ) : (
-              <span>
-                <FontAwesomeIcon icon={faMoneyBillWave} className="me-2" /> COBRAR AHORA
-              </span>
-            )}
-          </Button>
+          <div className="d-flex gap-2">
+            <Button
+              color="outline-danger"
+              size="md"
+              title="Limpiar venta"
+              style={{ borderRadius: '10px', width: '60px' }}
+              onClick={() => {
+                if (carrito.length > 0 && window.confirm('¿Desea limpiar la venta y la información del cliente?')) {
+                  limpiarTodo();
+                } else if (carrito.length === 0) {
+                  limpiarTodo();
+                }
+              }}
+              disabled={loading || !!ventaExitosa}
+            >
+              <FontAwesomeIcon icon={faTrashAlt} />
+            </Button>
+            <Button
+              color={metodoPago === MetodoPagoEnum.EFECTIVO && (parseFloat(montoPagado) || 0) < total ? 'secondary' : 'primary'}
+              size="md"
+              className="flex-grow-1 py-2 fw-bold shadow-sm"
+              style={{ borderRadius: '10px' }}
+              onClick={procesarVenta}
+              disabled={
+                carrito.length === 0 ||
+                loading ||
+                !!ventaExitosa ||
+                (metodoPago === MetodoPagoEnum.EFECTIVO && (parseFloat(montoPagado) || 0) < total)
+              }
+            >
+              {loading ? (
+                'Validando...'
+              ) : metodoPago === MetodoPagoEnum.EFECTIVO && (parseFloat(montoPagado) || 0) < total ? (
+                'ESPERANDO PAGO...'
+              ) : (
+                <span>
+                  <FontAwesomeIcon icon={faMoneyBillWave} className="me-2" /> COBRAR AHORA
+                </span>
+              )}
+            </Button>
+          </div>
         </div>
       </Card>
     </Col>
