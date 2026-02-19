@@ -32,13 +32,17 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
         <div className="d-flex justify-content-between mb-4 border-bottom pb-2">
           <div>
             <Label className="text-muted small text-uppercase fw-bold mb-0">Cliente</Label>
-            <div className="fw-bold fs-5 text-primary">{venta.cliente?.nombre || 'General'}</div>
-            <small className="text-muted">{venta.cliente?.cedula}</small>
+            <div className="fw-bold fs-5 text-primary">
+              {venta.anulada ? 'ANULADA' : (venta.cliente?.nombre || 'General')}
+            </div>
+            <small className="text-muted">{venta.anulada ? 'ANULADA' : venta.cliente?.cedula}</small>
           </div>
           <div className="text-end">
             <Label className="text-muted small text-uppercase fw-bold mb-0">Fecha y Hora</Label>
             <div className="fw-bold">{dayjs(venta.fecha).format('DD/MM/YYYY HH:mm')}</div>
-            <Badge color={venta.esContado ? 'success' : 'warning'}>{venta.esContado ? 'Contado' : 'Crédito'}</Badge>
+            <Badge color={venta.anulada ? 'danger' : (venta.esContado ? 'success' : 'warning')}>
+              {venta.anulada ? 'ANULADA' : (venta.esContado ? 'Contado' : 'Crédito')}
+            </Badge>
           </div>
         </div>
 
@@ -73,27 +77,29 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
         <div className="mt-4 p-3 bg-light rounded-4 ms-auto" style={{ maxWidth: '300px' }}>
           <div className="d-flex justify-content-between mb-1">
             <span className="text-muted">Subtotal:</span>
-            <span className="fw-bold">C$ {venta.subtotal?.toFixed(2)}</span>
+            <span className="fw-bold">C$ {venta.anulada ? '0.00' : venta.subtotal?.toFixed(2)}</span>
           </div>
           <div className="d-flex justify-content-between mb-1">
             <span className="text-muted">Descuento:</span>
-            <span className="text-success fw-bold">- C$ {(venta.descuento || 0).toFixed(2)}</span>
+            <span className="text-success fw-bold">- C$ {venta.anulada ? '0.00' : (venta.descuento || 0).toFixed(2)}</span>
           </div>
           <div className="d-flex justify-content-between mb-2">
             <span className="text-muted">IVA (15%):</span>
-            <span className="text-primary fw-bold">C$ {venta.iva?.toFixed(2)}</span>
+            <span className="text-primary fw-bold">C$ {venta.anulada ? '0.00' : venta.iva?.toFixed(2)}</span>
           </div>
           <div className="d-flex justify-content-between border-top pt-2">
             <h5 className="fw-bold m-0">Total:</h5>
-            <h5 className="fw-bold text-primary m-0">C$ {venta.total?.toFixed(2)}</h5>
+            <h5 className={`fw-bold m-0 ${venta.anulada ? 'text-danger' : 'text-primary'}`}>
+              C$ {venta.anulada ? '0.00' : venta.total?.toFixed(2)}
+            </h5>
           </div>
-          {venta.importeRecibido != null && (
+          {venta.importeRecibido != null && !venta.anulada && (
             <div className="d-flex justify-content-between mt-2 pt-2 border-top border-light">
               <span className="text-muted">Efectivo:</span>
               <span className="fw-bold">C$ {venta.importeRecibido?.toFixed(2)}</span>
             </div>
           )}
-          {venta.cambio != null && (
+          {venta.cambio != null && !venta.anulada && (
             <div className="d-flex justify-content-between">
               <span className="text-muted">Cambio:</span>
               <span className="fw-bold text-success">C$ {venta.cambio?.toFixed(2)}</span>
@@ -157,25 +163,25 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
               </div>
             </div>
 
-            {/* Paid Stamp effect */}
+            {/* Paid/Void Stamp effect */}
             <div
               style={{
                 position: 'absolute',
                 top: '160px',
                 right: '50px',
-                border: '5px solid #28a745',
-                color: '#28a745',
+                border: `5px solid ${venta.anulada ? '#dc3545' : '#28a745'}`,
+                color: venta.anulada ? '#dc3545' : '#28a745',
                 padding: '8px 25px',
                 fontSize: '40px',
                 fontWeight: 'bold',
                 borderRadius: '12px',
-                opacity: 0.12,
+                opacity: 0.15,
                 transform: 'rotate(-22deg)',
                 zIndex: 0,
                 pointerEvents: 'none',
               }}
             >
-              PAGADO
+              {venta.anulada ? 'ANULADA' : 'PAGADO'}
             </div>
 
             {/* Invoice Info Section - Balanced */}
@@ -193,18 +199,18 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                 >
                   CLIENTE
                 </h2>
-                <p style={{ margin: '1px 0', fontSize: '15.5px', fontWeight: 'bold', color: '#000' }}>
-                  {venta.cliente?.nombre || 'Consumidor Final'}
+                <p style={{ margin: '1px 0', fontSize: '15.5px', fontWeight: 'bold', color: venta.anulada ? '#dc3545' : '#000' }}>
+                  {venta.anulada ? 'ANULADA' : (venta.cliente?.nombre || 'Consumidor Final')}
                 </p>
                 <div style={{ fontSize: '12.5px' }}>
                   <p style={{ margin: '1px 0' }}>
-                    <strong>Cédula:</strong> {venta.cliente?.cedula}
+                    <strong>Cédula:</strong> {venta.anulada ? 'ANULADA' : venta.cliente?.cedula}
                   </p>
                   <p style={{ margin: '1px 0' }}>
-                    <strong>Dirección:</strong> {venta.cliente?.direccion || 'Ciudad'}
+                    <strong>Dirección:</strong> {venta.anulada ? 'ANULADA' : (venta.cliente?.direccion || 'Ciudad')}
                   </p>
                   <p style={{ margin: '1px 0' }}>
-                    <strong>Teléfono:</strong> {venta.cliente?.telefono || 'N/A'}
+                    <strong>Teléfono:</strong> {venta.anulada ? 'ANULADA' : (venta.cliente?.telefono || 'N/A')}
                   </p>
                 </div>
               </div>
@@ -278,22 +284,30 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                   </tr>
                 </thead>
                 <tbody>
-                  {venta.detalles?.map((det, i) => (
-                    <tr key={i} style={{ borderBottom: '1.2px solid #ccc' }}>
-                      <td style={{ padding: '8px 15px', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
-                        <div style={{ fontWeight: 'bold' }}>{det.articulo?.nombre}</div>
-                      </td>
-                      <td style={{ padding: '8px 15px', textAlign: 'center', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
-                        {det.cantidad}
-                      </td>
-                      <td style={{ padding: '8px 15px', textAlign: 'right', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
-                        C$ {det.precioVenta?.toFixed(2)}
-                      </td>
-                      <td style={{ padding: '8px 15px', textAlign: 'right', fontSize: '12px', fontWeight: 'bold' }}>
-                        C$ {det.monto?.toFixed(2)}
+                  {venta.anulada ? (
+                    <tr>
+                      <td colSpan={4} style={{ padding: '20px', textAlign: 'center', fontSize: '14px', fontWeight: 'bold', color: '#dc3545' }}>
+                        **** F A C T U R A   A N U L A D A ****
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    venta.detalles?.map((det, i) => (
+                      <tr key={i} style={{ borderBottom: '1.2px solid #ccc' }}>
+                        <td style={{ padding: '8px 15px', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
+                          <div style={{ fontWeight: 'bold' }}>{det.articulo?.nombre}</div>
+                        </td>
+                        <td style={{ padding: '8px 15px', textAlign: 'center', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
+                          {det.cantidad}
+                        </td>
+                        <td style={{ padding: '8px 15px', textAlign: 'right', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
+                          C$ {det.precioVenta?.toFixed(2)}
+                        </td>
+                        <td style={{ padding: '8px 15px', textAlign: 'right', fontSize: '12px', fontWeight: 'bold' }}>
+                          C$ {det.monto?.toFixed(2)}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -315,7 +329,12 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                 <p style={{ margin: '0 0 8px 0', fontWeight: 'bold', fontSize: '11px', textTransform: 'uppercase', color: '#666' }}>
                   Observaciones:
                 </p>
-                <div style={{ textAlign: 'center', marginTop: '20px', fontSize: '13px', fontWeight: '500' }}>Gracias por su compra.</div>
+                <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '12px', fontWeight: '500' }}>
+                  <div>Gracias por su compra.</div>
+                  <div style={{ marginTop: '5px', fontSize: '11px', color: '#555' }}>
+                    Cambios únicamente con factura y dentro de 24 horas.
+                  </div>
+                </div>
               </div>
 
               {/* Totals Grid Box */}
@@ -335,7 +354,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                     Sub-total
                   </div>
                   <div style={{ width: '50%', padding: '8px', textAlign: 'right', fontSize: '11.5px' }}>
-                    C$ {venta.subtotal?.toFixed(2)}
+                    C$ {venta.anulada ? '0.00' : venta.subtotal?.toFixed(2)}
                   </div>
                 </div>
                 <div style={{ display: 'flex', borderBottom: '1.2px solid #ccc' }}>
@@ -353,7 +372,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                     Descuento
                   </div>
                   <div style={{ width: '50%', padding: '8px', textAlign: 'right', fontSize: '11.5px', color: '#d9534f' }}>
-                    - C$ {(venta.descuento || 0).toFixed(2)}
+                    - C$ {venta.anulada ? '0.00' : (venta.descuento || 0).toFixed(2)}
                   </div>
                 </div>
                 <div style={{ display: 'flex', borderBottom: '1.2px solid #ccc' }}>
@@ -370,9 +389,11 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                   >
                     IVA (15%)
                   </div>
-                  <div style={{ width: '50%', padding: '8px', textAlign: 'right', fontSize: '11.5px' }}>C$ {venta.iva?.toFixed(2)}</div>
+                  <div style={{ width: '50%', padding: '8px', textAlign: 'right', fontSize: '11.5px' }}>
+                    C$ {venta.anulada ? '0.00' : venta.iva?.toFixed(2)}
+                  </div>
                 </div>
-                <div style={{ display: 'flex', backgroundColor: '#fef3e7' }}>
+                <div style={{ display: 'flex', backgroundColor: venta.anulada ? '#f8d7da' : '#fef3e7' }}>
                   <div
                     style={{
                       width: '50%',
@@ -393,21 +414,23 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                       textAlign: 'right',
                       fontWeight: 'bold',
                       fontSize: '16px',
-                      color: '#fd7e14',
+                      color: venta.anulada ? '#dc3545' : '#fd7e14',
                     }}
                   >
-                    C$ {venta.total?.toFixed(2)}
+                    C$ {venta.anulada ? '0.00' : venta.total?.toFixed(2)}
                   </div>
                 </div>
                 {/* Info Recibido/Cambio Alineada */}
-                <div style={{ borderTop: '1.2px solid #ccc', display: 'flex', fontSize: '12px', color: '#333' }}>
-                  <div style={{ width: '50%', padding: '6px 10px', borderRight: '1.2px solid #ccc', textAlign: 'right' }}>
-                    <strong>Recibido:</strong> C$ {venta.importeRecibido?.toFixed(2)}
+                {!venta.anulada && (
+                  <div style={{ borderTop: '1.2px solid #ccc', display: 'flex', fontSize: '12px', color: '#333' }}>
+                    <div style={{ width: '50%', padding: '6px 10px', borderRight: '1.2px solid #ccc', textAlign: 'right' }}>
+                      <strong>Recibido:</strong> C$ {venta.importeRecibido?.toFixed(2)}
+                    </div>
+                    <div style={{ width: '50%', padding: '6px 10px', textAlign: 'right' }}>
+                      <strong>Cambio:</strong> C$ {venta.cambio?.toFixed(2)}
+                    </div>
                   </div>
-                  <div style={{ width: '50%', padding: '6px 10px', textAlign: 'right' }}>
-                    <strong>Cambio:</strong> C$ {venta.cambio?.toFixed(2)}
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
