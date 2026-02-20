@@ -14,6 +14,7 @@ import {
   faHistory,
   faBuilding,
   faReceipt,
+  faCalendarAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import ArticuloService from 'app/services/articulo.service';
 import VentaService from 'app/services/venta.service';
@@ -23,9 +24,13 @@ import { IVenta } from 'app/shared/model/venta.model';
 import { IDevolucion } from 'app/shared/model/devolucion.model';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import dayjs from 'dayjs';
+import 'dayjs/locale/es';
 import { IDetalleVenta } from 'app/shared/model/detalle-venta.model';
 import DetalleDevolucionService from 'app/services/detalle-devolucion.service';
 import { IDetalleDevolucion } from 'app/shared/model/detalle-devolucion.model';
+import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+
+dayjs.locale('es');
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658'];
 
@@ -41,62 +46,79 @@ export const AdminDashboard = () => {
   const [devolucionesRecientes, setDevolucionesRecientes] = useState<IDevolucion[]>([]);
   const [categoryData, setCategoryData] = useState<ICategoryData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState(dayjs());
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
+
+  const [allArticulos, setAllArticulos] = useState<IArticulo[]>([]);
+  const [allDetallesVenta, setAllDetallesVenta] = useState<IDetalleVenta[]>([]);
+  const [allDetallesDevolucion, setAllDetallesDevolucion] = useState<IDetalleDevolucion[]>([]);
 
   useEffect(() => {
+    setLoading(true);
     Promise.all([
       ArticuloService.getAll(),
       VentaService.getAll({ size: 1000, sort: 'fecha,desc' }),
-      VentaService.getAllDetalles({ size: 1000 }),
+      VentaService.getAllDetalles({ size: 2000 }),
       DevolucionService.getAll(),
-      DetalleDevolucionService.getAll({ size: 1000 }),
+      DetalleDevolucionService.getAll({ size: 2000 }),
     ])
       .then(([artRes, venRes, detRes, devRes, detDevRes]) => {
-        const allArticulos = artRes.data;
-        const low = allArticulos.filter(a => a.activo && (a.existencia || 0) <= (a.existenciaMinima || 0));
-        setBajoStock(low);
+        setAllArticulos(artRes.data);
         setVentasRecientes(venRes.data);
         setDevolucionesRecientes(devRes.data);
+        setAllDetallesVenta(detRes.data);
+        setAllDetallesDevolucion(detDevRes.data);
 
-        // Crear mapa de categorías por ID de artículo para máxima precisión
-        const catMap: Record<number, string> = {};
-        allArticulos.forEach(a => {
-          if (a.id) catMap[a.id] = a.categoria?.nombre || 'Sin Categoría';
-        });
-
-        const groupByCategory: Record<string, number> = {};
-
-        // 1. Sumar Ventas (solo las no anuladas)
-        const details: IDetalleVenta[] = detRes.data;
-        details.forEach(det => {
-          if (det.venta?.anulada) return;
-          const catName = (det.articulo?.id ? catMap[det.articulo.id] : det.articulo?.categoria?.nombre) || 'Sin Categoría';
-          const monto = det.monto || 0;
-          groupByCategory[catName] = (groupByCategory[catName] || 0) + monto;
-        });
-
-        // 2. Restar Devoluciones (Solo el monto NETO para que coincida con la suma de ventas)
-        const detailsDev: IDetalleDevolucion[] = detDevRes.data;
-        detailsDev.forEach(det => {
-          const catName = (det.articulo?.id ? catMap[det.articulo.id] : det.articulo?.categoria?.nombre) || 'Sin Categoría';
-          // Usamos cantidad * precioUnitario para tener el valor neto (sin IVA)
-          const montoNeto = (det.cantidad || 0) * (det.precioUnitario || 0);
-
-          if (groupByCategory[catName] !== undefined) {
-            groupByCategory[catName] -= montoNeto;
-            if (groupByCategory[catName] < 0) groupByCategory[catName] = 0;
-          }
-        });
-
-        const pieData: ICategoryData[] = Object.keys(groupByCategory).map(name => ({
-          name,
-          value: groupByCategory[name],
-        }));
-
-        setCategoryData(pieData.sort((a, b) => b.value - a.value).filter(d => d.value > 0));
+        const low = artRes.data.filter(a => a.activo && (a.existencia || 0) <= (a.existenciaMinima || 0));
+        setBajoStock(low);
         setLoading(false);
       })
       .catch(console.error);
   }, []);
+
+  useEffect(() => {
+    if (loading) return;
+
+    // Crear mapa de categorías por ID de artículo para máxima precisión
+    const catMap: Record<number, string> = {};
+    allArticulos.forEach(a => {
+      if (a.id) catMap[a.id] = a.categoria?.nombre || 'Sin Categoría';
+    });
+
+    const groupByCategory: Record<string, number> = {};
+
+    // 1. Sumar Ventas del mes seleccionado (solo las no anuladas)
+    allDetallesVenta.forEach(det => {
+      if (det.venta?.anulada) return;
+      if (!dayjs(det.venta?.fecha).isSame(selectedDate, 'month')) return;
+
+      const catName = (det.articulo?.id ? catMap[det.articulo.id] : det.articulo?.categoria?.nombre) || 'Sin Categoría';
+      const monto = det.monto || 0;
+      groupByCategory[catName] = (groupByCategory[catName] || 0) + monto;
+    });
+
+    // 2. Restar Devoluciones del mes seleccionado
+    allDetallesDevolucion.forEach(det => {
+      if (!dayjs(det.devolucion?.fecha).isSame(selectedDate, 'month')) return;
+
+      const catName = (det.articulo?.id ? catMap[det.articulo.id] : det.articulo?.categoria?.nombre) || 'Sin Categoría';
+      const montoNeto = (det.cantidad || 0) * (det.precioUnitario || 0);
+
+      if (groupByCategory[catName] !== undefined) {
+        groupByCategory[catName] -= montoNeto;
+        if (groupByCategory[catName] < 0) groupByCategory[catName] = 0;
+      }
+    });
+
+    const pieData: ICategoryData[] = Object.keys(groupByCategory).map(name => ({
+      name,
+      value: groupByCategory[name],
+    }));
+
+    setCategoryData(pieData.sort((a, b) => b.value - a.value).filter(d => d.value > 0));
+  }, [selectedDate, loading, allArticulos, allDetallesVenta, allDetallesDevolucion]);
 
   // Procesar datos para la gráfica (Ventas Netas últimos 7 días)
   const chartData = [6, 5, 4, 3, 2, 1, 0].map(daysAgo => {
@@ -121,10 +143,26 @@ export const AdminDashboard = () => {
         <h4 className="text-primary fw-bold m-0">
           <FontAwesomeIcon icon={faChartLine} className="me-2" /> Panel de Control
         </h4>
-        <Button color="dark" outline size="sm" className="border-0 shadow-sm bg-white" onClick={() => navigate('/admin/configuracion')}>
-          <FontAwesomeIcon icon={faBuilding} className="me-2 text-primary" />
-          Configurar Empresa
-        </Button>
+        <div className="d-flex gap-2 align-items-center">
+          <Dropdown isOpen={dropdownOpen} toggle={toggleDropdown} size="sm">
+            <DropdownToggle caret color="white" className="border shadow-sm text-primary fw-bold px-3">
+              <FontAwesomeIcon icon={faCalendarAlt} className="me-2" />
+              {selectedDate.format('MMMM YYYY').charAt(0).toUpperCase() + selectedDate.format('MMMM YYYY').slice(1)}
+            </DropdownToggle>
+            <DropdownMenu end className="shadow border-0">
+              <DropdownItem header>Seleccionar Mes</DropdownItem>
+              {Array.from({ length: dayjs().month() + 1 }).map((_, m) => {
+                const d = dayjs().startOf('year').add(m, 'month');
+                const isSelected = selectedDate.isSame(d, 'month');
+                return (
+                  <DropdownItem key={m} onClick={() => setSelectedDate(d)} active={isSelected}>
+                    {d.format('MMMM YYYY').charAt(0).toUpperCase() + d.format('MMMM YYYY').slice(1)}
+                  </DropdownItem>
+                );
+              }).reverse()}
+            </DropdownMenu>
+          </Dropdown>
+        </div>
       </div>
 
       {/* KPI Cards */}
@@ -165,15 +203,15 @@ export const AdminDashboard = () => {
                   <div className="stat-value-palette">
                     {(() => {
                       const vMes = ventasRecientes
-                        .filter(v => dayjs(v.fecha).isSame(dayjs(), 'month') && !v.anulada)
+                        .filter(v => dayjs(v.fecha).isSame(selectedDate, 'month') && !v.anulada)
                         .reduce((acc, v) => acc + (v.total || 0), 0);
                       const dMes = devolucionesRecientes
-                        .filter(d => dayjs(d.fecha).isSame(dayjs(), 'month'))
+                        .filter(d => dayjs(d.fecha).isSame(selectedDate, 'month'))
                         .reduce((acc, d) => acc + (d.total || 0), 0);
                       return (vMes - dMes).toLocaleString('es-NI', { style: 'currency', currency: 'NIO', currencyDisplay: 'narrowSymbol' });
                     })()}
                   </div>
-                  <div className="stat-label-palette">Ventas del Mes</div>
+                  <div className="stat-label-palette">Ventas de {selectedDate.format('MMMM')}</div>
                 </div>
               </div>
             </CardBody>
@@ -227,15 +265,27 @@ export const AdminDashboard = () => {
                   <AreaChart data={chartData}>
                     <defs>
                       <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
-                        <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
+                        <stop offset="5%" stopColor="#1a0d65ff" stopOpacity={0.8} />
+                        <stop offset="95%" stopColor="#05afd9ff" stopOpacity={0.1} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                    <YAxis axisLine={false} tickLine={false} />
-                    <Tooltip contentStyle={{ borderRadius: '10px', border: 'none', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }} />
-                    <Area type="monotone" dataKey="total" stroke="#8884d8" fillOpacity={1} fill="url(#colorTotal)" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dy={10} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} />
+                    <Tooltip
+                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', padding: '10px' }}
+                      formatter={(value: any) => [`C$ ${Number(value).toLocaleString()}`, 'Ventas']}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="total"
+                      stroke="#4f46e5"
+                      strokeWidth={2}
+                      fillOpacity={1}
+                      fill="url(#colorTotal)"
+                      dot={{ r: 3, fill: '#fff', strokeWidth: 2, stroke: '#4f46e5' }}
+                      activeDot={{ r: 5, strokeWidth: 0, fill: '#4f46e5' }}
+                    />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -300,7 +350,7 @@ export const AdminDashboard = () => {
           <Card className="shadow mb-4">
             <CardBody>
               <CardTitle tag="h6" className="text-black border-bottom pb-2 mb-3">
-                Ventas por Categoría
+                Ventas por Categoría ({selectedDate.format('MMMM YYYY')})
               </CardTitle>
               <div style={{ height: '300px', width: '100%' }}>
                 <ResponsiveContainer width="100%" height="100%">
