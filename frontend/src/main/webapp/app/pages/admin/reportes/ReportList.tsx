@@ -36,7 +36,7 @@ const reports = [
     description: 'Resumen de ventas diarias desglosado por método de pago.',
     icon: faCashRegister,
     color: 'success',
-    path: null,
+    path: '/admin/reportes/cierre-caja',
   },
   {
     title: 'Productos Más Vendidos',
