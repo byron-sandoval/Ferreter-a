@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20260220155204-1" author="antigravity">
+        <createTable tableName="cierre_caja">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="fecha" type="${datetimeType}">
+                <constraints nullable="false" />
+            </column>
+            <column name="monto_apertura" type="decimal(21,2)">
+                <constraints nullable="false" />
+            </column>
+            <column name="monto_ventas_efectivo" type="decimal(21,2)">
+                <constraints nullable="false" />
+            </column>
+            <column name="monto_ventas_tarjeta" type="decimal(21,2)">
+                <constraints nullable="false" />
+            </column>
+            <column name="monto_ventas_transferencia" type="decimal(21,2)">
+                <constraints nullable="false" />
+            </column>
+            <column name="monto_devoluciones" type="decimal(21,2)">
+                <constraints nullable="false" />
+            </column>
+            <column name="total_ventas_brutas" type="decimal(21,2)">
+                <constraints nullable="false" />
+            </column>
+            <column name="monto_esperado" type="decimal(21,2)">
+                <constraints nullable="false" />
+            </column>
+            <column name="monto_fisico" type="decimal(21,2)">
+                <constraints nullable="false" />
+            </column>
+            <column name="diferencia" type="decimal(21,2)">
+                <constraints nullable="false" />
+            </column>
+            <column name="observaciones" type="varchar(255)"/>
+            <column name="usuario_id" type="bigint"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="usuario_id"
+                                 baseTableName="cierre_caja"
+                                 constraintName="fk_cierre_caja_usuario_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="usuario"/>
+    </changeSet>
+</databaseChangeLog>

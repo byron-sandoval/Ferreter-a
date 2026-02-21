@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useReactToPrint } from 'react-to-print';
+import { toast } from 'react-toastify';
 import {
     Container,
     Row,
@@ -19,24 +21,31 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faArrowLeft,
     faMoneyBillWave,
-    faFilePdf,
+    faPrint,
 } from '@fortawesome/free-solid-svg-icons';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import VentaService from 'app/services/venta.service';
 import DevolucionService from 'app/services/devolucion.service';
+import CierreCajaService from 'app/services/cierre-caja.service';
 import { IVenta } from 'app/shared/model/venta.model';
 import { IDevolucion } from 'app/shared/model/devolucion.model';
 import dayjs from 'dayjs';
 
 const CierreCaja = () => {
     const navigate = useNavigate();
+    const componentRef = useRef<HTMLDivElement>(null);
+    const handlePrint = useReactToPrint({
+        contentRef: componentRef,
+    });
+
     const [loading, setLoading] = useState(false);
+    const [saving, setSaving] = useState(false);
     const [fecha, setFecha] = useState(dayjs().format('YYYY-MM-DD'));
     const [ventas, setVentas] = useState<IVenta[]>([]);
     const [devoluciones, setDevoluciones] = useState<IDevolucion[]>([]);
     const [montoFisico, setMontoFisico] = useState<string>('');
+    const [montoSiguienteCaja, setMontoSiguienteCaja] = useState<string>('');
     const [saldoApertura, setSaldoApertura] = useState<string>('0');
+    const [observaciones, setObservaciones] = useState<string>('');
 
     // Totales desglosados
     const [stats, setStats] = useState({
@@ -48,8 +57,24 @@ const CierreCaja = () => {
     });
 
     useEffect(() => {
+        fetchLastClosing();
+    }, []);
+
+    useEffect(() => {
         fetchData();
     }, [fecha]);
+
+    const fetchLastClosing = async () => {
+        try {
+            const res = await CierreCajaService.getLast();
+            if (res.data && res.data.montoSiguienteCaja != null) {
+                setSaldoApertura(res.data.montoSiguienteCaja.toString());
+            }
+        } catch (error) {
+            // Si no hay cierres anteriores (404), simplemente se deja en 0
+            console.warn('Sin cierre anterior registrado.');
+        }
+    };
 
     const fetchData = async () => {
         setLoading(true);
@@ -97,88 +122,45 @@ const CierreCaja = () => {
 
     const efectivoEnCaja = Number(saldoApertura) + stats.efectivo - stats.devoluciones;
     const diferencia = (Number(montoFisico) || 0) - efectivoEnCaja;
+    const montoAEntregar = (Number(montoFisico) || 0) - (Number(montoSiguienteCaja) || 0);
 
-    const exportToPDF = () => {
-        const doc = new jsPDF();
-        const pageWidth = doc.internal.pageSize.getWidth();
+    const handleSaveAndPrint = async () => {
+        if (!montoFisico) {
+            toast.error('Debe ingresar el monto físico contado');
+            return;
+        }
 
-        // Título y Encabezado
-        doc.setFontSize(18);
-        doc.setTextColor(0, 0, 0);
-        doc.text('FERRONICA - CIERRE DE CAJA', pageWidth / 2, 20, { align: 'center' });
+        setSaving(true);
+        try {
+            const nuevoCierre = {
+                fecha: dayjs().toISOString(),
+                montoApertura: Number(saldoApertura),
+                montoVentasEfectivo: stats.efectivo,
+                montoVentasTarjeta: stats.tarjeta,
+                montoVentasTransferencia: stats.transferencia,
+                montoDevoluciones: stats.devoluciones,
+                totalVentasBrutas: stats.totalVentas,
+                montoEsperado: efectivoEnCaja,
+                montoFisico: Number(montoFisico),
+                montoSiguienteCaja: Number(montoSiguienteCaja),
+                diferencia,
+                observaciones
+            };
 
-        doc.setFontSize(10);
-        doc.setTextColor(100);
-        doc.text('Comprobante de Arqueo Diario', pageWidth / 2, 28, { align: 'center' });
+            await CierreCajaService.create(nuevoCierre);
+            toast.success('Cierre de caja registrado correctamente');
 
-        doc.setFontSize(11);
-        doc.setTextColor(0);
-        doc.text(`Fecha Reportada: ${dayjs(fecha).format('DD/MM/YYYY')}`, 14, 40);
-        doc.text(`Emitido el: ${dayjs().format('DD/MM/YYYY hh:mm A')}`, pageWidth - 14, 40, { align: 'right' });
+            // Disparar impresión nativa del navegador
+            setTimeout(() => {
+                handlePrint();
+            }, 500);
 
-        // Tabla de Resumen
-        autoTable(doc, {
-            startY: 45,
-            head: [['RESUMEN DE MOVIMIENTOS', 'MONTO (C$)']],
-            body: [
-                ['Ventas en Efectivo', `C$ ${stats.efectivo.toLocaleString()}`],
-                ['Ventas con Tarjeta', `C$ ${stats.tarjeta.toLocaleString()}`],
-                ['Ventas por Transferencia', `C$ ${stats.transferencia.toLocaleString()}`],
-                [{ content: 'TOTAL VENTAS BRUTAS', styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } }, { content: `C$ ${stats.totalVentas.toLocaleString()}`, styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } }],
-                ['(-) Total Devoluciones', `C$ ${stats.devoluciones.toLocaleString()}`]
-            ],
-            theme: 'striped',
-            headStyles: { fillColor: [70, 70, 70], halign: 'center' },
-            columnStyles: { 1: { halign: 'right' } }
-        });
-
-        // Sección de Conciliación
-        const lastY = (doc as any).lastAutoTable.finalY + 10;
-        doc.setFillColor(248, 249, 250);
-        doc.rect(14, lastY, pageWidth - 28, 35, 'F');
-        doc.rect(14, lastY, pageWidth - 28, 35, 'S');
-
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
-        doc.text('CONCILIACIÓN DE EFECTIVO', pageWidth / 2, lastY + 10, { align: 'center' });
-
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        doc.text(`Fondo Inicial: C$ ${Number(saldoApertura).toLocaleString()}`, 30, lastY + 20);
-        doc.text(`+ Ventas Efectivo: C$ ${stats.efectivo.toLocaleString()}`, 30, lastY + 25);
-        doc.text(`- Devoluciones: C$ ${stats.devoluciones.toLocaleString()}`, 30, lastY + 30);
-
-        doc.setFontSize(12);
-        doc.setFont('helvetica', 'bold');
-        doc.text(`TOTAL ESPERADO EN CAJA: C$ ${efectivoEnCaja.toLocaleString()}`, pageWidth - 30, lastY + 25, { align: 'right' });
-
-        // Tabla de Detalle de Facturas
-        autoTable(doc, {
-            startY: lastY + 45,
-            head: [['NO. FACTURA', 'HORA', 'VENDEDOR', 'CLIENTE', 'MONTO (C$)']],
-            body: ventas.length > 0
-                ? ventas.map(v => [
-                    `#${v.noFactura}`,
-                    dayjs(v.fecha).format('hh:mm A'),
-                    v.usuario?.nombre || 'Admin',
-                    v.cliente?.nombre || 'General',
-                    `C$ ${v.total?.toLocaleString()}`
-                ])
-                : [['-', '-', '-', 'Sin movimientos', 'C$ 0.00']],
-            headStyles: { fillColor: [40, 40, 40] },
-            columnStyles: { 4: { halign: 'right', fontStyle: 'bold' } },
-            margin: { top: 40 }
-        });
-
-        // Firmas
-        const finalY = (doc as any).lastAutoTable.finalY + 40;
-        doc.line(30, finalY, 90, finalY);
-        doc.text('FIRMA CAJERO', 60, finalY + 5, { align: 'center' });
-
-        doc.line(pageWidth - 90, finalY, pageWidth - 30, finalY);
-        doc.text('ADMINISTRACIÓN', pageWidth - 60, finalY + 5, { align: 'center' });
-
-        doc.save(`Cierre_Caja_${dayjs(fecha).format('DD_MM_YYYY')}.pdf`);
+        } catch (error) {
+            console.error('Error saving cierre de caja:', error);
+            toast.error('Error al guardar el cierre de caja');
+        } finally {
+            setSaving(false);
+        }
     };
 
     return (
@@ -222,10 +204,6 @@ const CierreCaja = () => {
                                     <span className="text-muted">Ventas Tarjeta</span>
                                     <span className="fw-bold">C$ {stats.tarjeta.toLocaleString()}</span>
                                 </div>
-                                <div className="d-flex justify-content-between mb-3 border-bottom pb-2">
-                                    <span className="text-muted">Ventas Transferencia</span>
-                                    <span className="fw-bold">C$ {stats.transferencia.toLocaleString()}</span>
-                                </div>
                                 <div className="d-flex justify-content-between align-items-center">
                                     <span className="h6 fw-bold mb-0 text-uppercase">Total Ventas</span>
                                     <span className="h5 fw-bold text-primary mb-0">C$ {stats.totalVentas.toLocaleString()}</span>
@@ -239,10 +217,6 @@ const CierreCaja = () => {
                         <Card className="shadow-sm border-0 h-100" style={{ borderRadius: '15px' }}>
                             <CardBody className="p-4">
                                 <h6 className="fw-bold text-uppercase text-danger border-bottom pb-2 mb-3">Salidas de Dinero</h6>
-                                <div className="d-flex justify-content-between mb-2">
-                                    <span className="text-muted">Retiros Efectivo</span>
-                                    <span className="fw-bold">C$ 0.00</span>
-                                </div>
                                 <div className="d-flex justify-content-between mb-3 border-bottom pb-2 text-danger">
                                     <span className="">Total Devoluciones</span>
                                     <span className="fw-bold">C$ {stats.devoluciones.toLocaleString()}</span>
@@ -339,41 +313,185 @@ const CierreCaja = () => {
                     <Col md="4">
                         {/* Arqueo Físico */}
                         <Card className="shadow-sm border-0 border-top border-4 border-success" style={{ borderRadius: '15px' }}>
-                            <CardBody className="p-4">
-                                <h6 className="fw-bold text-success mb-4 text-center text-uppercase">Cuadre de Efectivo</h6>
-                                <FormGroup className="mb-4">
-                                    <Label className="small fw-bold text-muted mb-2 text-center d-block">MONTO FÍSICO CONTADO</Label>
+                            <CardBody className="p-3">
+                                <h6 className="fw-bold text-success mb-2 text-center text-uppercase" style={{ fontSize: '0.78rem', letterSpacing: '0.05em' }}>Cuadre de Efectivo</h6>
+                                <FormGroup className="mb-2">
+                                    <Label className="small fw-bold text-muted mb-1 text-center d-block" style={{ fontSize: '0.72rem' }}>MONTO FÍSICO CONTADO</Label>
                                     <div className="position-relative">
-                                        <span className="position-absolute h-100 d-flex align-items-center px-4 text-muted border-end" style={{ top: 0, left: 0 }}>C$</span>
+                                        <span className="position-absolute h-100 d-flex align-items-center px-3 text-muted border-end" style={{ top: 0, left: 0, fontSize: '0.82rem' }}>C$</span>
                                         <Input
                                             type="number"
                                             placeholder="0.00"
-                                            className="form-control-lg border-2 ps-5 ms-3 fw-bold text-center"
-                                            style={{ fontSize: '2rem', height: '80px', borderRadius: '15px' }}
+                                            className="border-2 fw-bold text-center"
+                                            style={{ fontSize: '1.4rem', height: '52px', borderRadius: '10px', paddingLeft: '50px' }}
                                             value={montoFisico}
                                             onChange={(e) => setMontoFisico(e.target.value)}
                                         />
                                     </div>
                                 </FormGroup>
 
-                                <div className={`p-4 rounded-3 text-center ${diferencia === 0 ? 'bg-light' : diferencia > 0 ? 'bg-success bg-opacity-10' : 'bg-danger bg-opacity-10'}`}>
-                                    <div className="small fw-bold text-muted text-uppercase mb-1">Diferencia / Descuadre</div>
-                                    <h3 className={`fw-bold mb-0 ${diferencia === 0 ? 'text-dark' : diferencia > 0 ? 'text-success' : 'text-danger'}`}>
-                                        {diferencia >= 0 ? '+' : ''} C$ {diferencia.toLocaleString()}
-                                    </h3>
-                                    <div className="small mt-2 px-2 py-1 rounded-pill d-inline-block fw-bold" style={{ backgroundColor: 'white' }}>
-                                        {diferencia === 0 ? '👍 Caja Cuadrada' : diferencia > 0 ? '💰 Sobrante' : '⚠️ Faltante'}
+                                {montoFisico !== '' && (
+                                    <div className={`p-2 rounded-3 text-center mb-2 ${diferencia === 0 ? 'bg-light' : diferencia > 0 ? 'bg-success bg-opacity-10' : 'bg-danger bg-opacity-10'}`}>
+                                        <div className="fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.68rem' }}>Diferencia / Descuadre</div>
+                                        <div className={`fw-bold ${diferencia === 0 ? 'text-dark' : diferencia > 0 ? 'text-success' : 'text-danger'}`} style={{ fontSize: '1.3rem' }}>
+                                            {diferencia >= 0 ? '+' : ''} C$ {diferencia.toLocaleString()}
+                                        </div>
+                                        <div className="small mt-1 px-2 py-1 rounded-pill d-inline-block fw-bold" style={{ backgroundColor: 'white', fontSize: '0.72rem' }}>
+                                            {diferencia === 0 ? '👍 Caja Cuadrada' : diferencia > 0 ? '💰 Sobrante' : '⚠️ Faltante'}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <Card className="border-0 bg-light p-2 mb-2" style={{ borderRadius: '10px' }}>
+                                    <FormGroup className="mb-0">
+                                        <Label className="small fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.72rem' }}>Fondo para Siguiente Caja</Label>
+                                        <div className="position-relative">
+                                            <span className="position-absolute h-100 d-flex align-items-center ps-3 text-muted" style={{ fontSize: '0.82rem' }}>C$</span>
+                                            <Input
+                                                type="number"
+                                                bsSize="sm"
+                                                className="fw-bold border-0 bg-white"
+                                                style={{ borderRadius: '8px', paddingLeft: '40px' }}
+                                                value={montoSiguienteCaja}
+                                                onChange={(e) => setMontoSiguienteCaja(e.target.value)}
+                                            />
+                                        </div>
+                                    </FormGroup>
+                                </Card>
+
+                                <div className="p-2 border-top border-bottom mb-2">
+                                    <div className="d-flex justify-content-between align-items-center">
+                                        <span className="fw-bold text-muted text-uppercase" style={{ fontSize: '0.72rem' }}>Monto a Entregar</span>
+                                        <span className="fw-bold text-primary" style={{ fontSize: '1.1rem' }}>C$ {montoAEntregar.toLocaleString()}</span>
                                     </div>
                                 </div>
 
-                                <Button color="danger" block className="fw-bold py-3 mt-4 w-100 shadow-sm" style={{ borderRadius: '12px' }}
-                                    disabled={!montoFisico} onClick={exportToPDF}>
-                                    <FontAwesomeIcon icon={faFilePdf} className="me-2" /> GENERAR PDF CIERRE
+                                <FormGroup className="mb-2">
+                                    <Label className="small fw-bold text-muted mb-1" style={{ fontSize: '0.72rem' }}>OBSERVACIONES</Label>
+                                    <Input
+                                        type="textarea"
+                                        placeholder="Comentarios sobre el arqueo..."
+                                        rows={2}
+                                        bsSize="sm"
+                                        value={observaciones}
+                                        onChange={(e) => setObservaciones(e.target.value)}
+                                        style={{ borderRadius: '8px', fontSize: '0.82rem' }}
+                                    />
+                                </FormGroup>
+
+                                <Button color="success" block size="sm" className="fw-bold mt-1 shadow-sm" style={{ borderRadius: '8px' }}
+                                    disabled={!montoFisico || saving} onClick={handleSaveAndPrint}>
+                                    <FontAwesomeIcon icon={saving ? faMoneyBillWave : faPrint} spin={saving} className="me-2" />
+                                    {saving ? 'GUARDANDO...' : 'IMPRIMIR Y REGISTRAR CIERRE'}
                                 </Button>
                             </CardBody>
                         </Card>
                     </Col>
                 </Row>
+            </div>
+
+            {/* SECCIÓN OCULTA PARA IMPRESIÓN */}
+            <div style={{ display: 'none' }}>
+                <div
+                    ref={componentRef}
+                    style={{
+                        padding: '40px',
+                        fontFamily: 'Arial, sans-serif',
+                        width: '800px',
+                        backgroundColor: 'white',
+                        color: 'black'
+                    }}
+                >
+                    <div style={{ textAlign: 'center', marginBottom: '30px', borderBottom: '2px solid black', paddingBottom: '10px' }}>
+                        <h2 style={{ margin: 0, fontWeight: 'bold' }}>FERRONICA</h2>
+                        <h4 style={{ margin: '5px 0', textTransform: 'uppercase' }}>Comprobante de Arqueo Diario</h4>
+                        <div style={{ fontSize: '12px', fontWeight: 'bold', color: 'black', marginTop: '10px' }}>Emitido: {dayjs().format('DD/MM/YYYY hh:mm A')}</div>
+                    </div>
+
+
+                    {/* CONCILIACIÓN DE EFECTIVO - Formato estado de cuenta */}
+                    <div style={{ border: '1px solid black', padding: '20px', marginBottom: '30px', fontFamily: 'monospace', fontSize: '13px' }}>
+                        <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '14px', marginBottom: '12px', letterSpacing: '1px' }}>CONCILIACIÓN DE EFECTIVO</div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <span>Fondo Inicial:</span>
+                            <span>C$ {Number(saldoApertura).toLocaleString()}</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <span>+ Ventas en Efectivo:</span>
+                            <span>C$ {stats.efectivo.toLocaleString()}</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <span>+ Ventas con Tarjeta:</span>
+                            <span>C$ {stats.tarjeta.toLocaleString()}</span>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', color: 'red' }}>
+                            <span>- Devoluciones:</span>
+                            <span>C$ {stats.devoluciones.toLocaleString()}</span>
+                        </div>
+
+                        <div style={{ borderTop: '1px solid black', marginTop: '8px', marginBottom: '8px' }} />
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '14px', marginBottom: '4px' }}>
+                            <span>Total Esperado en Caja:</span>
+                            <span>C$ {efectivoEnCaja.toLocaleString()}</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <span>Saldo Contabilizado (físico):</span>
+                            <span style={{ fontWeight: 'bold' }}>C$ {Number(montoFisico).toLocaleString()}</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', color: diferencia >= 0 ? 'green' : 'red' }}>
+                            <span>Diferencia ({diferencia >= 0 ? 'Sobrante' : 'Faltante'}):</span>
+                            <span style={{ fontWeight: 'bold' }}>C$ {diferencia.toLocaleString()}</span>
+                        </div>
+
+                        <div style={{ borderTop: '1px dashed black', marginTop: '8px', marginBottom: '8px' }} />
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <span>Fondo para Siguiente Caja:</span>
+                            <span style={{ fontWeight: 'bold' }}>C$ {Number(montoSiguienteCaja).toLocaleString()}</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '14px' }}>
+                            <span>Monto a Entregar:</span>
+                            <span>C$ {montoAEntregar.toLocaleString()}</span>
+                        </div>
+                    </div>
+
+                    {observaciones && (
+                        <div style={{ marginBottom: '30px', border: '1px solid #ccc', padding: '10px' }}>
+                            <strong>Observaciones:</strong> {observaciones}
+                        </div>
+                    )}
+                    <h5 style={{ fontWeight: 'bold', borderBottom: '1px solid black', paddingBottom: '5px', marginTop: '30px' }}>Resumen de Ventas por Vendedor</h5>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', marginBottom: '30px', pageBreakInside: 'avoid' }}>
+                        <tbody>
+                            <tr style={{ backgroundColor: '#f2f2f2' }}>
+                                <td style={{ border: '1px solid black', padding: '10px', fontWeight: 'bold', textAlign: 'left' }}>Vendedor</td>
+                                <td style={{ border: '1px solid black', padding: '10px', fontWeight: 'bold', textAlign: 'right' }}>Monto Total Vendido</td>
+                            </tr>
+                            {Object.entries(
+                                ventas.reduce((acc: any, v) => {
+                                    const nombre = v.usuario?.nombre || 'Admin';
+                                    acc[nombre] = (acc[nombre] || 0) + (v.total || 0);
+                                    return acc;
+                                }, {})
+                            ).map(([vendedor, total]: [string, any]) => (
+                                <tr key={vendedor}>
+                                    <td style={{ border: '1px solid black', padding: '10px' }}>{vendedor}</td>
+                                    <td style={{ border: '1px solid black', padding: '10px', textAlign: 'right', fontWeight: 'bold' }}>C$ {total.toLocaleString()}</td>
+                                </tr>
+                            ))}
+                            {ventas.length === 0 && (
+                                <tr>
+                                    <td colSpan={2} style={{ border: '1px solid black', padding: '20px', textAlign: 'center' }}>
+                                        Sin movimientos de venta en la fecha seleccionada
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );
