@@ -57,6 +57,7 @@ export const NuevaVenta = () => {
   const [usuarioActual, setUsuarioActual] = useState<any>(null);
   const [montoPagado, setMontoPagado] = useState('');
   const [descuento, setDescuento] = useState<string>('0');
+  const [voucher, setVoucher] = useState('');
 
   // Impresion
   const componentRef = useRef<any>(null);
@@ -257,6 +258,11 @@ export const NuevaVenta = () => {
       return;
     }
 
+    if (metodoPago === MetodoPagoEnum.TARJETA_STRIPE && (!voucher || voucher.trim() === '')) {
+      toast.error('Por favor ingrese el número de voucher o referencia de la tarjeta.');
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -268,8 +274,9 @@ export const NuevaVenta = () => {
         total,
         totalEnMonedaBase: total, // Todo se asume en base C$ inicialmente
         metodoPago,
-        importeRecibido: montoPagadoNum,
-        cambio: cambio > 0 ? cambio : 0,
+        stripeId: voucher.trim() ? voucher.trim() : null,
+        importeRecibido: metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? total : montoPagadoNum,
+        cambio: metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? 0 : (cambio > 0 ? cambio : 0),
         esContado,
         cliente,
         usuario: usuarioActual,
@@ -334,6 +341,7 @@ export const NuevaVenta = () => {
     setCliente(null);
     setBusquedaCedula('');
     setMontoPagado('');
+    setVoucher('');
     setVentaExitosa(null);
     cargarDatosIniciales(); // Recargar stock y numeracion
   };
@@ -378,6 +386,8 @@ export const NuevaVenta = () => {
           descuento={descuento}
           setDescuento={setDescuento}
           cambio={cambio}
+          voucher={voucher}
+          setVoucher={setVoucher}
           procesarVenta={procesarVenta}
           loading={loading}
           ventaExitosa={ventaExitosa}
