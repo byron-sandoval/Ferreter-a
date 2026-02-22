@@ -46,6 +46,8 @@ interface IVentaSidebarProps {
   descuento: string;
   setDescuento: (v: string) => void;
   cambio: number;
+  voucher: string;
+  setVoucher: (v: string) => void;
   procesarVenta: () => void;
   loading: boolean;
   ventaExitosa: IVenta | null;
@@ -81,6 +83,8 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
   descuento,
   setDescuento,
   cambio,
+  voucher,
+  setVoucher,
   procesarVenta,
   loading,
   ventaExitosa,
@@ -234,6 +238,7 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
                     onChange={e => setMetodoPago(e.target.value as any)}
                   >
                     <option value={MetodoPagoEnum.EFECTIVO}>Efectivo</option>
+                    <option value={MetodoPagoEnum.TARJETA_STRIPE}>Tarjeta</option>
                   </Input>
                 </CardBody>
               </Card>
@@ -308,15 +313,30 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
             </div>
           ) : (
             <div className="mb-4">
-              <Label className="fw-bold small text-muted text-uppercase">Descuento (C$)</Label>
-              <Input
-                type="number"
-                bsSize="lg"
-                className="fw-bold text-end text-success border-0 shadow-sm"
-                placeholder="0.00"
-                value={descuento}
-                onChange={e => setDescuento(e.target.value)}
-              />
+              <Row className="g-2">
+                <Col md="5">
+                  <Label className="fw-bold small text-muted text-uppercase">Descuento (C$)</Label>
+                  <Input
+                    type="number"
+                    bsSize="lg"
+                    className="fw-bold text-end text-success border-0 shadow-sm"
+                    placeholder="0.00"
+                    value={descuento}
+                    onChange={e => setDescuento(e.target.value)}
+                  />
+                </Col>
+                <Col md="7">
+                  <Label className="fw-bold small text-muted text-uppercase">N° Voucher</Label>
+                  <Input
+                    type="text"
+                    bsSize="lg"
+                    className="fw-bold text-center border-0 shadow-sm"
+                    placeholder="Ej. 123456"
+                    value={voucher}
+                    onChange={e => setVoucher(e.target.value)}
+                  />
+                </Col>
+              </Row>
             </div>
           )}
 
@@ -347,13 +367,16 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
                 carrito.length === 0 ||
                 loading ||
                 !!ventaExitosa ||
-                (metodoPago === MetodoPagoEnum.EFECTIVO && (parseFloat(montoPagado) || 0) < total)
+                (metodoPago === MetodoPagoEnum.EFECTIVO && (parseFloat(montoPagado) || 0) < total) ||
+                (metodoPago === MetodoPagoEnum.TARJETA_STRIPE && !voucher.trim())
               }
             >
               {loading ? (
                 'Validando...'
               ) : metodoPago === MetodoPagoEnum.EFECTIVO && (parseFloat(montoPagado) || 0) < total ? (
                 'ESPERANDO PAGO...'
+              ) : metodoPago === MetodoPagoEnum.TARJETA_STRIPE && !voucher.trim() ? (
+                'FALTA VOUCHER'
               ) : (
                 <span>
                   <FontAwesomeIcon icon={faMoneyBillWave} className="me-2" /> COBRAR AHORA

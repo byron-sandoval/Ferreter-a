@@ -101,7 +101,7 @@ const CierreCaja = () => {
 
             // Cálculos
             const efec = ventasDia.filter(v => v.metodoPago === 'EFECTIVO').reduce((acc, v) => acc + (v.total || 0), 0);
-            const tarj = ventasDia.filter(v => v.metodoPago === 'TARJETA').reduce((acc, v) => acc + (v.total || 0), 0);
+            const tarj = ventasDia.filter(v => v.metodoPago === 'TARJETA_STRIPE').reduce((acc, v) => acc + (v.total || 0), 0);
             const trans = ventasDia.filter(v => v.metodoPago === 'TRANSFERENCIA').reduce((acc, v) => acc + (v.total || 0), 0);
             const dev = devolucionesDia.reduce((acc, d) => acc + (d.total || 0), 0);
 
@@ -120,7 +120,7 @@ const CierreCaja = () => {
         }
     };
 
-    const efectivoEnCaja = Number(saldoApertura) + stats.efectivo - stats.devoluciones;
+    const efectivoEnCaja = Number(saldoApertura) + stats.efectivo + stats.tarjeta - stats.devoluciones;
     const diferencia = (Number(montoFisico) || 0) - efectivoEnCaja;
     const montoAEntregar = (Number(montoFisico) || 0) - (Number(montoSiguienteCaja) || 0);
 
@@ -250,6 +250,10 @@ const CierreCaja = () => {
                                     <span className="opacity-75">+ Ventas Efectivo</span>
                                     <span className="fw-bold">C$ {stats.efectivo.toLocaleString()}</span>
                                 </div>
+                                <div className="d-flex justify-content-between mb-2">
+                                    <span className="opacity-75" title="No suma al efectivo de la gaveta">+ Ventas Tarjeta</span>
+                                    <span className="fw-bold text-light">C$ {stats.tarjeta.toLocaleString()}</span>
+                                </div>
                                 <div className="d-flex justify-content-between mb-3 border-bottom border-white border-opacity-25 pb-2">
                                     <span className="opacity-75">- Total Devoluciones</span>
                                     <span className="fw-bold">C$ {stats.devoluciones.toLocaleString()}</span>
@@ -294,7 +298,7 @@ const CierreCaja = () => {
                                                         <td>{v.cliente?.nombre || 'General'}</td>
                                                         <td className="text-center">
                                                             <Badge color={v.metodoPago === 'EFECTIVO' ? 'success' : 'info'} pill style={{ fontSize: '0.65rem' }}>
-                                                                {v.metodoPago}
+                                                                {v.metodoPago === 'TARJETA_STRIPE' ? 'TARJETA' : v.metodoPago}
                                                             </Badge>
                                                         </td>
                                                         <td className="text-end fw-bold">C$ {v.total?.toLocaleString()}</td>

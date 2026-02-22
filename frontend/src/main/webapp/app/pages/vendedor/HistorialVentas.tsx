@@ -205,7 +205,7 @@ export const HistorialVentas = () => {
                   </td>
                   <td>
                     <Badge color="light" className="text-dark border p-1" style={{ fontSize: '0.65rem' }}>
-                      {v.metodoPago}
+                      {v.metodoPago === 'TARJETA_STRIPE' ? 'TARJETA' : v.metodoPago}
                     </Badge>
                   </td>
                   <td className="text-center">

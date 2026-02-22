@@ -7,7 +7,7 @@ import { IDetalleVenta } from './detalle-venta.model';
 
 export enum MetodoPagoEnum {
   EFECTIVO = 'EFECTIVO',
-  TARJETA = 'TARJETA',
+  TARJETA_STRIPE = 'TARJETA_STRIPE',
   TRANSFERENCIA = 'TRANSFERENCIA',
 }
 
