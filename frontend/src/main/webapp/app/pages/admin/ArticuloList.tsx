@@ -23,11 +23,14 @@ import {
   faChevronRight,
 } from '@fortawesome/free-solid-svg-icons';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
+import { useAppSelector } from 'app/config/store';
+import { AUTHORITIES } from 'app/config/constants';
 import * as XLSX from 'xlsx-js-style';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 export const ArticuloList = () => {
+  const isAdmin = useAppSelector(state => state.authentication.account.authorities.includes(AUTHORITIES.ADMIN));
   const [articulos, setArticulos] = useState<IArticulo[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
@@ -452,18 +455,20 @@ export const ArticuloList = () => {
                             >
                               <FontAwesomeIcon icon={faPencilAlt} />
                             </Button>
-                            <Button
-                              size="sm"
-                              color="danger"
-                              outline
-                              title="Eliminar"
-                              onClick={e => {
-                                e.stopPropagation();
-                                handleDelete(articulo.id);
-                              }}
-                            >
-                              <FontAwesomeIcon icon={faTrash} />
-                            </Button>
+                            {isAdmin && (
+                              <Button
+                                size="sm"
+                                color="danger"
+                                outline
+                                title="Eliminar"
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  handleDelete(articulo.id);
+                                }}
+                              >
+                                <FontAwesomeIcon icon={faTrash} />
+                              </Button>
+                            )}
                           </div>
                         </td>
                       </tr>

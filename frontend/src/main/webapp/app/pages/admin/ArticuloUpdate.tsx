@@ -4,7 +4,8 @@ import { Button, Row, Col, Form, FormGroup, Label, Input, Card, CardBody, CardHe
 import { useForm, Controller } from 'react-hook-form';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faSave, faImage, faTimes, faExclamationTriangle, faBarcode } from '@fortawesome/free-solid-svg-icons';
-import { useAppDispatch } from 'app/config/store';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { AUTHORITIES } from 'app/config/constants';
 import ArticuloService from 'app/services/articulo.service';
 import CategoriaService from 'app/services/categoria.service';
 import UnidadMedidaService from 'app/services/unidad-medida.service';
@@ -14,6 +15,7 @@ import { IUnidadMedida } from 'app/shared/model/unidad-medida.model';
 import { toast } from 'react-toastify';
 
 export const ArticuloUpdate = () => {
+  const isAdmin = useAppSelector(state => state.authentication.account.authorities.includes(AUTHORITIES.ADMIN));
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { id } = useParams<'id'>();
@@ -221,7 +223,16 @@ export const ArticuloUpdate = () => {
                             name="precio"
                             control={control}
                             rules={{ required: true, min: 0 }}
-                            render={({ field }) => <Input type="number" step="0.01" {...field} invalid={esPrecioBajo} />}
+                            render={({ field }) => (
+                              <Input
+                                type="number"
+                                step="0.01"
+                                {...field}
+                                invalid={esPrecioBajo}
+                                readOnly={!isAdmin}
+                                className={!isAdmin ? 'bg-light text-muted' : ''}
+                              />
+                            )}
                           />
                           {esPrecioBajo && (
                             <div

@@ -17,6 +17,8 @@ import {
   Form,
   FormGroup,
 } from 'reactstrap';
+import { useAppSelector } from 'app/config/store';
+import { AUTHORITIES } from 'app/config/constants';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faUsers,
@@ -41,6 +43,7 @@ import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
 
 export const GestionClientes = () => {
+  const isAdmin = useAppSelector(state => state.authentication.account.authorities.includes(AUTHORITIES.ADMIN));
   const [clientes, setClientes] = useState<ICliente[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
@@ -145,11 +148,12 @@ export const GestionClientes = () => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este cliente?')) {
       try {
         await ClienteService.delete(id);
-        toast.success('Cliente eliminado con éxito');
+        // El backend decide si borra físico o solo desactiva según si tiene ventas
+        toast.success('Borrado físicamente si no tiene ventas o desactivado si tiene historial).');
         if (clienteSeleccionado?.id === id) setClienteSeleccionado(null);
         loadData();
       } catch (err) {
-        toast.error('No se pudo eliminar el cliente. Es posible que tenga registros asociados.');
+        toast.error('Ocurrió un error al intentar eliminar el cliente.');
       }
     }
   };
@@ -235,7 +239,7 @@ export const GestionClientes = () => {
                       <td className="small text-muted">{c.telefono || '-'}</td>
                       <td className="small text-muted text-capitalize">{c.genero?.toLowerCase() || '-'}</td>
                       <td className="text-center">
-                        <Badge color={c.activo ? 'success' : 'secondary'} pill style={{ fontSize: '0.65rem' }}>
+                        <Badge color={c.activo ? 'success' : 'danger'} pill style={{ fontSize: '0.65rem' }}>
                           {c.activo ? 'Activo' : 'Inactivo'}
                         </Badge>
                       </td>
@@ -243,9 +247,11 @@ export const GestionClientes = () => {
                         <Button color="light" size="sm" className="p-1 me-1 text-primary" onClick={e => abrirEditar(e, c)}>
                           <FontAwesomeIcon icon={faUserEdit} fixedWidth />
                         </Button>
-                        <Button color="light" size="sm" className="p-1 text-danger" onClick={e => eliminarCliente(e, c.id)}>
-                          <FontAwesomeIcon icon={faTrash} fixedWidth />
-                        </Button>
+                        {isAdmin && (
+                          <Button color="light" size="sm" className="p-1 text-danger" onClick={e => eliminarCliente(e, c.id)}>
+                            <FontAwesomeIcon icon={faTrash} fixedWidth />
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -390,9 +396,9 @@ export const GestionClientes = () => {
                       const lastChar =
                         raw.length > 13
                           ? raw
-                              .substring(13, 14)
-                              .replace(/[^a-zA-Z]/g, '')
-                              .toUpperCase()
+                            .substring(13, 14)
+                            .replace(/[^a-zA-Z]/g, '')
+                            .toUpperCase()
                           : '';
                       const input = digitsOnly + lastChar;
 

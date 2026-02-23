@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faArrowLeft, faPlus, faTrash, faShoppingCart, faClipboardList, faPlusCircle, faBarcode } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
 import { useAppSelector } from 'app/config/store';
+import { AUTHORITIES } from 'app/config/constants';
 import UsuarioService from 'app/services/usuario.service';
 import { IUsuario } from 'app/shared/model/usuario.model';
 import { IIngreso } from 'app/shared/model/ingreso.model';
@@ -21,6 +22,7 @@ import UnidadMedidaService from 'app/services/unidad-medida.service';
 
 export const IngresoNuevaCompra = () => {
     const account = useAppSelector(state => state.authentication.account);
+    const isAdmin = account?.authorities?.includes(AUTHORITIES.ADMIN);
     const navigate = useNavigate();
     const [proveedores, setProveedores] = useState<IProveedor[]>([]);
     const [usuarioActual, setUsuarioActual] = useState<IUsuario | null>(null);
@@ -285,7 +287,15 @@ export const IngresoNuevaCompra = () => {
                                 </Col>
                                 <Col md="4">
                                     <Label className="small fw-bold">Precio (Venta)</Label>
-                                    <Input type="number" step="0.01" value={precioVenta} onChange={e => setPrecioVenta(parseFloat(e.target.value))} bsSize="sm" />
+                                    <Input
+                                        type="number"
+                                        step="0.01"
+                                        value={precioVenta}
+                                        onChange={e => setPrecioVenta(parseFloat(e.target.value))}
+                                        bsSize="sm"
+                                        readOnly={!isAdmin}
+                                        className={!isAdmin ? 'bg-light text-muted' : ''}
+                                    />
                                 </Col>
                                 <Col md="4" className="d-flex align-items-end">
                                     <Button color="success" block onClick={agregarDetalle} className="fw-bold btn-sm">

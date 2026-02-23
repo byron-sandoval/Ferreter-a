@@ -4,12 +4,15 @@ import { Table, Button, Input, Badge, Card, CardBody } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSync, faPencilAlt, faTrash, faTags, faChevronLeft, faChevronRight, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
+import { useAppSelector } from 'app/config/store';
+import { AUTHORITIES } from 'app/config/constants';
 import { ICategoria } from 'app/shared/model/categoria.model';
 import CategoriaService from 'app/services/categoria.service';
 
 import { toast } from 'react-toastify';
 
 export const CategoriaList = () => {
+  const isAdmin = useAppSelector(state => state.authentication.account.authorities.includes(AUTHORITIES.ADMIN));
   const [categorias, setCategorias] = useState<ICategoria[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
@@ -129,9 +132,11 @@ export const CategoriaList = () => {
                     <Button color="info" size="sm" outline tag={Link} to={`${cat.id}/edit`} className="me-1 p-1">
                       <FontAwesomeIcon icon={faPencilAlt} fixedWidth />
                     </Button>
-                    <Button color="danger" size="sm" outline onClick={() => handleDelete(cat.id)} className="p-1">
-                      <FontAwesomeIcon icon={faTrash} fixedWidth />
-                    </Button>
+                    {isAdmin && (
+                      <Button color="danger" size="sm" outline onClick={() => handleDelete(cat.id)} className="p-1">
+                        <FontAwesomeIcon icon={faTrash} fixedWidth />
+                      </Button>
+                    )}
                   </td>
                 </tr>
               ))}

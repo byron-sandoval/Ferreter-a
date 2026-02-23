@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faArrowLeft, faPlus, faTrash, faBoxes, faShoppingCart, faClipboardList, faBarcode, faBoxOpen } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
 import { useAppSelector } from 'app/config/store';
+import { AUTHORITIES } from 'app/config/constants';
 import UsuarioService from 'app/services/usuario.service';
 import { IUsuario } from 'app/shared/model/usuario.model';
 import { IIngreso } from 'app/shared/model/ingreso.model';
@@ -17,6 +18,7 @@ import ProveedorService from 'app/services/proveedor.service';
 
 export const IngresoUpdate = () => {
   const account = useAppSelector(state => state.authentication.account);
+  const isAdmin = account?.authorities?.includes(AUTHORITIES.ADMIN);
   const navigate = useNavigate();
   const [proveedores, setProveedores] = useState<IProveedor[]>([]);
   const [articulos, setArticulos] = useState<IArticulo[]>([]);
@@ -265,20 +267,24 @@ export const IngresoUpdate = () => {
                   <Input type="number" step="0.01" value={costoUnitario} onChange={e => setCostoUnitario(parseFloat(e.target.value))} />
                 </Col>
                 <Col md="4">
-                  <FormGroup check className="mb-2">
-                    <Label check className="small fw-bold">
-                      <Input type="checkbox" checked={cambiarPrecio} onChange={e => setCambiarPrecio(e.target.checked)} />{' '}
-                      ¿Actualizar precios?
-                    </Label>
-                  </FormGroup>
-                  {cambiarPrecio && (
-                    <Input
-                      type="number"
-                      placeholder="Nuevo precio venta"
-                      value={precioVenta}
-                      onChange={e => setPrecioVenta(parseFloat(e.target.value))}
-                      bsSize="sm"
-                    />
+                  {isAdmin && (
+                    <>
+                      <FormGroup check className="mb-2">
+                        <Label check className="small fw-bold">
+                          <Input type="checkbox" checked={cambiarPrecio} onChange={e => setCambiarPrecio(e.target.checked)} />{' '}
+                          ¿Actualizar precios?
+                        </Label>
+                      </FormGroup>
+                      {cambiarPrecio && (
+                        <Input
+                          type="number"
+                          placeholder="Nuevo precio venta"
+                          value={precioVenta}
+                          onChange={e => setPrecioVenta(parseFloat(e.target.value))}
+                          bsSize="sm"
+                        />
+                      )}
+                    </>
                   )}
                 </Col>
                 <Col md="2">
