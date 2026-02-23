@@ -4,10 +4,13 @@ import { Card, CardBody, Form, FormGroup, Label, Input, Button, Row, Col } from 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faArrowLeft, faTruck } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
+import { useAppSelector } from 'app/config/store';
+import { AUTHORITIES } from 'app/config/constants';
 import { IProveedor } from 'app/shared/model/proveedor.model';
 import ProveedorService from 'app/services/proveedor.service';
 
 export const ProveedorUpdate = () => {
+  const isAdmin = useAppSelector(state => state.authentication.account.authorities.includes(AUTHORITIES.ADMIN));
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const isNew = !id;
@@ -105,6 +108,8 @@ export const ProveedorUpdate = () => {
                     placeholder="Ej: J0310000000000"
                     value={proveedor.ruc || ''}
                     onChange={handleChange}
+                    readOnly={!isAdmin}
+                    className={!isAdmin ? 'bg-light text-muted' : ''}
                   />
                 </FormGroup>
 

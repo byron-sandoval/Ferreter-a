@@ -6,8 +6,11 @@ import ProveedorService from 'app/services/proveedor.service';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSync, faSearch, faPencilAlt, faTrash, faTruck, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
+import { useAppSelector } from 'app/config/store';
+import { AUTHORITIES } from 'app/config/constants';
 
 export const ProveedorList = () => {
+  const isAdmin = useAppSelector(state => state.authentication.account.authorities.includes(AUTHORITIES.ADMIN));
   const navigate = useNavigate();
   const [proveedores, setProveedores] = useState<IProveedor[]>([]);
   const [loading, setLoading] = useState(false);
@@ -117,19 +120,21 @@ export const ProveedorList = () => {
                     >
                       <FontAwesomeIcon icon={faPencilAlt} fixedWidth />
                     </Button>
-                    <Button
-                      size="sm"
-                      color="danger"
-                      outline
-                      className="p-1"
-                      onClick={() => {
-                        if (p.id && window.confirm(`¿Está seguro de eliminar al proveedor "${p.nombre}"?`)) {
-                          ProveedorService.delete(p.id).then(() => loadAll());
-                        }
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faTrash} fixedWidth />
-                    </Button>
+                    {isAdmin && (
+                      <Button
+                        size="sm"
+                        color="danger"
+                        outline
+                        className="p-1"
+                        onClick={() => {
+                          if (p.id && window.confirm(`¿Está seguro de eliminar al proveedor "${p.nombre}"?`)) {
+                            ProveedorService.delete(p.id).then(() => loadAll());
+                          }
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faTrash} fixedWidth />
+                      </Button>
+                    )}
                   </td>
                 </tr>
               ))
