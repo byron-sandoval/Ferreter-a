@@ -16,4 +16,6 @@ public interface VentaRepository extends JpaRepository<Venta, Long>, JpaSpecific
     Optional<Venta> findOneWithEagerRelationships(@org.springframework.data.repository.query.Param("id") Long id);
 
     long countByUsuarioId(Long usuarioId);
+
+    long countByClienteId(Long clienteId);
 }

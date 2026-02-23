@@ -1,11 +1,15 @@
 package com.ferronica.app.web.rest;
 
+import com.ferronica.app.repository.UsuarioRepository;
 import com.ferronica.app.repository.VentaRepository;
+import com.ferronica.app.security.AuthoritiesConstants;
+import com.ferronica.app.security.SecurityUtils;
 import com.ferronica.app.service.VentaQueryService;
 import com.ferronica.app.service.VentaService;
 import com.ferronica.app.service.criteria.VentaCriteria;
 import com.ferronica.app.service.dto.VentaDTO;
 import com.ferronica.app.web.rest.errors.BadRequestAlertException;
+import tech.jhipster.service.filter.LongFilter;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
@@ -46,12 +50,14 @@ public class VentaResource {
     private final VentaRepository ventaRepository;
 
     private final VentaQueryService ventaQueryService;
+    private final UsuarioRepository usuarioRepository;
 
     public VentaResource(VentaService ventaService, VentaRepository ventaRepository,
-            VentaQueryService ventaQueryService) {
+            VentaQueryService ventaQueryService, UsuarioRepository usuarioRepository) {
         this.ventaService = ventaService;
         this.ventaRepository = ventaRepository;
         this.ventaQueryService = ventaQueryService;
+        this.usuarioRepository = usuarioRepository;
     }
 
     /**
@@ -167,7 +173,7 @@ public class VentaResource {
             VentaCriteria criteria,
             @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         LOG.debug("REST request to get Ventas by criteria: {}", criteria);
-
+        applySellerFilter(criteria);
         Page<VentaDTO> page = ventaQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil
                 .generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
@@ -185,6 +191,7 @@ public class VentaResource {
     @GetMapping("/count")
     public ResponseEntity<Long> countVentas(VentaCriteria criteria) {
         LOG.debug("REST request to count Ventas by criteria: {}", criteria);
+        applySellerFilter(criteria);
         return ResponseEntity.ok().body(ventaQueryService.countByCriteria(criteria));
     }
 
@@ -200,6 +207,18 @@ public class VentaResource {
     public ResponseEntity<VentaDTO> getVenta(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Venta : {}", id);
         Optional<VentaDTO> ventaDTO = ventaService.findOne(id);
+
+        // Seguridad extra: Si es vendedor y NO es admin, verificar que la venta le
+        // pertenezca
+        if (ventaDTO.isPresent() && SecurityUtils.hasCurrentUserThisAuthority(AuthoritiesConstants.VENDEDOR)
+                && !SecurityUtils.hasCurrentUserThisAuthority(AuthoritiesConstants.ADMIN)) {
+            String currentUserLogin = SecurityUtils.getCurrentUserLogin().orElse("");
+            if (ventaDTO.get().getUsuario() != null
+                    && !currentUserLogin.equals(ventaDTO.get().getUsuario().getUsername())) {
+                return ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN).build();
+            }
+        }
+
         return ResponseUtil.wrapOrNotFound(ventaDTO);
     }
 
@@ -209,7 +228,7 @@ public class VentaResource {
      * @param id the id of the ventaDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_VENDEDOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteVenta(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Venta : {}", id);
@@ -217,5 +236,19 @@ public class VentaResource {
         return ResponseEntity.noContent()
                 .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
                 .build();
+    }
+
+    private void applySellerFilter(VentaCriteria criteria) {
+        // Si es vendedor y NO es admin, forzar el filtro de su propio usuario
+        if (SecurityUtils.hasCurrentUserThisAuthority(AuthoritiesConstants.VENDEDOR)
+                && !SecurityUtils.hasCurrentUserThisAuthority(AuthoritiesConstants.ADMIN)) {
+            SecurityUtils.getCurrentUserKeycloakId()
+                    .flatMap(usuarioRepository::findByIdKeycloak)
+                    .ifPresent(usuario -> {
+                        LongFilter filter = new LongFilter();
+                        filter.setEquals(usuario.getId());
+                        criteria.setUsuarioId(filter);
+                    });
+        }
     }
 }
