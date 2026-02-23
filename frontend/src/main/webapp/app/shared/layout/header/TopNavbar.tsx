@@ -139,7 +139,7 @@ export const TopNavbar = () => {
           <Nav navbar className="flex-row flex-wrap align-items-center no-scrollbar overflow-auto">
             {/* 1. Inicio */}
             <NavItem className="nav-link-item">
-              <NavLink tag={Link} to="/" style={navLinkStyle}>
+              <NavLink tag={Link} to="/" style={navLinkStyle} active={location.pathname === '/' || location.pathname === '/vendedor' || location.pathname === '/bodeguero'}>
                 <FontAwesomeIcon icon={faHome} size="sm" /> Inicio
               </NavLink>
             </NavItem>
@@ -181,7 +181,7 @@ export const TopNavbar = () => {
             )}
 
             {/* 8. Categorías */}
-            {isAdmin && (
+            {(isAdmin || isBodeguero) && (
               <NavItem className="nav-link-item">
                 <NavLink tag={Link} to="/admin/categorias" style={navLinkStyle}>
                   <FontAwesomeIcon icon={faTags} size="sm" /> Categorías
@@ -199,7 +199,7 @@ export const TopNavbar = () => {
             )}
 
             {/* 10. Proveedores */}
-            {isAdmin && (
+            {(isAdmin || isBodeguero) && (
               <NavItem className="nav-link-item">
                 <NavLink tag={Link} to="/admin/proveedores" style={navLinkStyle}>
                   <FontAwesomeIcon icon={faTruck} size="sm" /> Proveedores
