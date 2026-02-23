@@ -63,7 +63,9 @@ export const HistorialVentas = () => {
     setLoading(true);
     try {
       const res = await VentaService.getAll({ size: 1000, sort: 'fecha,desc' });
-      setVentas(res.data);
+      // JHipster returns the list directly or in an array. Let's ensure it's an array.
+      const data = Array.isArray(res.data) ? res.data : (res.data as any).content || [];
+      setVentas(data);
     } catch (e) {
       toast.error('Error al cargar historial');
     } finally {
