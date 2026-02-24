@@ -157,7 +157,7 @@ export const GestionClientes = () => {
       }
     }
   };
-
+  
   const verDetalle = async (c: ICliente) => {
     setClienteSeleccionado(c);
     try {
@@ -171,9 +171,13 @@ export const GestionClientes = () => {
     }
   };
 
-  const filtered = clientes.filter(
-    c => (c.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (c.cedula || '').toLowerCase().includes(filter.toLowerCase()),
-  );
+  const filtered = clientes.filter(c => {
+    const matchesFilter =
+      (c.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (c.cedula || '').toLowerCase().includes(filter.toLowerCase());
+
+    if (isAdmin) return matchesFilter;
+    return matchesFilter && c.activo;
+  });
 
   // Cálculos para mostrar solo los 10 de la página actual
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -487,7 +491,7 @@ export const GestionClientes = () => {
                 onChange={e => setClienteEditar({ ...clienteEditar, direccion: e.target.value })}
               />
             </FormGroup>
-            {clienteEditar.id && (
+            {clienteEditar.id && isAdmin && (
               <FormGroup check>
                 <Label check className="small fw-bold text-uppercase" style={{ color: '#11373f' }}>
                   <Input
