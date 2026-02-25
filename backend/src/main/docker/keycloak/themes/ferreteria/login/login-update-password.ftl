@@ -9,7 +9,7 @@
                 height: 100%;
                 font-family: 'Inter', sans-serif;
                 overflow: hidden;
-                background: #000 !important;
+                background: #0a0a0c !important;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -29,12 +29,12 @@
             .main-card {
                 width: 450px;
                 max-width: 90%;
-                background: rgba(60, 56, 53, 0.98); 
+                background: rgba(15, 12, 25, 0.95);
                 padding: 40px;
                 color: white;
-                border: 1px solid rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(139, 92, 246, 0.2);
                 border-radius: 24px;
-                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
@@ -52,7 +52,7 @@
             }
 
             .subtitle {
-                color: #94a3b8;
+                color: #a78bfa;
                 margin-bottom: 30px;
                 font-size: 0.9rem;
                 text-align: center;
@@ -72,8 +72,8 @@
                 width: 100%;
                 padding: 12px 14px;
                 border-radius: 10px;
-                border: 1px solid #44403c;
-                background: #292524;
+                border: 1px solid #2e2a3d;
+                background: #1a1625;
                 color: white;
                 font-size: 0.95rem;
                 box-sizing: border-box;
@@ -82,28 +82,31 @@
 
             input:focus {
                 outline:none;
-                border-color:#ff6b00;
-                background: #44403c;
-                box-shadow:0 0 0 3px rgba(255,107,0,0.15);
+                border-color: #8b5cf6;
+                background: #241e33;
+                box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
             }
 
             .btn-primary {
                 width:100%;
                 padding:12px;
-                background: linear-gradient(90deg, #ff6b00, #ff8c00);
+                background: linear-gradient(90deg, #6d28d9, #8b5cf6);
                 color:white;
                 border:none;
-                border-radius:10px;
-                font-weight: 600;
+                border-radius:12px;
+                font-weight: 700;
                 font-size: 1rem;
                 margin-top:20px;
                 cursor:pointer;
-                transition: transform 0.1s, box-shadow 0.2s;
+                text-transform: uppercase;
+                transition: all 0.3s;
             }
 
             .btn-primary:hover {
-                box-shadow: 0 10px 20px -5px rgba(255, 107, 0, 0.4);
-                transform: translateY(-1px);
+                background: #6d28d9;
+                box-shadow: 0 10px 20px -5px rgba(139, 92, 246, 0.5);
+                transform: translateY(-2px);
+                filter: brightness(1.1);
             }
 
             .alert-error {
