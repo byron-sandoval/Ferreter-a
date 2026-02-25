@@ -25,7 +25,9 @@ export const IngresoList = () => {
 
   const loadAll = () => {
     setLoading(true);
-    IngresoService.getAll()
+    // Solicitamos un tamaño grande para que la paginación y el filtro del cliente funcionen
+    // y ordenamos por ID de forma descendente para ver lo más nuevo primero.
+    IngresoService.getAll({ sort: 'id,desc', size: 2000 })
       .then(res => {
         setIngresos(res.data);
         setLoading(false);
