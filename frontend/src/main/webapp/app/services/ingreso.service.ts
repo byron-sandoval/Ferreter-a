@@ -6,8 +6,8 @@ const API_INGRESOS = 'api/ingresos';
 const API_DETALLES = 'api/detalle-ingresos';
 
 export const IngresoService = {
-  getAll() {
-    return axios.get<IIngreso[]>(API_INGRESOS);
+  getAll(params?: any) {
+    return axios.get<IIngreso[]>(API_INGRESOS, { params });
   },
 
   get(id: number) {
