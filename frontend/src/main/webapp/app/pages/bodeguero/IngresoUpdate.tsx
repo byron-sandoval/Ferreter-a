@@ -29,7 +29,8 @@ export const IngresoUpdate = () => {
   const [noDocumento, setNoDocumento] = useState('');
   const [observaciones, setObservaciones] = useState('');
   const [detalles, setDetalles] = useState<IDetalleIngreso[]>([]);
-
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
   // Estado para agregar un producto al detalle
   const [articuloSeleccionado, setArticuloSeleccionado] = useState<string>('');
   const [cantidad, setCantidad] = useState<number>(1);
@@ -82,6 +83,7 @@ export const IngresoUpdate = () => {
 
     setDetalles([...detalles, nuevoDetalle]);
     setArticuloSeleccionado('');
+    setSearchTerm('');
     setCantidad(1);
     setCostoUnitario(0);
     setPrecioVenta(0);
@@ -208,28 +210,70 @@ export const IngresoUpdate = () => {
               </h6>
 
               <Row className="mb-3 g-2 align-items-end">
-                <Col md="6" className="mb-2">
+                <Col md="6" className="mb-2 position-relative">
                   <Label className="small fw-bold">Buscar Producto Existente</Label>
-                  <Input
-                    type="select"
-                    value={articuloSeleccionado}
-                    onChange={e => {
-                      setArticuloSeleccionado(e.target.value);
-                      const art = articulos.find(a => a.id?.toString() === e.target.value);
-                      if (art) {
-                        setCostoUnitario(art.costo || 0);
-                        setPrecioVenta(art.precio || 0);
-                      }
-                    }}
-                    className="form-select-sm"
+                  {/* Faux Select Input */}
+                  <div
+                    className="form-control form-control-sm d-flex justify-content-between align-items-center bg-white border-secondary"
+                    style={{ cursor: 'pointer', minHeight: '31px' }}
+                    onClick={() => setIsOpen(!isOpen)}
                   >
-                    <option value="">Seleccione un producto...</option>
-                    {articulos.filter(a => a.activo).map(a => (
-                      <option key={a.id} value={a.id}>
-                        {a.nombre}
-                      </option>
-                    ))}
-                  </Input>
+                    <span className="text-truncate">
+                      {articulos.find(a => a.id?.toString() === articuloSeleccionado)?.nombre || 'Seleccione un producto...'}
+                    </span>
+                    <small className="text-muted">▼</small>
+                  </div>
+
+                  {/* Cuadro desplegable CORTO con máximo 10 productos a la vista */}
+                  {isOpen && (
+                    <div
+                      className="position-absolute w-100 shadow-lg border rounded bg-white mt-1 p-2"
+                      style={{ zIndex: 1050 }}
+                    >
+                      {/* Buscador interno */}
+                      <Input
+                        autoFocus
+                        type="text"
+                        placeholder="Escriba para buscar..."
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                        className="form-control-sm mb-2"
+                        onClick={e => e.stopPropagation()}
+                      />
+
+                      {/* Lista de productos limitada en altura */}
+                      <div style={{ maxHeight: '250px', overflowY: 'auto' }}>
+                        {articulos
+                          .filter(a => a.activo && a.nombre?.toLowerCase().includes(searchTerm.toLowerCase()))
+                          .map(a => (
+                            <div
+                              key={a.id}
+                              className="p-2 border-bottom small product-item-hover-selector"
+                              style={{ cursor: 'pointer', transition: 'background 0.2s' }}
+                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
+                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                              onClick={() => {
+                                setArticuloSeleccionado(a.id!.toString());
+                                setCostoUnitario(a.costo || 0);
+                                setPrecioVenta(a.precio || 0);
+                                setIsOpen(false);
+                                setSearchTerm('');
+                              }}
+                            >
+                              <div className="fw-bold">{a.nombre}</div>
+                              <div className="text-muted" style={{ fontSize: '0.7rem' }}>Cod: {a.codigo} | Stock: {a.existencia}</div>
+                            </div>
+                          ))
+                        }
+                      </div>
+
+                      {/* Click fuera para cerrar */}
+                      <div
+                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: -1 }}
+                        onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
+                      />
+                    </div>
+                  )}
                 </Col>
                 <Col md="3" className="mb-2">
                   <Label className="small fw-bold">Código</Label>
