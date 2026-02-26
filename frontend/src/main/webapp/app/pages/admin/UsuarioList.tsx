@@ -13,6 +13,7 @@ export const UsuarioList = () => {
   const [usuarios, setUsuarios] = useState<IUsuario[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
+  const [showInactive, setShowInactive] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -40,10 +41,13 @@ export const UsuarioList = () => {
 
   const filtrados = Array.isArray(usuarios)
     ? usuarios.filter(
-      v =>
-        (v.nombre || '').toLowerCase().includes(filter.toLowerCase()) ||
-        (v.apellido || '').toLowerCase().includes(filter.toLowerCase()) ||
-        (v.cedula || '').toLowerCase().includes(filter.toLowerCase()),
+      v => {
+        const matchesSearch = (v.nombre || '').toLowerCase().includes(filter.toLowerCase()) ||
+          (v.apellido || '').toLowerCase().includes(filter.toLowerCase()) ||
+          (v.cedula || '').toLowerCase().includes(filter.toLowerCase());
+        const matchesStatus = showInactive ? v.activo === false || v.activo === null : v.activo === true;
+        return matchesSearch && matchesStatus;
+      }
     )
     : [];
 
@@ -101,6 +105,18 @@ export const UsuarioList = () => {
             <span className="input-group-text bg-white border-secondary text-muted">
               <FontAwesomeIcon icon={faSearch} size="sm" />
             </span>
+          </div>
+          <div className="form-check form-switch ms-2 d-flex align-items-center">
+            <Input
+              type="switch"
+              id="showInactiveSwitchUser"
+              checked={showInactive}
+              onChange={() => setShowInactive(!showInactive)}
+              style={{ cursor: 'pointer' }}
+            />
+            <label className="form-check-label text-white ms-2 small fw-bold" htmlFor="showInactiveSwitchUser" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              Ver Inactivos
+            </label>
           </div>
           <Button color="primary" size="sm" onClick={() => navigate('/admin/usuarios/new')} style={{ fontSize: '0.75rem' }}>
             <FontAwesomeIcon icon={faPlus} className="me-1" /> Nuevo Usuario

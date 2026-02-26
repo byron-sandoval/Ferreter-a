@@ -31,6 +31,8 @@ export const IngresoUpdate = () => {
   const [detalles, setDetalles] = useState<IDetalleIngreso[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const [isProveedorOpen, setIsProveedorOpen] = useState(false);
+  const [searchProveedorTerm, setSearchProveedorTerm] = useState('');
   // Estado para agregar un producto al detalle
   const [articuloSeleccionado, setArticuloSeleccionado] = useState<string>('');
   const [cantidad, setCantidad] = useState<number>(1);
@@ -154,16 +156,64 @@ export const IngresoUpdate = () => {
             <CardBody>
               <h6 className="fw-bold border-bottom pb-2">Datos Generales</h6>
               <Form onSubmit={handleSave}>
-                <FormGroup>
-                  <Label for="proveedor" className="small fw-bold">
+                <FormGroup className="position-relative">
+                  <Label className="small fw-bold">
                     <FontAwesomeIcon icon={faPlus} className="me-1 text-primary small" /> Proveedor
                   </Label>
-                  <Input type="select" id="proveedor" value={proveedorId} onChange={e => setProveedorId(e.target.value)} required className="form-select-sm">
-                    <option value="">Seleccione un proveedor...</option>
-                    {proveedores.filter(p => p.activo).map(p => (
-                      <option key={p.id} value={p.id}>{p.nombre}</option>
-                    ))}
-                  </Input>
+                  <div
+                    className="form-control form-control-sm d-flex justify-content-between align-items-center bg-white border-secondary"
+                    style={{ cursor: 'pointer', minHeight: '31px' }}
+                    onClick={() => setIsProveedorOpen(!isProveedorOpen)}
+                  >
+                    <span className="text-truncate">
+                      {proveedores.find(p => p.id?.toString() === proveedorId)?.nombre || 'Seleccione un proveedor...'}
+                    </span>
+                    <small className="text-muted">▼</small>
+                  </div>
+
+                  {isProveedorOpen && (
+                    <div
+                      className="position-absolute w-100 shadow-lg border rounded bg-white mt-1 p-2"
+                      style={{ zIndex: 1050 }}
+                    >
+                      <Input
+                        autoFocus
+                        type="text"
+                        placeholder="Escriba para buscar..."
+                        value={searchProveedorTerm}
+                        onChange={e => setSearchProveedorTerm(e.target.value)}
+                        className="form-control-sm mb-2"
+                        onClick={e => e.stopPropagation()}
+                      />
+
+                      <div style={{ maxHeight: '250px', overflowY: 'auto' }}>
+                        {proveedores
+                          .filter(p => p.activo && p.nombre?.toLowerCase().includes(searchProveedorTerm.toLowerCase()))
+                          .map(p => (
+                            <div
+                              key={p.id}
+                              className="p-2 border-bottom small product-item-hover-selector"
+                              style={{ cursor: 'pointer', transition: 'background 0.2s' }}
+                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
+                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                              onClick={() => {
+                                setProveedorId(p.id!.toString());
+                                setIsProveedorOpen(false);
+                                setSearchProveedorTerm('');
+                              }}
+                            >
+                              <div className="fw-bold">{p.nombre}</div>
+                            </div>
+                          ))
+                        }
+                      </div>
+
+                      <div
+                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: -1 }}
+                        onClick={(e) => { e.stopPropagation(); setIsProveedorOpen(false); }}
+                      />
+                    </div>
+                  )}
                 </FormGroup>
                 <FormGroup>
                   <Label for="noDocumento" className="small fw-bold">

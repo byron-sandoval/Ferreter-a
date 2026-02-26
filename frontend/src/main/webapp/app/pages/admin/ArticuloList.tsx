@@ -38,6 +38,7 @@ export const ArticuloList = () => {
   const [showHistory, setShowHistory] = useState(false);
   const [historial, setHistorial] = useState<IHistorialPrecio[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [showInactive, setShowInactive] = useState(false);
 
   const loadAll = () => {
     setLoading(true);
@@ -63,9 +64,11 @@ export const ArticuloList = () => {
     loadAll();
   }, []);
 
-  const articulosFiltrados = articulos.filter(
-    a => (a.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (a.codigo || '').toLowerCase().includes(filter.toLowerCase()),
-  );
+  const articulosFiltrados = articulos.filter(a => {
+    const matchesSearch = (a.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (a.codigo || '').toLowerCase().includes(filter.toLowerCase());
+    const matchesStatus = showInactive ? a.activo === false || a.activo === null : a.activo === true;
+    return matchesSearch && matchesStatus;
+  });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -348,6 +351,18 @@ export const ArticuloList = () => {
             <span className="input-group-text bg-white border-secondary text-muted">
               <FontAwesomeIcon icon={faSearch} />
             </span>
+          </div>
+          <div className="form-check form-switch ms-2 me-2 d-flex align-items-center">
+            <Input
+              type="switch"
+              id="showInactiveSwitch"
+              checked={showInactive}
+              onChange={() => setShowInactive(!showInactive)}
+              style={{ cursor: 'pointer' }}
+            />
+            <label className="form-check-label text-white ms-2 small fw-bold" htmlFor="showInactiveSwitch" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              Ver Inactivos
+            </label>
           </div>
           <Button color="success" size="sm" className="opacity-90" onClick={exportAllToExcel}>
             <FontAwesomeIcon icon={faFileExcel} className="me-2" /> Exportar Todo

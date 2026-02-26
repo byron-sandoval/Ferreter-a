@@ -51,11 +51,14 @@ export const BodegueroDashboard = () => {
       const bajoStockList = articulos.filter(a => a.activo && (a.existencia || 0) <= (a.existenciaMinima || 0));
       const comprasHoy = ingresos.filter(i => dayjs(i.fecha).isSame(dayjs(), 'day') && i.activo).length;
 
+      const categoriasActivas = categorias.filter(c => c.activo !== false);
+      const productosActivos = articulos.filter(a => a.activo !== false);
+
       setStats({
-        totalProductos: articulos.length,
+        totalProductos: productosActivos.length,
         bajoStock: bajoStockList.length,
         comprasHoy,
-        totalCategorias: categorias.length,
+        totalCategorias: categoriasActivas.length,
       });
 
       setRecientes(ingresos.slice(0, 6)); // Últimos 6 ingresos

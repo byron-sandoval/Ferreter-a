@@ -15,6 +15,7 @@ export const ProveedorList = () => {
   const [proveedores, setProveedores] = useState<IProveedor[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
+  const [showInactive, setShowInactive] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -40,7 +41,11 @@ export const ProveedorList = () => {
     loadAll();
   }, []);
 
-  const filtrados = proveedores.filter(p => (p.nombre || '').toLowerCase().includes(filter.toLowerCase()));
+  const filtrados = proveedores.filter(p => {
+    const matchesSearch = (p.nombre || '').toLowerCase().includes(filter.toLowerCase());
+    const matchesStatus = showInactive ? p.activo === false || p.activo === null : p.activo === true;
+    return matchesSearch && matchesStatus;
+  });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -74,6 +79,18 @@ export const ProveedorList = () => {
             <span className="input-group-text bg-white border-secondary text-muted">
               <FontAwesomeIcon icon={faSearch} size="sm" />
             </span>
+          </div>
+          <div className="form-check form-switch ms-2 d-flex align-items-center">
+            <Input
+              type="switch"
+              id="showInactiveSwitchProv"
+              checked={showInactive}
+              onChange={() => setShowInactive(!showInactive)}
+              style={{ cursor: 'pointer' }}
+            />
+            <label className="form-check-label text-white ms-2 small fw-bold" htmlFor="showInactiveSwitchProv" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              Ver Inactivos
+            </label>
           </div>
           <Button color="primary" size="sm" onClick={() => navigate('/admin/proveedores/new')} style={{ fontSize: '0.75rem' }}>
             <FontAwesomeIcon icon={faPlus} className="me-1" /> Nuevo
