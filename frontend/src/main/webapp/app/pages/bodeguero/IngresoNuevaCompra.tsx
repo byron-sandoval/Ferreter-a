@@ -35,6 +35,18 @@ export const IngresoNuevaCompra = () => {
     const [observaciones, setObservaciones] = useState('');
     const [detalles, setDetalles] = useState<IDetalleIngreso[]>([]);
 
+    // Estado para Proveedor con búsqueda
+    const [isProveedorOpen, setIsProveedorOpen] = useState(false);
+    const [searchProveedorTerm, setSearchProveedorTerm] = useState('');
+
+    // Estado para Categoría con búsqueda
+    const [isCategoriaOpen, setIsCategoriaOpen] = useState(false);
+    const [searchCategoriaTerm, setSearchCategoriaTerm] = useState('');
+
+    // Estado para Unidad de Medida con búsqueda
+    const [isUnidadOpen, setIsUnidadOpen] = useState(false);
+    const [searchUnidadTerm, setSearchUnidadTerm] = useState('');
+
     // Estado para el nuevo producto que se está armando
     const [nombreNuevo, setNombreNuevo] = useState('');
     const [codigoNuevo, setCodigoNuevo] = useState('');
@@ -199,14 +211,62 @@ export const IngresoNuevaCompra = () => {
                         <CardBody>
                             <h6 className="fw-bold border-bottom pb-2">Datos de Facturación</h6>
                             <Form onSubmit={handleSave}>
-                                <FormGroup>
+                                <FormGroup className="position-relative">
                                     <Label className="small fw-bold">Proveedor</Label>
-                                    <Input type="select" value={proveedorId} onChange={e => setProveedorId(e.target.value)} required bsSize="sm">
-                                        <option value="">Seleccione...</option>
-                                        {proveedores.filter(p => p.activo).map(p => (
-                                            <option key={p.id} value={p.id}>{p.nombre}</option>
-                                        ))}
-                                    </Input>
+                                    <div
+                                        className="form-control form-control-sm d-flex justify-content-between align-items-center bg-white border-secondary"
+                                        style={{ cursor: 'pointer', minHeight: '31px' }}
+                                        onClick={() => setIsProveedorOpen(!isProveedorOpen)}
+                                    >
+                                        <span className="text-truncate">
+                                            {proveedores.find(p => p.id?.toString() === proveedorId)?.nombre || 'Seleccione un proveedor...'}
+                                        </span>
+                                        <small className="text-muted">▼</small>
+                                    </div>
+
+                                    {isProveedorOpen && (
+                                        <div
+                                            className="position-absolute w-100 shadow-lg border rounded bg-white mt-1 p-2"
+                                            style={{ zIndex: 1050 }}
+                                        >
+                                            <Input
+                                                autoFocus
+                                                type="text"
+                                                placeholder="Escriba para buscar..."
+                                                value={searchProveedorTerm}
+                                                onChange={e => setSearchProveedorTerm(e.target.value)}
+                                                className="form-control-sm mb-2"
+                                                onClick={e => e.stopPropagation()}
+                                            />
+
+                                            <div style={{ maxHeight: '250px', overflowY: 'auto' }}>
+                                                {proveedores
+                                                    .filter(p => p.activo && p.nombre?.toLowerCase().includes(searchProveedorTerm.toLowerCase()))
+                                                    .map(p => (
+                                                        <div
+                                                            key={p.id}
+                                                            className="p-2 border-bottom small product-item-hover-selector"
+                                                            style={{ cursor: 'pointer', transition: 'background 0.2s' }}
+                                                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
+                                                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                                                            onClick={() => {
+                                                                setProveedorId(p.id!.toString());
+                                                                setIsProveedorOpen(false);
+                                                                setSearchProveedorTerm('');
+                                                            }}
+                                                        >
+                                                            <div className="fw-bold">{p.nombre}</div>
+                                                        </div>
+                                                    ))
+                                                }
+                                            </div>
+
+                                            <div
+                                                style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: -1 }}
+                                                onClick={(e) => { e.stopPropagation(); setIsProveedorOpen(false); }}
+                                            />
+                                        </div>
+                                    )}
                                 </FormGroup>
                                 <FormGroup>
                                     <Label className="small fw-bold">No. Factura</Label>
@@ -261,17 +321,117 @@ export const IngresoNuevaCompra = () => {
                                 </Col>
                                 <Col md="4">
                                     <Label className="small fw-bold">Categoría</Label>
-                                    <Input type="select" value={categoriaId} onChange={e => setCategoriaId(e.target.value)} bsSize="sm">
-                                        <option value="">Seleccione...</option>
-                                        {categorias.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
-                                    </Input>
+                                    <div className="position-relative">
+                                        <div
+                                            className="form-control form-control-sm d-flex justify-content-between align-items-center bg-white border-secondary"
+                                            style={{ cursor: 'pointer', minHeight: '31px' }}
+                                            onClick={() => setIsCategoriaOpen(!isCategoriaOpen)}
+                                        >
+                                            <span className="text-truncate">
+                                                {categorias.find(c => c.id?.toString() === categoriaId)?.nombre || 'Seleccione categoría...'}
+                                            </span>
+                                            <small className="text-muted">▼</small>
+                                        </div>
+
+                                        {isCategoriaOpen && (
+                                            <div
+                                                className="position-absolute w-100 shadow-lg border rounded bg-white mt-1 p-2"
+                                                style={{ zIndex: 1050 }}
+                                            >
+                                                <Input
+                                                    autoFocus
+                                                    type="text"
+                                                    placeholder="Buscar categoría..."
+                                                    value={searchCategoriaTerm}
+                                                    onChange={e => setSearchCategoriaTerm(e.target.value)}
+                                                    className="form-control-sm mb-2"
+                                                    onClick={e => e.stopPropagation()}
+                                                />
+                                                <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                                    {categorias
+                                                        .filter(c => c.activo !== false && c.nombre?.toLowerCase().includes(searchCategoriaTerm.toLowerCase()))
+                                                        .map(c => (
+                                                            <div
+                                                                key={c.id}
+                                                                className="p-2 border-bottom small product-item-hover-selector"
+                                                                style={{ cursor: 'pointer', transition: 'background 0.2s' }}
+                                                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
+                                                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                                                                onClick={() => {
+                                                                    setCategoriaId(c.id!.toString());
+                                                                    setIsCategoriaOpen(false);
+                                                                    setSearchCategoriaTerm('');
+                                                                }}
+                                                            >
+                                                                <div className="fw-bold">{c.nombre}</div>
+                                                            </div>
+                                                        ))
+                                                    }
+                                                </div>
+                                                <div
+                                                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: -1 }}
+                                                    onClick={(e) => { e.stopPropagation(); setIsCategoriaOpen(false); }}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
                                 </Col>
                                 <Col md="4">
                                     <Label className="small fw-bold">Unidad Medida</Label>
-                                    <Input type="select" value={unidadId} onChange={e => setUnidadId(e.target.value)} bsSize="sm">
-                                        <option value="">Seleccione...</option>
-                                        {unidades.map(u => <option key={u.id} value={u.id}>{u.nombre}</option>)}
-                                    </Input>
+                                    <div className="position-relative">
+                                        <div
+                                            className="form-control form-control-sm d-flex justify-content-between align-items-center bg-white border-secondary"
+                                            style={{ cursor: 'pointer', minHeight: '31px' }}
+                                            onClick={() => setIsUnidadOpen(!isUnidadOpen)}
+                                        >
+                                            <span className="text-truncate">
+                                                {unidades.find(u => u.id?.toString() === unidadId)?.nombre || 'Seleccione unidad...'}
+                                            </span>
+                                            <small className="text-muted">▼</small>
+                                        </div>
+
+                                        {isUnidadOpen && (
+                                            <div
+                                                className="position-absolute w-100 shadow-lg border rounded bg-white mt-1 p-2"
+                                                style={{ zIndex: 1050 }}
+                                            >
+                                                <Input
+                                                    autoFocus
+                                                    type="text"
+                                                    placeholder="Buscar unidad..."
+                                                    value={searchUnidadTerm}
+                                                    onChange={e => setSearchUnidadTerm(e.target.value)}
+                                                    className="form-control-sm mb-2"
+                                                    onClick={e => e.stopPropagation()}
+                                                />
+                                                <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                                    {unidades
+                                                        .filter(u => u.nombre?.toLowerCase().includes(searchUnidadTerm.toLowerCase()))
+                                                        .map(u => (
+                                                            <div
+                                                                key={u.id}
+                                                                className="p-2 border-bottom small product-item-hover-selector"
+                                                                style={{ cursor: 'pointer', transition: 'background 0.2s' }}
+                                                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
+                                                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                                                                onClick={() => {
+                                                                    setUnidadId(u.id!.toString());
+                                                                    setIsUnidadOpen(false);
+                                                                    setSearchUnidadTerm('');
+                                                                }}
+                                                            >
+                                                                <div className="fw-bold">{u.nombre}</div>
+                                                            </div>
+                                                        ))
+                                                    }
+                                                </div>
+                                                <div
+                                                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: -1 }}
+                                                    onClick={(e) => { e.stopPropagation(); setIsUnidadOpen(false); }}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
                                 </Col>
                                 <Col md="2">
                                     <Label className="small fw-bold">Stock Mín.</Label>
