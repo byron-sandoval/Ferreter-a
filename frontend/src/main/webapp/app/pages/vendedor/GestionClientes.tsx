@@ -47,6 +47,7 @@ export const GestionClientes = () => {
   const [clientes, setClientes] = useState<ICliente[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
+  const [showInactive, setShowInactive] = useState(false);
   const [clienteSeleccionado, setClienteSeleccionado] = useState<ICliente | null>(null);
   const [historial, setHistorial] = useState<IVenta[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -157,7 +158,7 @@ export const GestionClientes = () => {
       }
     }
   };
-  
+
   const verDetalle = async (c: ICliente) => {
     setClienteSeleccionado(c);
     try {
@@ -175,8 +176,8 @@ export const GestionClientes = () => {
     const matchesFilter =
       (c.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (c.cedula || '').toLowerCase().includes(filter.toLowerCase());
 
-    if (isAdmin) return matchesFilter;
-    return matchesFilter && c.activo;
+    const matchesStatus = showInactive ? c.activo === false || c.activo === null : c.activo === true;
+    return matchesFilter && matchesStatus;
   });
 
   // Cálculos para mostrar solo los 10 de la página actual
@@ -217,6 +218,18 @@ export const GestionClientes = () => {
                     onChange={e => setFilter(e.target.value)}
                     style={{ fontSize: '0.85rem', height: '34px' }}
                   />
+                </div>
+                <div className="form-check form-switch ms-3 d-flex align-items-center">
+                  <Input
+                    type="switch"
+                    id="showInactiveSwitchCli"
+                    checked={showInactive}
+                    onChange={() => setShowInactive(!showInactive)}
+                    style={{ cursor: 'pointer' }}
+                  />
+                  <label className="form-check-label text-muted ms-2 small fw-bold" htmlFor="showInactiveSwitchCli" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                    Ver Inactivos
+                  </label>
                 </div>
               </div>
               <Table hover size="sm" className="mb-0 align-middle">

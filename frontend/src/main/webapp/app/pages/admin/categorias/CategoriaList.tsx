@@ -16,6 +16,7 @@ export const CategoriaList = () => {
   const [categorias, setCategorias] = useState<ICategoria[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
+  const [showInactive, setShowInactive] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -42,8 +43,11 @@ export const CategoriaList = () => {
   }, []);
 
   const filtered = categorias.filter(
-    c =>
-      (c.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (c.descripcion || '').toLowerCase().includes(filter.toLowerCase()),
+    c => {
+      const matchesSearch = (c.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (c.descripcion || '').toLowerCase().includes(filter.toLowerCase());
+      const matchesStatus = showInactive ? c.activo === false || c.activo === null : c.activo === true;
+      return matchesSearch && matchesStatus;
+    }
   );
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -77,22 +81,36 @@ export const CategoriaList = () => {
 
       <Card className="shadow-sm border-0 mb-2 bg-light">
         <CardBody className="p-2">
-          <div
-            className="d-flex align-items-center"
-            style={{
-              maxWidth: '300px',
-              borderBottom: '2px solid #18a1bcff',
-              paddingBottom: '2px',
-            }}
-          >
-            <FontAwesomeIcon icon={faSearch} className="text-info opacity-75 me-2" />
-            <Input
-              placeholder="Buscar categoría..."
-              value={filter}
-              onChange={e => setFilter(e.target.value)}
-              className="border-0 shadow-none p-0 bg-transparent"
-              style={{ fontSize: '0.8rem' }}
-            />
+          <div className="d-flex justify-content-between align-items-center">
+            <div
+              className="d-flex align-items-center flex-grow-1"
+              style={{
+                maxWidth: '300px',
+                borderBottom: '2px solid #18a1bcff',
+                paddingBottom: '2px',
+              }}
+            >
+              <FontAwesomeIcon icon={faSearch} className="text-info opacity-75 me-2" />
+              <Input
+                placeholder="Buscar categoría..."
+                value={filter}
+                onChange={e => setFilter(e.target.value)}
+                className="border-0 shadow-none p-0 bg-transparent flex-grow-1"
+                style={{ fontSize: '0.8rem' }}
+              />
+            </div>
+            <div className="form-check form-switch ms-3 d-flex align-items-center">
+              <Input
+                type="switch"
+                id="showInactiveSwitch"
+                checked={showInactive}
+                onChange={() => setShowInactive(!showInactive)}
+                style={{ cursor: 'pointer' }}
+              />
+              <label className="form-check-label text-muted ms-2 small fw-bold" htmlFor="showInactiveSwitch" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                Ver Inactivos
+              </label>
+            </div>
           </div>
         </CardBody>
       </Card>

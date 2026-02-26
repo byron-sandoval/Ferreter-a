@@ -37,7 +37,7 @@ export const UsuarioDashboard = () => {
       setStats({
         ventasHoy: ventas.length,
         montoHoy: monto,
-        clientesTotal: resClie.data.length,
+        clientesTotal: resClie.data.filter((c: any) => c.activo !== false).length,
         productosBajoStock: bajoStock,
       });
     } catch (e) {

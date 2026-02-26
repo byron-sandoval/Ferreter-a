@@ -406,7 +406,7 @@ export const IngresoNuevaCompra = () => {
                                                 />
                                                 <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
                                                     {unidades
-                                                        .filter(u => u.nombre?.toLowerCase().includes(searchUnidadTerm.toLowerCase()))
+                                                        .filter(u => u.activo !== false && u.nombre?.toLowerCase().includes(searchUnidadTerm.toLowerCase()))
                                                         .map(u => (
                                                             <div
                                                                 key={u.id}

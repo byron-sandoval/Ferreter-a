@@ -35,15 +35,21 @@ export const GestionUnidadMedida = () => {
   const [unidades, setUnidades] = useState<IUnidadMedida[]>([]);
   const [loading, setLoading] = useState(false);
   const [modal, setModal] = useState(false);
+  const [showInactive, setShowInactive] = useState(false);
   const [currentUnidad, setCurrentUnidad] = useState<IUnidadMedida>({ nombre: '', simbolo: '', activo: true });
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  const filtered = unidades.filter(u => {
+    const matchesStatus = showInactive ? u.activo === false || u.activo === null : u.activo === true;
+    return matchesStatus;
+  });
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = unidades.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(unidades.length / itemsPerPage);
+  const currentItems = filtered.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
@@ -108,9 +114,23 @@ export const GestionUnidadMedida = () => {
           <FontAwesomeIcon icon={faRulerCombined} className="me-2" />
           Gestión de Unidades de Medida
         </h5>
-        <Button onClick={toggle} color="success" size="sm" className="fw-bold border-0 px-3">
-          <FontAwesomeIcon icon={faPlus} className="me-2" /> AGREGAR UNIDAD
-        </Button>
+        <div className="d-flex align-items-center gap-3">
+          <div className="form-check form-switch d-flex align-items-center m-0">
+            <Input
+              type="switch"
+              id="showInactiveSwitchUM"
+              checked={showInactive}
+              onChange={() => setShowInactive(!showInactive)}
+              style={{ cursor: 'pointer' }}
+            />
+            <label className="form-check-label text-white ms-2 small fw-bold" htmlFor="showInactiveSwitchUM" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              Ver Inactivos
+            </label>
+          </div>
+          <Button onClick={toggle} color="success" size="sm" className="fw-bold border-0 px-3">
+            <FontAwesomeIcon icon={faPlus} className="me-2" /> AGREGAR UNIDAD
+          </Button>
+        </div>
       </div>
 
       <Row>
@@ -164,7 +184,7 @@ export const GestionUnidadMedida = () => {
               {totalPages > 1 && (
                 <div className="d-flex justify-content-between align-items-center p-2 border-top bg-light">
                   <small className="text-muted ps-2">
-                    Mostrando {Math.min(indexOfLastItem, unidades.length)} de {unidades.length} unidades
+                    Mostrando {Math.min(indexOfLastItem, filtered.length)} de {filtered.length} unidades
                   </small>
                   <Pagination size="sm" className="mb-0 pe-2">
                     <PaginationItem disabled={currentPage === 1}>
