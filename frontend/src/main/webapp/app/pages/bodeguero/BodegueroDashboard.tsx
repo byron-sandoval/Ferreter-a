@@ -40,16 +40,20 @@ export const BodegueroDashboard = () => {
     try {
       const [resArt, resIng, resCat] = await Promise.all([
         ArticuloService.getAll(),
-        IngresoService.getAll(),
+        IngresoService.getAll({ sort: 'id,desc', size: 100 }),
         CategoriaService.getAll(),
       ]);
 
       const articulos = resArt.data;
-      const ingresos = resIng.data.sort((a, b) => dayjs(b.fecha).diff(dayjs(a.fecha)));
+      const ingresos = resIng.data; // Ya vienen ordenados del servidor
       const categorias = resCat.data;
 
       const bajoStockList = articulos.filter(a => a.activo && (a.existencia || 0) <= (a.existenciaMinima || 0));
-      const comprasHoy = ingresos.filter(i => dayjs(i.fecha).isSame(dayjs(), 'day') && i.activo).length;
+      const today = dayjs().startOf('day');
+      const comprasHoy = ingresos.filter(i => {
+        const fechaIngreso = dayjs(i.fecha).startOf('day');
+        return fechaIngreso.isSame(today) && i.activo;
+      }).length;
 
       const categoriasActivas = categorias.filter(c => c.activo !== false);
       const productosActivos = articulos.filter(a => a.activo !== false);
