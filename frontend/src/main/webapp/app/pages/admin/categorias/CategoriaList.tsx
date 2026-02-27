@@ -57,9 +57,22 @@ export const CategoriaList = () => {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  const handleDelete = (id: number) => {
-    if (window.confirm('¿Eliminar categoría?')) {
-      import('axios').then(axios => axios.default.delete(`api/categorias/${id}`).then(loadAll));
+  const handleDelete = async (id: number, nombre: string) => {
+    try {
+      // Primero contamos cuántos productos tiene esta categoría
+      const res = await import('app/services/articulo.service').then(m => m.default.countByCriteria({ 'categoriaId.equals': id, 'activo.equals': true }));
+      const count = res.data;
+
+      let message = `¿Está seguro de desactivar la categoría "${nombre}"?`;
+      if (count > 0) {
+        message = `⚠️ ATENCIÓN: La categoría "${nombre}" tiene ${count} productos asociados. \n\nSi la desactivas, TODOS estos productos también se desactivarán y no se podrán vender. \n\n¿Deseas desactivar la categoría y sus ${count} productos?`;
+      }
+
+      if (window.confirm(message)) {
+        import('axios').then(axios => axios.default.delete(`api/categorias/${id}`).then(loadAll));
+      }
+    } catch (error) {
+      toast.error('Error al verificar productos asociados');
     }
   };
 
@@ -73,9 +86,11 @@ export const CategoriaList = () => {
           <Button color="light" size="sm" onClick={loadAll} disabled={loading} style={{ fontSize: '0.75rem' }}>
             <FontAwesomeIcon icon={faSync} spin={loading} className="me-1" /> Actualizar
           </Button>
-          <Button color="success" size="sm" tag={Link} to="new" style={{ fontSize: '0.75rem' }}>
-            <FontAwesomeIcon icon={faPlus} className="me-1" /> Nueva Categoría
-          </Button>
+          {isAdmin && (
+            <Button color="success" size="sm" tag={Link} to="new" style={{ fontSize: '0.75rem' }}>
+              <FontAwesomeIcon icon={faPlus} className="me-1" /> Nueva Categoría
+            </Button>
+          )}
         </div>
       </div>
 
@@ -151,7 +166,7 @@ export const CategoriaList = () => {
                       <FontAwesomeIcon icon={faPencilAlt} fixedWidth />
                     </Button>
                     {isAdmin && (
-                      <Button color="danger" size="sm" outline onClick={() => handleDelete(cat.id)} className="p-1">
+                      <Button color="danger" size="sm" outline onClick={() => handleDelete(cat.id, cat.nombre)} className="p-1">
                         <FontAwesomeIcon icon={faTrash} fixedWidth />
                       </Button>
                     )}
