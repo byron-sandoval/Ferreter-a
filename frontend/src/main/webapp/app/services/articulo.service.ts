@@ -32,6 +32,14 @@ const getBajoStock = () => {
   return axios.get<IArticulo[]>(`${API_URL}?existencia.lessThan=existenciaMinima`);
 };
 
+const countByCriteria = (criteria: any) => {
+  const params = new URLSearchParams();
+  Object.keys(criteria).forEach(key => {
+    params.append(key, criteria[key]);
+  });
+  return axios.get<number>(`${API_URL}/count?${params.toString()}`);
+};
+
 export default {
   getAll,
   getById,
@@ -39,4 +47,5 @@ export default {
   update,
   delete: remove,
   getBajoStock,
+  countByCriteria,
 };
