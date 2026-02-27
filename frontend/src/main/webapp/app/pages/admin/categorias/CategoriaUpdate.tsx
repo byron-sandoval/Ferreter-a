@@ -8,10 +8,13 @@ import CategoriaService from 'app/services/categoria.service';
 import { ICategoria } from 'app/shared/model/categoria.model';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useAppSelector } from 'app/config/store';
+import { AUTHORITIES } from 'app/config/constants';
 
 export const CategoriaUpdate = () => {
   const navigate = useNavigate();
   const { id } = useParams<'id'>();
+  const isAdmin = useAppSelector(state => state.authentication.account?.authorities?.includes(AUTHORITIES.ADMIN));
   const isNew = id === undefined;
 
   const {
@@ -72,16 +75,18 @@ export const CategoriaUpdate = () => {
                 <Controller name="descripcion" control={control} render={({ field }) => <Input {...field} type="textarea" />} />
               </FormGroup>
 
-              <FormGroup check>
-                <Label check>
-                  <Controller
-                    name="activo"
-                    control={control}
-                    render={({ field }) => <Input type="checkbox" checked={field.value} onChange={e => field.onChange(e.target.checked)} />}
-                  />{' '}
-                  Activo
-                </Label>
-              </FormGroup>
+              {isAdmin && (
+                <FormGroup check>
+                  <Label check>
+                    <Controller
+                      name="activo"
+                      control={control}
+                      render={({ field }) => <Input type="checkbox" checked={field.value} onChange={e => field.onChange(e.target.checked)} />}
+                    />{' '}
+                    Activo
+                  </Label>
+                </FormGroup>
+              )}
 
               <Button color="primary" type="submit" className="mt-3">
                 <FontAwesomeIcon icon={faSave} /> Guardar
