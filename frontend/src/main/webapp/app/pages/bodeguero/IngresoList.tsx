@@ -107,6 +107,7 @@ export const IngresoList = () => {
               <th className="py-2">Fecha</th>
               <th className="py-2">No. Documento</th>
               <th className="py-2 text-start">Proveedor</th>
+              <th className="py-2 text-center" style={{ width: '100px' }}>Usuario</th>
               <th className="py-2 text-end">Total</th>
               <th className="py-2">Estado</th>
               <th className="py-2">Acciones</th>
@@ -119,6 +120,11 @@ export const IngresoList = () => {
                   <td>{dayjs(i.fecha).format('DD/MM/YY')}</td>
                   <td className="fw-bold">{i.noDocumento}</td>
                   <td className="text-start">{i.proveedor?.nombre}</td>
+                  <td className="text-center">
+                    <Badge color="light" className="text-dark border shadow-sm px-2 py-1">
+                      {i.usuario?.username}
+                    </Badge>
+                  </td>
                   <td className="text-end fw-bold text-primary">C$ {i.total?.toLocaleString()}</td>
                   <td>
                     <Badge color={i.activo ? 'success' : 'secondary'} pill style={{ fontSize: '0.65rem' }}>
@@ -134,7 +140,7 @@ export const IngresoList = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="text-center py-5 text-muted">
+                <td colSpan={7} className="text-center py-5 text-muted">
                   {loading ? 'Cargando registros...' : 'No se encontraron compras registradas'}
                 </td>
               </tr>
@@ -185,9 +191,10 @@ export const IngresoList = () => {
               </small>
             </div>
             <div className="text-end">
-              <Label className="text-muted small text-uppercase fw-bold mb-0">Fecha de Ingreso</Label>
+              <Label className="text-muted small text-uppercase fw-bold mb-0">Fecha / Responsable</Label>
               <div className="fw-bold">{dayjs(ingresoSeleccionado?.fecha).format('DD/MM/YYYY')}</div>
-              <Badge color={ingresoSeleccionado?.activo ? 'success' : 'danger'}>
+              <div className="small text-muted">@{ingresoSeleccionado?.usuario?.username}</div>
+              <Badge color={ingresoSeleccionado?.activo ? 'success' : 'danger'} className="mt-1">
                 {ingresoSeleccionado?.activo ? 'Procesado' : 'Anulado'}
               </Badge>
             </div>

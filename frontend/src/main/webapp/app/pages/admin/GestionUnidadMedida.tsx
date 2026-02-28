@@ -27,11 +27,14 @@ import {
   faChevronRight,
 } from '@fortawesome/free-solid-svg-icons';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
+import { useAppSelector } from 'app/config/store';
+import { AUTHORITIES } from 'app/config/constants';
 import UnidadMedidaService from '../../services/unidad-medida.service';
 import { IUnidadMedida } from '../../shared/model/unidad-medida.model';
 import { toast } from 'react-toastify';
 
 export const GestionUnidadMedida = () => {
+  const isAdmin = useAppSelector(state => state.authentication.account?.authorities?.includes(AUTHORITIES.ADMIN));
   const [unidades, setUnidades] = useState<IUnidadMedida[]>([]);
   const [loading, setLoading] = useState(false);
   const [modal, setModal] = useState(false);
@@ -79,15 +82,30 @@ export const GestionUnidadMedida = () => {
     setModal(true);
   };
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm('¿Está seguro de eliminar esta unidad?')) {
-      try {
-        await UnidadMedidaService.delete(id);
-        toast.success('Unidad eliminada');
-        loadUnidades();
-      } catch (e) {
-        toast.error('No se puede eliminar la unidad porque está siendo usada por productos.');
+  const checkProductsBeforeDeactivate = async (id: number) => {
+    try {
+      const res = await import('app/services/articulo.service').then(m => m.default.countByCriteria({ 'unidadMedidaId.equals': id, 'activo.equals': true }));
+      return res.data;
+    } catch (e) {
+      return 0;
+    }
+  };
+
+  const handleDelete = async (id: number, nombre: string) => {
+    try {
+      const count = await checkProductsBeforeDeactivate(id);
+      let message = `¿Está seguro de eliminar la unidad "${nombre}"?`;
+      if (count > 0) {
+        message = `⚠️ ATENCIÓN: La unidad "${nombre}" es usada por ${count} productos. \n\nSi la desactivas, TODOS estos productos también se desactivarán. \n\n¿Deseas continuar?`;
       }
+
+      if (window.confirm(message)) {
+        await UnidadMedidaService.delete(id);
+        toast.success(count > 0 ? 'Unidad y productos desactivados' : 'Unidad eliminada');
+        loadUnidades();
+      }
+    } catch (e) {
+      toast.error('Error al procesar la solicitud.');
     }
   };
 
@@ -127,9 +145,11 @@ export const GestionUnidadMedida = () => {
               Ver Inactivos
             </label>
           </div>
-          <Button onClick={toggle} color="success" size="sm" className="fw-bold border-0 px-3">
-            <FontAwesomeIcon icon={faPlus} className="me-2" /> AGREGAR UNIDAD
-          </Button>
+          {isAdmin && (
+            <Button onClick={toggle} color="success" size="sm" className="fw-bold border-0 px-3">
+              <FontAwesomeIcon icon={faPlus} className="me-2" /> AGREGAR UNIDAD
+            </Button>
+          )}
         </div>
       </div>
 
@@ -166,9 +186,11 @@ export const GestionUnidadMedida = () => {
                         <Button color="link" className="text-primary me-2 p-0" onClick={() => handleEdit(u)}>
                           <FontAwesomeIcon icon={faEdit} />
                         </Button>
-                        <Button color="link" className="text-danger p-0" onClick={() => u.id && handleDelete(u.id)}>
-                          <FontAwesomeIcon icon={faTrash} />
-                        </Button>
+                        {isAdmin && (
+                          <Button color="link" className="text-danger p-0" onClick={() => u.id && handleDelete(u.id, u.nombre)}>
+                            <FontAwesomeIcon icon={faTrash} />
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -236,16 +258,18 @@ export const GestionUnidadMedida = () => {
                 className="rounded-3 border-2"
               />
             </FormGroup>
-            <FormGroup check>
-              <Label check className="small fw-bold text-muted">
-                <Input
-                  type="checkbox"
-                  checked={currentUnidad.activo || false}
-                  onChange={e => setCurrentUnidad({ ...currentUnidad, activo: e.target.checked })}
-                />{' '}
-                Esta unidad estará disponible para nuevos productos
-              </Label>
-            </FormGroup>
+            {isAdmin && (
+              <FormGroup check>
+                <Label check className="small fw-bold text-muted">
+                  <Input
+                    type="checkbox"
+                    checked={currentUnidad.activo || false}
+                    onChange={e => setCurrentUnidad({ ...currentUnidad, activo: e.target.checked })}
+                  />{' '}
+                  Esta unidad estará disponible para nuevos productos
+                </Label>
+              </FormGroup>
+            )}
           </Form>
         </ModalBody>
         <ModalFooter className="border-0 pt-0">

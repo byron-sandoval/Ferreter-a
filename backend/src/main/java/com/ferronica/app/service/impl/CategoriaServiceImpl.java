@@ -1,6 +1,7 @@
 package com.ferronica.app.service.impl;
 
 import com.ferronica.app.domain.Categoria;
+import com.ferronica.app.repository.ArticuloRepository;
 import com.ferronica.app.repository.CategoriaRepository;
 import com.ferronica.app.service.CategoriaService;
 import com.ferronica.app.service.dto.CategoriaDTO;
@@ -24,11 +25,13 @@ public class CategoriaServiceImpl implements CategoriaService {
     private static final Logger LOG = LoggerFactory.getLogger(CategoriaServiceImpl.class);
 
     private final CategoriaRepository categoriaRepository;
-
+    private final ArticuloRepository articuloRepository;
     private final CategoriaMapper categoriaMapper;
 
-    public CategoriaServiceImpl(CategoriaRepository categoriaRepository, CategoriaMapper categoriaMapper) {
+    public CategoriaServiceImpl(CategoriaRepository categoriaRepository, ArticuloRepository articuloRepository,
+            CategoriaMapper categoriaMapper) {
         this.categoriaRepository = categoriaRepository;
+        this.articuloRepository = articuloRepository;
         this.categoriaMapper = categoriaMapper;
     }
 
@@ -79,10 +82,17 @@ public class CategoriaServiceImpl implements CategoriaService {
 
     @Override
     public void delete(Long id) {
-        LOG.debug("Request to delete Categoria (Logical) : {}", id);
+        LOG.debug("Request to delete Categoria and its products (Logical) : {}", id);
         categoriaRepository.findById(id).ifPresent(categoria -> {
             categoria.setActivo(false);
             categoriaRepository.save(categoria);
+            // Cascada: desactivar todos los productos de esta categoría
+            articuloRepository.findAll().stream()
+                    .filter(a -> a.getCategoria() != null && a.getCategoria().getId().equals(id))
+                    .forEach(articulo -> {
+                        articulo.setActivo(false);
+                        articuloRepository.save(articulo);
+                    });
         });
     }
 }

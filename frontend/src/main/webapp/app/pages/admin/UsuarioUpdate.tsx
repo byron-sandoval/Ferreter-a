@@ -6,11 +6,13 @@ import { faSave, faArrowLeft, faUsers } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'react-toastify';
 import { IUsuario } from 'app/shared/model/usuario.model';
 import UsuarioService from 'app/services/usuario.service';
+import { useAppSelector } from 'app/config/store';
 
 export const UsuarioUpdate = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const isNew = !id;
+  const account = useAppSelector(state => state.authentication.account);
 
   const [usuario, setUsuario] = useState<IUsuario>({
     cedula: '',
@@ -139,9 +141,9 @@ export const UsuarioUpdate = () => {
                       const lastChar =
                         raw.length > 13
                           ? raw
-                              .substring(13, 14)
-                              .replace(/[^a-zA-Z]/g, '')
-                              .toUpperCase()
+                            .substring(13, 14)
+                            .replace(/[^a-zA-Z]/g, '')
+                            .toUpperCase()
                           : '';
                       const input = digitsOnly + lastChar;
 
@@ -252,11 +254,24 @@ export const UsuarioUpdate = () => {
                         <Label for="rol" className="fw-bold small mb-1">
                           Rol Asignado *
                         </Label>
-                        <Input bsSize="sm" type="select" id="rol" name="rol" value={usuario.rol || 'ROLE_VENDEDOR'} onChange={handleChange}>
+                        <Input
+                          bsSize="sm"
+                          type="select"
+                          id="rol"
+                          name="rol"
+                          value={usuario.rol || 'ROLE_VENDEDOR'}
+                          onChange={handleChange}
+                          disabled={!isNew && (account?.login === usuario.username || account?.email === usuario.email)}
+                        >
                           <option value="ROLE_VENDEDOR">Vendedor</option>
                           <option value="ROLE_BODEGUERO">Bodeguero</option>
                           <option value="ROLE_ADMIN">Administrador</option>
                         </Input>
+                        {!isNew && (account?.login === usuario.username || account?.email === usuario.email) && (
+                          <div className="text-danger mt-1" style={{ fontSize: '0.75rem' }}>
+                            Por seguridad, no puedes cambiar tu propio rol.
+                          </div>
+                        )}
                       </FormGroup>
                     </Col>
                   </Row>
@@ -270,10 +285,16 @@ export const UsuarioUpdate = () => {
                     checked={usuario.activo || false}
                     onChange={handleChange}
                     className="mt-1"
+                    disabled={!isNew && (account?.login === usuario.username || account?.email === usuario.email)}
                   />
                   <Label check for="activo" className="fw-bold ms-1">
                     Usuario Activo en el Sistema
                   </Label>
+                  {!isNew && (account?.login === usuario.username || account?.email === usuario.email) && (
+                    <div className="text-danger mt-1" style={{ fontSize: '0.75rem', marginLeft: '-1.5rem' }}>
+                      Por seguridad, no puedes desactivar tu propia cuenta.
+                    </div>
+                  )}
                 </FormGroup>
 
                 <div className="d-flex gap-2">
