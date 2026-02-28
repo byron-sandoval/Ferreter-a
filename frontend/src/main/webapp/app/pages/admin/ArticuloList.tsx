@@ -66,7 +66,7 @@ export const ArticuloList = () => {
 
   const articulosFiltrados = articulos.filter(a => {
     const matchesSearch = (a.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (a.codigo || '').toLowerCase().includes(filter.toLowerCase());
-    const matchesStatus = showInactive ? a.activo === false || a.activo === null : a.activo === true;
+    const matchesStatus = showInactive ? a.activo === false : a.activo !== false;
     return matchesSearch && matchesStatus;
   });
 
