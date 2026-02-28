@@ -7,9 +7,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSync, faSearch, faPencilAlt, faTrash, faUsers, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import { toast } from 'react-toastify';
+import { useAppSelector } from 'app/config/store';
+import { AUTHORITIES } from 'app/config/constants';
 
 export const UsuarioList = () => {
   const navigate = useNavigate();
+  const account = useAppSelector(state => state.authentication.account);
+  const isAdmin = useAppSelector(state => state.authentication.account?.authorities?.includes(AUTHORITIES.ADMIN));
   const [usuarios, setUsuarios] = useState<IUsuario[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
@@ -133,38 +137,52 @@ export const UsuarioList = () => {
               <th className="py-2">Teléfono</th>
               <th className="py-2">Rol</th>
               <th className="py-2">Estado</th>
-              <th className="py-2">Acciones</th>
+              {isAdmin && <th className="py-2">Acciones</th>}
             </tr>
           </thead>
           <tbody>
             {currentItems.length > 0 ? (
-              currentItems.map(v => (
-                <tr key={v.id} className="text-center align-middle" style={{ fontSize: '0.8rem' }}>
-                  <td className="fw-bold text-muted">{v.id}</td>
-                  <td className="text-center px-3">
-                    {v.nombre} {v.apellido}
-                  </td>
-                  <td>{v.telefono || '-'}</td>
-                  <td>
-                    <Badge color="info" className="text-uppercase" style={{ fontSize: '0.65rem' }}>
-                      {(v.rol || '').replace('ROLE_', '')}
-                    </Badge>
-                  </td>
-                  <td>
-                    <Badge color={v.activo ? 'success' : 'danger'} pill style={{ fontSize: '0.65rem' }}>
-                      {v.activo ? 'Activo' : 'Inactivo'}
-                    </Badge>
-                  </td>
-                  <td className="px-3">
-                    <Button size="sm" color="info" outline className="p-1 me-1" onClick={() => navigate(`/admin/usuarios/${v.id}/edit`)}>
-                      <FontAwesomeIcon icon={faPencilAlt} fixedWidth />
-                    </Button>
-                    <Button size="sm" color="danger" outline className="p-1" onClick={() => v.id && handleDelete(v.id)}>
-                      <FontAwesomeIcon icon={faTrash} fixedWidth />
-                    </Button>
-                  </td>
-                </tr>
-              ))
+              currentItems.map(v => {
+                const isCurrentUser = account?.login === v.username || account?.email === v.email;
+
+                return (
+                  <tr key={v.id} className="text-center align-middle" style={{ fontSize: '0.8rem' }}>
+                    <td className="fw-bold text-muted">{v.id}</td>
+                    <td className="text-center px-3">
+                      {v.nombre} {v.apellido}
+                    </td>
+                    <td>{v.telefono || '-'}</td>
+                    <td>
+                      <Badge color="info" className="text-uppercase" style={{ fontSize: '0.65rem' }}>
+                        {(v.rol || '').replace('ROLE_', '')}
+                      </Badge>
+                    </td>
+                    <td>
+                      <Badge color={v.activo ? 'success' : 'danger'} pill style={{ fontSize: '0.65rem' }}>
+                        {v.activo ? 'Activo' : 'Inactivo'}
+                      </Badge>
+                    </td>
+                    {isAdmin && (
+                      <td className="px-3">
+                        <Button size="sm" color="info" outline className="p-1 me-1" title="Editar usuario" onClick={() => navigate(`/admin/usuarios/${v.id}/edit`)}>
+                          <FontAwesomeIcon icon={faPencilAlt} fixedWidth />
+                        </Button>
+                        <Button
+                          size="sm"
+                          color="danger"
+                          outline
+                          className="p-1"
+                          disabled={isCurrentUser}
+                          title={isCurrentUser ? "No puedes eliminar tu propio usuario" : "Eliminar usuario"}
+                          onClick={() => v.id && handleDelete(v.id)}
+                        >
+                          <FontAwesomeIcon icon={faTrash} fixedWidth />
+                        </Button>
+                      </td>
+                    )}
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td colSpan={5} className="text-center py-5 text-muted">
