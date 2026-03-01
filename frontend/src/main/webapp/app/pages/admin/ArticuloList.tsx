@@ -370,16 +370,18 @@ export const ArticuloList = () => {
           <Button color="secondary" size="sm" className="opacity-75" onClick={loadAll}>
             <FontAwesomeIcon icon={faSync} spin={loading} /> Restablecer
           </Button>
-          <Button
-            color="dark"
-            size="sm"
-            tag={Link}
-            to="new"
-            className="fw-bold border-secondary shadow-sm"
-            style={{ backgroundColor: '#2d0a4e' }}
-          >
-            <FontAwesomeIcon icon={faPlus} className="me-2" /> Nuevo Artículo
-          </Button>
+          {isAdmin && (
+            <Button
+              color="dark"
+              size="sm"
+              tag={Link}
+              to="new"
+              className="fw-bold border-secondary shadow-sm"
+              style={{ backgroundColor: '#2d0a4e' }}
+            >
+              <FontAwesomeIcon icon={faPlus} className="me-2" /> Nuevo Artículo
+            </Button>
+          )}
         </div>
       </div>
 
@@ -399,9 +401,9 @@ export const ArticuloList = () => {
                   <th className="py-2">Estado</th>
                   <th className="py-2">Stock</th>
                   <th className="py-2">Mín.</th>
-                  <th className="py-2 text-end">Costo</th>
+                  {isAdmin && <th className="py-2 text-end">Costo</th>}
                   <th className="py-2 text-end">Venta</th>
-                  <th className="py-2 text-end">Total</th>
+                  {isAdmin && <th className="py-2 text-end">Total</th>}
                   <th className="py-2 text-start">Observación</th>
                   <th className="py-2">Acciones</th>
                 </tr>
@@ -433,9 +435,9 @@ export const ArticuloList = () => {
                         </td>
                         <td style={{ backgroundColor: stockBg, color: 'white', fontWeight: 'bold' }}>{articulo.existencia}</td>
                         <td>{articulo.existenciaMinima}</td>
-                        <td className="text-end">C$ {articulo.costo?.toFixed(2)}</td>
+                        {isAdmin && <td className="text-end">C$ {articulo.costo?.toFixed(2)}</td>}
                         <td className="text-end">C$ {articulo.precio?.toFixed(2)}</td>
-                        <td className="text-end fw-bold">C$ {((articulo.existencia || 0) * (articulo.precio || 0)).toFixed(2)}</td>
+                        {isAdmin && <td className="text-end fw-bold">C$ {((articulo.existencia || 0) * (articulo.precio || 0)).toFixed(2)}</td>}
                         <td className="text-start small text-muted">
                           <div className="text-truncate" style={{ maxWidth: '120px' }}>
                             {articulo.descripcion || '-'}
@@ -459,17 +461,19 @@ export const ArticuloList = () => {
                             >
                               <FontAwesomeIcon icon={faEye} />
                             </Button>
-                            <Button
-                              size="sm"
-                              color="warning"
-                              outline
-                              tag={Link}
-                              to={`${articulo.id}/edit`}
-                              title="Editar"
-                              onClick={e => e.stopPropagation()}
-                            >
-                              <FontAwesomeIcon icon={faPencilAlt} />
-                            </Button>
+                            {isAdmin && (
+                              <Button
+                                size="sm"
+                                color="warning"
+                                outline
+                                tag={Link}
+                                to={`${articulo.id}/edit`}
+                                title="Editar"
+                                onClick={e => e.stopPropagation()}
+                              >
+                                <FontAwesomeIcon icon={faPencilAlt} />
+                              </Button>
+                            )}
                             {isAdmin && (
                               <Button
                                 size="sm"
@@ -571,10 +575,12 @@ export const ArticuloList = () => {
                 <Col md="10">
                   <Row>
                     <Col md="4">
-                      <div className="mb-3">
-                        <label className="text-muted small text-uppercase fw-bold">Precio Compra</label>
-                        <div className="fs-5">C$ {selectedArticulo.costo?.toFixed(2)}</div>
-                      </div>
+                      {isAdmin && (
+                        <div className="mb-3">
+                          <label className="text-muted small text-uppercase fw-bold">Precio Compra</label>
+                          <div className="fs-5">C$ {selectedArticulo.costo?.toFixed(2)}</div>
+                        </div>
+                      )}
                       <div>
                         <label className="text-muted small text-uppercase fw-bold">Precio Venta</label>
                         <div className="fs-4 fw-bold text-success">C$ {selectedArticulo.precio?.toFixed(2)}</div>
@@ -589,10 +595,12 @@ export const ArticuloList = () => {
                           {selectedArticulo.existencia} {selectedArticulo.unidadMedida?.simbolo}
                         </div>
                       </div>
-                      <div>
-                        <label className="text-muted small text-uppercase fw-bold">Inversión Total</label>
-                        <div className="fs-5">C$ {((selectedArticulo.existencia || 0) * (selectedArticulo.costo || 0)).toFixed(2)}</div>
-                      </div>
+                      {isAdmin && (
+                        <div>
+                          <label className="text-muted small text-uppercase fw-bold">Inversión Total</label>
+                          <div className="fs-5">C$ {((selectedArticulo.existencia || 0) * (selectedArticulo.costo || 0)).toFixed(2)}</div>
+                        </div>
+                      )}
                     </Col>
                     <Col md="4">
                       <div className="mb-2">
