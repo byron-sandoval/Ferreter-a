@@ -181,7 +181,7 @@ export const TopNavbar = () => {
             )}
 
             {/* 8. Categorías */}
-            {(isAdmin || isBodeguero) && (
+            {isAdmin && (
               <NavItem className="nav-link-item">
                 <NavLink tag={Link} to="/admin/categorias" style={navLinkStyle}>
                   <FontAwesomeIcon icon={faTags} size="sm" /> Categorías
@@ -199,7 +199,7 @@ export const TopNavbar = () => {
             )}
 
             {/* 10. Proveedores */}
-            {(isAdmin || isBodeguero) && (
+            {isAdmin && (
               <NavItem className="nav-link-item">
                 <NavLink tag={Link} to="/admin/proveedores" style={navLinkStyle}>
                   <FontAwesomeIcon icon={faTruck} size="sm" /> Proveedores
