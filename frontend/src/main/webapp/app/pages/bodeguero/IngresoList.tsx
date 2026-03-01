@@ -7,8 +7,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSync, faSearch, faEye, faFileInvoice, faChevronLeft, faChevronRight, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import dayjs from 'dayjs';
+import { useAppSelector } from 'app/config/store';
+import { AUTHORITIES } from 'app/config/constants';
 
 export const IngresoList = () => {
+  const account = useAppSelector(state => state.authentication.account);
+  const isAdmin = account?.authorities?.includes(AUTHORITIES.ADMIN);
   const navigate = useNavigate();
   const [ingresos, setIngresos] = useState<IIngreso[]>([]);
   const [loading, setLoading] = useState(false);
@@ -94,9 +98,11 @@ export const IngresoList = () => {
           <Button color="primary" size="sm" onClick={() => navigate('/bodeguero/ingresos/nuevo')} style={{ fontSize: '0.75rem' }} className="fw-bold">
             <FontAwesomeIcon icon={faPlus} className="me-1" /> ACTUALIZAR STOCK
           </Button>
-          <Button color="success" size="sm" onClick={() => navigate('/bodeguero/ingresos/nueva-compra')} style={{ fontSize: '0.75rem' }} className="fw-bold">
-            <FontAwesomeIcon icon={faShoppingCart} className="me-1" /> NUEVA COMPRA
-          </Button>
+          {isAdmin && (
+            <Button color="success" size="sm" onClick={() => navigate('/bodeguero/ingresos/nueva-compra')} style={{ fontSize: '0.75rem' }} className="fw-bold">
+              <FontAwesomeIcon icon={faShoppingCart} className="me-1" /> NUEVA COMPRA
+            </Button>
+          )}
         </div>
       </div>
 
@@ -108,7 +114,7 @@ export const IngresoList = () => {
               <th className="py-2">No. Documento</th>
               <th className="py-2 text-start">Proveedor</th>
               <th className="py-2 text-center" style={{ width: '100px' }}>Usuario</th>
-              <th className="py-2 text-end">Total</th>
+              {isAdmin && <th className="py-2 text-end">Total</th>}
               <th className="py-2">Estado</th>
               <th className="py-2">Acciones</th>
             </tr>
@@ -125,7 +131,7 @@ export const IngresoList = () => {
                       {i.usuario?.username}
                     </Badge>
                   </td>
-                  <td className="text-end fw-bold text-primary">C$ {i.total?.toLocaleString()}</td>
+                  {isAdmin && <td className="text-end fw-bold text-primary">C$ {i.total?.toLocaleString()}</td>}
                   <td>
                     <Badge color={i.activo ? 'success' : 'secondary'} pill style={{ fontSize: '0.65rem' }}>
                       {i.activo ? 'Recibido' : 'Anulado'}
@@ -205,8 +211,8 @@ export const IngresoList = () => {
               <tr>
                 <th>Producto</th>
                 <th className="text-center">Cantidad</th>
-                <th className="text-end">Costo Unit.</th>
-                <th className="text-end">Monto</th>
+                {isAdmin && <th className="text-end">Costo Unit.</th>}
+                {isAdmin && <th className="text-end">Monto</th>}
               </tr>
             </thead>
             <tbody>
@@ -221,19 +227,21 @@ export const IngresoList = () => {
                       {det.cantidad}
                     </Badge>
                   </td>
-                  <td className="text-end">C$ {det.costoUnitario?.toLocaleString()}</td>
-                  <td className="text-end fw-bold">C$ {det.monto?.toLocaleString()}</td>
+                  {isAdmin && <td className="text-end">C$ {det.costoUnitario?.toLocaleString()}</td>}
+                  {isAdmin && <td className="text-end fw-bold">C$ {det.monto?.toLocaleString()}</td>}
                 </tr>
               ))}
             </tbody>
           </Table>
 
-          <div className="mt-4 p-3 bg-light rounded-4 ms-auto" style={{ maxWidth: '300px' }}>
-            <div className="d-flex justify-content-between border-top pt-2">
-              <h5 className="fw-bold m-0">Total Compra:</h5>
-              <h5 className="fw-bold text-dark m-0">C$ {ingresoSeleccionado?.total?.toLocaleString()}</h5>
+          {isAdmin && (
+            <div className="mt-4 p-3 bg-light rounded-4 ms-auto" style={{ maxWidth: '300px' }}>
+              <div className="d-flex justify-content-between border-top pt-2">
+                <h5 className="fw-bold m-0">Total Compra:</h5>
+                <h5 className="fw-bold text-dark m-0">C$ {ingresoSeleccionado?.total?.toLocaleString()}</h5>
+              </div>
             </div>
-          </div>
+          )}
 
           {ingresoSeleccionado?.observaciones && (
             <div className="mt-4 p-3 bg-warning bg-opacity-10 border-start border-4 border-warning rounded">
