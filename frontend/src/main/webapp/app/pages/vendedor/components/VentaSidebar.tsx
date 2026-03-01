@@ -266,6 +266,7 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
                     size="sm"
                     color={metodoPago === MetodoPagoEnum.EFECTIVO ? 'primary' : 'outline-dark'}
                     className="p-1 px-2 border-0"
+                    title="Efectivo"
                     onClick={() => setMetodoPago(MetodoPagoEnum.EFECTIVO)}
                   >
                     <FontAwesomeIcon icon={faMoneyBillWave} />
@@ -274,6 +275,7 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
                     size="sm"
                     color={metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? 'primary' : 'outline-dark'}
                     className="p-1 px-2 border-0"
+                    title="Tarjeta"
                     onClick={() => {
                       setMetodoPago(MetodoPagoEnum.TARJETA_STRIPE);
                       setDescuento('0');
