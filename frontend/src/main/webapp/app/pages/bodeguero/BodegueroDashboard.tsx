@@ -13,6 +13,8 @@ import {
   faArrowRight
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
+import { useAppSelector } from 'app/config/store';
+import { AUTHORITIES } from 'app/config/constants';
 import ArticuloService from 'app/services/articulo.service';
 import IngresoService from 'app/services/ingreso.service';
 import CategoriaService from 'app/services/categoria.service';
@@ -21,6 +23,8 @@ import { IIngreso } from 'app/shared/model/ingreso.model';
 import dayjs from 'dayjs';
 
 export const BodegueroDashboard = () => {
+  const account = useAppSelector(state => state.authentication.account);
+  const isAdmin = account?.authorities?.includes(AUTHORITIES.ADMIN);
   const [stats, setStats] = useState({
     totalProductos: 0,
     bajoStock: 0,
@@ -165,7 +169,7 @@ export const BodegueroDashboard = () => {
                       <th className="py-2">Fecha</th>
                       <th className="py-2">Factura</th>
                       <th className="py-2">Proveedor</th>
-                      <th className="py-2 text-end">Total</th>
+                      {isAdmin && <th className="py-2 text-end">Total</th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -175,7 +179,7 @@ export const BodegueroDashboard = () => {
                           <td className="small">{dayjs(ing.fecha).format('DD/MM/YY')}</td>
                           <td className="fw-bold">{ing.noDocumento}</td>
                           <td className="small text-muted text-truncate" style={{ maxWidth: '150px' }}>{ing.proveedor?.nombre}</td>
-                          <td className="text-end fw-bold text-success">C$ {ing.total?.toLocaleString()}</td>
+                          {isAdmin && <td className="text-end fw-bold text-success">C$ {ing.total?.toLocaleString()}</td>}
                         </tr>
                       ))
                     ) : (

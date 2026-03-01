@@ -35,7 +35,7 @@ export const ConsultaInventario = () => {
     const matchText =
       (a.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (a.codigo || '').toLowerCase().includes(filter.toLowerCase());
     const matchCat = catFilter === '' || a.categoria?.id === Number(catFilter);
-    return a.activo && matchText && matchCat;
+    return a.activo !== false && matchText && matchCat;
   });
 
   return (

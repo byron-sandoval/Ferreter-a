@@ -239,10 +239,12 @@ export const IngresoUpdate = () => {
                     onChange={e => setObservaciones(e.target.value)}
                   />
                 </FormGroup>
-                <div className="p-3 bg-primary bg-opacity-10 rounded text-center mb-3">
-                  <span className="text-dark fw-bold me-2 fs-6">TOTAL COMPRA:</span>
-                  <span className="fw-bold text-primary fs-4">C$ {calcularTotal().toLocaleString()}</span>
-                </div>
+                {isAdmin && (
+                  <div className="p-3 bg-primary bg-opacity-10 rounded text-center mb-3">
+                    <span className="text-dark fw-bold me-2 fs-6">TOTAL COMPRA:</span>
+                    <span className="fw-bold text-primary fs-4">C$ {calcularTotal().toLocaleString()}</span>
+                  </div>
+                )}
                 <Button color="primary" block type="submit" className="fw-bolder shadow-sm py-3 fs-7">
                   <FontAwesomeIcon icon={faSave} className="me-3" /> PROCESAR ACTUALIZACIÓN
                 </Button>
@@ -395,7 +397,7 @@ export const IngresoUpdate = () => {
                     <th>Descripción</th>
                     <th className="text-center">Cant.</th>
                     <th className="text-end">Costo Unit.</th>
-                    <th className="text-end">Monto</th>
+                    {isAdmin && <th className="text-end">Monto</th>}
                     <th className="text-center"></th>
                   </tr>
                 </thead>
@@ -409,7 +411,7 @@ export const IngresoUpdate = () => {
                           <Badge color="info" pill>{d.cantidad}</Badge>
                         </td>
                         <td className="text-end text-muted small">C$ {d.costoUnitario?.toLocaleString()}</td>
-                        <td className="text-end fw-bold">C$ {d.monto?.toLocaleString()}</td>
+                        {isAdmin && <td className="text-end fw-bold">C$ {d.monto?.toLocaleString()}</td>}
                         <td className="text-center">
                           <Button color="danger" size="sm" outline onClick={() => eliminarDetalle(index)}>
                             <FontAwesomeIcon icon={faTrash} />

@@ -194,11 +194,9 @@ export const IngresoNuevaCompra = () => {
         <div className="animate__animated animate__fadeIn p-3">
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h4 className="fw-bold text-dark m-0">
-                        <FontAwesomeIcon icon={faShoppingCart} className="me-2 text-success" />
-                        Nueva Compra
-                    </h4>
-                    <p className="text-muted small m-0">Inscriba nuevos productos en su catálogo mientras realiza la compra</p>
+                    <p className="text-muted small m-0">
+                        {isAdmin ? 'Inscriba nuevos productos en su catálogo mientras realiza la compra' : 'Actualice las existencias de productos autorizados por el administrador'}
+                    </p>
                 </div>
                 <Button color="dark" size="sm" outline className="fw-bold px-3" onClick={() => navigate('/bodeguero/ingresos')}>
                     <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Volver
@@ -296,208 +294,225 @@ export const IngresoNuevaCompra = () => {
                 </Col>
 
                 <Col md="8">
-                    <Card className="shadow-sm border-0 mb-3">
-                        <CardBody>
-                            <h6 className="fw-bold border-bottom pb-2 text-success">
-                                <FontAwesomeIcon icon={faPlusCircle} className="me-2" />
-                                Registrar Nuevo Producto para esta Compra
-                            </h6>
+                    {isAdmin ? (
+                        <Card className="shadow-sm border-0 mb-3">
+                            <CardBody>
+                                <h6 className="fw-bold border-bottom pb-2 text-success">
+                                    <FontAwesomeIcon icon={faPlusCircle} className="me-2" />
+                                    Registrar Nuevo Producto para esta Compra
+                                </h6>
 
-                            <Row className="g-2">
-                                <Col md="8">
-                                    <Label className="small fw-bold">Nombre del Producto</Label>
-                                    <Input placeholder="Ej: Taladro Manual" value={nombreNuevo} onChange={e => setNombreNuevo(e.target.value)} bsSize="sm" />
-                                </Col>
-                                <Col md="4">
-                                    <Label className="small fw-bold">Código / Barcode</Label>
-                                    <div className="input-group input-group-sm">
-                                        <span className="input-group-text bg-light"><FontAwesomeIcon icon={faBarcode} /></span>
-                                        <Input placeholder="Código único" value={codigoNuevo} onChange={e => setCodigoNuevo(e.target.value)} />
-                                    </div>
-                                </Col>
-                                <Col md="12">
-                                    <Label className="small fw-bold">Descripción (Opcional)</Label>
-                                    <Input type="textarea" rows="1" placeholder="Detalles técnicos..." value={descripcionNuevo || ''} onChange={e => setDescripcionNuevo(e.target.value)} bsSize="sm" />
-                                </Col>
-                                <Col md="4">
-                                    <Label className="small fw-bold">Categoría</Label>
-                                    <div className="position-relative">
-                                        <div
-                                            className="form-control form-control-sm d-flex justify-content-between align-items-center bg-white border-secondary"
-                                            style={{ cursor: 'pointer', minHeight: '31px' }}
-                                            onClick={() => setIsCategoriaOpen(!isCategoriaOpen)}
-                                        >
-                                            <span className="text-truncate">
-                                                {categorias.find(c => c.id?.toString() === categoriaId)?.nombre || 'Seleccione categoría...'}
-                                            </span>
-                                            <small className="text-muted">▼</small>
+                                <Row className="g-2">
+                                    <Col md="8">
+                                        <Label className="small fw-bold">Nombre del Producto</Label>
+                                        <Input placeholder="Ej: Taladro Manual" value={nombreNuevo} onChange={e => setNombreNuevo(e.target.value)} bsSize="sm" />
+                                    </Col>
+                                    <Col md="4">
+                                        <Label className="small fw-bold">Código / Barcode</Label>
+                                        <div className="input-group input-group-sm">
+                                            <span className="input-group-text bg-light"><FontAwesomeIcon icon={faBarcode} /></span>
+                                            <Input placeholder="Código único" value={codigoNuevo} onChange={e => setCodigoNuevo(e.target.value)} />
                                         </div>
-
-                                        {isCategoriaOpen && (
+                                    </Col>
+                                    <Col md="12">
+                                        <Label className="small fw-bold">Descripción (Opcional)</Label>
+                                        <Input type="textarea" rows="1" placeholder="Detalles técnicos..." value={descripcionNuevo || ''} onChange={e => setDescripcionNuevo(e.target.value)} bsSize="sm" />
+                                    </Col>
+                                    <Col md="4">
+                                        <Label className="small fw-bold">Categoría</Label>
+                                        <div className="position-relative">
                                             <div
-                                                className="position-absolute w-100 shadow-lg border rounded bg-white mt-1 p-2"
-                                                style={{ zIndex: 1050 }}
+                                                className="form-control form-control-sm d-flex justify-content-between align-items-center bg-white border-secondary"
+                                                style={{ cursor: 'pointer', minHeight: '31px' }}
+                                                onClick={() => setIsCategoriaOpen(!isCategoriaOpen)}
                                             >
-                                                <Input
-                                                    autoFocus
-                                                    type="text"
-                                                    placeholder="Buscar categoría..."
-                                                    value={searchCategoriaTerm}
-                                                    onChange={e => setSearchCategoriaTerm(e.target.value)}
-                                                    className="form-control-sm mb-2"
-                                                    onClick={e => e.stopPropagation()}
-                                                />
-                                                <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                                                    {categorias
-                                                        .filter(c => c.activo !== false && c.nombre?.toLowerCase().includes(searchCategoriaTerm.toLowerCase()))
-                                                        .map(c => (
-                                                            <div
-                                                                key={c.id}
-                                                                className="p-2 border-bottom small product-item-hover-selector"
-                                                                style={{ cursor: 'pointer', transition: 'background 0.2s' }}
-                                                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
-                                                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                                                                onClick={() => {
-                                                                    setCategoriaId(c.id!.toString());
-                                                                    setIsCategoriaOpen(false);
-                                                                    setSearchCategoriaTerm('');
-                                                                }}
-                                                            >
-                                                                <div className="fw-bold">{c.nombre}</div>
-                                                            </div>
-                                                        ))
-                                                    }
-                                                </div>
-                                                <div
-                                                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: -1 }}
-                                                    onClick={(e) => { e.stopPropagation(); setIsCategoriaOpen(false); }}
-                                                />
+                                                <span className="text-truncate">
+                                                    {categorias.find(c => c.id?.toString() === categoriaId)?.nombre || 'Seleccione categoría...'}
+                                                </span>
+                                                <small className="text-muted">▼</small>
                                             </div>
-                                        )}
-                                    </div>
-                                </Col>
-                                <Col md="4">
-                                    <Label className="small fw-bold">Unidad Medida</Label>
-                                    <div className="position-relative">
-                                        <div
-                                            className="form-control form-control-sm d-flex justify-content-between align-items-center bg-white border-secondary"
-                                            style={{ cursor: 'pointer', minHeight: '31px' }}
-                                            onClick={() => setIsUnidadOpen(!isUnidadOpen)}
-                                        >
-                                            <span className="text-truncate">
-                                                {unidades.find(u => u.id?.toString() === unidadId)?.nombre || 'Seleccione unidad...'}
-                                            </span>
-                                            <small className="text-muted">▼</small>
+
+                                            {isCategoriaOpen && (
+                                                <div
+                                                    className="position-absolute w-100 shadow-lg border rounded bg-white mt-1 p-2"
+                                                    style={{ zIndex: 1050 }}
+                                                >
+                                                    <Input
+                                                        autoFocus
+                                                        type="text"
+                                                        placeholder="Buscar categoría..."
+                                                        value={searchCategoriaTerm}
+                                                        onChange={e => setSearchCategoriaTerm(e.target.value)}
+                                                        className="form-control-sm mb-2"
+                                                        onClick={e => e.stopPropagation()}
+                                                    />
+                                                    <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                                        {categorias
+                                                            .filter(c => c.activo !== false && c.nombre?.toLowerCase().includes(searchCategoriaTerm.toLowerCase()))
+                                                            .map(c => (
+                                                                <div
+                                                                    key={c.id}
+                                                                    className="p-2 border-bottom small product-item-hover-selector"
+                                                                    style={{ cursor: 'pointer', transition: 'background 0.2s' }}
+                                                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
+                                                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                                                                    onClick={() => {
+                                                                        setCategoriaId(c.id!.toString());
+                                                                        setIsCategoriaOpen(false);
+                                                                        setSearchCategoriaTerm('');
+                                                                    }}
+                                                                >
+                                                                    <div className="fw-bold">{c.nombre}</div>
+                                                                </div>
+                                                            ))
+                                                        }
+                                                    </div>
+                                                    <div
+                                                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: -1 }}
+                                                        onClick={(e) => { e.stopPropagation(); setIsCategoriaOpen(false); }}
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
-
-                                        {isUnidadOpen && (
+                                    </Col>
+                                    <Col md="4">
+                                        <Label className="small fw-bold">Unidad Medida</Label>
+                                        <div className="position-relative">
                                             <div
-                                                className="position-absolute w-100 shadow-lg border rounded bg-white mt-1 p-2"
-                                                style={{ zIndex: 1050 }}
+                                                className="form-control form-control-sm d-flex justify-content-between align-items-center bg-white border-secondary"
+                                                style={{ cursor: 'pointer', minHeight: '31px' }}
+                                                onClick={() => setIsUnidadOpen(!isUnidadOpen)}
                                             >
-                                                <Input
-                                                    autoFocus
-                                                    type="text"
-                                                    placeholder="Buscar unidad..."
-                                                    value={searchUnidadTerm}
-                                                    onChange={e => setSearchUnidadTerm(e.target.value)}
-                                                    className="form-control-sm mb-2"
-                                                    onClick={e => e.stopPropagation()}
-                                                />
-                                                <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                                                    {unidades
-                                                        .filter(u => u.activo !== false && u.nombre?.toLowerCase().includes(searchUnidadTerm.toLowerCase()))
-                                                        .map(u => (
-                                                            <div
-                                                                key={u.id}
-                                                                className="p-2 border-bottom small product-item-hover-selector"
-                                                                style={{ cursor: 'pointer', transition: 'background 0.2s' }}
-                                                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
-                                                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                                                                onClick={() => {
-                                                                    setUnidadId(u.id!.toString());
-                                                                    setIsUnidadOpen(false);
-                                                                    setSearchUnidadTerm('');
-                                                                }}
-                                                            >
-                                                                <div className="fw-bold">{u.nombre}</div>
-                                                            </div>
-                                                        ))
-                                                    }
-                                                </div>
-                                                <div
-                                                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: -1 }}
-                                                    onClick={(e) => { e.stopPropagation(); setIsUnidadOpen(false); }}
-                                                />
+                                                <span className="text-truncate">
+                                                    {unidades.find(u => u.id?.toString() === unidadId)?.nombre || 'Seleccione unidad...'}
+                                                </span>
+                                                <small className="text-muted">▼</small>
                                             </div>
-                                        )}
-                                    </div>
-                                </Col>
-                                <Col md="2">
-                                    <Label className="small fw-bold">Stock Mín.</Label>
-                                    <Input type="number" min="0" value={existenciaMinima} onChange={e => setExistenciaMinima(parseInt(e.target.value, 10))} bsSize="sm" />
-                                </Col>
-                                <Col md="2">
-                                    <Label className="small fw-bold">Cant. Comprada</Label>
-                                    <Input type="number" min="1" value={cantidad} onChange={e => setCantidad(parseInt(e.target.value, 10))} bsSize="sm" />
-                                </Col>
-                                <Col md="4">
-                                    <Label className="small fw-bold">Costo Unitario (Compra)</Label>
-                                    <Input type="number" step="0.01" value={costoUnitario} onChange={e => setCostoUnitario(parseFloat(e.target.value))} bsSize="sm" />
-                                </Col>
-                                <Col md="4">
-                                    <Label className="small fw-bold">Precio (Venta)</Label>
-                                    <Input
-                                        type="number"
-                                        step="0.01"
-                                        value={precioVenta}
-                                        onChange={e => setPrecioVenta(parseFloat(e.target.value))}
-                                        bsSize="sm"
-                                        readOnly={!isAdmin}
-                                        className={!isAdmin ? 'bg-light text-muted' : ''}
-                                    />
-                                </Col>
-                                <Col md="4" className="d-flex align-items-end">
-                                    <Button color="success" block onClick={agregarDetalle} className="fw-bold btn-sm">
-                                        <FontAwesomeIcon icon={faPlus} className="me-1" /> Añadir a la Lista
-                                    </Button>
-                                </Col>
-                            </Row>
 
-                            <Table responsive size="sm" hover className="mt-4 border">
-                                <thead className="table-success small">
-                                    <tr>
-                                        <th>Código</th>
-                                        <th>Producto</th>
-                                        <th className="text-center">Cant.</th>
-                                        <th className="text-end">Costo</th>
-                                        <th className="text-end">Monto</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {detalles.length > 0 ? (
-                                        detalles.map((d, index) => (
-                                            <tr key={index} className="align-middle">
-                                                <td>{d.articulo?.codigo}</td>
-                                                <td className="fw-bold">{d.articulo?.nombre}</td>
-                                                <td className="text-center">{d.cantidad}</td>
-                                                <td className="text-end">C$ {d.costoUnitario?.toLocaleString()}</td>
-                                                <td className="text-end fw-bold">C$ {d.monto?.toLocaleString()}</td>
-                                                <td className="text-center">
-                                                    <Button color="danger" size="sm" outline onClick={() => eliminarDetalle(index)}>
-                                                        <FontAwesomeIcon icon={faTrash} />
-                                                    </Button>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr><td colSpan={6} className="text-center py-3 text-muted">No hay productos en esta compra.</td></tr>
-                                    )}
-                                </tbody>
-                            </Table>
-                        </CardBody>
-                    </Card>
+                                            {isUnidadOpen && (
+                                                <div
+                                                    className="position-absolute w-100 shadow-lg border rounded bg-white mt-1 p-2"
+                                                    style={{ zIndex: 1050 }}
+                                                >
+                                                    <Input
+                                                        autoFocus
+                                                        type="text"
+                                                        placeholder="Buscar unidad..."
+                                                        value={searchUnidadTerm}
+                                                        onChange={e => setSearchUnidadTerm(e.target.value)}
+                                                        className="form-control-sm mb-2"
+                                                        onClick={e => e.stopPropagation()}
+                                                    />
+                                                    <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                                        {unidades
+                                                            .filter(u => u.activo !== false && u.nombre?.toLowerCase().includes(searchUnidadTerm.toLowerCase()))
+                                                            .map(u => (
+                                                                <div
+                                                                    key={u.id}
+                                                                    className="p-2 border-bottom small product-item-hover-selector"
+                                                                    style={{ cursor: 'pointer', transition: 'background 0.2s' }}
+                                                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
+                                                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                                                                    onClick={() => {
+                                                                        setUnidadId(u.id!.toString());
+                                                                        setIsUnidadOpen(false);
+                                                                        setSearchUnidadTerm('');
+                                                                    }}
+                                                                >
+                                                                    <div className="fw-bold">{u.nombre}</div>
+                                                                </div>
+                                                            ))
+                                                        }
+                                                    </div>
+                                                    <div
+                                                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: -1 }}
+                                                        onClick={(e) => { e.stopPropagation(); setIsUnidadOpen(false); }}
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </Col>
+                                    <Col md="2">
+                                        <Label className="small fw-bold">Stock Mín.</Label>
+                                        <Input type="number" min="0" value={existenciaMinima} onChange={e => setExistenciaMinima(parseInt(e.target.value, 10))} bsSize="sm" />
+                                    </Col>
+                                    <Col md="2">
+                                        <Label className="small fw-bold">Cant. Comprada</Label>
+                                        <Input type="number" min="1" value={cantidad} onChange={e => setCantidad(parseInt(e.target.value, 10))} bsSize="sm" />
+                                    </Col>
+                                    <Col md="4">
+                                        <Label className="small fw-bold">Costo Unitario</Label>
+                                        <Input type="number" step="0.01" value={costoUnitario} onChange={e => setCostoUnitario(parseFloat(e.target.value))} bsSize="sm" />
+                                    </Col>
+                                    <Col md="4">
+                                        <Label className="small fw-bold">Precio (Venta)</Label>
+                                        <Input
+                                            type="number"
+                                            step="0.01"
+                                            value={precioVenta}
+                                            onChange={e => setPrecioVenta(parseFloat(e.target.value))}
+                                            bsSize="sm"
+                                            readOnly={!isAdmin}
+                                            className={!isAdmin ? 'bg-light text-muted' : ''}
+                                        />
+                                    </Col>
+                                    <Col md="4" className="d-flex align-items-end">
+                                        <Button color="success" block onClick={agregarDetalle} className="fw-bold btn-sm">
+                                            <FontAwesomeIcon icon={faPlus} className="me-1" /> Añadir a la Lista
+                                        </Button>
+                                    </Col>
+                                </Row>
+
+                                <Table responsive size="sm" hover className="mt-4 border">
+                                    <thead className="table-success small">
+                                        <tr>
+                                            <th>Código</th>
+                                            <th>Producto</th>
+                                            <th className="text-center">Cant.</th>
+                                            <th className="text-end">Costo</th>
+                                            {isAdmin && <th className="text-end">Monto</th>}
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {detalles.length > 0 ? (
+                                            detalles.map((d, index) => (
+                                                <tr key={index} className="align-middle">
+                                                    <td>{d.articulo?.codigo}</td>
+                                                    <td className="fw-bold">{d.articulo?.nombre}</td>
+                                                    <td className="text-center">{d.cantidad}</td>
+                                                    <td className="text-end">C$ {d.costoUnitario?.toLocaleString()}</td>
+                                                    {isAdmin && <td className="text-end fw-bold">C$ {d.monto?.toLocaleString()}</td>}
+                                                    <td className="text-center">
+                                                        <Button color="danger" size="sm" outline onClick={() => eliminarDetalle(index)}>
+                                                            <FontAwesomeIcon icon={faTrash} />
+                                                        </Button>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr><td colSpan={6} className="text-center py-3 text-muted">No hay productos en esta compra.</td></tr>
+                                        )}
+                                    </tbody>
+                                </Table>
+                            </CardBody>
+                        </Card>
+                    ) : (
+                        <Card className="shadow-sm border-0 mb-3 text-center p-5">
+                            <CardBody>
+                                <FontAwesomeIcon icon={faShoppingCart} size="4x" className="text-muted mb-4 opacity-25" />
+                                <h4 className="fw-bold">Acceso Limitado</h4>
+                                <p className="text-muted">
+                                    El registro de <strong>Nuevos Productos</strong> en el catálogo es una función exclusiva del Administrador.
+                                    <br />
+                                    Por favor use la opción de <strong>Actualizar Stock</strong> para productos ya existentes.
+                                </p>
+                                <Button color="primary" onClick={() => navigate('/bodeguero/ingresos/nuevo')}>
+                                    Ir a Actualizar Stock
+                                </Button>
+                            </CardBody>
+                        </Card>
+                    )}
                 </Col>
             </Row>
         </div>
