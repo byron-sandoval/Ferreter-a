@@ -52,7 +52,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                 display: 'flex',
                 justifyContent: 'space-between',
                 marginBottom: '15px',
-                borderBottom: '3px solid #fd7e14',
+                borderBottom: '3px solid #1a56db',
                 paddingBottom: '8px',
               }}
             >
@@ -65,7 +65,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                   />
                 )}
                 <div>
-                  <h1 style={{ margin: 0, fontSize: '28px', color: '#fd7e14', fontWeight: 'bold', letterSpacing: '0.5px' }}>
+                  <h1 style={{ margin: 0, fontSize: '28px', color: '#1a56db', fontWeight: 'bold', letterSpacing: '0.5px' }}>
                     {empresa?.nombre || 'FERRONICA'}
                   </h1>
                   <p style={{ margin: 0, fontSize: '13px', fontStyle: 'italic', color: '#666', fontWeight: '500' }}>
@@ -75,10 +75,10 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
               </div>
               <div style={{ textAlign: 'right', fontSize: '12.5px', color: '#444' }}>
                 <p style={{ margin: '0 0 2px 0', fontSize: '15px', fontWeight: 'bold' }}></p>
+                <p style={{ margin: '1px 0' }}><strong>Dir:</strong> {empresa?.direccion}</p>
                 <p style={{ margin: '1px 0' }}>
                   <strong>RUC:</strong> {empresa?.ruc || 'N/A'}
                 </p>
-                <p style={{ margin: '1px 0' }}>{empresa?.direccion}</p>
                 <p style={{ margin: '1px 0' }}>
                   <strong>Tel:</strong> {empresa?.telefono}
                 </p>
@@ -92,8 +92,9 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
             <div
               style={{
                 position: 'absolute',
-                top: '160px',
-                right: '50px',
+                top: '25%',
+                left: '50%',
+                transform: 'translateX(-50%) rotate(-22deg)',
                 border: '5px solid #28a745',
                 color: '#28a745',
                 padding: '8px 25px',
@@ -101,9 +102,9 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                 fontWeight: 'bold',
                 borderRadius: '12px',
                 opacity: 0.12,
-                transform: 'rotate(-22deg)',
                 zIndex: 0,
                 pointerEvents: 'none',
+                whiteSpace: 'nowrap',
               }}
             >
               PAGADO
@@ -116,7 +117,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                   style={{
                     fontSize: '15px',
                     marginBottom: '6px',
-                    color: '#fd7e14',
+                    color: '#1a56db',
                     borderBottom: '1px solid #eee',
                     display: 'inline-block',
                     paddingRight: '40px',
@@ -142,7 +143,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                   backgroundColor: '#fff',
                   padding: '10px',
                   borderRadius: '10px',
-                  border: '2px solid #fd7e14',
+                  border: '2px solid #1a56db',
                   minWidth: '220px',
                   boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
                 }}
@@ -152,7 +153,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px' }}>
                   <strong>Nº:</strong>
-                  <span style={{ color: '#fd7e14', fontWeight: 'bold' }}>#{ventaExitosa?.noFactura}</span>
+                  <span style={{ color: '#1a56db', fontWeight: 'bold' }}>{ventaExitosa?.noFactura}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px' }}>
                   <strong>FECHA:</strong>
@@ -169,7 +170,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
             <div style={{ position: 'relative', zIndex: 1, minHeight: '260px' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', border: '1.5px solid #ccc' }}>
                 <thead>
-                  <tr style={{ backgroundColor: '#fd7e14', color: '#fff' }}>
+                  <tr style={{ backgroundColor: '#1a56db', color: '#fff' }}>
                     <th
                       style={{
                         width: '45%',
@@ -212,22 +213,32 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {carrito.map((item, i) => (
-                    <tr key={i} style={{ borderBottom: '1.2px solid #ccc' }}>
-                      <td style={{ padding: '8px 15px', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
-                        <div style={{ fontWeight: 'bold' }}>{item.articulo.nombre}</div>
-                      </td>
-                      <td style={{ padding: '8px 15px', textAlign: 'center', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
-                        {item.cantidad}
-                      </td>
-                      <td style={{ padding: '8px 15px', textAlign: 'right', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
-                        C$ {item.articulo.precio?.toFixed(2)}
-                      </td>
-                      <td style={{ padding: '8px 15px', textAlign: 'right', fontSize: '12px', fontWeight: 'bold' }}>
-                        C$ {item.subtotal.toFixed(2)}
-                      </td>
-                    </tr>
-                  ))}
+                  <>
+                    {carrito.map((item, i) => (
+                      <tr key={i} style={{ borderBottom: '1.2px solid #ccc' }}>
+                        <td style={{ padding: '8px 15px', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
+                          <div style={{ fontWeight: 'bold' }}>{item.articulo.nombre}</div>
+                        </td>
+                        <td style={{ padding: '8px 15px', textAlign: 'center', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
+                          {item.cantidad}
+                        </td>
+                        <td style={{ padding: '8px 15px', textAlign: 'right', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
+                          C$ {item.articulo.precio?.toFixed(2)}
+                        </td>
+                        <td style={{ padding: '8px 15px', textAlign: 'right', fontSize: '12px', fontWeight: 'bold' }}>
+                          C$ {item.subtotal.toFixed(2)}
+                        </td>
+                      </tr>
+                    ))}
+                    {Array.from({ length: Math.max(0, 8 - carrito.length) }).map((_, i) => (
+                      <tr key={`empty-${i}`} style={{ borderBottom: '1.2px solid #ccc' }}>
+                        <td style={{ padding: '8px 15px', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>&nbsp;</td>
+                        <td style={{ padding: '8px 15px', borderRight: '1.2px solid #ccc' }}>&nbsp;</td>
+                        <td style={{ padding: '8px 15px', borderRight: '1.2px solid #ccc' }}>&nbsp;</td>
+                        <td style={{ padding: '8px 15px' }}>&nbsp;</td>
+                      </tr>
+                    ))}
+                  </>
                 </tbody>
               </table>
             </div>
@@ -313,7 +324,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                     C$ {ventaExitosa?.iva?.toFixed(2)}
                   </div>
                 </div>
-                <div style={{ display: 'flex', backgroundColor: '#fef3e7' }}>
+                <div style={{ display: 'flex', backgroundColor: '#e8f0fe' }}>
                   <div
                     style={{
                       width: '50%',
@@ -334,7 +345,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                       textAlign: 'right',
                       fontWeight: 'bold',
                       fontSize: '16px',
-                      color: '#fd7e14',
+                      color: '#1a56db',
                     }}
                   >
                     C$ {ventaExitosa?.total?.toFixed(2)}
