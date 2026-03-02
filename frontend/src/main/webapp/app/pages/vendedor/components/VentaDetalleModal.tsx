@@ -127,7 +127,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                 display: 'flex',
                 justifyContent: 'space-between',
                 marginBottom: '15px',
-                borderBottom: '3px solid #fd7e14',
+                borderBottom: '3px solid #1a56db',
                 paddingBottom: '8px',
               }}
             >
@@ -140,7 +140,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                   />
                 )}
                 <div>
-                  <h1 style={{ margin: 0, fontSize: '28px', color: '#fd7e14', fontWeight: 'bold', letterSpacing: '0.5px' }}>
+                  <h1 style={{ margin: 0, fontSize: '28px', color: '#1a56db', fontWeight: 'bold', letterSpacing: '0.5px' }}>
                     {empresa?.nombre || 'FERRONICA'}
                   </h1>
                   <p style={{ margin: 0, fontSize: '13px', fontStyle: 'italic', color: '#666', fontWeight: '500' }}>
@@ -150,10 +150,10 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
               </div>
               <div style={{ textAlign: 'right', fontSize: '12.5px', color: '#444' }}>
                 <p style={{ margin: '0 0 2px 0', fontSize: '15px', fontWeight: 'bold' }}></p>
+                <p style={{ margin: '1px 0' }}><strong>Dir:</strong> {empresa?.direccion}</p>
                 <p style={{ margin: '1px 0' }}>
                   <strong>RUC:</strong> {empresa?.ruc || 'N/A'}
                 </p>
-                <p style={{ margin: '1px 0' }}>{empresa?.direccion}</p>
                 <p style={{ margin: '1px 0' }}>
                   <strong>Tel:</strong> {empresa?.telefono}
                 </p>
@@ -167,8 +167,9 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
             <div
               style={{
                 position: 'absolute',
-                top: '160px',
-                right: '50px',
+                top: '25%',
+                left: '50%',
+                transform: 'translateX(-50%) rotate(-22deg)',
                 border: `5px solid ${venta.anulada ? '#dc3545' : '#28a745'}`,
                 color: venta.anulada ? '#dc3545' : '#28a745',
                 padding: '8px 25px',
@@ -176,9 +177,9 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                 fontWeight: 'bold',
                 borderRadius: '12px',
                 opacity: 0.15,
-                transform: 'rotate(-22deg)',
                 zIndex: 0,
                 pointerEvents: 'none',
+                whiteSpace: 'nowrap',
               }}
             >
               {venta.anulada ? 'ANULADA' : 'PAGADO'}
@@ -191,7 +192,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                   style={{
                     fontSize: '15px',
                     marginBottom: '6px',
-                    color: '#fd7e14',
+                    color: '#1a56db',
                     borderBottom: '1px solid #eee',
                     display: 'inline-block',
                     paddingRight: '40px',
@@ -215,7 +216,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                 </div>
               </div>
               <div
-                style={{ backgroundColor: '#fff', padding: '10px', borderRadius: '10px', border: '2px solid #fd7e14', minWidth: '220px' }}
+                style={{ backgroundColor: '#fff', padding: '10px', borderRadius: '10px', border: '2px solid #1a56db', minWidth: '220px' }}
               >
                 <div style={{ textAlign: 'center', marginBottom: '6px', borderBottom: '1px solid #eee', paddingBottom: '4px' }}>
                   <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase' }}>
@@ -224,7 +225,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px' }}>
                   <strong>Nº:</strong>
-                  <span style={{ color: '#fd7e14', fontWeight: 'bold' }}>#{venta.noFactura}</span>
+                  <span style={{ color: '#1a56db', fontWeight: 'bold' }}>{venta.noFactura}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px' }}>
                   <strong>FECHA:</strong>
@@ -241,7 +242,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
             <div style={{ position: 'relative', zIndex: 1, minHeight: '260px' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', border: '1.5px solid #ccc' }}>
                 <thead>
-                  <tr style={{ backgroundColor: '#fd7e14', color: '#fff' }}>
+                  <tr style={{ backgroundColor: '#1a56db', color: '#fff' }}>
                     <th
                       style={{
                         width: '45%',
@@ -279,7 +280,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                       Precio Unitario
                     </th>
                     <th style={{ width: '20%', padding: '10px 15px', textAlign: 'right', fontWeight: 'bold', fontSize: '12.5px' }}>
-                      Precio
+                      Total
                     </th>
                   </tr>
                 </thead>
@@ -291,22 +292,32 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                       </td>
                     </tr>
                   ) : (
-                    venta.detalles?.map((det, i) => (
-                      <tr key={i} style={{ borderBottom: '1.2px solid #ccc' }}>
-                        <td style={{ padding: '8px 15px', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
-                          <div style={{ fontWeight: 'bold' }}>{det.articulo?.nombre}</div>
-                        </td>
-                        <td style={{ padding: '8px 15px', textAlign: 'center', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
-                          {det.cantidad}
-                        </td>
-                        <td style={{ padding: '8px 15px', textAlign: 'right', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
-                          C$ {det.precioVenta?.toFixed(2)}
-                        </td>
-                        <td style={{ padding: '8px 15px', textAlign: 'right', fontSize: '12px', fontWeight: 'bold' }}>
-                          C$ {det.monto?.toFixed(2)}
-                        </td>
-                      </tr>
-                    ))
+                    <>
+                      {venta.detalles?.map((det, i) => (
+                        <tr key={i} style={{ borderBottom: '1.2px solid #ccc' }}>
+                          <td style={{ padding: '8px 15px', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
+                            <div style={{ fontWeight: 'bold' }}>{det.articulo?.nombre}</div>
+                          </td>
+                          <td style={{ padding: '8px 15px', textAlign: 'center', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
+                            {det.cantidad}
+                          </td>
+                          <td style={{ padding: '8px 15px', textAlign: 'right', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>
+                            C$ {det.precioVenta?.toFixed(2)}
+                          </td>
+                          <td style={{ padding: '8px 15px', textAlign: 'right', fontSize: '12px', fontWeight: 'bold' }}>
+                            C$ {det.monto?.toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
+                      {Array.from({ length: Math.max(0, 8 - (venta.detalles?.length || 0)) }).map((_, i) => (
+                        <tr key={`empty-${i}`} style={{ borderBottom: '1.2px solid #ccc' }}>
+                          <td style={{ padding: '8px 15px', fontSize: '12px', borderRight: '1.2px solid #ccc' }}>&nbsp;</td>
+                          <td style={{ padding: '8px 15px', borderRight: '1.2px solid #ccc' }}>&nbsp;</td>
+                          <td style={{ padding: '8px 15px', borderRight: '1.2px solid #ccc' }}>&nbsp;</td>
+                          <td style={{ padding: '8px 15px' }}>&nbsp;</td>
+                        </tr>
+                      ))}
+                    </>
                   )}
                 </tbody>
               </table>
@@ -393,7 +404,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                     C$ {venta.anulada ? '0.00' : venta.iva?.toFixed(2)}
                   </div>
                 </div>
-                <div style={{ display: 'flex', backgroundColor: venta.anulada ? '#f8d7da' : '#fef3e7' }}>
+                <div style={{ display: 'flex', backgroundColor: venta.anulada ? '#dbeafe' : '#e8f0fe' }}>
                   <div
                     style={{
                       width: '50%',
@@ -414,7 +425,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                       textAlign: 'right',
                       fontWeight: 'bold',
                       fontSize: '16px',
-                      color: venta.anulada ? '#dc3545' : '#fd7e14',
+                      color: venta.anulada ? '#dc3545' : '#1a56db',
                     }}
                   >
                     C$ {venta.anulada ? '0.00' : venta.total?.toFixed(2)}
