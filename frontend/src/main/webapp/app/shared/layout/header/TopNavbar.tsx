@@ -34,7 +34,7 @@ export const TopNavbar = () => {
   const account = useAppSelector(state => state.authentication.account);
   const isAdmin = hasAnyAuthority(account?.authorities || [], [AUTHORITIES.ADMIN]);
   const isVendedor = hasAnyAuthority(account?.authorities || [], [AUTHORITIES.VENDEDOR]);
-  const isBodeguero = hasAnyAuthority(account?.authorities || [], [AUTHORITIES.BODEGUERO]);
+  const isJefeBodega = hasAnyAuthority(account?.authorities || [], [AUTHORITIES.JEFE_BODEGA]);
   const location = useLocation();
 
   const isVentasActive = location.pathname === '/vendedor/historial-ventas' || location.pathname === '/admin/devoluciones';
@@ -92,7 +92,7 @@ export const TopNavbar = () => {
                 FerroNica
               </h4>
               <small className="text-white-50 d-block" style={{ fontSize: '0.65rem', marginTop: '-2px' }}>
-                {isAdmin ? 'Panel Administrativo' : isBodeguero ? 'Gestión de Almacén' : 'Punto de Venta'}
+                {isAdmin ? 'Panel Administrativo' : isJefeBodega ? 'Jefe de Bodega' : 'Punto de Venta'}
               </small>
             </div>
           </div>
@@ -163,7 +163,7 @@ export const TopNavbar = () => {
             )}
 
             {/* 5. Compras */}
-            {(isAdmin || isBodeguero) && (
+            {(isAdmin || isJefeBodega) && (
               <NavItem className="nav-link-item">
                 <NavLink tag={Link} to="/bodeguero/ingresos" style={navLinkStyle}>
                   <FontAwesomeIcon icon={faFileInvoice} size="sm" /> Compras
@@ -172,7 +172,7 @@ export const TopNavbar = () => {
             )}
 
             {/* 7. Productos */}
-            {(isAdmin || isBodeguero) && (
+            {(isAdmin || isJefeBodega) && (
               <NavItem className="nav-link-item">
                 <NavLink tag={Link} to="/admin/articulos" style={navLinkStyle}>
                   <FontAwesomeIcon icon={faBoxes} size="sm" /> Productos
@@ -199,7 +199,7 @@ export const TopNavbar = () => {
             )}
 
             {/* 10. Proveedores */}
-            {isAdmin && (
+            {(isAdmin || isJefeBodega) && (
               <NavItem className="nav-link-item">
                 <NavLink tag={Link} to="/admin/proveedores" style={navLinkStyle}>
                   <FontAwesomeIcon icon={faTruck} size="sm" /> Proveedores

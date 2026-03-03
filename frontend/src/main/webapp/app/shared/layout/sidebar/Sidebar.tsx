@@ -21,7 +21,7 @@ export const Sidebar = () => {
   const account = useAppSelector(state => state.authentication.account);
   const isAdmin = hasAnyAuthority(account?.authorities || [], [AUTHORITIES.ADMIN]);
   const isVendedor = hasAnyAuthority(account?.authorities || [], [AUTHORITIES.VENDEDOR]);
-  const isBodeguero = hasAnyAuthority(account?.authorities || [], [AUTHORITIES.BODEGUERO]);
+  const isJefeBodega = hasAnyAuthority(account?.authorities || [], [AUTHORITIES.JEFE_BODEGA]);
 
   const navLinkStyle = {
     color: '#bdc3c7',
@@ -83,12 +83,12 @@ export const Sidebar = () => {
           </>
         )}
 
-        {(isAdmin || isBodeguero) && (
+        {(isAdmin || isJefeBodega) && (
           <>
             <div className="sidebar-heading mt-4 mb-2 text-muted text-uppercase small px-3">Almacén</div>
             <NavItem>
               <NavLink tag={Link} to="/bodeguero" style={navLinkStyle}>
-                <FontAwesomeIcon icon={faWarehouse} className="me-3" /> Bodega
+                <FontAwesomeIcon icon={faWarehouse} className="me-3" /> Jefe de Bodega
               </NavLink>
             </NavItem>
             <NavItem>
