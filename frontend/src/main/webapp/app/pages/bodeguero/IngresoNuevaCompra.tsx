@@ -23,6 +23,8 @@ import UnidadMedidaService from 'app/services/unidad-medida.service';
 export const IngresoNuevaCompra = () => {
     const account = useAppSelector(state => state.authentication.account);
     const isAdmin = account?.authorities?.includes(AUTHORITIES.ADMIN);
+    const isJefeBodega = account?.authorities?.includes(AUTHORITIES.JEFE_BODEGA);
+    const isVendedor = account?.authorities?.includes(AUTHORITIES.VENDEDOR);
     const navigate = useNavigate();
     const [proveedores, setProveedores] = useState<IProveedor[]>([]);
     const [usuarioActual, setUsuarioActual] = useState<IUsuario | null>(null);
@@ -294,7 +296,7 @@ export const IngresoNuevaCompra = () => {
                 </Col>
 
                 <Col md="8">
-                    {isAdmin ? (
+                    {(isAdmin || isJefeBodega) ? (
                         <Card className="shadow-sm border-0 mb-3">
                             <CardBody>
                                 <h6 className="fw-bold border-bottom pb-2 text-success">

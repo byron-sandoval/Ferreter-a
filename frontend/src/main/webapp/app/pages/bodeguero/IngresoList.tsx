@@ -13,6 +13,7 @@ import { AUTHORITIES } from 'app/config/constants';
 export const IngresoList = () => {
   const account = useAppSelector(state => state.authentication.account);
   const isAdmin = account?.authorities?.includes(AUTHORITIES.ADMIN);
+  const isJefeBodega = account?.authorities?.includes(AUTHORITIES.JEFE_BODEGA);
   const navigate = useNavigate();
   const [ingresos, setIngresos] = useState<IIngreso[]>([]);
   const [loading, setLoading] = useState(false);
@@ -98,7 +99,7 @@ export const IngresoList = () => {
           <Button color="primary" size="sm" onClick={() => navigate('/bodeguero/ingresos/nuevo')} style={{ fontSize: '0.75rem' }} className="fw-bold">
             <FontAwesomeIcon icon={faPlus} className="me-1" /> ACTUALIZAR STOCK
           </Button>
-          {isAdmin && (
+          {(isAdmin || isJefeBodega) && (
             <Button color="success" size="sm" onClick={() => navigate('/bodeguero/ingresos/nueva-compra')} style={{ fontSize: '0.75rem' }} className="fw-bold">
               <FontAwesomeIcon icon={faShoppingCart} className="me-1" /> NUEVA COMPRA
             </Button>

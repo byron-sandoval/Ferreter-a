@@ -11,6 +11,7 @@ import { AUTHORITIES } from 'app/config/constants';
 
 export const ProveedorList = () => {
   const isAdmin = useAppSelector(state => state.authentication.account.authorities.includes(AUTHORITIES.ADMIN));
+  const isJefeBodega = useAppSelector(state => state.authentication.account.authorities.includes(AUTHORITIES.JEFE_BODEGA));
   const navigate = useNavigate();
   const [proveedores, setProveedores] = useState<IProveedor[]>([]);
   const [loading, setLoading] = useState(false);
@@ -92,9 +93,11 @@ export const ProveedorList = () => {
               Ver Inactivos
             </label>
           </div>
-          <Button color="primary" size="sm" onClick={() => navigate('/admin/proveedores/new')} style={{ fontSize: '0.75rem' }}>
-            <FontAwesomeIcon icon={faPlus} className="me-1" /> Nuevo
-          </Button>
+          {isAdmin && (
+            <Button color="primary" size="sm" onClick={() => navigate('/admin/proveedores/new')} style={{ fontSize: '0.75rem' }}>
+              <FontAwesomeIcon icon={faPlus} className="me-1" /> Nuevo
+            </Button>
+          )}
         </div>
       </div>
 
@@ -128,15 +131,17 @@ export const ProveedorList = () => {
                     </Badge>
                   </td>
                   <td className="px-3">
-                    <Button
-                      size="sm"
-                      color="info"
-                      outline
-                      className="p-1 me-1"
-                      onClick={() => p.id && navigate(`/admin/proveedores/${p.id}/edit`)}
-                    >
-                      <FontAwesomeIcon icon={faPencilAlt} fixedWidth />
-                    </Button>
+                    {isAdmin && (
+                      <Button
+                        size="sm"
+                        color="info"
+                        outline
+                        className="p-1 me-1"
+                        onClick={() => p.id && navigate(`/admin/proveedores/${p.id}/edit`)}
+                      >
+                        <FontAwesomeIcon icon={faPencilAlt} fixedWidth />
+                      </Button>
+                    )}
                     {isAdmin && (
                       <Button
                         size="sm"
