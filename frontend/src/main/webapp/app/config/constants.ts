@@ -2,7 +2,7 @@ export const AUTHORITIES = {
   ADMIN: 'ROLE_ADMIN',
   USER: 'ROLE_USER',
   VENDEDOR: 'ROLE_VENDEDOR',
-  BODEGUERO: 'ROLE_BODEGUERO',
+  JEFE_BODEGA: 'ROLE_JEFE_BODEGA',
 };
 
 export const messages = {

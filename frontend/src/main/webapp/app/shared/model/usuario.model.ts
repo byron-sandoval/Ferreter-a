@@ -9,7 +9,7 @@ export interface IUsuario {
   username?: string;
   email?: string;
   password?: string;
-  rol?: string; // 'ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR'
+  rol?: string; // 'ROLE_ADMIN', 'ROLE_JEFE_BODEGA', 'ROLE_VENDEDOR'
 }
 
 export const defaultUsuario: Readonly<IUsuario> = {
