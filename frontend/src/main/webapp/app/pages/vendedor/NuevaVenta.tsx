@@ -116,11 +116,19 @@ export const NuevaVenta = () => {
       }
 
       if (res.data.length > 0) {
-        const c = res.data[0];
+        // Filtrar solo los activos para la venta
+        const clientesActivos = res.data.filter(cli => cli.activo !== false);
+
+        if (clientesActivos.length === 0) {
+          toast.error('El cliente encontrado está DESACTIVADO.');
+          return;
+        }
+
+        const c = clientesActivos[0];
         setCliente(c);
 
-        if (res.data.length > 1) {
-          toast.info(`Se encontraron ${res.data.length} coincidencias. Se seleccionó: ${c.nombre}.`);
+        if (clientesActivos.length > 1) {
+          toast.info(`Se encontraron ${clientesActivos.length} coincidencias activas. Se seleccionó: ${c.nombre}.`);
         } else {
           if ((c.saldo || 0) > 0) {
             toast.warning(`Atención: El cliente ${c.nombre} tiene un saldo pendiente de C$ ${c.saldo?.toFixed(2)}`, { autoClose: 5000 });
