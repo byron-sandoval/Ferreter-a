@@ -208,7 +208,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                       Precio Unitario
                     </th>
                     <th style={{ width: '20%', padding: '10px 15px', textAlign: 'right', fontWeight: 'bold', fontSize: '12.5px' }}>
-                      Precio
+                      Total
                     </th>
                   </tr>
                 </thead>
