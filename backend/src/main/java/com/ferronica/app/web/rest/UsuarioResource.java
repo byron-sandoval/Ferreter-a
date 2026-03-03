@@ -157,7 +157,7 @@ public class UsuarioResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
      *         of usuarios in body.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_VENDEDOR')")
     @GetMapping("")
     public ResponseEntity<List<UsuarioDTO>> getAllUsuarios(
             @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
@@ -175,7 +175,7 @@ public class UsuarioResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
      *         the usuarioDTO, or with status {@code 404 (Not Found)}.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_VENDEDOR')")
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioDTO> getUsuario(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Usuario : {}", id);

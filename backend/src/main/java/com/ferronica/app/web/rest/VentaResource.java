@@ -167,7 +167,7 @@ public class VentaResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
      *         of ventas in body.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_VENDEDOR')")
     @GetMapping("")
     public ResponseEntity<List<VentaDTO>> getAllVentas(
             VentaCriteria criteria,
@@ -187,7 +187,7 @@ public class VentaResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count
      *         in body.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_VENDEDOR')")
     @GetMapping("/count")
     public ResponseEntity<Long> countVentas(VentaCriteria criteria) {
         LOG.debug("REST request to count Ventas by criteria: {}", criteria);
@@ -202,7 +202,7 @@ public class VentaResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
      *         the ventaDTO, or with status {@code 404 (Not Found)}.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_VENDEDOR')")
     @GetMapping("/{id}")
     public ResponseEntity<VentaDTO> getVenta(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Venta : {}", id);

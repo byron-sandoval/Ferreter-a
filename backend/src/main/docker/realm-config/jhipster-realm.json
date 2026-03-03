@@ -77,8 +77,8 @@
       },
       {
         "id": "1e5c4a6b-2525-4c02-b06d-445856417590",
-        "name": "ROLE_BODEGUERO",
-        "description": "Encargado de Inventario",
+        "name": "ROLE_JEFE_BODEGA",
+        "description": "Jefe de Bodega",
         "composite": false,
         "clientRole": false,
         "containerId": "jhipster",
@@ -2515,7 +2515,7 @@
       "disableableCredentialTypes": [],
       "requiredActions": [],
       "realmRoles": [
-        "ROLE_BODEGUERO",
+        "ROLE_JEFE_BODEGA",
         "offline_access",
         "uma_authorization"
       ],

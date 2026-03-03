@@ -155,7 +155,7 @@ public class HistorialPrecioResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
      *         of historialPrecios in body.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("")
     public List<HistorialPrecioDTO> getAllHistorialPrecios(@RequestParam(required = false) Long articuloId) {
         LOG.debug("REST request to get all HistorialPrecios");
@@ -172,7 +172,7 @@ public class HistorialPrecioResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
      *         the historialPrecioDTO, or with status {@code 404 (Not Found)}.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<HistorialPrecioDTO> getHistorialPrecio(@PathVariable("id") Long id) {
         LOG.debug("REST request to get HistorialPrecio : {}", id);

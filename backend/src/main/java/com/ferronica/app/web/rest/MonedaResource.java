@@ -148,7 +148,7 @@ public class MonedaResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
      *         of monedas in body.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA', 'ROLE_VENDEDOR')")
     @GetMapping("")
     public List<MonedaDTO> getAllMonedas() {
         LOG.debug("REST request to get all Monedas");
@@ -162,7 +162,7 @@ public class MonedaResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
      *         the monedaDTO, or with status {@code 404 (Not Found)}.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA', 'ROLE_VENDEDOR')")
     @GetMapping("/{id}")
     public ResponseEntity<MonedaDTO> getMoneda(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Moneda : {}", id);
