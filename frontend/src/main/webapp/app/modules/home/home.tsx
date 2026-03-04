@@ -35,7 +35,7 @@ export const Home = () => {
     return <Navigate to="/vendedor" replace />;
   }
 
-  if (account.authorities?.includes(AUTHORITIES.BODEGUERO)) {
+  if (account.authorities?.includes(AUTHORITIES.JEFE_BODEGA)) {
     return <Navigate to="/bodeguero" replace />;
   }
 

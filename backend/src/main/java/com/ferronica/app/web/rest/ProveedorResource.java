@@ -57,7 +57,7 @@ public class ProveedorResource {
      *         if the proveedor has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PostMapping("")
     public ResponseEntity<ProveedorDTO> createProveedor(@Valid @RequestBody ProveedorDTO proveedorDTO)
             throws URISyntaxException {
@@ -85,7 +85,7 @@ public class ProveedorResource {
      *         proveedorDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ProveedorDTO> updateProveedor(
             @PathVariable(value = "id", required = false) final Long id,
@@ -125,7 +125,7 @@ public class ProveedorResource {
      *         proveedorDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<ProveedorDTO> partialUpdateProveedor(
             @PathVariable(value = "id", required = false) final Long id,
@@ -157,7 +157,7 @@ public class ProveedorResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
      *         of proveedors in body.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA')")
     @GetMapping("")
     public ResponseEntity<List<ProveedorDTO>> getAllProveedors(
             @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
@@ -175,7 +175,7 @@ public class ProveedorResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
      *         the proveedorDTO, or with status {@code 404 (Not Found)}.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA')")
     @GetMapping("/{id}")
     public ResponseEntity<ProveedorDTO> getProveedor(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Proveedor : {}", id);

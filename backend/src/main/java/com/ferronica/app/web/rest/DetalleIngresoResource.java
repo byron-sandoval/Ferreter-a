@@ -53,7 +53,7 @@ public class DetalleIngresoResource {
      *         {@code 400 (Bad Request)} if the detalleIngreso has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA')")
     @PostMapping("")
     public ResponseEntity<DetalleIngresoDTO> createDetalleIngreso(
             @Valid @RequestBody DetalleIngresoDTO detalleIngresoDTO)
@@ -83,7 +83,7 @@ public class DetalleIngresoResource {
      *         detalleIngresoDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA')")
     @PutMapping("/{id}")
     public ResponseEntity<DetalleIngresoDTO> updateDetalleIngreso(
             @PathVariable(value = "id", required = false) final Long id,
@@ -123,7 +123,7 @@ public class DetalleIngresoResource {
      *         detalleIngresoDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA')")
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<DetalleIngresoDTO> partialUpdateDetalleIngreso(
             @PathVariable(value = "id", required = false) final Long id,
@@ -154,7 +154,7 @@ public class DetalleIngresoResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
      *         of detalleIngresos in body.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA')")
     @GetMapping("")
     public List<DetalleIngresoDTO> getAllDetalleIngresos() {
         LOG.debug("REST request to get all DetalleIngresos");
@@ -168,7 +168,7 @@ public class DetalleIngresoResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
      *         the detalleIngresoDTO, or with status {@code 404 (Not Found)}.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA')")
     @GetMapping("/{id}")
     public ResponseEntity<DetalleIngresoDTO> getDetalleIngreso(@PathVariable("id") Long id) {
         LOG.debug("REST request to get DetalleIngreso : {}", id);

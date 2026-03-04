@@ -53,7 +53,7 @@ public class UnidadMedidaResource {
      *         {@code 400 (Bad Request)} if the unidadMedida has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PostMapping("")
     public ResponseEntity<UnidadMedidaDTO> createUnidadMedida(@Valid @RequestBody UnidadMedidaDTO unidadMedidaDTO)
             throws URISyntaxException {
@@ -81,7 +81,7 @@ public class UnidadMedidaResource {
      *         unidadMedidaDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<UnidadMedidaDTO> updateUnidadMedida(
             @PathVariable(value = "id", required = false) final Long id,
@@ -121,7 +121,7 @@ public class UnidadMedidaResource {
      *         unidadMedidaDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<UnidadMedidaDTO> partialUpdateUnidadMedida(
             @PathVariable(value = "id", required = false) final Long id,
@@ -152,7 +152,7 @@ public class UnidadMedidaResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
      *         of unidadMedidas in body.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA', 'ROLE_VENDEDOR')")
     @GetMapping("")
     public List<UnidadMedidaDTO> getAllUnidadMedidas() {
         LOG.debug("REST request to get all UnidadMedidas");
@@ -166,7 +166,7 @@ public class UnidadMedidaResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
      *         the unidadMedidaDTO, or with status {@code 404 (Not Found)}.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA', 'ROLE_VENDEDOR')")
     @GetMapping("/{id}")
     public ResponseEntity<UnidadMedidaDTO> getUnidadMedida(@PathVariable("id") Long id) {
         LOG.debug("REST request to get UnidadMedida : {}", id);

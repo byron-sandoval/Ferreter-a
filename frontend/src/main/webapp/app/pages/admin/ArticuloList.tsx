@@ -31,6 +31,7 @@ import autoTable from 'jspdf-autotable';
 
 export const ArticuloList = () => {
   const isAdmin = useAppSelector(state => state.authentication.account.authorities.includes(AUTHORITIES.ADMIN));
+  const isJefeBodega = useAppSelector(state => state.authentication.account.authorities.includes(AUTHORITIES.JEFE_BODEGA));
   const [articulos, setArticulos] = useState<IArticulo[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
@@ -413,18 +414,28 @@ export const ArticuloList = () => {
                   currentItems.map(articulo => {
                     const hasStock = (articulo.existencia || 0) > 0;
                     const isLowStock = (articulo.existencia || 0) <= (articulo.existenciaMinima || 0);
+                    const missingPrice = (articulo.precio || 0) <= 0;
                     const stockBg = !hasStock ? '#ff0000' : isLowStock ? '#ffc107' : '#00a000';
                     const isSelected = selectedArticulo?.id === articulo.id;
+
+                    const rowStyle = isSelected ? rowSelectedStyle : {};
 
                     return (
                       <tr
                         key={articulo.id}
-                        style={isSelected ? rowSelectedStyle : {}}
+                        style={rowStyle}
                         className={`text-center ${!articulo.activo ? 'text-muted' : ''}`}
                       >
                         <td className="fw-bold text-primary">{articulo.id}</td>
                         <td>{articulo.codigo}</td>
-                        <td className="text-start">{articulo.nombre}</td>
+                        <td className="text-start">
+                          <div className="fw-bold">{articulo.nombre}</div>
+                          {missingPrice && (
+                            <Badge color="warning" className="text-dark small py-0 px-1" style={{ fontSize: '0.6rem' }}>
+                              PRECIO PENDIENTE
+                            </Badge>
+                          )}
+                        </td>
                         <td>
                           <Badge
                             color={articulo.activo ? 'light' : 'danger'}
@@ -461,7 +472,7 @@ export const ArticuloList = () => {
                             >
                               <FontAwesomeIcon icon={faEye} />
                             </Button>
-                            {isAdmin && (
+                            {(isAdmin || isJefeBodega) && (
                               <Button
                                 size="sm"
                                 color="warning"

@@ -264,7 +264,7 @@ export const UsuarioUpdate = () => {
                           disabled={!isNew && (account?.login === usuario.username || account?.email === usuario.email)}
                         >
                           <option value="ROLE_VENDEDOR">Vendedor</option>
-                          <option value="ROLE_BODEGUERO">Bodeguero</option>
+                          <option value="ROLE_JEFE_BODEGA">Jefe de Bodega</option>
                           <option value="ROLE_ADMIN">Administrador</option>
                         </Input>
                         {!isNew && (account?.login === usuario.username || account?.email === usuario.email) && (

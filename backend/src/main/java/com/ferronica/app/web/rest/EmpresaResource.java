@@ -150,7 +150,7 @@ public class EmpresaResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
      *         of empresas in body.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_VENDEDOR')")
     @GetMapping("")
     public List<EmpresaDTO> getAllEmpresas() {
         LOG.debug("REST request to get all Empresas");
@@ -164,7 +164,7 @@ public class EmpresaResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
      *         the empresaDTO, or with status {@code 404 (Not Found)}.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_VENDEDOR')")
     @GetMapping("/{id}")
     public ResponseEntity<EmpresaDTO> getEmpresa(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Empresa : {}", id);

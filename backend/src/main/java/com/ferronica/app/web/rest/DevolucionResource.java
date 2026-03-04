@@ -151,7 +151,7 @@ public class DevolucionResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
      *         of devolucions in body.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_VENDEDOR')")
     @GetMapping("")
     public List<DevolucionDTO> getAllDevolucions() {
         LOG.debug("REST request to get all Devolucions");
@@ -165,7 +165,7 @@ public class DevolucionResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
      *         the devolucionDTO, or with status {@code 404 (Not Found)}.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_VENDEDOR')")
     @GetMapping("/{id}")
     public ResponseEntity<DevolucionDTO> getDevolucion(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Devolucion : {}", id);
@@ -196,7 +196,7 @@ public class DevolucionResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
      *         of devolucions in body.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_VENDEDOR')")
     @GetMapping("/venta/{ventaId}")
     public List<DevolucionDTO> getAllByVenta(@PathVariable("ventaId") Long ventaId) {
         LOG.debug("REST request to get Devolucions by Venta : {}", ventaId);

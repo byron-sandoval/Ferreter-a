@@ -57,7 +57,7 @@ public class CategoriaResource {
      *         if the categoria has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PostMapping("")
     public ResponseEntity<CategoriaDTO> createCategoria(@Valid @RequestBody CategoriaDTO categoriaDTO)
             throws URISyntaxException {
@@ -85,7 +85,7 @@ public class CategoriaResource {
      *         categoriaDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<CategoriaDTO> updateCategoria(
             @PathVariable(value = "id", required = false) final Long id,
@@ -125,7 +125,7 @@ public class CategoriaResource {
      *         categoriaDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<CategoriaDTO> partialUpdateCategoria(
             @PathVariable(value = "id", required = false) final Long id,
@@ -157,7 +157,7 @@ public class CategoriaResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
      *         of categorias in body.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA', 'ROLE_VENDEDOR')")
     @GetMapping("")
     public ResponseEntity<List<CategoriaDTO>> getAllCategorias(
             @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
@@ -175,7 +175,7 @@ public class CategoriaResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
      *         the categoriaDTO, or with status {@code 404 (Not Found)}.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA', 'ROLE_VENDEDOR')")
     @GetMapping("/{id}")
     public ResponseEntity<CategoriaDTO> getCategoria(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Categoria : {}", id);

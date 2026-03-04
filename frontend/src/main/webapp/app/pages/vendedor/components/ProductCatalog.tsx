@@ -93,7 +93,7 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
 
               const matchesCategory = categoriaFiltro === 'todas' || p.categoria?.nombre === categoriaFiltro;
               const categoryIsActive = p.categoria ? p.categoria.activo !== false : true;
-              return p.activo !== false && categoryIsActive && matchesSearch && matchesCategory;
+              return p.activo !== false && categoryIsActive && matchesSearch && matchesCategory && (p.precio || 0) > 0;
             })
             .map(prod => (
               <Col md="3" key={prod.id}>

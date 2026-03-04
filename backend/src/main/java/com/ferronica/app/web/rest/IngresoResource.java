@@ -47,7 +47,8 @@ public class IngresoResource {
 
     private final IngresoQueryService ingresoQueryService;
 
-    public IngresoResource(IngresoService ingresoService, IngresoRepository ingresoRepository, IngresoQueryService ingresoQueryService) {
+    public IngresoResource(IngresoService ingresoService, IngresoRepository ingresoRepository,
+            IngresoQueryService ingresoQueryService) {
         this.ingresoService = ingresoService;
         this.ingresoRepository = ingresoRepository;
         this.ingresoQueryService = ingresoQueryService;
@@ -57,38 +58,44 @@ public class IngresoResource {
      * {@code POST  /ingresos} : Create a new ingreso.
      *
      * @param ingresoDTO the ingresoDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new ingresoDTO, or with status {@code 400 (Bad Request)} if the ingreso has already an ID.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with
+     *         body the new ingresoDTO, or with status {@code 400 (Bad Request)} if
+     *         the ingreso has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-                @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA')")
     @PostMapping("")
-    public ResponseEntity<IngresoDTO> createIngreso(@Valid @RequestBody IngresoDTO ingresoDTO) throws URISyntaxException {
+    public ResponseEntity<IngresoDTO> createIngreso(@Valid @RequestBody IngresoDTO ingresoDTO)
+            throws URISyntaxException {
         LOG.debug("REST request to save Ingreso : {}", ingresoDTO);
         if (ingresoDTO.getId() != null) {
             throw new BadRequestAlertException("A new ingreso cannot already have an ID", ENTITY_NAME, "idexists");
         }
         ingresoDTO = ingresoService.save(ingresoDTO);
         return ResponseEntity.created(new URI("/api/ingresos/" + ingresoDTO.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, ingresoDTO.getId().toString()))
-            .body(ingresoDTO);
+                .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME,
+                        ingresoDTO.getId().toString()))
+                .body(ingresoDTO);
     }
 
     /**
      * {@code PUT  /ingresos/:id} : Updates an existing ingreso.
      *
-     * @param id the id of the ingresoDTO to save.
+     * @param id         the id of the ingresoDTO to save.
      * @param ingresoDTO the ingresoDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated ingresoDTO,
-     * or with status {@code 400 (Bad Request)} if the ingresoDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the ingresoDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated ingresoDTO,
+     *         or with status {@code 400 (Bad Request)} if the ingresoDTO is not
+     *         valid,
+     *         or with status {@code 500 (Internal Server Error)} if the ingresoDTO
+     *         couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-                @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA')")
     @PutMapping("/{id}")
     public ResponseEntity<IngresoDTO> updateIngreso(
-        @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody IngresoDTO ingresoDTO
-    ) throws URISyntaxException {
+            @PathVariable(value = "id", required = false) final Long id,
+            @Valid @RequestBody IngresoDTO ingresoDTO) throws URISyntaxException {
         LOG.debug("REST request to update Ingreso : {}, {}", id, ingresoDTO);
         if (ingresoDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -103,27 +110,32 @@ public class IngresoResource {
 
         ingresoDTO = ingresoService.update(ingresoDTO);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, ingresoDTO.getId().toString()))
-            .body(ingresoDTO);
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME,
+                        ingresoDTO.getId().toString()))
+                .body(ingresoDTO);
     }
 
     /**
-     * {@code PATCH  /ingresos/:id} : Partial updates given fields of an existing ingreso, field will ignore if it is null
+     * {@code PATCH  /ingresos/:id} : Partial updates given fields of an existing
+     * ingreso, field will ignore if it is null
      *
-     * @param id the id of the ingresoDTO to save.
+     * @param id         the id of the ingresoDTO to save.
      * @param ingresoDTO the ingresoDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated ingresoDTO,
-     * or with status {@code 400 (Bad Request)} if the ingresoDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the ingresoDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the ingresoDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated ingresoDTO,
+     *         or with status {@code 400 (Bad Request)} if the ingresoDTO is not
+     *         valid,
+     *         or with status {@code 404 (Not Found)} if the ingresoDTO is not
+     *         found,
+     *         or with status {@code 500 (Internal Server Error)} if the ingresoDTO
+     *         couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-                @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA')")
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<IngresoDTO> partialUpdateIngreso(
-        @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody IngresoDTO ingresoDTO
-    ) throws URISyntaxException {
+            @PathVariable(value = "id", required = false) final Long id,
+            @NotNull @RequestBody IngresoDTO ingresoDTO) throws URISyntaxException {
         LOG.debug("REST request to partial update Ingreso partially : {}, {}", id, ingresoDTO);
         if (ingresoDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -139,9 +151,8 @@ public class IngresoResource {
         Optional<IngresoDTO> result = ingresoService.partialUpdate(ingresoDTO);
 
         return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, ingresoDTO.getId().toString())
-        );
+                result,
+                HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, ingresoDTO.getId().toString()));
     }
 
     /**
@@ -149,18 +160,19 @@ public class IngresoResource {
      *
      * @param pageable the pagination information.
      * @param criteria the criteria which the requested entities should match.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of ingresos in body.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
+     *         of ingresos in body.
      */
-                @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA')")
     @GetMapping("")
     public ResponseEntity<List<IngresoDTO>> getAllIngresos(
-        IngresoCriteria criteria,
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable
-    ) {
+            IngresoCriteria criteria,
+            @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         LOG.debug("REST request to get Ingresos by criteria: {}", criteria);
 
         Page<IngresoDTO> page = ingresoQueryService.findByCriteria(criteria, pageable);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        HttpHeaders headers = PaginationUtil
+                .generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
@@ -168,9 +180,10 @@ public class IngresoResource {
      * {@code GET  /ingresos/count} : count all the ingresos.
      *
      * @param criteria the criteria which the requested entities should match.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count
+     *         in body.
      */
-                @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA')")
     @GetMapping("/count")
     public ResponseEntity<Long> countIngresos(IngresoCriteria criteria) {
         LOG.debug("REST request to count Ingresos by criteria: {}", criteria);
@@ -181,9 +194,10 @@ public class IngresoResource {
      * {@code GET  /ingresos/:id} : get the "id" ingreso.
      *
      * @param id the id of the ingresoDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the ingresoDTO, or with status {@code 404 (Not Found)}.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the ingresoDTO, or with status {@code 404 (Not Found)}.
      */
-                @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA')")
     @GetMapping("/{id}")
     public ResponseEntity<IngresoDTO> getIngreso(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Ingreso : {}", id);
@@ -197,13 +211,13 @@ public class IngresoResource {
      * @param id the id of the ingresoDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-            @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteIngreso(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Ingreso : {}", id);
         ingresoService.delete(id);
         return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-            .build();
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+                .build();
     }
 }
