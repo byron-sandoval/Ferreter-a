@@ -96,12 +96,9 @@ export const IngresoList = () => {
               <FontAwesomeIcon icon={faSearch} size="sm" />
             </span>
           </div>
-          <Button color="primary" size="sm" onClick={() => navigate('/bodeguero/ingresos/nuevo')} style={{ fontSize: '0.75rem' }} className="fw-bold">
-            <FontAwesomeIcon icon={faPlus} className="me-1" /> ACTUALIZAR STOCK
-          </Button>
           {(isAdmin || isJefeBodega) && (
-            <Button color="success" size="sm" onClick={() => navigate('/bodeguero/ingresos/nueva-compra')} style={{ fontSize: '0.75rem' }} className="fw-bold">
-              <FontAwesomeIcon icon={faShoppingCart} className="me-1" /> NUEVA COMPRA
+            <Button color="success" size="sm" onClick={() => navigate('/bodeguero/ingresos/nueva-compra')} style={{ fontSize: '0.75rem' }} className="fw-bold px-3">
+              <FontAwesomeIcon icon={faPlus} className="me-1" /> NUEVA COMPRA
             </Button>
           )}
         </div>
@@ -198,10 +195,13 @@ export const IngresoList = () => {
               </small>
             </div>
             <div className="text-end">
-              <Label className="text-muted small text-uppercase fw-bold mb-0">Fecha / Responsable</Label>
-              <div className="fw-bold">{dayjs(ingresoSeleccionado?.fecha).format('DD/MM/YYYY')}</div>
-              <div className="small text-muted">@{ingresoSeleccionado?.usuario?.username}</div>
-              <Badge color={ingresoSeleccionado?.activo ? 'success' : 'danger'} className="mt-1">
+              <Label className="text-muted small text-uppercase fw-bold mb-0">Fecha de Compra</Label>
+              <div className="fw-bold text-dark">{dayjs(ingresoSeleccionado?.fecha).format('DD/MM/YYYY')}</div>
+              <div className="small mt-1">
+                <span className="text-muted">Gestionado por:</span>{' '}
+                <span className="fw-bold text-dark">{ingresoSeleccionado?.usuario?.username}</span>
+              </div>
+              <Badge color={ingresoSeleccionado?.activo ? 'success' : 'danger'} className="mt-2 shadow-sm border-0" style={{ fontSize: '0.7rem' }}>
                 {ingresoSeleccionado?.activo ? 'Procesado' : 'Anulado'}
               </Badge>
             </div>
