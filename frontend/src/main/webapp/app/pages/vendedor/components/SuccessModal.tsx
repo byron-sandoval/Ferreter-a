@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Modal, ModalHeader, ModalBody, Button } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faPrint, faFileAlt, faReceipt } from '@fortawesome/free-solid-svg-icons';
 import dayjs from 'dayjs';
 import { IVenta } from 'app/shared/model/venta.model';
 import { IEmpresa } from 'app/shared/model/empresa.model';
@@ -10,7 +10,9 @@ interface ISuccessModalProps {
   ventaExitosa: IVenta | null;
   finalizarVentaYLimpiar: () => void;
   handlePrint: () => void;
+  handlePrintTicket: () => void;
   componentRef: React.RefObject<any>;
+  ticketRef: React.RefObject<any>;
   carrito: any[];
   empresa: IEmpresa | null;
 }
@@ -19,10 +21,13 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
   ventaExitosa,
   finalizarVentaYLimpiar,
   handlePrint,
+  handlePrintTicket,
   componentRef,
+  ticketRef,
   carrito,
   empresa,
 }) => {
+  const [formatoImpresion, setFormatoImpresion] = useState<'a4' | 'ticket'>('a4');
   return (
     <Modal isOpen={!!ventaExitosa} toggle={finalizarVentaYLimpiar} centered size="sm">
       <ModalHeader className="bg-success text-white border-0 py-3">
@@ -88,27 +93,6 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
               </div>
             </div>
 
-            {/* Paid Stamp effect - Balanced */}
-            <div
-              style={{
-                position: 'absolute',
-                top: '25%',
-                left: '50%',
-                transform: 'translateX(-50%) rotate(-22deg)',
-                border: '5px solid #28a745',
-                color: '#28a745',
-                padding: '8px 25px',
-                fontSize: '40px',
-                fontWeight: 'bold',
-                borderRadius: '12px',
-                opacity: 0.12,
-                zIndex: 0,
-                pointerEvents: 'none',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              PAGADO
-            </div>
 
             {/* Invoice Info Section - Balanced */}
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', position: 'relative', zIndex: 1 }}>
@@ -365,10 +349,141 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
           </div>
         </div>
 
+        {/* TICKET TERMICO 80mm (OCULTO EN PANTALLA) */}
+        <div style={{ display: 'none' }}>
+          <div
+            ref={ticketRef}
+            style={{
+              width: '280px',
+              fontFamily: "'Courier New', monospace",
+              fontSize: '11px',
+              color: '#000',
+              padding: '8px',
+              backgroundColor: '#fff',
+            }}
+          >
+            {/* Cabecera */}
+            <div style={{ textAlign: 'center', marginBottom: '6px' }}>
+              {empresa?.logo && (
+                <img
+                  src={`data:${empresa.logoContentType};base64,${empresa.logo}`}
+                  alt="logo"
+                  style={{
+                    maxHeight: '60px',
+                    maxWidth: '200px',
+                    display: 'block',
+                    margin: '0 auto 6px auto',
+                    filter: 'grayscale(100%)',
+                    objectFit: 'contain',
+                  }}
+                />
+              )}
+              <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{empresa?.nombre || 'FERRONICA'}</div>
+              <div style={{ fontSize: '10px' }}>{empresa?.direccion}</div>
+              <div style={{ fontSize: '10px' }}>Tel: {empresa?.telefono} | RUC: {empresa?.ruc}</div>
+            </div>
+            <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }} />
+            <div style={{ textAlign: 'center', fontSize: '10px', marginBottom: '4px' }}>
+              <strong>FACTURA #{ventaExitosa?.noFactura}</strong>
+              <div>{dayjs(ventaExitosa?.fecha).format('DD/MM/YYYY HH:mm')}</div>
+              <div>Vendedor: {ventaExitosa?.usuario?.nombre || 'Admin'}</div>
+            </div>
+            <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }} />
+            {/* Cliente */}
+            <div style={{ marginBottom: '4px', fontSize: '10px' }}>
+              <strong>Cliente:</strong> {ventaExitosa?.cliente?.nombre}
+              <div><strong>Cédula:</strong> {ventaExitosa?.cliente?.cedula}</div>
+            </div>
+            <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }} />
+            {/* Items */}
+            <div style={{ marginBottom: '4px' }}>
+              {carrito.map((item, i) => (
+                <div key={i} style={{ marginBottom: '3px' }}>
+                  <div style={{ fontWeight: 'bold', fontSize: '11px' }}>{item.articulo.nombre}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px' }}>
+                    <span>{item.cantidad} x C$ {item.articulo.precio?.toFixed(2)}</span>
+                    <span><strong>C$ {item.subtotal.toFixed(2)}</strong></span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }} />
+            {/* Totales */}
+            <div style={{ fontSize: '11px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Subtotal:</span><span>C$ {ventaExitosa?.subtotal?.toFixed(2)}</span>
+              </div>
+              {(ventaExitosa?.descuento || 0) > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Descuento:</span><span>- C$ {ventaExitosa?.descuento?.toFixed(2)}</span>
+                </div>
+              )}
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>IVA (15%):</span><span>C$ {ventaExitosa?.iva?.toFixed(2)}</span>
+              </div>
+            </div>
+            <div style={{ borderTop: '2px solid #000', margin: '4px 0' }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '13px' }}>
+              <span>TOTAL:</span><span>C$ {ventaExitosa?.total?.toFixed(2)}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', marginTop: '2px' }}>
+              <span>Recibido: C$ {ventaExitosa?.importeRecibido?.toFixed(2)}</span>
+              <span>Cambio: C$ {ventaExitosa?.cambio?.toFixed(2)}</span>
+            </div>
+            <div style={{ borderTop: '1px dashed #000', margin: '8px 0 4px' }} />
+            <div style={{ textAlign: 'center', fontSize: '10px' }}>
+              <div>¡Gracias por su compra!</div>
+              <div>Cambios solo con factura en 24 hrs.</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Botones de impresión */}
         <div className="d-grid gap-2 mt-4">
-          <Button color="primary" className="fw-bold py-2 shadow-sm" onClick={() => handlePrint()}>
-            <FontAwesomeIcon icon={faPrint} className="me-2" /> Imprimir
+          {/* Selector de formato */}
+          <div className="d-flex gap-2">
+            <button
+              onClick={() => setFormatoImpresion('a4')}
+              style={{
+                flex: 1, padding: '12px 8px',
+                border: `2px solid ${formatoImpresion === 'a4' ? '#1a56db' : '#dee2e6'}`,
+                borderRadius: '12px',
+                background: formatoImpresion === 'a4' ? '#1a56db' : '#fff',
+                color: formatoImpresion === 'a4' ? '#fff' : '#333',
+                cursor: 'pointer', display: 'flex', flexDirection: 'column',
+                alignItems: 'center', gap: '4px', transition: 'all 0.2s',
+              }}
+            >
+              <FontAwesomeIcon icon={faFileAlt} style={{ fontSize: '1.4rem' }} />
+              <span style={{ fontSize: '0.7rem', fontWeight: 'bold' }}>A4</span>
+            </button>
+            <button
+              onClick={() => setFormatoImpresion('ticket')}
+              style={{
+                flex: 1, padding: '12px 8px',
+                border: `2px solid ${formatoImpresion === 'ticket' ? '#198754' : '#dee2e6'}`,
+                borderRadius: '12px',
+                background: formatoImpresion === 'ticket' ? '#198754' : '#fff',
+                color: formatoImpresion === 'ticket' ? '#fff' : '#333',
+                cursor: 'pointer', display: 'flex', flexDirection: 'column',
+                alignItems: 'center', gap: '4px', transition: 'all 0.2s',
+              }}
+            >
+              <FontAwesomeIcon icon={faReceipt} style={{ fontSize: '1.4rem' }} />
+              <span style={{ fontSize: '0.7rem', fontWeight: 'bold' }}>Ticket 80mm</span>
+            </button>
+          </div>
+
+          {/* Boton imprimir unico */}
+          <Button
+            color={formatoImpresion === 'a4' ? 'primary' : 'success'}
+            className="fw-bold py-2 shadow-sm"
+            onClick={() => formatoImpresion === 'a4' ? handlePrint() : handlePrintTicket()}
+          >
+            <FontAwesomeIcon icon={faPrint} className="me-2" />
+            Imprimir {formatoImpresion === 'a4' ? 'A4' : 'Ticket'}
           </Button>
+
           <Button color="outline-dark" onClick={finalizarVentaYLimpiar}>
             Nueva Venta
           </Button>
