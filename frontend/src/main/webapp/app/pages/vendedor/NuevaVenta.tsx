@@ -23,6 +23,7 @@ import { ProductCatalog } from './components/ProductCatalog';
 import { VentaSidebar } from './components/VentaSidebar';
 import { ClientRegistrationModal } from './components/ClientRegistrationModal';
 import { SuccessModal } from './components/SuccessModal';
+import { ClientSelectionModal } from './components/ClientSelectionModal';
 import { EmpresaService } from 'app/services/empresa.service';
 import { IEmpresa } from 'app/shared/model/empresa.model';
 
@@ -40,6 +41,7 @@ export const NuevaVenta = () => {
   const [cliente, setCliente] = useState<ICliente | null>(null);
   const [busquedaCedula, setBusquedaCedula] = useState('');
   const [showClienteModal, setShowClienteModal] = useState(false);
+  const [showSelectionModal, setShowSelectionModal] = useState(false);
   const [nuevoCliente, setNuevoCliente] = useState<ICliente>({
     cedula: '',
     nombre: '',
@@ -59,10 +61,17 @@ export const NuevaVenta = () => {
   const [descuento, setDescuento] = useState<string>('0');
   const [voucher, setVoucher] = useState('');
 
-  // Impresion
+  // Impresion A4
   const componentRef = useRef<any>(null);
   const handlePrint = useReactToPrint({
     contentRef: componentRef,
+  });
+
+  // Impresion Ticket Termico
+  const ticketRef = useRef<any>(null);
+  const handlePrintTicket = useReactToPrint({
+    contentRef: ticketRef,
+    pageStyle: `@page { size: 80mm auto; margin: 0; } body { margin: 0; display: flex; justify-content: center; }`,
   });
 
   const [ventaExitosa, setVentaExitosa] = useState<IVenta | null>(null);
@@ -105,7 +114,10 @@ export const NuevaVenta = () => {
   };
 
   const buscarCliente = async () => {
-    if (!busquedaCedula) return;
+    if (!busquedaCedula) {
+      setShowSelectionModal(true);
+      return;
+    }
     try {
       // 1. Intentar por Cédula (Exacta)
       let res = await ClienteService.getByCedula(busquedaCedula);
@@ -417,9 +429,25 @@ export const NuevaVenta = () => {
         ventaExitosa={ventaExitosa}
         finalizarVentaYLimpiar={finalizarVentaYLimpiar}
         handlePrint={handlePrint}
+        handlePrintTicket={handlePrintTicket}
         componentRef={componentRef}
+        ticketRef={ticketRef}
         carrito={carrito}
         empresa={empresa}
+      />
+
+      <ClientSelectionModal
+        isOpen={showSelectionModal}
+        toggle={() => setShowSelectionModal(!showSelectionModal)}
+        onSelect={c => {
+          setCliente(c);
+          setShowSelectionModal(false);
+          if ((c.saldo || 0) > 0) {
+            toast.warning(`Atención: El cliente ${c.nombre} tiene un saldo pendiente de C$ ${c.saldo?.toFixed(2)}`, { autoClose: 5000 });
+          } else {
+            toast.success(`Cliente seleccionado: ${c.nombre}`);
+          }
+        }}
       />
     </div>
   );
