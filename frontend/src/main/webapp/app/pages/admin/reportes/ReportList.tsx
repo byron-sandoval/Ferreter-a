@@ -156,7 +156,7 @@ export const ReportList = () => {
             box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
           }
           .hover-lift:hover {
-            border-bottom: 3px solid #0d6efd !important;
+            border-bottom: 3px solid #031125ff !important;
           }
         `}
       </style>

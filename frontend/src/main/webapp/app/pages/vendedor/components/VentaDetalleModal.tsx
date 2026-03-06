@@ -1,7 +1,7 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Label, Badge, Table } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileInvoiceDollar, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { faFileInvoiceDollar, faPrint, faFileAlt, faReceipt } from '@fortawesome/free-solid-svg-icons';
 import dayjs from 'dayjs';
 import { useReactToPrint } from 'react-to-print';
 import { IVenta } from 'app/shared/model';
@@ -16,9 +16,16 @@ interface VentaDetalleModalProps {
 
 export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, toggle, venta, empresa }) => {
   const componentRef = useRef<HTMLDivElement>(null);
+  const ticketRef = useRef<HTMLDivElement>(null);
+  const [formatoImpresion, setFormatoImpresion] = useState<'a4' | 'ticket'>('a4');
 
   const handlePrint = useReactToPrint({
     contentRef: componentRef,
+  });
+
+  const handlePrintTicket = useReactToPrint({
+    contentRef: ticketRef,
+    pageStyle: `@page { size: 80mm auto; margin: 0; } body { margin: 0; display: flex; justify-content: center; }`,
   });
 
   if (!venta) return null;
@@ -161,28 +168,6 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                   <strong>Email:</strong> {empresa?.correo || 'ferronica@gmail.com'}
                 </p>
               </div>
-            </div>
-
-            {/* Paid/Void Stamp effect */}
-            <div
-              style={{
-                position: 'absolute',
-                top: '25%',
-                left: '50%',
-                transform: 'translateX(-50%) rotate(-22deg)',
-                border: `5px solid ${venta.anulada ? '#dc3545' : '#28a745'}`,
-                color: venta.anulada ? '#dc3545' : '#28a745',
-                padding: '8px 25px',
-                fontSize: '40px',
-                fontWeight: 'bold',
-                borderRadius: '12px',
-                opacity: 0.15,
-                zIndex: 0,
-                pointerEvents: 'none',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {venta.anulada ? 'ANULADA' : 'PAGADO'}
             </div>
 
             {/* Invoice Info Section - Balanced */}
@@ -446,13 +431,154 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
             </div>
           </div>
         </div>
+        {/* TICKET TERMICO 80mm OCULTO */}
+        <div style={{ display: 'none' }}>
+          <div
+            ref={ticketRef}
+            style={{
+              width: '280px',
+              fontFamily: "'Courier New', monospace",
+              fontSize: '11px',
+              color: '#000',
+              padding: '8px',
+              backgroundColor: '#fff',
+            }}
+          >
+            {/* Cabecera */}
+            <div style={{ textAlign: 'center', marginBottom: '6px' }}>
+              {empresa?.logo && (
+                <img
+                  src={`data:${empresa.logoContentType};base64,${empresa.logo}`}
+                  alt="logo"
+                  style={{ maxHeight: '60px', maxWidth: '200px', display: 'block', margin: '0 auto 6px auto', filter: 'grayscale(100%)', objectFit: 'contain' }}
+                />
+              )}
+              <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{empresa?.nombre || 'FERRONICA'}</div>
+              <div style={{ fontSize: '10px' }}>{empresa?.direccion}</div>
+              <div style={{ fontSize: '10px' }}>Tel: {empresa?.telefono} | RUC: {empresa?.ruc}</div>
+            </div>
+            <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }} />
+            {venta.anulada && (
+              <div style={{
+                textAlign: 'center',
+                fontWeight: 'bold',
+                fontSize: '13px',
+                border: '2px solid #120f0fff',
+                color: '#000000ff',
+                padding: '4px',
+                margin: '4px 0',
+                letterSpacing: '2px',
+              }}>
+                *** FACTURA ANULADA ***
+              </div>
+            )}
+            <div style={{ textAlign: 'center', fontSize: '10px', marginBottom: '4px' }}>
+              <strong>COPIA - FACTURA #{venta.noFactura}</strong>
+              <div>{dayjs(venta.fecha).format('DD/MM/YYYY HH:mm')}</div>
+              <div>Vendedor: {venta.usuario?.nombre || 'Admin'}</div>
+            </div>
+            <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }} />
+            <div style={{ marginBottom: '4px', fontSize: '10px' }}>
+              <strong>Cliente:</strong> {venta.cliente?.nombre || 'Consumidor Final'}
+              <div><strong>Cédula:</strong> {venta.cliente?.cedula}</div>
+            </div>
+            <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }} />
+            <div style={{ marginBottom: '4px' }}>
+              {venta.detalles?.map((det, i) => (
+                <div key={i} style={{ marginBottom: '3px' }}>
+                  <div style={{ fontWeight: 'bold', fontSize: '11px' }}>{det.articulo?.nombre}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px' }}>
+                    <span>{det.cantidad} x C$ {det.precioVenta?.toFixed(2)}</span>
+                    <span><strong>C$ {det.monto?.toFixed(2)}</strong></span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }} />
+            <div style={{ fontSize: '11px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Subtotal:</span><span>C$ {venta.subtotal?.toFixed(2)}</span>
+              </div>
+              {(venta.descuento || 0) > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Descuento:</span><span>- C$ {venta.descuento?.toFixed(2)}</span>
+                </div>
+              )}
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>IVA (15%):</span><span>C$ {venta.iva?.toFixed(2)}</span>
+              </div>
+            </div>
+            <div style={{ borderTop: '2px solid #000', margin: '4px 0' }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '13px' }}>
+              <span>TOTAL:</span><span>C$ {venta.total?.toFixed(2)}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', marginTop: '2px' }}>
+              <span>Recibido: C$ {venta.importeRecibido?.toFixed(2)}</span>
+              <span>Cambio: C$ {venta.cambio?.toFixed(2)}</span>
+            </div>
+            <div style={{ borderTop: '1px dashed #000', margin: '8px 0 4px' }} />
+            <div style={{ textAlign: 'center', fontSize: '10px' }}>
+              <div>¡Gracias por su compra!</div>
+              <div>Cambios solo con factura en 24 hrs.</div>
+            </div>
+          </div>
+        </div>
       </ModalBody>
-      <ModalFooter className="border-0">
-        <Button color="secondary" onClick={toggle}>
-          Cerrar
-        </Button>
-        <Button color="primary" onClick={() => handlePrint()}>
-          <FontAwesomeIcon icon={faPrint} className="me-2" /> Reimprimir
+
+      <ModalFooter className="border-0 d-flex gap-2 align-items-center">
+        <Button color="secondary" onClick={toggle}>Cerrar</Button>
+
+        {/* Selector de formato compacto */}
+        <div className="d-flex gap-1 ms-auto">
+          <button
+            onClick={() => setFormatoImpresion('a4')}
+            title="Formato A4"
+            style={{
+              padding: '6px 12px',
+              border: `2px solid ${formatoImpresion === 'a4' ? '#1a56db' : '#dee2e6'}`,
+              borderRadius: '8px',
+              background: formatoImpresion === 'a4' ? '#1a56db' : '#fff',
+              color: formatoImpresion === 'a4' ? '#fff' : '#555',
+              cursor: 'pointer',
+              fontSize: '0.7rem',
+              fontWeight: 'bold',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              transition: 'all 0.15s',
+            }}
+          >
+            <FontAwesomeIcon icon={faFileAlt} /> A4
+          </button>
+          <button
+            onClick={() => setFormatoImpresion('ticket')}
+            title="Ticket 80mm"
+            style={{
+              padding: '6px 12px',
+              border: `2px solid ${formatoImpresion === 'ticket' ? '#198754' : '#dee2e6'}`,
+              borderRadius: '8px',
+              background: formatoImpresion === 'ticket' ? '#198754' : '#fff',
+              color: formatoImpresion === 'ticket' ? '#fff' : '#555',
+              cursor: 'pointer',
+              fontSize: '0.7rem',
+              fontWeight: 'bold',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              transition: 'all 0.15s',
+            }}
+          >
+            <FontAwesomeIcon icon={faReceipt} /> Ticket
+          </button>
+        </div>
+
+        <Button
+          color={formatoImpresion === 'a4' ? 'primary' : 'success'}
+          className="fw-bold"
+          onClick={() => formatoImpresion === 'a4' ? handlePrint() : handlePrintTicket()}
+        >
+          <FontAwesomeIcon icon={faPrint} className="me-1" />
+          Reimprimir
         </Button>
       </ModalFooter>
     </Modal>
