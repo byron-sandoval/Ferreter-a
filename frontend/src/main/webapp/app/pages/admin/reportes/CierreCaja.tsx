@@ -238,13 +238,7 @@ const CierreCaja = () => {
                                 <h6 className="fw-bold text-uppercase opacity-75 border-bottom border-white border-opacity-25 pb-2 mb-3 text-white">Efectivo en Caja</h6>
                                 <div className="d-flex justify-content-between mb-2 align-items-center">
                                     <span className="opacity-75">Saldo Apertura</span>
-                                    <Input
-                                        type="number"
-                                        bsSize="sm"
-                                        value={saldoApertura}
-                                        onChange={(e) => setSaldoApertura(e.target.value)}
-                                        className="bg-transparent border-0 border-bottom border-white border-opacity-25 text-white text-end fw-bold p-0 shadow-none w-25"
-                                    />
+                                    <span className="fw-bold">C$ {Number(saldoApertura).toLocaleString()}</span>
                                 </div>
                                 <div className="d-flex justify-content-between mb-2">
                                     <span className="opacity-75">+ Ventas Efectivo</span>
