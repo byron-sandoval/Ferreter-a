@@ -339,21 +339,23 @@ export const GestionClientes = () => {
                   <h6 className="fw-bold text-muted text-uppercase mb-3 small">
                     <FontAwesomeIcon icon={faHistory} className="me-2" /> Historial Reciente
                   </h6>
-                  {historial.map(v => (
-                    <div key={v.id} className="d-flex justify-content-between align-items-center mb-3 p-2 rounded hover-light">
-                      <div>
-                        <div className="fw-bold small text-dark">Factura #{v.noFactura}</div>
-                        <small className="text-muted">{dayjs(v.fecha).format('DD/MM/YYYY')}</small>
+                  <div style={{ maxHeight: '480px', overflowY: 'auto', paddingRight: '8px' }} className="custom-scrollbar">
+                    {historial.map(v => (
+                      <div key={v.id} className="d-flex justify-content-between align-items-center mb-3 p-2 rounded hover-light">
+                        <div>
+                          <div className="fw-bold small text-dark">Factura #{v.noFactura}</div>
+                          <small className="text-muted">{dayjs(v.fecha).format('DD/MM/YYYY')}</small>
+                        </div>
+                        <div className="text-end">
+                          <div className="fw-bold text-primary">C$ {v.total?.toFixed(2)}</div>
+                          <Badge color="light" pill className="text-dark border small">
+                            {v.metodoPago}
+                          </Badge>
+                        </div>
                       </div>
-                      <div className="text-end">
-                        <div className="fw-bold text-primary">C$ {v.total?.toFixed(2)}</div>
-                        <Badge color="light" pill className="text-dark border small">
-                          {v.metodoPago}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                  {historial.length === 0 && <small className="text-muted d-block text-center py-3">No hay compras registradas.</small>}
+                    ))}
+                    {historial.length === 0 && <small className="text-muted d-block text-center py-3">No hay compras registradas.</small>}
+                  </div>
                 </CardBody>
               </Card>
             </div>
