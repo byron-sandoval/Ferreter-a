@@ -88,7 +88,7 @@ export const ClientSelectionModal: React.FC<IClientSelectionModalProps> = ({ isO
                                 </tr>
                             ) : clientesFiltrados.length > 0 ? (
                                 clientesFiltrados.map(c => (
-                                    <tr key={c.id} style={{ cursor: 'pointer' }} onClick={() => onSelect(c)}>
+                                    <tr key={c.id}>
                                         <td className="ps-3 py-3">
                                             <div className="fw-bold text-primary">{c.nombre}</div>
                                         </td>
@@ -110,7 +110,12 @@ export const ClientSelectionModal: React.FC<IClientSelectionModalProps> = ({ isO
                                             </div>
                                         </td>
                                         <td className="text-end pe-3">
-                                            <Button color="primary" size="sm" className="rounded-pill px-3 shadow-sm hover-scale">
+                                            <Button
+                                                color="primary"
+                                                size="sm"
+                                                className="rounded-pill px-3 shadow-sm hover-scale"
+                                                onClick={() => onSelect(c)}
+                                            >
                                                 <FontAwesomeIcon icon={faUserCheck} className="me-1" /> Seleccionar
                                             </Button>
                                         </td>
