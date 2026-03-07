@@ -414,7 +414,7 @@ export const ArticuloList = () => {
                   currentItems.map(articulo => {
                     const hasStock = (articulo.existencia || 0) > 0;
                     const isLowStock = (articulo.existencia || 0) <= (articulo.existenciaMinima || 0);
-                    const missingPrice = (articulo.precio || 0) <= 0;
+                    const missingPrice = (articulo.precio || 0) <= 0 && articulo.activo;
                     const stockBg = !hasStock ? '#ff0000' : isLowStock ? '#ffc107' : '#00a000';
                     const isSelected = selectedArticulo?.id === articulo.id;
 
