@@ -60,19 +60,31 @@ public class IngresoServiceImpl implements IngresoService {
 
         Ingreso savedIngreso = ingresoRepository.save(ingreso);
 
-        // Actualizar stock de productos
-        if (savedIngreso.getDetalles() != null && !savedIngreso.getDetalles().isEmpty()) {
-            savedIngreso.getDetalles().forEach(detalle -> {
+        // Actualizar stock y revisar márgenes de productos
+        if (ingreso.getDetalles() != null && !ingreso.getDetalles().isEmpty()) {
+            ingreso.getDetalles().forEach(detalle -> {
                 if (detalle.getArticulo() != null && detalle.getArticulo().getId() != null) {
                     articuloRepository.findById(detalle.getArticulo().getId()).ifPresent(articulo -> {
                         BigDecimal existenciaActual = articulo.getExistencia() != null ? articulo.getExistencia()
                                 : BigDecimal.ZERO;
                         BigDecimal cantidadIngreso = detalle.getCantidad() != null ? detalle.getCantidad()
                                 : BigDecimal.ZERO;
+                        BigDecimal costoNuevo = detalle.getCostoUnitario() != null ? detalle.getCostoUnitario()
+                                : BigDecimal.ZERO;
+                        BigDecimal costoAnterior = articulo.getCosto() != null ? articulo.getCosto()
+                                : BigDecimal.ZERO;
+
+                        // Si el costo sube, guardamos el anterior para mostrarlo en el Dashboard
+                        if (costoNuevo.compareTo(costoAnterior) > 0) {
+                            articulo.setUltimoCosto(costoAnterior); // Aquí guardamos el "Costo Anterior"
+                        }
+
                         articulo.setExistencia(existenciaActual.add(cantidadIngreso));
+                        articulo.setCosto(costoNuevo); // Actualizamos al último costo
                         articuloRepository.save(articulo);
-                        LOG.debug("Stock actualizado para Articulo ID {}: {} + {} = {}",
-                                articulo.getId(), existenciaActual, cantidadIngreso, articulo.getExistencia());
+
+                        LOG.debug("Procesado Articulo ID {}: Stock +{}, Costo {} -> {}",
+                                articulo.getId(), cantidadIngreso, costoAnterior, costoNuevo);
                     });
                 }
             });
