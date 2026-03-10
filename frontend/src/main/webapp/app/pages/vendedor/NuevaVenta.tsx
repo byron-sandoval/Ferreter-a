@@ -198,6 +198,12 @@ export const NuevaVenta = () => {
   };
 
   const agregarAlCarrito = (producto: IArticulo) => {
+    const isPendingReview = producto.ultimoCosto && (producto.costo || 0) > (producto.ultimoCosto || 0);
+    if (isPendingReview) {
+      toast.error(`El producto ${producto.nombre} tiene un aumento de costo y está pendiente de revisión de precio por el administrador.`);
+      return;
+    }
+
     const existente = carrito.find(item => item.articulo.id === producto.id);
     const cantActual = existente ? existente.cantidad : 0;
 
