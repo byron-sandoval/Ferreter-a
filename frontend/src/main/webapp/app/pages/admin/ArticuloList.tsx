@@ -65,11 +65,28 @@ export const ArticuloList = () => {
     loadAll();
   }, []);
 
-  const articulosFiltrados = articulos.filter(a => {
-    const matchesSearch = (a.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (a.codigo || '').toLowerCase().includes(filter.toLowerCase());
-    const matchesStatus = showInactive ? a.activo === false : a.activo !== false;
-    return matchesSearch && matchesStatus;
-  });
+  const articulosFiltrados = articulos
+    .filter(a => {
+      const matchesSearch = (a.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (a.codigo || '').toLowerCase().includes(filter.toLowerCase());
+      const matchesStatus = showInactive ? a.activo === false : a.activo !== false;
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      const aPending = (a.precio || 0) <= 0 && a.activo;
+      const bPending = (b.precio || 0) <= 0 && b.activo;
+
+      if (aPending && !bPending) return -1;
+      if (!aPending && bPending) return 1;
+
+      // Opcional: Prioridad secundaria para los que tienen aumento de costo (pendientes de revisión)
+      const aReview = a.ultimoCosto && (a.costo || 0) > (a.ultimoCosto || 0);
+      const bReview = b.ultimoCosto && (b.costo || 0) > (b.ultimoCosto || 0);
+
+      if (aReview && !bReview) return -1;
+      if (!aReview && bReview) return 1;
+
+      return 0; // Mantener orden original si ambos son iguales en prioridad
+    });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -402,10 +419,10 @@ export const ArticuloList = () => {
                   <th className="py-2">Estado</th>
                   <th className="py-2">Stock</th>
                   <th className="py-2">Mín.</th>
-                  {isAdmin && <th className="py-2 text-end">Costo</th>}
+                  {(isAdmin || isJefeBodega) && <th className="py-2 text-end">Costo</th>}
                   <th className="py-2 text-end">Venta</th>
                   {isAdmin && <th className="py-2 text-end">Total</th>}
-                  <th className="py-2 text-start">Observación</th>
+                  <th className="py-2 text-center">Observación</th>
                   <th className="py-2">Acciones</th>
                 </tr>
               </thead>
@@ -431,9 +448,9 @@ export const ArticuloList = () => {
                         <td className="text-start">
                           <div className="fw-bold">{articulo.nombre}</div>
                           {missingPrice && (
-                            <Badge color="warning" className="text-dark small py-0 px-1" style={{ fontSize: '0.6rem' }}>
+                            <div className="text-warning fw-bold text-uppercase" style={{ fontSize: '0.65rem', letterSpacing: '0.5px' }}>
                               PRECIO PENDIENTE
-                            </Badge>
+                            </div>
                           )}
                         </td>
                         <td>
@@ -446,10 +463,10 @@ export const ArticuloList = () => {
                         </td>
                         <td style={{ backgroundColor: stockBg, color: 'white', fontWeight: 'bold' }}>{articulo.existencia}</td>
                         <td>{articulo.existenciaMinima}</td>
-                        {isAdmin && <td className="text-end">C$ {articulo.costo?.toFixed(2)}</td>}
+                        {(isAdmin || isJefeBodega) && <td className="text-end">C$ {articulo.costo?.toFixed(2)}</td>}
                         <td className="text-end">C$ {articulo.precio?.toFixed(2)}</td>
                         {isAdmin && <td className="text-end fw-bold">C$ {((articulo.existencia || 0) * (articulo.precio || 0)).toFixed(2)}</td>}
-                        <td className="text-start small text-muted">
+                        <td className="text-center small text-muted px-3">
                           <div className="text-truncate" style={{ maxWidth: '120px' }}>
                             {articulo.descripcion || '-'}
                           </div>
@@ -586,7 +603,7 @@ export const ArticuloList = () => {
                 <Col md="10">
                   <Row>
                     <Col md="4">
-                      {isAdmin && (
+                      {(isAdmin || isJefeBodega) && (
                         <div className="mb-3">
                           <label className="text-muted small text-uppercase fw-bold">Precio Compra</label>
                           <div className="fs-5">C$ {selectedArticulo.costo?.toFixed(2)}</div>

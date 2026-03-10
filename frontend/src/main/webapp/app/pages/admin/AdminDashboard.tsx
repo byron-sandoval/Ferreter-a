@@ -10,6 +10,7 @@ import {
   faExclamationTriangle,
   faMoneyBillWave,
   faCog,
+  faPencilAlt,
   faTruck,
   faHistory,
   faBuilding,
@@ -390,7 +391,7 @@ export const AdminDashboard = () => {
             <div style={{ background: 'linear-gradient(135deg, #29128cff 0%, #888f87ff 100%)', padding: '10px 15px' }}>
               <div className="d-flex justify-content-between align-items-center text-white">
                 <h6 className="m-0 fw-bold">
-                  <FontAwesomeIcon icon={faMoneyBillWave} className="me-2" /> Alertas de Compras
+                  <FontAwesomeIcon icon={faMoneyBillWave} className="me-2" /> Alerta: Costo de Compra
                 </h6>
                 <Badge color="light" text="dark" pill>
                   {revisionPrecios.length}
@@ -405,7 +406,7 @@ export const AdminDashboard = () => {
               ) : revisionPrecios.length > 0 ? (
                 <Row style={{ maxHeight: '500px', overflowY: 'auto', padding: '10px' }}>
                   {revisionPrecios.map(p => (
-                    <Col md="4" key={p.id} className="mb-4">
+                    <Col md="3" key={p.id} className="mb-4">
                       <div
                         className="bg-white p-3 shadow-sm border product-alert-card h-100"
                         style={{
@@ -434,7 +435,7 @@ export const AdminDashboard = () => {
                             }}
                             style={{ width: '35px', height: '35px', borderRadius: '10px', cursor: 'pointer' }}
                           >
-                            <FontAwesomeIcon icon={faCog} />
+                            <FontAwesomeIcon icon={faPencilAlt} />
                           </div>
                         </div>
 
