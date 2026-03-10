@@ -95,79 +95,104 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
               const categoryIsActive = p.categoria ? p.categoria.activo !== false : true;
               return p.activo !== false && categoryIsActive && matchesSearch && matchesCategory && (p.precio || 0) > 0;
             })
-            .map(prod => (
-              <Col md="3" key={prod.id}>
-                <Card
-                  className="h-100 shadow-sm border-0 product-card cursor-pointer overflow-hidden"
-                  onClick={() => agregarAlCarrito(prod)}
-                  style={{
-                    transition: 'all 0.3s ease',
-                    borderRadius: '12px',
-                    backgroundColor: '#fff'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-5px)';
-                    e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.15)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)';
-                  }}
-                >
-                  {/* Top Bar with Code and Stock */}
-                  <div className="d-flex justify-content-between align-items-center px-2 pt-1">
-                    <div className="text-muted fw-bold" style={{ fontSize: '0.55rem' }}>
-                      #{prod.codigo}
-                    </div>
-                    <Badge
-                      color={(prod.existencia || 0) > 0 ? 'success' : 'danger'}
-                      className="px-2 py-1 shadow-sm"
-                      style={{ fontSize: '0.70rem', borderRadius: '5px' }}
-                    >
-                      Stock: {prod.existencia}
-                    </Badge>
-                  </div>
+            .map(prod => {
+              const isPendingReview = !!(prod.ultimoCosto && (prod.costo || 0) > (prod.ultimoCosto || 0));
 
-                  {/* Image Container */}
-                  <div className="text-center d-flex align-items-center justify-content-center bg-white" style={{ height: '100px', padding: '5px' }}>
-                    {prod.imagen ? (
-                      <img
-                        src={`data:${prod.imagenContentType};base64,${prod.imagen}`}
-                        alt={prod.nombre}
-                        style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }}
-                      />
-                    ) : (
-                      <FontAwesomeIcon icon={faBoxOpen} size="lg" className="text-muted opacity-50" />
-                    )}
-                  </div>
+              return (
+                <Col md="3" key={prod.id}>
+                  <Card
+                    className={`h-100 shadow-sm border-0 product-card overflow-hidden ${isPendingReview ? 'pending-product' : 'cursor-pointer'}`}
+                    onClick={() => !isPendingReview && agregarAlCarrito(prod)}
+                    style={{
+                      transition: 'all 0.3s ease',
+                      borderRadius: '12px',
+                      backgroundColor: '#fff',
+                      opacity: isPendingReview ? 0.7 : 1,
+                      filter: isPendingReview ? 'grayscale(0.8)' : 'none',
+                      cursor: isPendingReview ? 'not-allowed' : 'pointer'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isPendingReview) {
+                        e.currentTarget.style.transform = 'translateY(-5px)';
+                        e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.15)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isPendingReview) {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)';
+                      }
+                    }}
+                  >
+                    {/* Top Bar with Code and Stock */}
+                    <div className="d-flex justify-content-between align-items-center px-2 pt-1">
+                      <div className="text-muted fw-bold" style={{ fontSize: '0.55rem' }}>
+                        #{prod.codigo}
+                      </div>
+                      <Badge
+                        color={(prod.existencia || 0) > 0 ? 'success' : 'danger'}
+                        className="px-2 py-1 shadow-sm"
+                        style={{ fontSize: '0.70rem', borderRadius: '5px' }}
+                      >
+                        Stock: {prod.existencia}
+                      </Badge>
+                    </div>
 
-                  {/* Info Section */}
-                  <div className="px-2 pb-1 pt-0 text-start bg-white">
-                    <div
-                      className="fw-bold text-uppercase"
-                      style={{
-                        fontSize: '0.65rem',
-                        letterSpacing: '0.4px',
-                        color: '#444',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                        lineHeight: '1.2',
-                        height: '2.4em',
-                        wordBreak: 'break-word'
-                      }}
-                      title={prod.nombre}
-                    >
-                      {prod.nombre}
+                    {/* Image Container */}
+                    <div className="text-center d-flex align-items-center justify-content-center bg-white" style={{ height: '100px', padding: '5px', position: 'relative' }}>
+                      {prod.imagen ? (
+                        <img
+                          src={`data:${prod.imagenContentType};base64,${prod.imagen}`}
+                          alt={prod.nombre}
+                          style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }}
+                        />
+                      ) : (
+                        <FontAwesomeIcon icon={faBoxOpen} size="lg" className="text-muted opacity-50" />
+                      )}
+
+                      {isPendingReview && (
+                        <div
+                          className="position-absolute w-100 h-100 d-flex align-items-center justify-content-center"
+                          style={{ backgroundColor: 'rgba(255,255,255,0.4)', top: 0, left: 0 }}
+                        >
+                          <Badge color="secondary" className="px-3 py-2 shadow fw-bold text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '1px' }}>
+                            PENDIENTE
+                          </Badge>
+                        </div>
+                      )}
                     </div>
-                    <div className="fw-bold" style={{ color: '#007bff', fontSize: '0.90rem' }}>
-                      C$ {prod.precio?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+
+                    {/* Info Section */}
+                    <div className="px-2 pb-1 pt-0 text-start bg-white">
+                      <div
+                        className="fw-bold text-uppercase"
+                        style={{
+                          fontSize: '0.65rem',
+                          letterSpacing: '0.4px',
+                          color: '#444',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          lineHeight: '1.2',
+                          height: '2.4em',
+                          wordBreak: 'break-word'
+                        }}
+                        title={prod.nombre}
+                      >
+                        {prod.nombre}
+                      </div>
+                      <div className="fw-bold d-flex justify-content-between align-items-center" style={{ color: '#007bff', fontSize: '0.90rem' }}>
+                        <span>C$ {prod.precio?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        {isPendingReview && (
+                          <Badge color="warning" pill style={{ fontSize: '0.55rem' }}>REVISIÓN PRECIO</Badge>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </Card>
-              </Col>
-            ))}
+                  </Card>
+                </Col>
+              );
+            })}
         </Row>
       </div>
     </Col>
