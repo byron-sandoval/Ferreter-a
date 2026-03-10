@@ -15,6 +15,7 @@ import org.mapstruct.*;
 public interface ArticuloMapper extends EntityMapper<ArticuloDTO, Articulo> {
     @Mapping(target = "categoria", source = "categoria", qualifiedByName = "categoriaId")
     @Mapping(target = "unidadMedida", source = "unidadMedida", qualifiedByName = "unidadMedidaId")
+    @Mapping(target = "ultimoCosto", source = "ultimoCosto")
     ArticuloDTO toDto(Articulo s);
 
     @Named("categoriaId")
