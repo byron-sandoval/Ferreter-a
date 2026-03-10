@@ -16,6 +16,7 @@ export interface IArticulo {
   categoria?: ICategoria | null;
   unidadMedida?: IUnidadMedida | null;
   priceChangeReason?: string | null;
+  ultimoCosto?: number | null;
 }
 
 export const defaultArticulo: Readonly<IArticulo> = {
