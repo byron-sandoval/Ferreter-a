@@ -504,9 +504,43 @@ export const IngresoNuevaCompra = () => {
                                                 <Label className="small fw-bold">Cant. Entrante</Label>
                                                 <Input type="number" min="1" value={cantidad} onChange={e => setCantidad(parseInt(e.target.value, 10))} bsSize="sm" />
                                             </Col>
-                                            <Col md="3" className="mt-2">
+                                            <Col md="2" className="mt-2">
                                                 <Label className="small fw-bold">Costo Und.</Label>
                                                 <Input type="number" step="0.01" value={costoUnitario} onChange={e => setCostoUnitario(parseFloat(e.target.value))} bsSize="sm" />
+                                            </Col>
+                                            <Col md="2" className="mt-2">
+                                                <Label className="small fw-bold text-muted">Venta Actual</Label>
+                                                <div className="input-group input-group-sm">
+                                                    <span className="input-group-text bg-light text-success">C$</span>
+                                                    <Input
+                                                        type="text"
+                                                        readOnly
+                                                        value={articulos.find(a => a.id?.toString() === articuloSeleccionado)?.precio || '0'}
+                                                        className="bg-white fw-bold text-success border-start-0"
+                                                    />
+                                                </div>
+                                            </Col>
+                                            <Col md="5" className="mt-2 d-flex align-items-center">
+                                                {articuloSeleccionado && costoUnitario > 0 && (
+                                                    <div className="w-100">
+                                                        {(() => {
+                                                            const art = articulos.find(a => a.id?.toString() === articuloSeleccionado);
+                                                            if (!art || !art.precio) return null;
+                                                            const margenAmt = art.precio - costoUnitario;
+                                                            const percent = (margenAmt / art.precio) * 100;
+
+                                                            if (percent < 15) {
+                                                                return (
+                                                                    <Badge color="danger" className="w-100 py-2 d-flex align-items-center justify-content-center">
+                                                                        <FontAwesomeIcon icon={faShoppingCart} className="me-2" />
+                                                                        Margen Crítico: {percent.toFixed(1)}% {percent <= 0 ? '(PÉRDIDA)' : '(Revisar)'}
+                                                                    </Badge>
+                                                                );
+                                                            }
+                                                            return null;
+                                                        })()}
+                                                    </div>
+                                                )}
                                             </Col>
                                             <Col md="6" className="mt-2">
                                                 {isAdmin && (
