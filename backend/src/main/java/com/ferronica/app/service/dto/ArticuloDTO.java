@@ -47,6 +47,8 @@ public class ArticuloDTO implements Serializable {
 
     private Boolean activo;
 
+    private BigDecimal ultimoCosto;
+
     private CategoriaDTO categoria;
 
     private UnidadMedidaDTO unidadMedida;
@@ -139,6 +141,14 @@ public class ArticuloDTO implements Serializable {
 
     public void setActivo(Boolean activo) {
         this.activo = activo;
+    }
+
+    public BigDecimal getUltimoCosto() {
+        return ultimoCosto;
+    }
+
+    public void setUltimoCosto(BigDecimal ultimoCosto) {
+        this.ultimoCosto = ultimoCosto;
     }
 
     public CategoriaDTO getCategoria() {
