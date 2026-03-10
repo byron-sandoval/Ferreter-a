@@ -22,7 +22,7 @@ import DevolucionService from 'app/services/devolucion.service';
 import { IArticulo } from 'app/shared/model/articulo.model';
 import { IVenta } from 'app/shared/model/venta.model';
 import { IDevolucion } from 'app/shared/model/devolucion.model';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, BarChart, Bar } from 'recharts';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 import { IDetalleVenta } from 'app/shared/model/detalle-venta.model';
@@ -44,7 +44,9 @@ export const AdminDashboard = () => {
   const [bajoStock, setBajoStock] = useState<IArticulo[]>([]);
   const [ventasRecientes, setVentasRecientes] = useState<IVenta[]>([]);
   const [devolucionesRecientes, setDevolucionesRecientes] = useState<IDevolucion[]>([]);
+  const [revisionPrecios, setRevisionPrecios] = useState<IArticulo[]>([]);
   const [categoryData, setCategoryData] = useState<ICategoryData[]>([]);
+  const [topProductsData, setTopProductsData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -73,6 +75,8 @@ export const AdminDashboard = () => {
 
         const low = artRes.data.filter(a => a.activo && (a.existencia || 0) <= (a.existenciaMinima || 0));
         setBajoStock(low);
+        const revision = artRes.data.filter(a => a.activo && a.ultimoCosto && (a.costo || 0) > (a.ultimoCosto || 0));
+        setRevisionPrecios(revision);
         setLoading(false);
       })
       .catch(console.error);
@@ -374,6 +378,90 @@ export const AdminDashboard = () => {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
+            </CardBody>
+          </Card>
+        </Col>
+      </Row>
+
+      <Row className="mt-3">
+        {/* Alertas de Margen: Ahora en una fila propia abajo */}
+        <Col md="12">
+          <Card className="shadow mb-4 border-0 overflow-hidden" style={{ borderRadius: '15px' }}>
+            <div style={{ background: 'linear-gradient(135deg, #29128cff 0%, #888f87ff 100%)', padding: '10px 15px' }}>
+              <div className="d-flex justify-content-between align-items-center text-white">
+                <h6 className="m-0 fw-bold">
+                  <FontAwesomeIcon icon={faMoneyBillWave} className="me-2" /> Alertas de Compras
+                </h6>
+                <Badge color="light" text="dark" pill>
+                  {revisionPrecios.length}
+                </Badge>
+              </div>
+            </div>
+            <CardBody className="bg-light bg-opacity-10">
+              {loading ? (
+                <div className="text-center py-5">
+                  <div className="spinner-border spinner-border-sm text-warning" role="status"></div>
+                </div>
+              ) : revisionPrecios.length > 0 ? (
+                <Row style={{ maxHeight: '500px', overflowY: 'auto', padding: '10px' }}>
+                  {revisionPrecios.map(p => (
+                    <Col md="4" key={p.id} className="mb-4">
+                      <div
+                        className="bg-white p-3 shadow-sm border product-alert-card h-100"
+                        style={{
+                          borderRadius: '15px',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-5px)';
+                          e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      >
+                        <div className="d-flex justify-content-between align-items-start mb-3">
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div className="fw-bold text-dark text-truncate" style={{ fontSize: '1rem' }}>{p.nombre}</div>
+                            <Badge color="warning" className="text-uppercase mt-1" style={{ fontSize: '0.6rem', padding: '3px 7px' }}>Revisión Requerida</Badge>
+                          </div>
+                          <div
+                            className="btn-sm p-0 d-flex align-items-center justify-content-center bg-primary text-white shadow-sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/admin/articulos/${p.id}/edit`);
+                            }}
+                            style={{ width: '35px', height: '35px', borderRadius: '10px', cursor: 'pointer' }}
+                          >
+                            <FontAwesomeIcon icon={faCog} />
+                          </div>
+                        </div>
+
+                        <div className="d-flex justify-content-between gap-1 bg-light p-3 rounded-4 border-0">
+                          <div className="text-center flex-fill">
+                            <div className="text-muted mb-1" style={{ fontSize: '0.65rem' }}>ANTERIOR</div>
+                            <div className="fw-bold small text-dark">C$ {p.ultimoCosto?.toLocaleString() || '---'}</div>
+                          </div>
+                          <div className="text-center flex-fill border-start border-end">
+                            <div className="text-muted mb-1" style={{ fontSize: '0.65rem' }}>NUEVO</div>
+                            <div className="text-danger fw-bold small">C$ {p.costo?.toLocaleString()}</div>
+                          </div>
+                          <div className="text-center flex-fill">
+                            <div className="text-muted mb-1" style={{ fontSize: '0.65rem' }}>VENTA</div>
+                            <div className="text-primary fw-bold small">C$ {p.precio?.toLocaleString()}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </Col>
+                  ))}
+                </Row>
+              ) : (
+                <div className="text-center py-5 text-muted">
+                  <FontAwesomeIcon icon={faChartLine} size="2x" className="mb-2 opacity-10" />
+                  <p className="small mb-0">Márgenes saludables</p>
+                </div>
+              )}
             </CardBody>
           </Card>
         </Col>

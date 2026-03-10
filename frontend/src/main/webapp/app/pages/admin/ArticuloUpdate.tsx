@@ -97,9 +97,11 @@ export const ArticuloUpdate = () => {
   const onSubmit = async (data: IArticulo) => {
     try {
       if (isNew) {
+        data.ultimoCosto = data.costo;
         await ArticuloService.create(data);
         toast.success('Articulo creado exitosamente');
       } else {
+        data.ultimoCosto = data.costo;
         await ArticuloService.update(data);
         toast.success('Articulo actualizado exitosamente');
       }

@@ -65,6 +65,9 @@ public class Articulo implements Serializable {
     @Column(name = "activo")
     private Boolean activo;
 
+    @Column(name = "ultimo_costo", precision = 21, scale = 2)
+    private BigDecimal ultimoCosto;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "padre" }, allowSetters = true)
     private Categoria categoria;
@@ -217,6 +220,14 @@ public class Articulo implements Serializable {
         this.activo = activo;
     }
 
+    public BigDecimal getUltimoCosto() {
+        return ultimoCosto;
+    }
+
+    public void setUltimoCosto(BigDecimal ultimoCosto) {
+        this.ultimoCosto = ultimoCosto;
+    }
+
     public Categoria getCategoria() {
         return this.categoria;
     }
@@ -243,7 +254,8 @@ public class Articulo implements Serializable {
         return this;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and
+    // setters here
 
     @Override
     public boolean equals(Object o) {
@@ -258,7 +270,8 @@ public class Articulo implements Serializable {
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        // see
+        // https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 
@@ -266,17 +279,17 @@ public class Articulo implements Serializable {
     @Override
     public String toString() {
         return "Articulo{" +
-            "id=" + getId() +
-            ", codigo='" + getCodigo() + "'" +
-            ", nombre='" + getNombre() + "'" +
-            ", descripcion='" + getDescripcion() + "'" +
-            ", existencia=" + getExistencia() +
-            ", existenciaMinima=" + getExistenciaMinima() +
-            ", precio=" + getPrecio() +
-            ", costo=" + getCosto() +
-            ", imagen='" + getImagen() + "'" +
-            ", imagenContentType='" + getImagenContentType() + "'" +
-            ", activo='" + getActivo() + "'" +
-            "}";
+                "id=" + getId() +
+                ", codigo='" + getCodigo() + "'" +
+                ", nombre='" + getNombre() + "'" +
+                ", descripcion='" + getDescripcion() + "'" +
+                ", existencia=" + getExistencia() +
+                ", existenciaMinima=" + getExistenciaMinima() +
+                ", precio=" + getPrecio() +
+                ", costo=" + getCosto() +
+                ", imagen='" + getImagen() + "'" +
+                ", imagenContentType='" + getImagenContentType() + "'" +
+                ", activo='" + getActivo() + "'" +
+                "}";
     }
 }

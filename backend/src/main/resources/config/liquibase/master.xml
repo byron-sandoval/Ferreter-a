@@ -30,6 +30,7 @@
     <include file="config/liquibase/changelog/20260210230000_added_entity_DetalleDevolucion.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260220155204_added_entity_CierreCaja.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260220165500_added_column_to_CierreCaja.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260309212000_added_ultimoCosto_to_Articulo.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20260128152744_added_entity_constraints_Categoria.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260128152745_added_entity_constraints_Articulo.xml" relativeToChangelogFile="false"/>
