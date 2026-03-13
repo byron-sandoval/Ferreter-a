@@ -52,8 +52,8 @@ export const CategoriaUpdate = () => {
       <Col md="8">
         <Card>
           <CardHeader className="bg-white d-flex justify-content-between align-items-center">
-            <h4 className="mb-0 text-primary">{isNew ? 'Nueva Categoría' : 'Editar Categoría'}</h4>
-            <Button tag={Link} to="/admin/categorias" outline>
+            <h4 className="mb-0 text-black">{isNew ? 'Nueva Categoría' : 'Editar Categoría'}</h4>
+            <Button tag={Link} to="/admin/categorias" color="light" className="text-muted">
               <FontAwesomeIcon icon={faArrowLeft} /> Volver
             </Button>
           </CardHeader>

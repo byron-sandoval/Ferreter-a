@@ -26,6 +26,14 @@ import {
   faUpload,
   faInfoCircle,
   faRulerCombined,
+  faIdCard,
+  faMapMarkerAlt,
+  faPhoneAlt,
+  faEnvelope,
+  faUser,
+  faTrashAlt,
+  faExclamationTriangle,
+  faCloudUploadAlt
 } from '@fortawesome/free-solid-svg-icons';
 import GestionUnidadMedida from '../GestionUnidadMedida';
 import { EmpresaService } from 'app/services/empresa.service';
@@ -96,48 +104,49 @@ export const ConfiguracionEmpresa = () => {
   return (
     <div className="p-4 animate__animated animate__fadeIn">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="text-secondary fw-bold m-0">
-          <FontAwesomeIcon icon={faBuilding} className="me-2 text-primary" />
+        <h3 className="fw-bold m-0" style={{ color: '#00264d' }}>
           Configuraciones del Programa
-        </h2>
+        </h3>
       </div>
 
       <Row>
         <Col md="3">
-          <Card className="shadow-sm border-0 mb-4 overflow-hidden">
-            <Nav vertical className="p-0">
-              <NavItem>
+          <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: '15px', backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
+            <Nav vertical className="p-2">
+              <NavItem className="mb-2">
                 <NavLink
-                  className={`p-3 border-start border-4 ${activeTab === '1' ? 'bg-light border-primary fw-bold text-primary' : 'border-transparent text-secondary'}`}
+                  className={`p-3 d-flex align-items-center rounded-3 ${activeTab === '1' ? 'active-tab' : 'inactive-tab text-dark'}`}
                   onClick={() => setActiveTab('1')}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: 'pointer', transition: 'all 0.3s' }}
                 >
-                  <FontAwesomeIcon icon={faBuilding} className="me-2" /> Información del Negocio
+                  <div className={`icon-box me-2 bg-primary`}>
+                    <FontAwesomeIcon icon={faInfoCircle} className="text-white" />
+                  </div>
+                  <span className="small fw-bold">Información del Negocio</span>
                 </NavLink>
               </NavItem>
-              <NavItem>
+              <NavItem className="mb-2">
                 <NavLink
-                  className={`p-3 border-start border-4 ${activeTab === '4' ? 'bg-light border-primary fw-bold text-primary' : 'border-transparent text-secondary'}`}
+                  className={`p-3 d-flex align-items-center rounded-3 ${activeTab === '4' ? 'active-tab' : 'inactive-tab text-dark'}`}
                   onClick={() => setActiveTab('4')}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: 'pointer', transition: 'all 0.3s' }}
                 >
-                  <FontAwesomeIcon icon={faRulerCombined} className="me-2" /> Unidades de Medida
+                  <div className={`icon-box me-2`} style={{ backgroundColor: '#ff6b00' }}>
+                    <FontAwesomeIcon icon={faRulerCombined} className="text-white" />
+                  </div>
+                  <span className="small fw-bold">Unidades de Medida</span>
                 </NavLink>
               </NavItem>
               <NavItem>
                 <NavLink
-                  className={`p-3 border-start border-4 ${activeTab === '2' ? 'bg-light border-primary fw-bold text-primary' : 'border-transparent text-secondary text-opacity-50'}`}
-                  style={{ cursor: 'not-allowed' }}
+                  className={`p-3 d-flex align-items-center rounded-3 ${activeTab === '3' ? 'active-tab' : 'inactive-tab text-dark'}`}
+                  onClick={() => setActiveTab('3')}
+                  style={{ cursor: 'pointer', transition: 'all 0.3s' }}
                 >
-                  <FontAwesomeIcon icon={faHistory} className="me-2" /> Logs
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink
-                  className={`p-3 border-start border-4 ${activeTab === '3' ? 'bg-light border-primary fw-bold text-primary' : 'border-transparent text-secondary text-opacity-50'}`}
-                  style={{ cursor: 'not-allowed' }}
-                >
-                  <FontAwesomeIcon icon={faDatabase} className="me-2" /> Respaldo
+                  <div className={`icon-box me-2`} style={{ backgroundColor: '#28a745' }}>
+                    <FontAwesomeIcon icon={faCloudUploadAlt} className="text-white" />
+                  </div>
+                  <span className="small fw-bold">Respaldo</span>
                 </NavLink>
               </NavItem>
             </Nav>
@@ -147,129 +156,133 @@ export const ConfiguracionEmpresa = () => {
         <Col md="9">
           <TabContent activeTab={activeTab}>
             <TabPane tabId="1">
-              <Card className="shadow-sm border-0">
-                <CardBody className="p-4">
-                  <h5 className="border-bottom pb-3 mb-4 text-primary fw-bold">Información del Negocio</h5>
+              <Card className="shadow-sm border-0" style={{ borderRadius: '15px' }}>
+                <CardBody className="p-4 bg-glass-card">
+                  <h5 className="mb-4 fw-bold" style={{ color: '#00264d' }}>Información General del Negocio</h5>
                   <Form onSubmit={handleSubmit}>
                     <Row>
                       <Col md="7">
-                        <FormGroup className="mb-3">
-                          <Label for="nombre" className="small fw-bold text-secondary">
+                        <FormGroup className="mb-3 position-relative">
+                          <Label for="nombre" className="small fw-bold text-dark mb-1">
                             Nombre del Negocio *
                           </Label>
-                          <Input
-                            type="text"
-                            name="nombre"
-                            id="nombre"
-                            value={empresa.nombre || ''}
-                            onChange={handleInputChange}
-                            required
-                            placeholder="Ej: Ferretería Luz - El Viejo"
-                            className="form-control-lg border-2"
-                          />
+                          <div className="input-with-icon">
+                            <Input
+                              type="text"
+                              name="nombre"
+                              id="nombre"
+                              value={empresa.nombre || ''}
+                              onChange={handleInputChange}
+                              required
+                              className="custom-input"
+                            />
+                            <FontAwesomeIcon icon={faUser} className="field-icon text-info" />
+                          </div>
                         </FormGroup>
-
-                        <FormGroup className="mb-3">
-                          <Label for="ruc" className="small fw-bold text-secondary">
+                        <FormGroup className="mb-3 position-relative">
+                          <Label for="ruc" className="small fw-bold text-dark mb-1">
                             RUC / Identificación Fiscal *
                           </Label>
-                          <Input
-                            type="text"
-                            name="ruc"
-                            id="ruc"
-                            value={empresa.ruc || ''}
-                            onChange={handleInputChange}
-                            required
-                            placeholder="Ingrese el RUC"
-                            className="border-2"
-                          />
+                          <div className="input-with-icon">
+                            <Input
+                              type="text"
+                              name="ruc"
+                              id="ruc"
+                              value={empresa.ruc || ''}
+                              onChange={handleInputChange}
+                              required
+                              className="custom-input"
+                            />
+                            <FontAwesomeIcon icon={faIdCard} className="field-icon" style={{ color: '#ff9800' }} />
+                          </div>
                         </FormGroup>
-
-                        <FormGroup className="mb-3">
-                          <Label for="direccion" className="small fw-bold text-secondary">
+                        <FormGroup className="mb-3 position-relative">
+                          <Label for="direccion" className="small fw-bold text-dark mb-1">
                             Dirección Exacta *
                           </Label>
-                          <Input
-                            type="textarea"
-                            name="direccion"
-                            id="direccion"
-                            value={empresa.direccion || ''}
-                            onChange={handleInputChange}
-                            required
-                            placeholder="Dirección del local"
-                            className="border-2"
-                            rows={3}
-                          />
+                          <div className="input-with-icon">
+                            <Input
+                              type="textarea"
+                              name="direccion"
+                              id="direccion"
+                              value={empresa.direccion || ''}
+                              onChange={handleInputChange}
+                              required
+                              className="custom-input"
+                              rows={3}
+                            />
+                            <FontAwesomeIcon icon={faMapMarkerAlt} className="field-icon text-primary" />
+                          </div>
                         </FormGroup>
-
                         <Row>
                           <Col md="6">
-                            <FormGroup className="mb-3">
-                              <Label for="telefono" className="small fw-bold text-secondary">
+                            <FormGroup className="mb-3 position-relative">
+                              <Label for="telefono" className="small fw-bold text-dark mb-1">
                                 Teléfonos
                               </Label>
-                              <Input
-                                type="text"
-                                name="telefono"
-                                id="telefono"
-                                value={empresa.telefono || ''}
-                                onChange={handleInputChange}
-                                placeholder="7717-6886 / 8810-9566"
-                                className="border-2"
-                              />
+                              <div className="input-with-icon">
+                                <Input
+                                  type="text"
+                                  name="telefono"
+                                  id="telefono"
+                                  value={empresa.telefono || ''}
+                                  onChange={handleInputChange}
+                                  className="custom-input"
+                                />
+                                <FontAwesomeIcon icon={faPhoneAlt} className="field-icon text-success" />
+                              </div>
                             </FormGroup>
                           </Col>
                           <Col md="6">
-                            <FormGroup className="mb-3">
-                              <Label for="correo" className="small fw-bold text-secondary">
+                            <FormGroup className="mb-3 position-relative">
+                              <Label for="correo" className="small fw-bold text-dark mb-1">
                                 Correo Electrónico
                               </Label>
-                              <Input
-                                type="email"
-                                name="correo"
-                                id="correo"
-                                value={empresa.correo || ''}
-                                onChange={handleInputChange}
-                                placeholder="ejemplo@correo.com"
-                                className="border-2"
-                              />
+                              <div className="input-with-icon">
+                                <Input
+                                  type="email"
+                                  name="correo"
+                                  id="correo"
+                                  value={empresa.correo || ''}
+                                  onChange={handleInputChange}
+                                  className="custom-input"
+                                />
+                                <FontAwesomeIcon icon={faEnvelope} className="field-icon text-primary" />
+                              </div>
                             </FormGroup>
                           </Col>
                         </Row>
-
-                        <FormGroup className="mb-4">
-                          <Label for="eslogan" className="small fw-bold text-secondary">
+                        <FormGroup className="mb-4 position-relative">
+                          <Label for="eslogan" className="small fw-bold text-dark mb-1">
                             Eslogan o Lema
                           </Label>
-                          <Input
-                            type="text"
-                            name="eslogan"
-                            id="eslogan"
-                            value={empresa.eslogan || ''}
-                            onChange={handleInputChange}
-                            placeholder="Ej: Siempre contigo"
-                            className="border-2 italic"
-                          />
+                          <div className="input-with-icon">
+                            <Input
+                              type="text"
+                              name="eslogan"
+                              id="eslogan"
+                              value={empresa.eslogan || ''}
+                              onChange={handleInputChange}
+                              className="custom-input"
+                            />
+                          </div>
                         </FormGroup>
                       </Col>
 
-                      <Col md="5" className="ps-md-5 border-start">
+                      <Col md="5" className="ps-md-5">
                         <div className="text-center mb-4">
-                          <Label className="small fw-bold text-secondary d-block mb-3">Logo del Negocio</Label>
-                          <div
-                            className="mx-auto bg-light rounded shadow-sm d-flex align-items-center justify-content-center overflow-hidden mb-3"
-                            style={{ width: '200px', height: '200px', border: '2px dashed #dee2e6' }}
-                          >
+                          <Label className="small fw-bold text-dark d-block mb-3">Logo del Negocio</Label>
+                          <div className="logo-container mx-auto mb-3">
                             {empresa.logo ? (
                               <img
                                 src={`data:${empresa.logoContentType};base64,${empresa.logo}`}
                                 alt="Logo"
                                 className="img-fluid"
-                                style={{ maxHeight: '100%' }}
+                                style={{ maxHeight: '100%', borderRadius: '10px' }}
                               />
                             ) : (
                               <div className="text-muted opacity-50">
-                                <FontAwesomeIcon icon={faImage} size="4x" />
+                                <FontAwesomeIcon icon={faCloudUploadAlt} size="4x" />
                                 <div className="mt-2 small">Sin Logo</div>
                               </div>
                             )}
@@ -297,44 +310,46 @@ export const ConfiguracionEmpresa = () => {
                               accept="image/*"
                             />
                             <Button
-                              color="outline-primary"
+                              className="custom-btn primary"
                               size="sm"
-                              className="px-3"
                               onClick={() => document.getElementById('logoFile')?.click()}
                             >
-                              <FontAwesomeIcon icon={faUpload} className="me-2" /> Seleccionar
+                              <FontAwesomeIcon icon={faUpload} className="me-2" /> SELECCIONAR
                             </Button>
                             {empresa.logo && (
                               <Button
-                                color="danger"
+                                className="custom-btn danger"
                                 size="sm"
-                                className="px-3"
-                                outline
                                 onClick={() => setEmpresa({ ...empresa, logo: null, logoContentType: null })}
                               >
-                                Quitar
+                                QUITAR
                               </Button>
                             )}
                           </div>
                         </div>
 
-                        <Alert color="info" className="small border-0 shadow-sm" fade={false}>
-                          <FontAwesomeIcon icon={faInfoCircle} className="me-2" />
-                          Esta información se verá reflejada en tus facturas impresas y reportes oficiales.
-                        </Alert>
+                        <div className="alert-box-vibrant d-flex align-items-center">
+                          <div className="alert-icon-wrap me-3">
+                            <FontAwesomeIcon icon={faExclamationTriangle} size="lg" className="text-warning" />
+                          </div>
+                          <div>
+                            <strong className="d-block">¡OJO!</strong>
+                            <span className="small">Esta información aparecerá en sus facturas y reportes oficiales. ¡Revise con cuidado!</span>
+                          </div>
+                        </div>
                       </Col>
                     </Row>
 
                     <hr className="my-4" />
 
                     <div className="d-flex justify-content-end">
-                      <Button color="primary" size="lg" className="px-5 shadow-sm fw-bold" disabled={saving}>
+                      <Button className="btn-save-vibrant shadow-sm" disabled={saving}>
                         {saving ? (
                           <span className="spinner-border spinner-border-sm me-2" role="status"></span>
                         ) : (
                           <FontAwesomeIcon icon={faSave} className="me-2" />
                         )}
-                        Guardar Información
+                        GUARDAR
                       </Button>
                     </div>
                   </Form>
@@ -347,6 +362,113 @@ export const ConfiguracionEmpresa = () => {
           </TabContent>
         </Col>
       </Row>
+      <style>
+        {`
+          .animate__fadeIn {
+            background: linear-gradient(135deg, #e3edf7 0%, #ccdcf1 100%);
+            min-vh-100;
+          }
+          .active-tab {
+            background: linear-gradient(90deg, #1080ee, #3ea0f5) !important;
+            color: white !important;
+            box-shadow: 0 4px 15px rgba(16, 128, 238, 0.4);
+          }
+          .inactive-tab:hover {
+            background-color: rgba(255, 255, 255, 0.8) !important;
+          }
+          .icon-box {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+          }
+          .bg-glass-card {
+            background: rgba(255, 255, 255, 0.6) !important;
+            backdrop-filter: blur(5px);
+          }
+          .input-with-icon {
+            position: relative;
+          }
+          .custom-input {
+            border: 1px solid #c9d6e4 !important;
+            border-radius: 8px !important;
+            padding: 10px 12px !important;
+            background-color: #f0f7ff !important;
+            transition: all 0.3s;
+          }
+          .custom-input:focus {
+            background-color: #ffffff !important;
+            border-color: #008cff !important;
+            box-shadow: 0 0 8px rgba(0, 140, 255, 0.2) !important;
+          }
+          .field-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.7;
+            font-size: 0.9rem;
+          }
+          .logo-container {
+             width: 200px;
+             height: 200px;
+             border-radius: 12px;
+             background: white;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             box-shadow: 0 0 20px rgba(0, 140, 255, 0.4);
+             padding: 5px;
+             overflow: hidden;
+          }
+          .custom-btn {
+            border-radius: 6px !important;
+            font-weight: bold !important;
+            font-size: 0.7rem !important;
+            padding: 6px 12px !important;
+            border: 1px solid #dee2e6 !important;
+          }
+          .custom-btn.primary { color: #008cff; background: white; border-color: #008cff; }
+          .custom-btn.danger { color: #ff4757; background: white; border-color: #ff4757; }
+          
+          .alert-box-vibrant {
+            background: linear-gradient(90deg, #c026d3, #9d174d) !important;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            box-shadow: 0 5px 15px rgba(157, 23, 77, 0.3);
+          }
+          .alert-icon-wrap {
+            background: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+          }
+          .btn-save-vibrant {
+            background: linear-gradient(90deg, #1e88e5, #1565c0) !important;
+            border: none !important;
+            color: white !important;
+            padding: 10px 40px !important;
+            border-radius: 8px !important;
+            font-weight: bold !important;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(21, 101, 192, 0.4);
+            transition: all 0.3s;
+          }
+          .btn-save-vibrant:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(21, 101, 192, 0.5);
+          }
+        `}
+      </style>
     </div>
   );
 };

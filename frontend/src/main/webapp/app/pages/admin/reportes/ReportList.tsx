@@ -18,20 +18,6 @@ import {
 
 const reports = [
   {
-    title: 'Ventas por Fecha',
-    description: 'Análisis detallado de ingresos por rango de fechas y sucursales.',
-    icon: faCalendarAlt,
-    color: 'primary',
-    path: null,
-  },
-  {
-    title: 'Inventario Crítico',
-    description: 'Productos con bajo stock y alertas de reorden de mercancía.',
-    icon: faExclamationTriangle,
-    color: 'danger',
-    path: null,
-  },
-  {
     title: 'Cierre de Caja',
     description: 'Resumen de ventas diarias desglosado por método de pago.',
     icon: faCashRegister,
@@ -39,11 +25,11 @@ const reports = [
     path: '/admin/reportes/cierre-caja',
   },
   {
-    title: 'Productos Más Vendidos',
-    description: 'Ranking de artículos con mayor rotación en el periodo.',
+    title: 'Mayor y Menor Demanda',
+    description: 'Análisis de rotación de productos (Top 10 más vendidos y menos vendidos).',
     icon: faStar,
     color: 'warning',
-    path: null,
+    path: '/admin/reportes/demanda',
   },
   {
     title: 'Compras por Proveedor',
@@ -56,22 +42,8 @@ const reports = [
     title: 'Reporte de Ganancias',
     description: 'Margen de utilidad calculado entre costo y precio de venta.',
     icon: faMoneyBillWave,
-    color: 'secondary',
-    path: '/admin/reportes/ganancias',
-  },
-  {
-    title: 'Estado de Cuenta Clientes',
-    description: 'Saldos pendientes y comportamiento de pagos de clientes.',
-    icon: faUserFriends,
-    color: 'dark',
-    path: null,
-  },
-  {
-    title: 'Factura Maestro-Detalle',
-    description: 'Consulta de facturas específicas con desglose de artículos.',
-    icon: faFileInvoice,
     color: 'primary',
-    path: null,
+    path: '/admin/reportes/ganancias',
   },
 ];
 
@@ -86,33 +58,9 @@ export const ReportList = () => {
           </h4>
           <p className="text-muted small m-0">Genera y exporta la información clave de tu ferretería</p>
         </div>
-        <Button color="success" size="sm" className="shadow-sm">
-          <FontAwesomeIcon icon={faFileExcel} className="me-2" />
-          Exportar Lista General
-        </Button>
       </div>
 
-      {/* Filtros Globales Quick Access (Simulados) */}
-      <Card className="shadow-sm mb-4 border-0" style={{ background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(10px)' }}>
-        <CardBody className="py-2">
-          <Row className="align-items-center">
-            <Col md="auto">
-              <span className="small fw-bold text-muted">FILTROS RÁPIDOS:</span>
-            </Col>
-            <Col md="auto">
-              <Button color="light" size="sm" className="me-2 border shadow-sm">
-                Hoy
-              </Button>
-              <Button color="light" size="sm" className="me-2 border shadow-sm">
-                Esta Semana
-              </Button>
-              <Button color="light" size="sm" className="me-2 border shadow-sm">
-                Este Mes
-              </Button>
-            </Col>
-          </Row>
-        </CardBody>
-      </Card>
+
 
       <Row>
         {reports.map((report, index) => (
