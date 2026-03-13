@@ -19,6 +19,9 @@ export const DevolucionService = {
   getByVenta(ventaId: number) {
     return axios.get<IDevolucion[]>(`${API_URL}/venta/${ventaId}`);
   },
+  getAllDetalles(params?: any) {
+    return axios.get<any[]>('api/detalle-devolucions', { params });
+  }
 };
 
 export default DevolucionService;
