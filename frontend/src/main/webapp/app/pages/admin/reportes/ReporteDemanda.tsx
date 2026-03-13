@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartLine, faArrowLeft, faFileExcel, faCalendarDay, faFilter, faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import VentaService from 'app/services/venta.service';
+import DevolucionService from 'app/services/devolucion.service';
 import ArticuloService from 'app/services/articulo.service';
 import { IDetalleVenta } from 'app/shared/model/detalle-venta.model';
 import { IArticulo } from 'app/shared/model/articulo.model';
@@ -14,6 +15,7 @@ import * as XLSX from 'xlsx-js-style';
 export const ReporteDemanda = () => {
   const navigate = useNavigate();
   const [detalles, setDetalles] = useState<IDetalleVenta[]>([]);
+  const [detalleDevoluciones, setDetalleDevoluciones] = useState<any[]>([]);
   const [articulos, setArticulos] = useState<IArticulo[]>([]);
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState('7_DAYS'); // 'TODAY', '7_DAYS', '15_DAYS', 'MONTH'
@@ -25,12 +27,14 @@ export const ReporteDemanda = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [artRes, detRes] = await Promise.all([
+      const [artRes, detRes, devRes] = await Promise.all([
         ArticuloService.getAll(0, 5000),
-        VentaService.getAllDetalles({ size: 10000, sort: 'id,desc' })
+        VentaService.getAllDetalles({ size: 10000, sort: 'id,desc' }),
+        DevolucionService.getAllDetalles({ size: 10000, sort: 'id,desc' })
       ]);
       setArticulos(artRes.data);
       setDetalles(detRes.data);
+      setDetalleDevoluciones(devRes.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -54,29 +58,56 @@ export const ReporteDemanda = () => {
     });
   };
 
+  const getFilteredDevoluciones = () => {
+    let startDate = dayjs().startOf('day');
+    const endDate = dayjs().endOf('day');
+
+    if (range === '7_DAYS') startDate = dayjs().subtract(7, 'days').startOf('day');
+    if (range === '15_DAYS') startDate = dayjs().subtract(15, 'days').startOf('day');
+    if (range === 'MONTH') startDate = dayjs().startOf('month');
+    if (range === 'TODAY') startDate = dayjs().startOf('day');
+
+    return detalleDevoluciones.filter(det => {
+      if (!det.devolucion || !det.devolucion.fecha) return false;
+      const fechaDev = dayjs(det.devolucion.fecha);
+      return fechaDev.isAfter(startDate) && fechaDev.isBefore(endDate);
+    });
+  };
+
   const processedData = () => {
-    const filtered = getFilteredDetalles();
+    const filteredDet = getFilteredDetalles();
+    const filteredDev = getFilteredDevoluciones();
     const map = new Map<number, { nombre: string; cant: number; codigo: string }>();
 
-    // Inicializar con 0 para todos los artículos que queremos monitorear (opcional, pero ayuda a ver los de "Cero demanda")
+    // Inicializar con 0 para todos los artículos que queremos monitorear
     articulos.forEach(art => {
       if (art.activo && art.id !== undefined) {
         map.set(art.id, { nombre: art.nombre || '', cant: 0, codigo: art.codigo || '' });
       }
     });
 
-    filtered.forEach(det => {
+    // Sumar ventas
+    filteredDet.forEach(det => {
       if (det.articulo && det.articulo.id !== undefined) {
         const current = map.get(det.articulo.id);
         if (current) {
           current.cant += (det.cantidad || 0);
-        } else {
-            // Si por alguna razón no estaba en la lista inicial (ej: inactivo pero con ventas pasadas)
+        } else if (det.articulo.id) {
             map.set(det.articulo.id, { 
                 nombre: det.articulo.nombre || 'Desconocido', 
                 cant: det.cantidad || 0, 
                 codigo: det.articulo.codigo || '-' 
             });
+        }
+      }
+    });
+
+    // Restar devoluciones
+    filteredDev.forEach(det => {
+      if (det.articulo && det.articulo.id !== undefined) {
+        const current = map.get(det.articulo.id);
+        if (current) {
+          current.cant -= (det.cantidad || 0);
         }
       }
     });

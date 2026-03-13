@@ -268,7 +268,10 @@ const CierreCaja = () => {
                             <CardBody>
                                 <div className="d-flex justify-content-between align-items-center mb-3">
                                     <h6 className="fw-bold m-0"><FontAwesomeIcon icon={faMoneyBillWave} className="me-2 text-primary" />Detalle de Operaciones</h6>
-                                    <Badge color="primary" pill>{ventas.length} Facturas</Badge>
+                                    <Badge color="primary" pill>{(() => {
+                                        const returnedVentaIds = new Set(devoluciones.map(d => d.venta?.id));
+                                        return ventas.filter(v => !returnedVentaIds.has(v.id)).length + devoluciones.length;
+                                    })()} Movimientos</Badge>
                                 </div>
                                 <div className="table-responsive">
                                     <Table hover size="sm" className="align-middle">
@@ -283,24 +286,50 @@ const CierreCaja = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {ventas.length > 0 ? (
-                                                ventas.map((v) => (
-                                                    <tr key={v.id} className="small">
-                                                        <td className="fw-bold">#{v.noFactura}</td>
-                                                        <td className="text-muted text-center">{dayjs(v.fecha).format('hh:mm A')}</td>
-                                                        <td className="text-center">{v.usuario?.nombre || 'Admin'}</td>
-                                                        <td>{v.cliente?.nombre || 'General'}</td>
-                                                        <td className="text-center">
-                                                            <Badge color={v.metodoPago === 'EFECTIVO' ? 'success' : 'info'} pill style={{ fontSize: '0.65rem' }}>
-                                                                {v.metodoPago === 'TARJETA_STRIPE' ? 'TARJETA' : v.metodoPago}
-                                                            </Badge>
-                                                        </td>
-                                                        <td className="text-end fw-bold">C$ {v.total?.toLocaleString()}</td>
-                                                    </tr>
-                                                ))
-                                            ) : (
-                                                <tr><td colSpan={6} className="text-center py-5 text-muted">No hay registros para este día.</td></tr>
-                                            )}
+                                            {(() => {
+                                                const returnedVentaIds = new Set(devoluciones.map(d => d.venta?.id));
+                                                const allOps = [
+                                                    ...ventas.filter(v => !returnedVentaIds.has(v.id)).map(v => ({ ...v, _tipo: 'VENTA' })),
+                                                    ...devoluciones.map(d => ({ ...d, _tipo: 'DEVOLUCION' }))
+                                                ].sort((a, b) => dayjs(b.fecha).diff(dayjs(a.fecha)));
+
+                                                if (allOps.length === 0) {
+                                                    return <tr><td colSpan={6} className="text-center py-5 text-muted">No hay registros para este día.</td></tr>;
+                                                }
+
+                                                return allOps.map((op: any) => {
+                                                    const isVenta = op._tipo === 'VENTA';
+                                                    return (
+                                                        <tr key={isVenta ? `v-${op.id}` : `d-${op.id}`} className="small">
+                                                            <td className="fw-bold">
+                                                                #{isVenta ? op.noFactura : op.venta?.noFactura}
+                                                                {!isVenta && <small className="ms-1 text-danger fw-normal">(Devolución)</small>}
+                                                            </td>
+                                                            <td className="text-muted text-center">{dayjs(op.fecha).format('hh:mm A')}</td>
+                                                            <td className="text-center">{isVenta ? (op.usuario?.nombre || 'Admin') : (op.venta?.usuario?.nombre || 'Admin')}</td>
+                                                            <td>{isVenta ? (op.cliente?.nombre || 'General') : (op.venta?.cliente?.nombre || 'General')}</td>
+                                                            <td className="text-center">
+                                                                <Badge 
+                                                                    color={
+                                                                        isVenta 
+                                                                            ? (op.metodoPago === 'EFECTIVO' ? 'success' : 'info') 
+                                                                            : ((op.venta?.metodoPago === 'EFECTIVO' || !op.venta?.metodoPago) ? 'success' : 'info')
+                                                                    } 
+                                                                    pill style={{ fontSize: '0.65rem' }}
+                                                                >
+                                                                    {isVenta 
+                                                                        ? (op.metodoPago === 'TARJETA_STRIPE' ? 'TARJETA' : op.metodoPago) 
+                                                                        : (op.venta?.metodoPago === 'TARJETA_STRIPE' ? 'TARJETA' : op.venta?.metodoPago || 'EFECTIVO')
+                                                                    }
+                                                                </Badge>
+                                                            </td>
+                                                            <td className={`text-end fw-bold ${!isVenta ? 'text-danger' : ''}`}>
+                                                                {isVenta ? '' : '- '}C$ {op.total?.toLocaleString()}
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                });
+                                            })()}
                                         </tbody>
                                     </Table>
                                 </div>
