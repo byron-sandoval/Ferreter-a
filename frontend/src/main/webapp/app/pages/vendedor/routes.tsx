@@ -7,6 +7,8 @@ import ConsultaInventario from './ConsultaInventario';
 import HistorialVentas from './HistorialVentas';
 import GestionClientes from './GestionClientes';
 
+const DevolucionList = React.lazy(() => import('../admin/DevolucionList'));
+
 const VentaRoutes = () => (
   <ErrorBoundaryRoutes>
     <Route index element={<UsuarioDashboard />} />
@@ -14,6 +16,14 @@ const VentaRoutes = () => (
     {/* <Route path="consulta-inventario" element={<ConsultaInventario />} /> */}
     <Route path="historial-ventas" element={<HistorialVentas />} />
     <Route path="clientes" element={<GestionClientes />} />
+    <Route
+      path="devoluciones"
+      element={
+        <React.Suspense fallback={<div>Cargando...</div>}>
+          <DevolucionList />
+        </React.Suspense>
+      }
+    />
   </ErrorBoundaryRoutes>
 );
 

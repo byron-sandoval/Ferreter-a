@@ -141,7 +141,7 @@ export const HistorialVentas = () => {
             color="outline-primary"
             size="sm"
             className="me-2"
-            onClick={() => navigate('/admin/devoluciones')}
+            onClick={() => navigate('/vendedor/devoluciones')}
             style={{ fontSize: '0.75rem' }}
           >
             <FontAwesomeIcon icon={faUndoAlt} className="me-1" /> Devoluciones
