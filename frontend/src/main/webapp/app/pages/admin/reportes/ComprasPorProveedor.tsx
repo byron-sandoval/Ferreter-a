@@ -272,7 +272,7 @@ export const ComprasPorProveedor = () => {
                     </td>
                     <td className="text-end fw-bold text-success">C$ {totalCompras.toLocaleString()}</td>
                     <td className="text-center">
-                      <Badge color={prov.activo ? 'success' : 'secondary'} pill style={{ fontSize: '0.65rem' }}>
+                      <Badge color={prov.activo ? 'success' : 'danger'} pill style={{ fontSize: '0.65rem' }}>
                         {prov.activo ? 'Activo' : 'Inactivo'}
                       </Badge>
                     </td>
