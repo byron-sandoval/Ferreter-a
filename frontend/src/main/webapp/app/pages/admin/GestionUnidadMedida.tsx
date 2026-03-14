@@ -84,7 +84,9 @@ export const GestionUnidadMedida = () => {
 
   const checkProductsBeforeDeactivate = async (id: number) => {
     try {
-      const res = await import('app/services/articulo.service').then(m => m.default.countByCriteria({ 'unidadMedidaId.equals': id, 'activo.equals': true }));
+      const res = await import('app/services/articulo.service').then(m =>
+        m.default.countByCriteria({ 'unidadMedidaId.equals': id, 'activo.equals': true }),
+      );
       return res.data;
     } catch (e) {
       return 0;
@@ -141,7 +143,11 @@ export const GestionUnidadMedida = () => {
               onChange={() => setShowInactive(!showInactive)}
               style={{ cursor: 'pointer' }}
             />
-            <label className="form-check-label text-white ms-2 small fw-bold" htmlFor="showInactiveSwitchUM" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
+            <label
+              className="form-check-label text-white ms-2 small fw-bold"
+              htmlFor="showInactiveSwitchUM"
+              style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
+            >
               Ver Inactivos
             </label>
           </div>

@@ -89,7 +89,11 @@ export const ProveedorList = () => {
               onChange={() => setShowInactive(!showInactive)}
               style={{ cursor: 'pointer' }}
             />
-            <label className="form-check-label text-white ms-2 small fw-bold" htmlFor="showInactiveSwitchProv" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
+            <label
+              className="form-check-label text-white ms-2 small fw-bold"
+              htmlFor="showInactiveSwitchProv"
+              style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
+            >
               Ver Inactivos
             </label>
           </div>

@@ -114,7 +114,13 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
                 value={busquedaCedula}
                 className="bg-light border-0"
                 autoComplete="off"
-                maxLength={/^[\d\-]*[a-zA-Z]?$/.test(busquedaCedula) && busquedaCedula.length > 0 ? (busquedaCedula.includes('-') ? 16 : 14) : undefined}
+                maxLength={
+                  /^[\d\-]*[a-zA-Z]?$/.test(busquedaCedula) && busquedaCedula.length > 0
+                    ? busquedaCedula.includes('-')
+                      ? 16
+                      : 14
+                    : undefined
+                }
                 onChange={e => setBusquedaCedula(/^[\d\-]*[a-zA-Z]?$/.test(e.target.value) ? e.target.value.toUpperCase() : e.target.value)}
                 onKeyPress={e => e.key === 'Enter' && buscarCliente()}
               />
@@ -186,7 +192,10 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
                     </div>
                   </td>
                   <td className="text-center py-2">
-                    <div className="d-flex align-items-center justify-content-center gap-1 border rounded-pill bg-white px-1 shadow-sm" style={{ width: 'fit-content', margin: '0 auto' }}>
+                    <div
+                      className="d-flex align-items-center justify-content-center gap-1 border rounded-pill bg-white px-1 shadow-sm"
+                      style={{ width: 'fit-content', margin: '0 auto' }}
+                    >
                       <Button
                         size="sm"
                         color="link"
@@ -212,12 +221,7 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
                   </td>
                   <td className="text-end py-2 fw-bold text-primary">C$ {item.subtotal.toFixed(2)}</td>
                   <td className="text-end py-2">
-                    <Button
-                      size="sm"
-                      color="link"
-                      className="text-danger p-0"
-                      onClick={() => eliminarDelCarrito(item.articulo.id)}
-                    >
+                    <Button size="sm" color="link" className="text-danger p-0" onClick={() => eliminarDelCarrito(item.articulo.id)}>
                       <FontAwesomeIcon icon={faTimes} style={{ fontSize: '0.8rem' }} />
                     </Button>
                   </td>
@@ -246,9 +250,13 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
           </div>
 
           <div className="d-flex justify-content-between align-items-center my-1 bg-dark text-white p-2 px-3 rounded-3 shadow-sm">
-            <span className="fw-bold small text-uppercase" style={{ fontSize: '0.7rem' }}>Total a Pagar</span>
+            <span className="fw-bold small text-uppercase" style={{ fontSize: '0.7rem' }}>
+              Total a Pagar
+            </span>
             <div className="text-end">
-              <h5 className="fw-bold m-0" style={{ color: '#00d1ff' }}>C$ {total.toFixed(2)}</h5>
+              <h5 className="fw-bold m-0" style={{ color: '#00d1ff' }}>
+                C$ {total.toFixed(2)}
+              </h5>
               {monedaSeleccionada?.simbolo !== 'C$' && (
                 <div className="text-light opacity-75 fw-bold small">
                   {monedaSeleccionada?.simbolo} {totalEnMoneda.toFixed(2)}
@@ -260,7 +268,9 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
           <div className="p-2 bg-white rounded-3 border mb-2">
             <Row className="g-2 align-items-center">
               <Col xs="4">
-                <Label className="small text-muted mb-0 d-block text-uppercase fw-bold" style={{ fontSize: '0.6rem' }}>Pago con:</Label>
+                <Label className="small text-muted mb-0 d-block text-uppercase fw-bold" style={{ fontSize: '0.6rem' }}>
+                  Pago con:
+                </Label>
                 <div className="d-flex gap-1 mt-1">
                   <Button
                     size="sm"
@@ -289,7 +299,9 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
               {metodoPago === MetodoPagoEnum.EFECTIVO ? (
                 <>
                   <Col xs="4">
-                    <Label className="small text-muted mb-0 d-block text-uppercase fw-bold" style={{ fontSize: '0.6rem' }}>Desc. (C$)</Label>
+                    <Label className="small text-muted mb-0 d-block text-uppercase fw-bold" style={{ fontSize: '0.6rem' }}>
+                      Desc. (C$)
+                    </Label>
                     <Input
                       type="number"
                       bsSize="sm"
@@ -301,7 +313,9 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
                   </Col>
 
                   <Col xs="4">
-                    <Label className="small text-muted mb-0 d-block text-uppercase fw-bold" style={{ fontSize: '0.6rem' }}>Recibido</Label>
+                    <Label className="small text-muted mb-0 d-block text-uppercase fw-bold" style={{ fontSize: '0.6rem' }}>
+                      Recibido
+                    </Label>
                     <Input
                       type="number"
                       bsSize="sm"
@@ -314,7 +328,9 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
                 </>
               ) : (
                 <Col xs="8">
-                  <Label className="small text-muted mb-0 d-block text-uppercase fw-bold" style={{ fontSize: '0.6rem' }}>N° Voucher / Referencia</Label>
+                  <Label className="small text-muted mb-0 d-block text-uppercase fw-bold" style={{ fontSize: '0.6rem' }}>
+                    N° Voucher / Referencia
+                  </Label>
                   <Input
                     type="text"
                     bsSize="sm"
@@ -355,7 +371,7 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
             <Button
               color={
                 (metodoPago === MetodoPagoEnum.EFECTIVO && (parseFloat(montoPagado) || 0) < total) ||
-                  (metodoPago === MetodoPagoEnum.TARJETA_STRIPE && !voucher.trim())
+                (metodoPago === MetodoPagoEnum.TARJETA_STRIPE && !voucher.trim())
                   ? 'secondary'
                   : 'success'
               }
@@ -376,7 +392,7 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
               ) : (
                 <span>
                   <FontAwesomeIcon icon={faMoneyBillWave} className="me-2" />
-                  {(metodoPago === MetodoPagoEnum.EFECTIVO && (parseFloat(montoPagado) || 0) < total) ? 'Esperando Pago' : 'Finalizar Venta'}
+                  {metodoPago === MetodoPagoEnum.EFECTIVO && (parseFloat(montoPagado) || 0) < total ? 'Esperando Pago' : 'Finalizar Venta'}
                 </span>
               )}
             </Button>

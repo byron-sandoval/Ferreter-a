@@ -23,7 +23,21 @@ import DevolucionService from 'app/services/devolucion.service';
 import { IArticulo } from 'app/shared/model/articulo.model';
 import { IVenta } from 'app/shared/model/venta.model';
 import { IDevolucion } from 'app/shared/model/devolucion.model';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, BarChart, Bar } from 'recharts';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+  BarChart,
+  Bar,
+} from 'recharts';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 import { IDetalleVenta } from 'app/shared/model/detalle-venta.model';
@@ -156,15 +170,17 @@ export const AdminDashboard = () => {
             </DropdownToggle>
             <DropdownMenu end className="shadow border-0">
               <DropdownItem header>Seleccionar Mes</DropdownItem>
-              {Array.from({ length: dayjs().month() + 1 }).map((_, m) => {
-                const d = dayjs().startOf('year').add(m, 'month');
-                const isSelected = selectedDate.isSame(d, 'month');
-                return (
-                  <DropdownItem key={m} onClick={() => setSelectedDate(d)} active={isSelected}>
-                    {d.format('MMMM YYYY').charAt(0).toUpperCase() + d.format('MMMM YYYY').slice(1)}
-                  </DropdownItem>
-                );
-              }).reverse()}
+              {Array.from({ length: dayjs().month() + 1 })
+                .map((_, m) => {
+                  const d = dayjs().startOf('year').add(m, 'month');
+                  const isSelected = selectedDate.isSame(d, 'month');
+                  return (
+                    <DropdownItem key={m} onClick={() => setSelectedDate(d)} active={isSelected}>
+                      {d.format('MMMM YYYY').charAt(0).toUpperCase() + d.format('MMMM YYYY').slice(1)}
+                    </DropdownItem>
+                  );
+                })
+                .reverse()}
             </DropdownMenu>
           </Dropdown>
         </div>
@@ -278,7 +294,12 @@ export const AdminDashboard = () => {
                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dy={10} />
                     <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} />
                     <Tooltip
-                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', padding: '10px' }}
+                      contentStyle={{
+                        borderRadius: '12px',
+                        border: 'none',
+                        boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                        padding: '10px',
+                      }}
                       formatter={(value: any) => [`C$ ${Number(value).toLocaleString()}`, 'Ventas']}
                     />
                     <Area
@@ -411,25 +432,29 @@ export const AdminDashboard = () => {
                         className="bg-white p-3 shadow-sm border product-alert-card h-100"
                         style={{
                           borderRadius: '15px',
-                          transition: 'all 0.3s ease'
+                          transition: 'all 0.3s ease',
                         }}
-                        onMouseEnter={(e) => {
+                        onMouseEnter={e => {
                           e.currentTarget.style.transform = 'translateY(-5px)';
                           e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)';
                         }}
-                        onMouseLeave={(e) => {
+                        onMouseLeave={e => {
                           e.currentTarget.style.transform = 'translateY(0)';
                           e.currentTarget.style.boxShadow = 'none';
                         }}
                       >
                         <div className="d-flex justify-content-between align-items-start mb-3">
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <div className="fw-bold text-dark text-truncate" style={{ fontSize: '1rem' }}>{p.nombre}</div>
-                            <Badge color="warning" className="text-uppercase mt-1" style={{ fontSize: '0.6rem', padding: '3px 7px' }}>Revisión Requerida</Badge>
+                            <div className="fw-bold text-dark text-truncate" style={{ fontSize: '1rem' }}>
+                              {p.nombre}
+                            </div>
+                            <Badge color="warning" className="text-uppercase mt-1" style={{ fontSize: '0.6rem', padding: '3px 7px' }}>
+                              Revisión Requerida
+                            </Badge>
                           </div>
                           <div
                             className="btn-sm p-0 d-flex align-items-center justify-content-center bg-primary text-white shadow-sm"
-                            onClick={(e) => {
+                            onClick={e => {
                               e.stopPropagation();
                               navigate(`/admin/articulos/${p.id}/edit`);
                             }}
@@ -441,15 +466,21 @@ export const AdminDashboard = () => {
 
                         <div className="d-flex justify-content-between gap-1 bg-light p-3 rounded-4 border-0">
                           <div className="text-center flex-fill">
-                            <div className="text-muted mb-1" style={{ fontSize: '0.65rem' }}>ANTERIOR</div>
+                            <div className="text-muted mb-1" style={{ fontSize: '0.65rem' }}>
+                              ANTERIOR
+                            </div>
                             <div className="fw-bold small text-dark">C$ {p.ultimoCosto?.toLocaleString() || '---'}</div>
                           </div>
                           <div className="text-center flex-fill border-start border-end">
-                            <div className="text-muted mb-1" style={{ fontSize: '0.65rem' }}>NUEVO</div>
+                            <div className="text-muted mb-1" style={{ fontSize: '0.65rem' }}>
+                              NUEVO
+                            </div>
                             <div className="text-danger fw-bold small">C$ {p.costo?.toLocaleString()}</div>
                           </div>
                           <div className="text-center flex-fill">
-                            <div className="text-muted mb-1" style={{ fontSize: '0.65rem' }}>VENTA</div>
+                            <div className="text-muted mb-1" style={{ fontSize: '0.65rem' }}>
+                              VENTA
+                            </div>
                             <div className="text-primary fw-bold small">C$ {p.precio?.toLocaleString()}</div>
                           </div>
                         </div>

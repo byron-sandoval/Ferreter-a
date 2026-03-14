@@ -33,7 +33,7 @@ import {
   faUser,
   faTrashAlt,
   faExclamationTriangle,
-  faCloudUploadAlt
+  faCloudUploadAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import GestionUnidadMedida from '../GestionUnidadMedida';
 import { EmpresaService } from 'app/services/empresa.service';
@@ -158,7 +158,9 @@ export const ConfiguracionEmpresa = () => {
             <TabPane tabId="1">
               <Card className="shadow-sm border-0" style={{ borderRadius: '15px' }}>
                 <CardBody className="p-4 bg-glass-card">
-                  <h5 className="mb-4 fw-bold" style={{ color: '#00264d' }}>Información General del Negocio</h5>
+                  <h5 className="mb-4 fw-bold" style={{ color: '#00264d' }}>
+                    Información General del Negocio
+                  </h5>
                   <Form onSubmit={handleSubmit}>
                     <Row>
                       <Col md="7">
@@ -309,11 +311,7 @@ export const ConfiguracionEmpresa = () => {
                               }}
                               accept="image/*"
                             />
-                            <Button
-                              className="custom-btn primary"
-                              size="sm"
-                              onClick={() => document.getElementById('logoFile')?.click()}
-                            >
+                            <Button className="custom-btn primary" size="sm" onClick={() => document.getElementById('logoFile')?.click()}>
                               <FontAwesomeIcon icon={faUpload} className="me-2" /> SELECCIONAR
                             </Button>
                             {empresa.logo && (
@@ -334,7 +332,9 @@ export const ConfiguracionEmpresa = () => {
                           </div>
                           <div>
                             <strong className="d-block">¡OJO!</strong>
-                            <span className="small">Esta información aparecerá en sus facturas y reportes oficiales. ¡Revise con cuidado!</span>
+                            <span className="small">
+                              Esta información aparecerá en sus facturas y reportes oficiales. ¡Revise con cuidado!
+                            </span>
                           </div>
                         </div>
                       </Col>

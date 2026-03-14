@@ -58,43 +58,66 @@ export const UsuarioDashboard = () => {
 
       <Row className="g-4 mb-5">
         <Col md="4">
-          <Card className="border-0 shadow-lg rounded-4 overflow-hidden h-100" style={{ background: 'linear-gradient(135deg, #4e73df 0%, #224abe 100%)', color: 'white' }}>
+          <Card
+            className="border-0 shadow-lg rounded-4 overflow-hidden h-100"
+            style={{ background: 'linear-gradient(135deg, #4e73df 0%, #224abe 100%)', color: 'white' }}
+          >
             <CardBody className="p-4">
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <div className="rounded-circle bg-white p-3 d-flex align-items-center justify-content-center shadow-sm" style={{ width: '54px', height: '54px' }}>
+                <div
+                  className="rounded-circle bg-white p-3 d-flex align-items-center justify-content-center shadow-sm"
+                  style={{ width: '54px', height: '54px' }}
+                >
                   <FontAwesomeIcon icon={faShoppingBag} size="lg" className="text-primary" />
                 </div>
-
               </div>
-              <h6 className="text-white-50 small text-uppercase fw-bold mb-1" style={{ letterSpacing: '0.5px' }}>Ventas Realizadas</h6>
+              <h6 className="text-white-50 small text-uppercase fw-bold mb-1" style={{ letterSpacing: '0.5px' }}>
+                Ventas Realizadas
+              </h6>
               <h3 className="fw-bold text-white m-0">{stats.ventasHoy}</h3>
             </CardBody>
           </Card>
         </Col>
 
         <Col md="4">
-          <Card className="border-0 shadow-lg rounded-4 overflow-hidden h-100" style={{ background: 'linear-gradient(135deg, #1cc88a 0%, #13855c 100%)', color: 'white' }}>
+          <Card
+            className="border-0 shadow-lg rounded-4 overflow-hidden h-100"
+            style={{ background: 'linear-gradient(135deg, #1cc88a 0%, #13855c 100%)', color: 'white' }}
+          >
             <CardBody className="p-4">
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <div className="rounded-circle bg-white p-3 d-flex align-items-center justify-content-center shadow-sm" style={{ width: '54px', height: '54px' }}>
+                <div
+                  className="rounded-circle bg-white p-3 d-flex align-items-center justify-content-center shadow-sm"
+                  style={{ width: '54px', height: '54px' }}
+                >
                   <FontAwesomeIcon icon={faChartLine} size="lg" className="text-success" />
                 </div>
               </div>
-              <h6 className="text-white-50 small text-uppercase fw-bold mb-1" style={{ letterSpacing: '0.5px' }}>Total del Día</h6>
+              <h6 className="text-white-50 small text-uppercase fw-bold mb-1" style={{ letterSpacing: '0.5px' }}>
+                Total del Día
+              </h6>
               <h3 className="fw-bold text-white m-0">C$ {stats.montoHoy.toFixed(2)}</h3>
             </CardBody>
           </Card>
         </Col>
 
         <Col md="4">
-          <Card className="border-0 shadow-lg rounded-4 overflow-hidden h-100" style={{ background: 'linear-gradient(135deg, #8e44ad 0%, #6c3483 100%)', color: 'white' }}>
+          <Card
+            className="border-0 shadow-lg rounded-4 overflow-hidden h-100"
+            style={{ background: 'linear-gradient(135deg, #8e44ad 0%, #6c3483 100%)', color: 'white' }}
+          >
             <CardBody className="p-4">
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <div className="rounded-circle bg-white p-3 d-flex align-items-center justify-content-center shadow-sm" style={{ width: '54px', height: '54px' }}>
+                <div
+                  className="rounded-circle bg-white p-3 d-flex align-items-center justify-content-center shadow-sm"
+                  style={{ width: '54px', height: '54px' }}
+                >
                   <FontAwesomeIcon icon={faUserFriends} size="lg" style={{ color: '#8e44ad' }} />
                 </div>
               </div>
-              <h6 className="text-white-50 small text-uppercase fw-bold mb-1" style={{ letterSpacing: '0.5px' }}>Clientes Registrados</h6>
+              <h6 className="text-white-50 small text-uppercase fw-bold mb-1" style={{ letterSpacing: '0.5px' }}>
+                Clientes Registrados
+              </h6>
               <h3 className="fw-bold text-white m-0">{stats.clientesTotal}</h3>
             </CardBody>
           </Card>

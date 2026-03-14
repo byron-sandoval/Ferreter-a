@@ -21,7 +21,7 @@ export const DevolucionService = {
   },
   getAllDetalles(params?: any) {
     return axios.get<any[]>('api/detalle-devolucions', { params });
-  }
+  },
 };
 
 export default DevolucionService;

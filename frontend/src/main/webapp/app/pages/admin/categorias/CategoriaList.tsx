@@ -42,13 +42,12 @@ export const CategoriaList = () => {
     loadAll();
   }, []);
 
-  const filtered = categorias.filter(
-    c => {
-      const matchesSearch = (c.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (c.descripcion || '').toLowerCase().includes(filter.toLowerCase());
-      const matchesStatus = showInactive ? c.activo === false || c.activo === null : c.activo === true;
-      return matchesSearch && matchesStatus;
-    }
-  );
+  const filtered = categorias.filter(c => {
+    const matchesSearch =
+      (c.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (c.descripcion || '').toLowerCase().includes(filter.toLowerCase());
+    const matchesStatus = showInactive ? c.activo === false || c.activo === null : c.activo === true;
+    return matchesSearch && matchesStatus;
+  });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -60,7 +59,9 @@ export const CategoriaList = () => {
   const handleDelete = async (id: number, nombre: string) => {
     try {
       // Primero contamos cuántos productos tiene esta categoría
-      const res = await import('app/services/articulo.service').then(m => m.default.countByCriteria({ 'categoriaId.equals': id, 'activo.equals': true }));
+      const res = await import('app/services/articulo.service').then(m =>
+        m.default.countByCriteria({ 'categoriaId.equals': id, 'activo.equals': true }),
+      );
       const count = res.data;
 
       let message = `¿Está seguro de desactivar la categoría "${nombre}"?`;
@@ -122,7 +123,11 @@ export const CategoriaList = () => {
                 onChange={() => setShowInactive(!showInactive)}
                 style={{ cursor: 'pointer' }}
               />
-              <label className="form-check-label text-muted ms-2 small fw-bold" htmlFor="showInactiveSwitch" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              <label
+                className="form-check-label text-muted ms-2 small fw-bold"
+                htmlFor="showInactiveSwitch"
+                style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
+              >
                 Ver Inactivos
               </label>
             </div>

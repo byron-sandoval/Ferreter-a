@@ -81,7 +81,9 @@ export const CategoriaUpdate = () => {
                     <Controller
                       name="activo"
                       control={control}
-                      render={({ field }) => <Input type="checkbox" checked={field.value} onChange={e => field.onChange(e.target.checked)} />}
+                      render={({ field }) => (
+                        <Input type="checkbox" checked={field.value} onChange={e => field.onChange(e.target.checked)} />
+                      )}
                     />{' '}
                     Activo
                   </Label>

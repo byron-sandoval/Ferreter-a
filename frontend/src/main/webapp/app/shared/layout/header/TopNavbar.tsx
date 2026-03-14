@@ -38,7 +38,9 @@ export const TopNavbar = () => {
   const location = useLocation();
 
   const isVentasActive =
-    location.pathname === '/vendedor/historial-ventas' || location.pathname === '/admin/devoluciones' || location.pathname === '/vendedor/devoluciones';
+    location.pathname === '/vendedor/historial-ventas' ||
+    location.pathname === '/admin/devoluciones' ||
+    location.pathname === '/vendedor/devoluciones';
 
   const [dateStr, setDateStr] = useState('');
   const [timeStr, setTimeStr] = useState('');
@@ -140,7 +142,12 @@ export const TopNavbar = () => {
           <Nav navbar className="flex-row flex-wrap align-items-center no-scrollbar overflow-auto">
             {/* 1. Inicio */}
             <NavItem className="nav-link-item">
-              <NavLink tag={Link} to="/" style={navLinkStyle} active={location.pathname === '/' || location.pathname === '/vendedor' || location.pathname === '/bodeguero'}>
+              <NavLink
+                tag={Link}
+                to="/"
+                style={navLinkStyle}
+                active={location.pathname === '/' || location.pathname === '/vendedor' || location.pathname === '/bodeguero'}
+              >
                 <FontAwesomeIcon icon={faHome} size="sm" /> Inicio
               </NavLink>
             </NavItem>

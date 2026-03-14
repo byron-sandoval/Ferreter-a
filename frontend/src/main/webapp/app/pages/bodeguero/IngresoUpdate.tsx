@@ -2,7 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardBody, Form, FormGroup, Label, Input, Button, Row, Col, Table, Badge } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faArrowLeft, faPlus, faTrash, faBoxes, faShoppingCart, faClipboardList, faBarcode, faBoxOpen } from '@fortawesome/free-solid-svg-icons';
+import {
+  faSave,
+  faArrowLeft,
+  faPlus,
+  faTrash,
+  faBoxes,
+  faShoppingCart,
+  faClipboardList,
+  faBarcode,
+  faBoxOpen,
+} from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
 import { useAppSelector } from 'app/config/store';
 import { AUTHORITIES } from 'app/config/constants';
@@ -172,10 +182,7 @@ export const IngresoUpdate = () => {
                   </div>
 
                   {isProveedorOpen && (
-                    <div
-                      className="position-absolute w-100 shadow-lg border rounded bg-white mt-1 p-2"
-                      style={{ zIndex: 1050 }}
-                    >
+                    <div className="position-absolute w-100 shadow-lg border rounded bg-white mt-1 p-2" style={{ zIndex: 1050 }}>
                       <Input
                         autoFocus
                         type="text"
@@ -194,23 +201,25 @@ export const IngresoUpdate = () => {
                               key={p.id}
                               className="p-2 border-bottom small product-item-hover-selector"
                               style={{ cursor: 'pointer', transition: 'background 0.2s' }}
-                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
-                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                              onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f8f9fa')}
+                              onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
                               onClick={() => {
-                                setProveedorId(p.id!.toString());
+                                setProveedorId(p.id.toString());
                                 setIsProveedorOpen(false);
                                 setSearchProveedorTerm('');
                               }}
                             >
                               <div className="fw-bold">{p.nombre}</div>
                             </div>
-                          ))
-                        }
+                          ))}
                       </div>
 
                       <div
                         style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: -1 }}
-                        onClick={(e) => { e.stopPropagation(); setIsProveedorOpen(false); }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          setIsProveedorOpen(false);
+                        }}
                       />
                     </div>
                   )}
@@ -230,7 +239,9 @@ export const IngresoUpdate = () => {
                   />
                 </FormGroup>
                 <FormGroup>
-                  <Label for="observaciones" className="small fw-bold">Observaciones</Label>
+                  <Label for="observaciones" className="small fw-bold">
+                    Observaciones
+                  </Label>
                   <Input
                     type="textarea"
                     id="observaciones"
@@ -278,10 +289,7 @@ export const IngresoUpdate = () => {
 
                   {/* Cuadro desplegable CORTO con máximo 10 productos a la vista */}
                   {isOpen && (
-                    <div
-                      className="position-absolute w-100 shadow-lg border rounded bg-white mt-1 p-2"
-                      style={{ zIndex: 1050 }}
-                    >
+                    <div className="position-absolute w-100 shadow-lg border rounded bg-white mt-1 p-2" style={{ zIndex: 1050 }}>
                       {/* Buscador interno */}
                       <Input
                         autoFocus
@@ -302,10 +310,10 @@ export const IngresoUpdate = () => {
                               key={a.id}
                               className="p-2 border-bottom small product-item-hover-selector"
                               style={{ cursor: 'pointer', transition: 'background 0.2s' }}
-                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
-                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                              onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f8f9fa')}
+                              onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
                               onClick={() => {
-                                setArticuloSeleccionado(a.id!.toString());
+                                setArticuloSeleccionado(a.id.toString());
                                 setCostoUnitario(a.costo || 0);
                                 setPrecioVenta(a.precio || 0);
                                 setIsOpen(false);
@@ -313,16 +321,20 @@ export const IngresoUpdate = () => {
                               }}
                             >
                               <div className="fw-bold">{a.nombre}</div>
-                              <div className="text-muted" style={{ fontSize: '0.7rem' }}>Cod: {a.codigo} | Stock: {a.existencia}</div>
+                              <div className="text-muted" style={{ fontSize: '0.7rem' }}>
+                                Cod: {a.codigo} | Stock: {a.existencia}
+                              </div>
                             </div>
-                          ))
-                        }
+                          ))}
                       </div>
 
                       {/* Click fuera para cerrar */}
                       <div
                         style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: -1 }}
-                        onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          setIsOpen(false);
+                        }}
                       />
                     </div>
                   )}
@@ -330,7 +342,9 @@ export const IngresoUpdate = () => {
                 <Col md="3" className="mb-2">
                   <Label className="small fw-bold">Código</Label>
                   <div className="input-group input-group-sm">
-                    <span className="input-group-text bg-light"><FontAwesomeIcon icon={faBarcode} /></span>
+                    <span className="input-group-text bg-light">
+                      <FontAwesomeIcon icon={faBarcode} />
+                    </span>
                     <Input
                       type="text"
                       readOnly
@@ -343,7 +357,9 @@ export const IngresoUpdate = () => {
                 <Col md="3" className="mb-2">
                   <Label className="small fw-bold">Stock Actual</Label>
                   <div className="input-group input-group-sm">
-                    <span className="input-group-text bg-light text-primary"><FontAwesomeIcon icon={faBoxOpen} /></span>
+                    <span className="input-group-text bg-light text-primary">
+                      <FontAwesomeIcon icon={faBoxOpen} />
+                    </span>
                     <Input
                       type="text"
                       readOnly
@@ -367,8 +383,8 @@ export const IngresoUpdate = () => {
                     <>
                       <FormGroup check className="mb-2">
                         <Label check className="small fw-bold">
-                          <Input type="checkbox" checked={cambiarPrecio} onChange={e => setCambiarPrecio(e.target.checked)} />{' '}
-                          ¿Actualizar precios?
+                          <Input type="checkbox" checked={cambiarPrecio} onChange={e => setCambiarPrecio(e.target.checked)} /> ¿Actualizar
+                          precios?
                         </Label>
                       </FormGroup>
                       {cambiarPrecio && (
@@ -408,7 +424,9 @@ export const IngresoUpdate = () => {
                         <td className="small">{d.articulo?.codigo}</td>
                         <td className="fw-bold">{d.articulo?.nombre}</td>
                         <td className="text-center">
-                          <Badge color="info" pill>{d.cantidad}</Badge>
+                          <Badge color="info" pill>
+                            {d.cantidad}
+                          </Badge>
                         </td>
                         <td className="text-end text-muted small">C$ {d.costoUnitario?.toLocaleString()}</td>
                         {isAdmin && <td className="text-end fw-bold">C$ {d.monto?.toLocaleString()}</td>}

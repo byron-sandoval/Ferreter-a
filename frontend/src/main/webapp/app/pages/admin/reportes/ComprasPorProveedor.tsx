@@ -27,10 +27,7 @@ export const ComprasPorProveedor = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [provRes, ingRes] = await Promise.all([
-        ProveedorService.getAll(), 
-        IngresoService.getAll({ size: 5000, sort: 'id,desc' })
-      ]);
+      const [provRes, ingRes] = await Promise.all([ProveedorService.getAll(), IngresoService.getAll({ size: 5000, sort: 'id,desc' })]);
       setProveedores(provRes.data);
       setIngresos(ingRes.data);
     } catch (error) {
@@ -80,14 +77,14 @@ export const ComprasPorProveedor = () => {
 
   const exportDetalleExcel = async () => {
     if (!proveedorSeleccionado) return;
-    
+
     // Cargamos los artículos solo para obtener los códigos para el Excel
     let todosLosArticulos: any[] = [];
     try {
       const artRes = await ArticuloService.getAll(0, 5000);
       todosLosArticulos = artRes.data;
     } catch (e) {
-      console.error("Error al obtener códigos de artículos para el reporte", e);
+      console.error('Error al obtener códigos de artículos para el reporte', e);
     }
 
     const wb = XLSX.utils.book_new();
@@ -140,7 +137,13 @@ export const ComprasPorProveedor = () => {
             </div>
           </div>
           <div className="d-flex gap-2">
-            <Button color="success" size="sm" onClick={exportDetalleExcel} style={{ fontSize: '0.75rem' }} className="fw-bold border-0 shadow-sm">
+            <Button
+              color="success"
+              size="sm"
+              onClick={exportDetalleExcel}
+              style={{ fontSize: '0.75rem' }}
+              className="fw-bold border-0 shadow-sm"
+            >
               <FontAwesomeIcon icon={faFileExcel} className="me-1" /> EXCEL
             </Button>
             <Button color="light" size="sm" onClick={() => setProveedorSeleccionado(null)} style={{ fontSize: '0.75rem' }}>
