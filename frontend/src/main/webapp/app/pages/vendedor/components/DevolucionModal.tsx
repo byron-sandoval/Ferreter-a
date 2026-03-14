@@ -56,9 +56,9 @@ export const DevolucionModal: React.FC<DevolucionModalProps> = ({ isOpen, toggle
 
   if (!venta) return null;
 
-  // Calcular el factor de proporción (Total Final / Subtotal Original) 
+  // Calcular el factor de proporción (Total Final / Subtotal Original)
   // Esto aplica IVA y Descuentos proporcionalmente a cada producto devuelto.
-  const factorProporcional = (venta.subtotal && venta.subtotal > 0) ? (venta.total || 0) / venta.subtotal : 1;
+  const factorProporcional = venta.subtotal && venta.subtotal > 0 ? (venta.total || 0) / venta.subtotal : 1;
 
   const handleCantidadChange = (detalleId: number, cantidad: number, max: number, precio: number) => {
     const val = Math.min(Math.max(0, cantidad), max);
@@ -84,7 +84,7 @@ export const DevolucionModal: React.FC<DevolucionModalProps> = ({ isOpen, toggle
         detalles.push({
           cantidad: q,
           precioUnitario: det.precioVenta, // Mantenemos el unitario base
-          montoTotal: montoConIVA,       // Pero el monto total de retorno tiene su IVA
+          montoTotal: montoConIVA, // Pero el monto total de retorno tiene su IVA
           articulo: det.articulo,
         });
       }

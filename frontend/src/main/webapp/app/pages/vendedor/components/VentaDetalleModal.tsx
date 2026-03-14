@@ -39,16 +39,14 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
         <div className="d-flex justify-content-between mb-4 border-bottom pb-2">
           <div>
             <Label className="text-muted small text-uppercase fw-bold mb-0">Cliente</Label>
-            <div className="fw-bold fs-5 text-primary">
-              {venta.anulada ? 'ANULADA' : (venta.cliente?.nombre || 'General')}
-            </div>
+            <div className="fw-bold fs-5 text-primary">{venta.anulada ? 'ANULADA' : venta.cliente?.nombre || 'General'}</div>
             <small className="text-muted">{venta.anulada ? 'ANULADA' : venta.cliente?.cedula}</small>
           </div>
           <div className="text-end">
             <Label className="text-muted small text-uppercase fw-bold mb-0">Fecha y Hora</Label>
             <div className="fw-bold">{dayjs(venta.fecha).format('DD/MM/YYYY HH:mm')}</div>
-            <Badge color={venta.anulada ? 'danger' : (venta.esContado ? 'success' : 'warning')}>
-              {venta.anulada ? 'ANULADA' : (venta.esContado ? 'Contado' : 'Crédito')}
+            <Badge color={venta.anulada ? 'danger' : venta.esContado ? 'success' : 'warning'}>
+              {venta.anulada ? 'ANULADA' : venta.esContado ? 'Contado' : 'Crédito'}
             </Badge>
           </div>
         </div>
@@ -157,7 +155,9 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
               </div>
               <div style={{ textAlign: 'right', fontSize: '12.5px', color: '#444' }}>
                 <p style={{ margin: '0 0 2px 0', fontSize: '15px', fontWeight: 'bold' }}></p>
-                <p style={{ margin: '1px 0' }}><strong>Dir:</strong> {empresa?.direccion}</p>
+                <p style={{ margin: '1px 0' }}>
+                  <strong>Dir:</strong> {empresa?.direccion}
+                </p>
                 <p style={{ margin: '1px 0' }}>
                   <strong>RUC:</strong> {empresa?.ruc || 'N/A'}
                 </p>
@@ -186,17 +186,17 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                   CLIENTE
                 </h2>
                 <p style={{ margin: '1px 0', fontSize: '15.5px', fontWeight: 'bold', color: venta.anulada ? '#dc3545' : '#000' }}>
-                  {venta.anulada ? 'ANULADA' : (venta.cliente?.nombre || 'Consumidor Final')}
+                  {venta.anulada ? 'ANULADA' : venta.cliente?.nombre || 'Consumidor Final'}
                 </p>
                 <div style={{ fontSize: '12.5px' }}>
                   <p style={{ margin: '1px 0' }}>
                     <strong>Cédula:</strong> {venta.anulada ? 'ANULADA' : venta.cliente?.cedula}
                   </p>
                   <p style={{ margin: '1px 0' }}>
-                    <strong>Dirección:</strong> {venta.anulada ? 'ANULADA' : (venta.cliente?.direccion || 'Ciudad')}
+                    <strong>Dirección:</strong> {venta.anulada ? 'ANULADA' : venta.cliente?.direccion || 'Ciudad'}
                   </p>
                   <p style={{ margin: '1px 0' }}>
-                    <strong>Teléfono:</strong> {venta.anulada ? 'ANULADA' : (venta.cliente?.telefono || 'N/A')}
+                    <strong>Teléfono:</strong> {venta.anulada ? 'ANULADA' : venta.cliente?.telefono || 'N/A'}
                   </p>
                 </div>
               </div>
@@ -272,8 +272,11 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                 <tbody>
                   {venta.anulada ? (
                     <tr>
-                      <td colSpan={4} style={{ padding: '20px', textAlign: 'center', fontSize: '14px', fontWeight: 'bold', color: '#dc3545' }}>
-                        **** F A C T U R A   A N U L A D A ****
+                      <td
+                        colSpan={4}
+                        style={{ padding: '20px', textAlign: 'center', fontSize: '14px', fontWeight: 'bold', color: '#dc3545' }}
+                      >
+                        **** F A C T U R A A N U L A D A ****
                       </td>
                     </tr>
                   ) : (
@@ -450,25 +453,36 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                 <img
                   src={`data:${empresa.logoContentType};base64,${empresa.logo}`}
                   alt="logo"
-                  style={{ maxHeight: '60px', maxWidth: '200px', display: 'block', margin: '0 auto 6px auto', filter: 'grayscale(100%)', objectFit: 'contain' }}
+                  style={{
+                    maxHeight: '60px',
+                    maxWidth: '200px',
+                    display: 'block',
+                    margin: '0 auto 6px auto',
+                    filter: 'grayscale(100%)',
+                    objectFit: 'contain',
+                  }}
                 />
               )}
               <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{empresa?.nombre || 'FERRONICA'}</div>
               <div style={{ fontSize: '10px' }}>{empresa?.direccion}</div>
-              <div style={{ fontSize: '10px' }}>Tel: {empresa?.telefono} | RUC: {empresa?.ruc}</div>
+              <div style={{ fontSize: '10px' }}>
+                Tel: {empresa?.telefono} | RUC: {empresa?.ruc}
+              </div>
             </div>
             <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }} />
             {venta.anulada && (
-              <div style={{
-                textAlign: 'center',
-                fontWeight: 'bold',
-                fontSize: '13px',
-                border: '2px solid #120f0fff',
-                color: '#000000ff',
-                padding: '4px',
-                margin: '4px 0',
-                letterSpacing: '2px',
-              }}>
+              <div
+                style={{
+                  textAlign: 'center',
+                  fontWeight: 'bold',
+                  fontSize: '13px',
+                  border: '2px solid #120f0fff',
+                  color: '#000000ff',
+                  padding: '4px',
+                  margin: '4px 0',
+                  letterSpacing: '2px',
+                }}
+              >
                 *** FACTURA ANULADA ***
               </div>
             )}
@@ -480,7 +494,9 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
             <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }} />
             <div style={{ marginBottom: '4px', fontSize: '10px' }}>
               <strong>Cliente:</strong> {venta.cliente?.nombre || 'Consumidor Final'}
-              <div><strong>Cédula:</strong> {venta.cliente?.cedula}</div>
+              <div>
+                <strong>Cédula:</strong> {venta.cliente?.cedula}
+              </div>
             </div>
             <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }} />
             <div style={{ marginBottom: '4px' }}>
@@ -488,8 +504,12 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                 <div key={i} style={{ marginBottom: '3px' }}>
                   <div style={{ fontWeight: 'bold', fontSize: '11px' }}>{det.articulo?.nombre}</div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px' }}>
-                    <span>{det.cantidad} x C$ {det.precioVenta?.toFixed(2)}</span>
-                    <span><strong>C$ {det.monto?.toFixed(2)}</strong></span>
+                    <span>
+                      {det.cantidad} x C$ {det.precioVenta?.toFixed(2)}
+                    </span>
+                    <span>
+                      <strong>C$ {det.monto?.toFixed(2)}</strong>
+                    </span>
                   </div>
                 </div>
               ))}
@@ -497,20 +517,24 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
             <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }} />
             <div style={{ fontSize: '11px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Subtotal:</span><span>C$ {venta.subtotal?.toFixed(2)}</span>
+                <span>Subtotal:</span>
+                <span>C$ {venta.subtotal?.toFixed(2)}</span>
               </div>
               {(venta.descuento || 0) > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span>Descuento:</span><span>- C$ {venta.descuento?.toFixed(2)}</span>
+                  <span>Descuento:</span>
+                  <span>- C$ {venta.descuento?.toFixed(2)}</span>
                 </div>
               )}
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>IVA (15%):</span><span>C$ {venta.iva?.toFixed(2)}</span>
+                <span>IVA (15%):</span>
+                <span>C$ {venta.iva?.toFixed(2)}</span>
               </div>
             </div>
             <div style={{ borderTop: '2px solid #000', margin: '4px 0' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '13px' }}>
-              <span>TOTAL:</span><span>C$ {venta.total?.toFixed(2)}</span>
+              <span>TOTAL:</span>
+              <span>C$ {venta.total?.toFixed(2)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', marginTop: '2px' }}>
               <span>Recibido: C$ {venta.importeRecibido?.toFixed(2)}</span>
@@ -526,7 +550,9 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
       </ModalBody>
 
       <ModalFooter className="border-0 d-flex gap-2 align-items-center">
-        <Button color="secondary" onClick={toggle}>Cerrar</Button>
+        <Button color="secondary" onClick={toggle}>
+          Cerrar
+        </Button>
 
         {/* Selector de formato compacto */}
         <div className="d-flex gap-1 ms-auto">
@@ -575,7 +601,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
         <Button
           color={formatoImpresion === 'a4' ? 'primary' : 'success'}
           className="fw-bold"
-          onClick={() => formatoImpresion === 'a4' ? handlePrint() : handlePrintTicket()}
+          onClick={() => (formatoImpresion === 'a4' ? handlePrint() : handlePrintTicket())}
         >
           <FontAwesomeIcon icon={faPrint} className="me-1" />
           Reimprimir

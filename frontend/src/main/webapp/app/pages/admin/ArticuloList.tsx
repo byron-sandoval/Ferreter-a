@@ -67,7 +67,8 @@ export const ArticuloList = () => {
 
   const articulosFiltrados = articulos
     .filter(a => {
-      const matchesSearch = (a.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (a.codigo || '').toLowerCase().includes(filter.toLowerCase());
+      const matchesSearch =
+        (a.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (a.codigo || '').toLowerCase().includes(filter.toLowerCase());
       const matchesStatus = showInactive ? a.activo === false : a.activo !== false;
       return matchesSearch && matchesStatus;
     })
@@ -378,7 +379,11 @@ export const ArticuloList = () => {
               onChange={() => setShowInactive(!showInactive)}
               style={{ cursor: 'pointer' }}
             />
-            <label className="form-check-label text-white ms-2 small fw-bold" htmlFor="showInactiveSwitch" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
+            <label
+              className="form-check-label text-white ms-2 small fw-bold"
+              htmlFor="showInactiveSwitch"
+              style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
+            >
               Ver Inactivos
             </label>
           </div>
@@ -438,11 +443,7 @@ export const ArticuloList = () => {
                     const rowStyle = isSelected ? rowSelectedStyle : {};
 
                     return (
-                      <tr
-                        key={articulo.id}
-                        style={rowStyle}
-                        className={`text-center ${!articulo.activo ? 'text-muted' : ''}`}
-                      >
+                      <tr key={articulo.id} style={rowStyle} className={`text-center ${!articulo.activo ? 'text-muted' : ''}`}>
                         <td className="fw-bold text-primary">{articulo.id}</td>
                         <td>{articulo.codigo}</td>
                         <td className="text-start">
@@ -465,7 +466,9 @@ export const ArticuloList = () => {
                         <td>{articulo.existenciaMinima}</td>
                         {(isAdmin || isJefeBodega) && <td className="text-end">C$ {articulo.costo?.toFixed(2)}</td>}
                         <td className="text-end">C$ {articulo.precio?.toFixed(2)}</td>
-                        {isAdmin && <td className="text-end fw-bold">C$ {((articulo.existencia || 0) * (articulo.precio || 0)).toFixed(2)}</td>}
+                        {isAdmin && (
+                          <td className="text-end fw-bold">C$ {((articulo.existencia || 0) * (articulo.precio || 0)).toFixed(2)}</td>
+                        )}
                         <td className="text-center small text-muted px-3">
                           <div className="text-truncate" style={{ maxWidth: '120px' }}>
                             {articulo.descripcion || '-'}

@@ -302,7 +302,7 @@ export const NuevaVenta = () => {
         metodoPago,
         stripeId: voucher.trim() ? voucher.trim() : null,
         importeRecibido: metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? total : montoPagadoNum,
-        cambio: metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? 0 : (cambio > 0 ? cambio : 0),
+        cambio: metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? 0 : cambio > 0 ? cambio : 0,
         esContado,
         cliente,
         usuario: usuarioActual,

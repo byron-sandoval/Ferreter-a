@@ -109,15 +109,15 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
                       backgroundColor: '#fff',
                       opacity: isPendingReview ? 0.7 : 1,
                       filter: isPendingReview ? 'grayscale(0.8)' : 'none',
-                      cursor: isPendingReview ? 'not-allowed' : 'pointer'
+                      cursor: isPendingReview ? 'not-allowed' : 'pointer',
                     }}
-                    onMouseEnter={(e) => {
+                    onMouseEnter={e => {
                       if (!isPendingReview) {
                         e.currentTarget.style.transform = 'translateY(-5px)';
                         e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.15)';
                       }
                     }}
-                    onMouseLeave={(e) => {
+                    onMouseLeave={e => {
                       if (!isPendingReview) {
                         e.currentTarget.style.transform = 'translateY(0)';
                         e.currentTarget.style.boxShadow = '0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)';
@@ -139,7 +139,10 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
                     </div>
 
                     {/* Image Container */}
-                    <div className="text-center d-flex align-items-center justify-content-center bg-white" style={{ height: '100px', padding: '5px', position: 'relative' }}>
+                    <div
+                      className="text-center d-flex align-items-center justify-content-center bg-white"
+                      style={{ height: '100px', padding: '5px', position: 'relative' }}
+                    >
                       {prod.imagen ? (
                         <img
                           src={`data:${prod.imagenContentType};base64,${prod.imagen}`}
@@ -155,7 +158,11 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
                           className="position-absolute w-100 h-100 d-flex align-items-center justify-content-center"
                           style={{ backgroundColor: 'rgba(255,255,255,0.4)', top: 0, left: 0 }}
                         >
-                          <Badge color="secondary" className="px-3 py-2 shadow fw-bold text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '1px' }}>
+                          <Badge
+                            color="secondary"
+                            className="px-3 py-2 shadow fw-bold text-uppercase"
+                            style={{ fontSize: '0.75rem', letterSpacing: '1px' }}
+                          >
                             PENDIENTE
                           </Badge>
                         </div>
@@ -176,16 +183,21 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
                           overflow: 'hidden',
                           lineHeight: '1.2',
                           height: '2.4em',
-                          wordBreak: 'break-word'
+                          wordBreak: 'break-word',
                         }}
                         title={prod.nombre}
                       >
                         {prod.nombre}
                       </div>
-                      <div className="fw-bold d-flex justify-content-between align-items-center" style={{ color: '#007bff', fontSize: '0.90rem' }}>
+                      <div
+                        className="fw-bold d-flex justify-content-between align-items-center"
+                        style={{ color: '#007bff', fontSize: '0.90rem' }}
+                      >
                         <span>C$ {prod.precio?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         {isPendingReview && (
-                          <Badge color="warning" pill style={{ fontSize: '0.55rem' }}>REVISIÓN PRECIO</Badge>
+                          <Badge color="warning" pill style={{ fontSize: '0.55rem' }}>
+                            REVISIÓN PRECIO
+                          </Badge>
                         )}
                       </div>
                     </div>

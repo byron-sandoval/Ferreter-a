@@ -80,7 +80,9 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
               </div>
               <div style={{ textAlign: 'right', fontSize: '12.5px', color: '#444' }}>
                 <p style={{ margin: '0 0 2px 0', fontSize: '15px', fontWeight: 'bold' }}></p>
-                <p style={{ margin: '1px 0' }}><strong>Dir:</strong> {empresa?.direccion}</p>
+                <p style={{ margin: '1px 0' }}>
+                  <strong>Dir:</strong> {empresa?.direccion}
+                </p>
                 <p style={{ margin: '1px 0' }}>
                   <strong>RUC:</strong> {empresa?.ruc || 'N/A'}
                 </p>
@@ -92,7 +94,6 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                 </p>
               </div>
             </div>
-
 
             {/* Invoice Info Section - Balanced */}
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', position: 'relative', zIndex: 1 }}>
@@ -380,7 +381,9 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
               )}
               <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{empresa?.nombre || 'FERRONICA'}</div>
               <div style={{ fontSize: '10px' }}>{empresa?.direccion}</div>
-              <div style={{ fontSize: '10px' }}>Tel: {empresa?.telefono} | RUC: {empresa?.ruc}</div>
+              <div style={{ fontSize: '10px' }}>
+                Tel: {empresa?.telefono} | RUC: {empresa?.ruc}
+              </div>
             </div>
             <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }} />
             <div style={{ textAlign: 'center', fontSize: '10px', marginBottom: '4px' }}>
@@ -392,7 +395,9 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
             {/* Cliente */}
             <div style={{ marginBottom: '4px', fontSize: '10px' }}>
               <strong>Cliente:</strong> {ventaExitosa?.cliente?.nombre}
-              <div><strong>Cédula:</strong> {ventaExitosa?.cliente?.cedula}</div>
+              <div>
+                <strong>Cédula:</strong> {ventaExitosa?.cliente?.cedula}
+              </div>
             </div>
             <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }} />
             {/* Items */}
@@ -401,8 +406,12 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                 <div key={i} style={{ marginBottom: '3px' }}>
                   <div style={{ fontWeight: 'bold', fontSize: '11px' }}>{item.articulo.nombre}</div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px' }}>
-                    <span>{item.cantidad} x C$ {item.articulo.precio?.toFixed(2)}</span>
-                    <span><strong>C$ {item.subtotal.toFixed(2)}</strong></span>
+                    <span>
+                      {item.cantidad} x C$ {item.articulo.precio?.toFixed(2)}
+                    </span>
+                    <span>
+                      <strong>C$ {item.subtotal.toFixed(2)}</strong>
+                    </span>
                   </div>
                 </div>
               ))}
@@ -411,20 +420,24 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
             {/* Totales */}
             <div style={{ fontSize: '11px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Subtotal:</span><span>C$ {ventaExitosa?.subtotal?.toFixed(2)}</span>
+                <span>Subtotal:</span>
+                <span>C$ {ventaExitosa?.subtotal?.toFixed(2)}</span>
               </div>
               {(ventaExitosa?.descuento || 0) > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span>Descuento:</span><span>- C$ {ventaExitosa?.descuento?.toFixed(2)}</span>
+                  <span>Descuento:</span>
+                  <span>- C$ {ventaExitosa?.descuento?.toFixed(2)}</span>
                 </div>
               )}
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>IVA (15%):</span><span>C$ {ventaExitosa?.iva?.toFixed(2)}</span>
+                <span>IVA (15%):</span>
+                <span>C$ {ventaExitosa?.iva?.toFixed(2)}</span>
               </div>
             </div>
             <div style={{ borderTop: '2px solid #000', margin: '4px 0' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '13px' }}>
-              <span>TOTAL:</span><span>C$ {ventaExitosa?.total?.toFixed(2)}</span>
+              <span>TOTAL:</span>
+              <span>C$ {ventaExitosa?.total?.toFixed(2)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', marginTop: '2px' }}>
               <span>Recibido: C$ {ventaExitosa?.importeRecibido?.toFixed(2)}</span>
@@ -445,13 +458,18 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
             <button
               onClick={() => setFormatoImpresion('a4')}
               style={{
-                flex: 1, padding: '12px 8px',
+                flex: 1,
+                padding: '12px 8px',
                 border: `2px solid ${formatoImpresion === 'a4' ? '#1a56db' : '#dee2e6'}`,
                 borderRadius: '12px',
                 background: formatoImpresion === 'a4' ? '#1a56db' : '#fff',
                 color: formatoImpresion === 'a4' ? '#fff' : '#333',
-                cursor: 'pointer', display: 'flex', flexDirection: 'column',
-                alignItems: 'center', gap: '4px', transition: 'all 0.2s',
+                cursor: 'pointer',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '4px',
+                transition: 'all 0.2s',
               }}
             >
               <FontAwesomeIcon icon={faFileAlt} style={{ fontSize: '1.4rem' }} />
@@ -460,13 +478,18 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
             <button
               onClick={() => setFormatoImpresion('ticket')}
               style={{
-                flex: 1, padding: '12px 8px',
+                flex: 1,
+                padding: '12px 8px',
                 border: `2px solid ${formatoImpresion === 'ticket' ? '#198754' : '#dee2e6'}`,
                 borderRadius: '12px',
                 background: formatoImpresion === 'ticket' ? '#198754' : '#fff',
                 color: formatoImpresion === 'ticket' ? '#fff' : '#333',
-                cursor: 'pointer', display: 'flex', flexDirection: 'column',
-                alignItems: 'center', gap: '4px', transition: 'all 0.2s',
+                cursor: 'pointer',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '4px',
+                transition: 'all 0.2s',
               }}
             >
               <FontAwesomeIcon icon={faReceipt} style={{ fontSize: '1.4rem' }} />
@@ -478,7 +501,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
           <Button
             color={formatoImpresion === 'a4' ? 'primary' : 'success'}
             className="fw-bold py-2 shadow-sm"
-            onClick={() => formatoImpresion === 'a4' ? handlePrint() : handlePrintTicket()}
+            onClick={() => (formatoImpresion === 'a4' ? handlePrint() : handlePrintTicket())}
           >
             <FontAwesomeIcon icon={faPrint} className="me-2" />
             Imprimir {formatoImpresion === 'a4' ? 'A4' : 'Ticket'}

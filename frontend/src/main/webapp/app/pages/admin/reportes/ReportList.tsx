@@ -60,8 +60,6 @@ export const ReportList = () => {
         </div>
       </div>
 
-
-
       <Row>
         {reports.map((report, index) => (
           <Col md="4" lg="3" key={index} className="mb-4">

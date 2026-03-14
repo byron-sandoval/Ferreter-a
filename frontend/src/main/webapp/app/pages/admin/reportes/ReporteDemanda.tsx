@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartLine, faArrowLeft, faFileExcel, faCalendarDay, faFilter, faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import VentaService from 'app/services/venta.service';
+import DevolucionService from 'app/services/devolucion.service';
 import ArticuloService from 'app/services/articulo.service';
 import { IDetalleVenta } from 'app/shared/model/detalle-venta.model';
 import { IArticulo } from 'app/shared/model/articulo.model';
@@ -14,6 +15,7 @@ import * as XLSX from 'xlsx-js-style';
 export const ReporteDemanda = () => {
   const navigate = useNavigate();
   const [detalles, setDetalles] = useState<IDetalleVenta[]>([]);
+  const [detalleDevoluciones, setDetalleDevoluciones] = useState<any[]>([]);
   const [articulos, setArticulos] = useState<IArticulo[]>([]);
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState('7_DAYS'); // 'TODAY', '7_DAYS', '15_DAYS', 'MONTH'
@@ -25,12 +27,14 @@ export const ReporteDemanda = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [artRes, detRes] = await Promise.all([
+      const [artRes, detRes, devRes] = await Promise.all([
         ArticuloService.getAll(0, 5000),
-        VentaService.getAllDetalles({ size: 10000, sort: 'id,desc' })
+        VentaService.getAllDetalles({ size: 10000, sort: 'id,desc' }),
+        DevolucionService.getAllDetalles({ size: 10000, sort: 'id,desc' }),
       ]);
       setArticulos(artRes.data);
       setDetalles(detRes.data);
+      setDetalleDevoluciones(devRes.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -54,29 +58,56 @@ export const ReporteDemanda = () => {
     });
   };
 
+  const getFilteredDevoluciones = () => {
+    let startDate = dayjs().startOf('day');
+    const endDate = dayjs().endOf('day');
+
+    if (range === '7_DAYS') startDate = dayjs().subtract(7, 'days').startOf('day');
+    if (range === '15_DAYS') startDate = dayjs().subtract(15, 'days').startOf('day');
+    if (range === 'MONTH') startDate = dayjs().startOf('month');
+    if (range === 'TODAY') startDate = dayjs().startOf('day');
+
+    return detalleDevoluciones.filter(det => {
+      if (!det.devolucion || !det.devolucion.fecha) return false;
+      const fechaDev = dayjs(det.devolucion.fecha);
+      return fechaDev.isAfter(startDate) && fechaDev.isBefore(endDate);
+    });
+  };
+
   const processedData = () => {
-    const filtered = getFilteredDetalles();
+    const filteredDet = getFilteredDetalles();
+    const filteredDev = getFilteredDevoluciones();
     const map = new Map<number, { nombre: string; cant: number; codigo: string }>();
 
-    // Inicializar con 0 para todos los artículos que queremos monitorear (opcional, pero ayuda a ver los de "Cero demanda")
+    // Inicializar con 0 para todos los artículos que queremos monitorear
     articulos.forEach(art => {
       if (art.activo && art.id !== undefined) {
         map.set(art.id, { nombre: art.nombre || '', cant: 0, codigo: art.codigo || '' });
       }
     });
 
-    filtered.forEach(det => {
+    // Sumar ventas
+    filteredDet.forEach(det => {
       if (det.articulo && det.articulo.id !== undefined) {
         const current = map.get(det.articulo.id);
         if (current) {
-          current.cant += (det.cantidad || 0);
-        } else {
-            // Si por alguna razón no estaba en la lista inicial (ej: inactivo pero con ventas pasadas)
-            map.set(det.articulo.id, { 
-                nombre: det.articulo.nombre || 'Desconocido', 
-                cant: det.cantidad || 0, 
-                codigo: det.articulo.codigo || '-' 
-            });
+          current.cant += det.cantidad || 0;
+        } else if (det.articulo.id) {
+          map.set(det.articulo.id, {
+            nombre: det.articulo.nombre || 'Desconocido',
+            cant: det.cantidad || 0,
+            codigo: det.articulo.codigo || '-',
+          });
+        }
+      }
+    });
+
+    // Restar devoluciones
+    filteredDev.forEach(det => {
+      if (det.articulo && det.articulo.id !== undefined) {
+        const current = map.get(det.articulo.id);
+        if (current) {
+          current.cant -= det.cantidad || 0;
         }
       }
     });
@@ -86,7 +117,10 @@ export const ReporteDemanda = () => {
 
   const data = processedData();
   const topProducts = data.slice(0, 10);
-  const bottomProducts = [...data].filter(p => p.cant >= 0).sort((a, b) => a.cant - b.cant).slice(0, 10);
+  const bottomProducts = [...data]
+    .filter(p => p.cant >= 0)
+    .sort((a, b) => a.cant - b.cant)
+    .slice(0, 10);
 
   const exportToExcel = () => {
     const wb = XLSX.utils.book_new();
@@ -96,18 +130,18 @@ export const ReporteDemanda = () => {
       ['Fecha Generación:', dayjs().format('DD/MM/YYYY')],
       [''],
       ['PRODUCTOS MÁS VENDIDOS'],
-      ['Código', 'Producto', 'Cantidad Vendida']
+      ['Código', 'Producto', 'Cantidad Vendida'],
     ];
 
     topProducts.forEach(p => wsData.push([p.codigo, p.nombre, p.cant.toString()]));
-    
+
     wsData.push(['']);
     wsData.push(['PRODUCTOS MENOS VENDIDOS']);
     wsData.push(['Código', 'Producto', 'Cantidad Vendida']);
     bottomProducts.forEach(p => wsData.push([p.codigo, p.nombre, p.cant.toString()]));
 
     const ws = XLSX.utils.aoa_to_sheet(wsData);
-    
+
     // Anchos de columna
     ws['!cols'] = [{ wch: 15 }, { wch: 45 }, { wch: 20 }];
 
@@ -141,15 +175,7 @@ export const ReporteDemanda = () => {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.1} />
-              <XAxis 
-                dataKey="nombre" 
-                angle={-45} 
-                textAnchor="end" 
-                interval={0} 
-                fontSize={10} 
-                stroke="#6c757d"
-                height={60}
-              />
+              <XAxis dataKey="nombre" angle={-45} textAnchor="end" interval={0} fontSize={10} stroke="#6c757d" height={60} />
               <YAxis fontSize={10} stroke="#6c757d" />
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="cant" radius={[4, 4, 0, 0]}>
@@ -177,15 +203,23 @@ export const ReporteDemanda = () => {
           </h4>
         </div>
         <div className="d-flex align-items-center gap-3">
-            <ButtonGroup size="sm" className="shadow-sm">
-                <Button color={range === 'TODAY' ? 'primary' : 'white'} onClick={() => setRange('TODAY')}>Hoy</Button>
-                <Button color={range === '7_DAYS' ? 'primary' : 'white'} onClick={() => setRange('7_DAYS')}>Últimos 7 días</Button>
-                <Button color={range === '15_DAYS' ? 'primary' : 'white'} onClick={() => setRange('15_DAYS')}>Últimos 15 días</Button>
-                <Button color={range === 'MONTH' ? 'primary' : 'white'} onClick={() => setRange('MONTH')}>Este mes</Button>
-            </ButtonGroup>
-            <Button color="success" size="sm" className="shadow-sm border-0 px-3 fw-bold" onClick={exportToExcel}>
-                <FontAwesomeIcon icon={faFileExcel} className="me-2" /> EXPORTAR A EXCEL
+          <ButtonGroup size="sm" className="shadow-sm">
+            <Button color={range === 'TODAY' ? 'primary' : 'white'} onClick={() => setRange('TODAY')}>
+              Hoy
             </Button>
+            <Button color={range === '7_DAYS' ? 'primary' : 'white'} onClick={() => setRange('7_DAYS')}>
+              Últimos 7 días
+            </Button>
+            <Button color={range === '15_DAYS' ? 'primary' : 'white'} onClick={() => setRange('15_DAYS')}>
+              Últimos 15 días
+            </Button>
+            <Button color={range === 'MONTH' ? 'primary' : 'white'} onClick={() => setRange('MONTH')}>
+              Este mes
+            </Button>
+          </ButtonGroup>
+          <Button color="success" size="sm" className="shadow-sm border-0 px-3 fw-bold" onClick={exportToExcel}>
+            <FontAwesomeIcon icon={faFileExcel} className="me-2" /> EXPORTAR A EXCEL
+          </Button>
         </div>
       </div>
 
@@ -197,12 +231,8 @@ export const ReporteDemanda = () => {
       ) : (
         <>
           <Row className="mb-4">
-            <Col md="6">
-              {renderChart(topProducts, 'Gráfica de productos más demandados', '#6a11cb', '#2575fc')}
-            </Col>
-            <Col md="6">
-              {renderChart(bottomProducts, 'Gráfica de productos menos demandados', '#ff9a9e', '#fecfef')}
-            </Col>
+            <Col md="6">{renderChart(topProducts, 'Gráfica de productos más demandados', '#6a11cb', '#2575fc')}</Col>
+            <Col md="6">{renderChart(bottomProducts, 'Gráfica de productos menos demandados', '#ff9a9e', '#fecfef')}</Col>
           </Row>
 
           <Row>
@@ -210,7 +240,10 @@ export const ReporteDemanda = () => {
               <Card className="border-0 shadow-sm mb-4">
                 <CardBody className="p-0">
                   <div className="p-3 border-bottom d-flex justify-content-between align-items-center bg-light bg-opacity-50">
-                    <h6 className="fw-bold m-0 small text-uppercase"><FontAwesomeIcon icon={faArrowUp} className="text-success me-2"/>Recuento de productos más vendidos</h6>
+                    <h6 className="fw-bold m-0 small text-uppercase">
+                      <FontAwesomeIcon icon={faArrowUp} className="text-success me-2" />
+                      Recuento de productos más vendidos
+                    </h6>
                   </div>
                   <div className="table-responsive" style={{ maxHeight: '400px' }}>
                     <Table hover size="sm" className="mb-0 align-middle">
@@ -225,7 +258,11 @@ export const ReporteDemanda = () => {
                           <tr key={idx} className={idx === 0 ? 'bg-primary bg-opacity-10' : ''}>
                             <td className="px-3 py-2 small fw-bold text-dark">{p.nombre}</td>
                             <td className="px-3 py-2 text-end">
-                              <Badge color="soft-primary" className="fw-bold px-3" style={{ backgroundColor: 'rgba(37, 117, 252, 0.1)', color: '#2575fc' }}>
+                              <Badge
+                                color="soft-primary"
+                                className="fw-bold px-3"
+                                style={{ backgroundColor: 'rgba(37, 117, 252, 0.1)', color: '#2575fc' }}
+                              >
                                 {p.cant}
                               </Badge>
                             </td>
@@ -242,7 +279,10 @@ export const ReporteDemanda = () => {
               <Card className="border-0 shadow-sm mb-4">
                 <CardBody className="p-0">
                   <div className="p-3 border-bottom d-flex justify-content-between align-items-center bg-light bg-opacity-50">
-                    <h6 className="fw-bold m-0 small text-uppercase"><FontAwesomeIcon icon={faArrowDown} className="text-danger me-2"/>Recuento de productos menos vendidos</h6>
+                    <h6 className="fw-bold m-0 small text-uppercase">
+                      <FontAwesomeIcon icon={faArrowDown} className="text-danger me-2" />
+                      Recuento de productos menos vendidos
+                    </h6>
                   </div>
                   <div className="table-responsive" style={{ maxHeight: '400px' }}>
                     <Table hover size="sm" className="mb-0 align-middle">
@@ -257,7 +297,11 @@ export const ReporteDemanda = () => {
                           <tr key={idx} className={p.cant === 0 ? 'bg-danger bg-opacity-10' : ''}>
                             <td className="px-3 py-2 small fw-bold text-dark">{p.nombre}</td>
                             <td className="px-3 py-2 text-end">
-                              <Badge color="soft-danger" className="fw-bold px-3" style={{ backgroundColor: 'rgba(255, 154, 158, 0.1)', color: '#dc3545' }}>
+                              <Badge
+                                color="soft-danger"
+                                className="fw-bold px-3"
+                                style={{ backgroundColor: 'rgba(255, 154, 158, 0.1)', color: '#dc3545' }}
+                              >
                                 {p.cant}
                               </Badge>
                             </td>

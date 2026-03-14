@@ -141,9 +141,9 @@ export const UsuarioUpdate = () => {
                       const lastChar =
                         raw.length > 13
                           ? raw
-                            .substring(13, 14)
-                            .replace(/[^a-zA-Z]/g, '')
-                            .toUpperCase()
+                              .substring(13, 14)
+                              .replace(/[^a-zA-Z]/g, '')
+                              .toUpperCase()
                           : '';
                       const input = digitsOnly + lastChar;
 

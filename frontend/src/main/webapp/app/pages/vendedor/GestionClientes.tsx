@@ -227,7 +227,11 @@ export const GestionClientes = () => {
                     onChange={() => setShowInactive(!showInactive)}
                     style={{ cursor: 'pointer' }}
                   />
-                  <label className="form-check-label text-muted ms-2 small fw-bold" htmlFor="showInactiveSwitchCli" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  <label
+                    className="form-check-label text-muted ms-2 small fw-bold"
+                    htmlFor="showInactiveSwitchCli"
+                    style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
+                  >
                     Ver Inactivos
                   </label>
                 </div>
@@ -415,9 +419,9 @@ export const GestionClientes = () => {
                       const lastChar =
                         raw.length > 13
                           ? raw
-                            .substring(13, 14)
-                            .replace(/[^a-zA-Z]/g, '')
-                            .toUpperCase()
+                              .substring(13, 14)
+                              .replace(/[^a-zA-Z]/g, '')
+                              .toUpperCase()
                           : '';
                       const input = digitsOnly + lastChar;
 

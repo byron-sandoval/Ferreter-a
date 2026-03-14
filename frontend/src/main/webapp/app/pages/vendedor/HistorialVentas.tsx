@@ -108,7 +108,11 @@ export const HistorialVentas = () => {
   };
 
   const handleAnular = async (id: number, noFactura: number) => {
-    if (window.confirm(`¿Está seguro de ANULAR la factura #${noFactura}? \n\nEsto devolverá los productos al inventario y la venta ya no contará en sus reportes.`)) {
+    if (
+      window.confirm(
+        `¿Está seguro de ANULAR la factura #${noFactura}? \n\nEsto devolverá los productos al inventario y la venta ya no contará en sus reportes.`,
+      )
+    ) {
       try {
         await VentaService.anular(id);
         toast.success(`Factura #${noFactura} anulada correctamente`);
@@ -141,7 +145,7 @@ export const HistorialVentas = () => {
             color="outline-primary"
             size="sm"
             className="me-2"
-            onClick={() => navigate('/admin/devoluciones')}
+            onClick={() => navigate('/vendedor/devoluciones')}
             style={{ fontSize: '0.75rem' }}
           >
             <FontAwesomeIcon icon={faUndoAlt} className="me-1" /> Devoluciones
@@ -248,7 +252,7 @@ export const HistorialVentas = () => {
                         size="sm"
                         className="ms-1 p-1"
                         title="Anular Factura"
-                        onClick={() => v.id && v.noFactura && handleAnular(v.id as number, v.noFactura as number)}
+                        onClick={() => v.id && v.noFactura && handleAnular(v.id, v.noFactura)}
                       >
                         <FontAwesomeIcon icon={faBan} fixedWidth />
                       </Button>

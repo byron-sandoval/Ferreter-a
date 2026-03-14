@@ -44,15 +44,14 @@ export const UsuarioList = () => {
   }, []);
 
   const filtrados = Array.isArray(usuarios)
-    ? usuarios.filter(
-      v => {
-        const matchesSearch = (v.nombre || '').toLowerCase().includes(filter.toLowerCase()) ||
+    ? usuarios.filter(v => {
+        const matchesSearch =
+          (v.nombre || '').toLowerCase().includes(filter.toLowerCase()) ||
           (v.apellido || '').toLowerCase().includes(filter.toLowerCase()) ||
           (v.cedula || '').toLowerCase().includes(filter.toLowerCase());
         const matchesStatus = showInactive ? v.activo === false || v.activo === null : v.activo === true;
         return matchesSearch && matchesStatus;
-      }
-    )
+      })
     : [];
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -118,7 +117,11 @@ export const UsuarioList = () => {
               onChange={() => setShowInactive(!showInactive)}
               style={{ cursor: 'pointer' }}
             />
-            <label className="form-check-label text-white ms-2 small fw-bold" htmlFor="showInactiveSwitchUser" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
+            <label
+              className="form-check-label text-white ms-2 small fw-bold"
+              htmlFor="showInactiveSwitchUser"
+              style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
+            >
               Ver Inactivos
             </label>
           </div>
@@ -164,7 +167,14 @@ export const UsuarioList = () => {
                     </td>
                     {isAdmin && (
                       <td className="px-3">
-                        <Button size="sm" color="info" outline className="p-1 me-1" title="Editar usuario" onClick={() => navigate(`/admin/usuarios/${v.id}/edit`)}>
+                        <Button
+                          size="sm"
+                          color="info"
+                          outline
+                          className="p-1 me-1"
+                          title="Editar usuario"
+                          onClick={() => navigate(`/admin/usuarios/${v.id}/edit`)}
+                        >
                           <FontAwesomeIcon icon={faPencilAlt} fixedWidth />
                         </Button>
                         <Button
@@ -173,7 +183,7 @@ export const UsuarioList = () => {
                           outline
                           className="p-1"
                           disabled={isCurrentUser}
-                          title={isCurrentUser ? "No puedes eliminar tu propio usuario" : "Eliminar usuario"}
+                          title={isCurrentUser ? 'No puedes eliminar tu propio usuario' : 'Eliminar usuario'}
                           onClick={() => v.id && handleDelete(v.id)}
                         >
                           <FontAwesomeIcon icon={faTrash} fixedWidth />
