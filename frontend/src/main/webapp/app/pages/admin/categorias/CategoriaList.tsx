@@ -99,20 +99,21 @@ export const CategoriaList = () => {
         <CardBody className="p-2">
           <div className="d-flex justify-content-between align-items-center">
             <div
-              className="d-flex align-items-center flex-grow-1"
+              className="d-flex align-items-center flex-grow-1 bg-white"
               style={{
-                maxWidth: '300px',
-                borderBottom: '2px solid #18a1bcff',
-                paddingBottom: '2px',
+                maxWidth: '350px',
+                border: '2px solid #adb5bd',
+                borderRadius: '6px',
+                padding: '6px 12px',
               }}
             >
-              <FontAwesomeIcon icon={faSearch} className="text-info opacity-75 me-2" />
+              <FontAwesomeIcon icon={faSearch} className="opacity-75 me-2" style={{ color: '#a855f7' }} />
               <Input
                 placeholder="Buscar categoría..."
                 value={filter}
                 onChange={e => setFilter(e.target.value)}
                 className="border-0 shadow-none p-0 bg-transparent flex-grow-1"
-                style={{ fontSize: '0.8rem' }}
+                style={{ fontSize: '0.9rem' }}
               />
             </div>
             <div className="form-check form-switch ms-3 d-flex align-items-center">

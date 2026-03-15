@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card, CardBody, Form, FormGroup, Label, Input, Button, Row, Col } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faArrowLeft, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faSave, faArrowLeft, faUsers, faKey } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
 import { IUsuario } from 'app/shared/model/usuario.model';
 import UsuarioService from 'app/services/usuario.service';
@@ -13,6 +13,7 @@ export const UsuarioUpdate = () => {
   const { id } = useParams<{ id: string }>();
   const isNew = !id;
   const account = useAppSelector(state => state.authentication.account);
+  const [resetContra, setResetContra] = useState(false);
 
   const [usuario, setUsuario] = useState<IUsuario>({
     cedula: '',
@@ -230,26 +231,25 @@ export const UsuarioUpdate = () => {
                     </Col>
                   </Row>
                   <Row>
-                    {isNew && (
-                      <Col md="6">
-                        <FormGroup className="mb-3">
-                          <Label for="password" className="fw-bold small mb-1">
-                            Contraseña Temporal *
-                          </Label>
-                          <Input
-                            bsSize="sm"
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="********"
-                            value={usuario.password || ''}
-                            onChange={handleChange}
-                            required={isNew}
-                          />
-                        </FormGroup>
-                      </Col>
-                    )}
-                    <Col md={isNew ? '6' : '12'}>
+                    <Col md="6">
+                      <FormGroup className="mb-3">
+                        <Label for="password" className="fw-bold small mb-1">
+                          {isNew ? 'Contraseña Temporal *' : 'Restablecer Contraseña'}
+                        </Label>
+                        <Input
+                          bsSize="sm"
+                          type="password"
+                          id="password"
+                          name="password"
+                          placeholder="********"
+                          value={usuario.password || ''}
+                          onChange={handleChange}
+                          required={isNew}
+                        />
+                      </FormGroup>
+                    </Col>
+                    
+                    <Col md="6">
                       <FormGroup className="mb-0">
                         <Label for="rol" className="fw-bold small mb-1">
                           Rol Asignado *

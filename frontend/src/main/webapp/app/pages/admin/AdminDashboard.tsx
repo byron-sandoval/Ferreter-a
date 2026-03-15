@@ -337,28 +337,45 @@ export const AdminDashboard = () => {
                   <div className="spinner-border spinner-border-sm text-danger" role="status"></div>
                 </div>
               ) : bajoStock.length > 0 ? (
-                <div className="table-responsive" style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                  <Table size="sm" borderless hover className="align-middle">
-                    <tbody>
-                      {bajoStock.map(p => (
-                        <tr key={p.id}>
-                          <td>
-                            <div className="fw-bold small text-truncate" style={{ maxWidth: '150px' }}>
-                              {p.nombre}
-                            </div>
-                            <div className="text-muted" style={{ fontSize: '0.65rem' }}>
-                              {p.codigo}
-                            </div>
-                          </td>
-                          <td className="text-end">
-                            <Badge color="soft-danger" style={{ backgroundColor: '#ffebee', color: '#c62828', fontSize: '0.7rem' }}>
-                              {p.existencia} / {p.existenciaMinima}
-                            </Badge>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
+                <div className="d-flex flex-column gap-2 custom-scrollbar" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                  {bajoStock.map(p => {
+                    const existencia = p.existencia || 0;
+                    const minima = p.existenciaMinima || 0;
+
+                    let nivel: 'critico' | 'bajo';
+                    if (existencia === 0) {
+                      nivel = 'critico';
+                    } else {
+                      nivel = 'bajo';
+                    }
+
+                    const estilos = {
+                      critico: { bg: '#fff0f0', border: '#e53e3e', badgeText: 'CRÍTICO', dot: '#e53e3e', countColor: '#e53e3e', countBg: '#ffe5e5' },
+                      bajo: { bg: '#fffbeb', border: '#d97706', badgeText: 'BAJO', dot: '#d97706', countColor: '#d97706', countBg: '#fef3c7' },
+                    }[nivel];
+
+                    return (
+                      <div
+                        key={p.id}
+                        className="d-flex justify-content-between align-items-center px-3 py-2 rounded-3"
+                        style={{ backgroundColor: estilos.bg, borderLeft: `4px solid ${estilos.border}` }}
+                      >
+                        <div className="text-truncate me-2">
+                          <div className="fw-bold small text-truncate" style={{ maxWidth: '150px' }}>{p.nombre}</div>
+                          <div className="text-muted" style={{ fontSize: '0.65rem' }}>{p.codigo}</div>
+                        </div>
+                        <div className="d-flex align-items-center gap-2" style={{ minWidth: '110px', justifyContent: 'flex-end' }}>
+                          <span className="d-flex align-items-center gap-1 fw-semibold" style={{ fontSize: '0.72rem', color: estilos.dot }}>
+                            <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: estilos.dot, display: 'inline-block' }} />
+                            {estilos.badgeText}
+                          </span>
+                          <span className="fw-bold rounded-2 px-2 py-1" style={{ fontSize: '0.72rem', color: estilos.countColor, backgroundColor: estilos.countBg, whiteSpace: 'nowrap' }}>
+                            {existencia} / {minima}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="text-center text-success py-5">
