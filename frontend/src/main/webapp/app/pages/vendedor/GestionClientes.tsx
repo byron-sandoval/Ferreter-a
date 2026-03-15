@@ -33,6 +33,7 @@ import {
   faTrash,
   faChevronLeft,
   faChevronRight,
+  faUserCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import ClienteService from 'app/services/cliente.service';
@@ -188,15 +189,14 @@ export const GestionClientes = () => {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
+  const totalGastado = historial.reduce((acc, v) => acc + (v.total || 0), 0);
+
   return (
     <div className="animate__animated animate__fadeIn p-1">
       <div className="d-flex justify-content-between align-items-center mb-2 px-1">
         <h5 className="fw-bold text-dark mb-0">
           <FontAwesomeIcon icon={faUsers} className="me-2 text-info" /> Clientes registrados
         </h5>
-        <Button color="black" size="sm" outline style={{ fontSize: '0.75rem' }} onClick={abrirNuevo}>
-          <FontAwesomeIcon icon={faPlus} className="me-1" /> Nuevo Cliente
-        </Button>
       </div>
 
       <Row className="g-2">
@@ -205,18 +205,16 @@ export const GestionClientes = () => {
             <CardBody className="p-0">
               <div className="p-2 bg-white border-bottom d-flex justify-content-start">
                 <div
-                  className="input-group shadow-sm rounded-pill overflow-hidden border"
-                  style={{ maxWidth: '320px', borderColor: '#18a1bcff' }}
+                  className="d-flex align-items-center shadow-sm rounded-pill border px-3"
+                  style={{ maxWidth: '320px', width: '100%', borderColor: '#18a1bcff', height: '38px', backgroundColor: '#fff' }}
                 >
-                  <span className="input-group-text bg-white border-0 ps-3">
-                    <FontAwesomeIcon icon={faSearch} className="text-info opacity-75" />
-                  </span>
+                  <FontAwesomeIcon icon={faSearch} className="text-info opacity-75 me-2" style={{ fontSize: '1.1rem' }} />
                   <Input
                     placeholder="Buscar cliente..."
-                    className="border-0 shadow-none ps-0"
+                    className="border-0 shadow-none p-0 bg-transparent flex-grow-1"
                     value={filter}
                     onChange={e => setFilter(e.target.value)}
-                    style={{ fontSize: '0.85rem', height: '34px' }}
+                    style={{ fontSize: '0.95rem' }}
                   />
                 </div>
                 <div className="form-check form-switch ms-3 d-flex align-items-center">
@@ -311,31 +309,24 @@ export const GestionClientes = () => {
             <div className="animate__animated animate__fadeIn">
               <Card className="shadow-lg border-0 rounded-3 overflow-hidden mb-2">
                 <div className="bg-primary p-3 text-white">
-                  <div className="d-flex justify-content-between align-items-start mb-2">
+                  <div className="d-flex justify-content-between align-items-start">
                     <div>
                       <h5 className="fw-bold m-0">{clienteSeleccionado.nombre}</h5>
-                      <small className="opacity-75" style={{ fontSize: '0.75rem' }}>
+                      <small className="opacity-75 d-block mb-3" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
                         {clienteSeleccionado.cedula}
                       </small>
+                      <div className="small mt-2" style={{ fontSize: '0.85rem' }}>
+                        <div className="mb-1"><strong>Compras:</strong> {historial.length}</div>
+                        <div className="mb-1"><strong>Total gastado:</strong> C$ {totalGastado.toLocaleString('es-NI', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                        <div><strong>Última compra:</strong> {historial.length > 0 ? dayjs(historial[0].fecha).format('DD/MM/YYYY') : 'N/A'}</div>
+                      </div>
+                    </div>
+                    <div className="d-flex flex-column align-items-center justify-content-center opacity-75 bg-white bg-opacity-25 rounded p-2" style={{ minWidth: '60px' }}>
+                      <FontAwesomeIcon icon={faUserCircle} size="lg" className="mb-1" />
+                      <span style={{ fontSize: '0.6rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>Perfil</span>
                     </div>
                   </div>
                 </div>
-                <CardBody className="p-2">
-                  <div className="mb-2">
-                    <Label className="fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.65rem' }}>
-                      Perfil
-                    </Label>
-                    <Progress value={80} color="success" style={{ height: '4px' }} />
-                  </div>
-                  <div className="list-group list-group-flush">
-                    <div className="list-group-item px-0 py-1 border-0" style={{ fontSize: '0.8rem' }}>
-                      <FontAwesomeIcon icon={faHistory} className="me-2 text-primary" />
-                      <span>
-                        <strong>Venta:</strong> {historial.length > 0 ? dayjs(historial[0].fecha).format('DD/MM/YY') : 'N/A'}
-                      </span>
-                    </div>
-                  </div>
-                </CardBody>
               </Card>
 
               <Card className="shadow-sm border-0 rounded-4">
@@ -353,7 +344,7 @@ export const GestionClientes = () => {
                         <div className="text-end">
                           <div className="fw-bold text-primary">C$ {v.total?.toFixed(2)}</div>
                           <Badge color="light" pill className="text-dark border small">
-                            {v.metodoPago}
+                            {v.metodoPago === 'TARJETA_STRIPE' ? 'TARJETA' : v.metodoPago}
                           </Badge>
                         </div>
                       </div>

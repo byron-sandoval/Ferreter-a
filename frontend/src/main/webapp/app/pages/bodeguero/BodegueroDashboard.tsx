@@ -249,30 +249,59 @@ export const BodegueroDashboard = () => {
                   Ir a inventario <FontAwesomeIcon icon={faArrowRight} className="ms-1" />
                 </Button>
               </div>
-              <div className="d-flex flex-column gap-3 mt-3">
+              <div className="d-flex flex-column gap-2 mt-3">
                 {articulosBajo.length > 0 ? (
-                  articulosBajo.map(art => (
-                    <div
-                      key={art.id}
-                      className="d-flex justify-content-between align-items-center p-3 rounded-3"
-                      style={{ backgroundColor: '#fff5f5', borderLeft: '4px solid #f87171' }}
-                    >
-                      <div className="text-truncate me-2">
-                        <div className="fw-bold text-dark small text-truncate">{art.nombre}</div>
-                        <div className="text-muted" style={{ fontSize: '0.7rem' }}>
-                          Cod: {art.codigo}
+                  articulosBajo.map(art => {
+                    const existencia = art.existencia || 0;
+                    const minima = art.existenciaMinima || 0;
+
+                    // Determinar nivel de alerta
+                    const nivel: 'critico' | 'bajo' = existencia === 0 ? 'critico' : 'bajo';
+
+                    const estilos = {
+                      critico: {
+                        bg: '#fff0f0',
+                        border: '#e53e3e',
+                        badgeText: 'CRÍTICO',
+                        dot: '#e53e3e',
+                        countColor: '#e53e3e',
+                        countBg: '#ffe5e5',
+                      },
+                      bajo: {
+                        bg: '#fffbeb',
+                        border: '#d97706',
+                        badgeText: 'BAJO',
+                        dot: '#d97706',
+                        countColor: '#d97706',
+                        countBg: '#fef3c7',
+                      },
+                    }[nivel];
+
+                    return (
+                      <div
+                        key={art.id}
+                        className="d-flex justify-content-between align-items-center px-3 py-2 rounded-3"
+                        style={{ backgroundColor: estilos.bg, borderLeft: `4px solid ${estilos.border}` }}
+                      >
+                        <div className="text-truncate me-2">
+                          <div className="fw-bold text-dark small text-truncate">{art.nombre}</div>
+                          <div className="text-muted" style={{ fontSize: '0.7rem' }}>{art.codigo}</div>
+                        </div>
+                        <div className="d-flex align-items-center gap-2" style={{ minWidth: '110px', justifyContent: 'flex-end' }}>
+                          <span className="d-flex align-items-center gap-1 fw-semibold" style={{ fontSize: '0.72rem', color: estilos.dot }}>
+                            <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: estilos.dot, display: 'inline-block' }} />
+                            {estilos.badgeText}
+                          </span>
+                          <span
+                            className="fw-bold rounded-2 px-2 py-1"
+                            style={{ fontSize: '0.75rem', color: estilos.countColor, backgroundColor: estilos.countBg, whiteSpace: 'nowrap' }}
+                          >
+                            {existencia} / {minima}
+                          </span>
                         </div>
                       </div>
-                      <div className="text-end" style={{ minWidth: '80px' }}>
-                        <div className="fw-bold text-danger">
-                          {art.existencia} <span className="small text-muted">{art.unidadMedida?.simbolo}</span>
-                        </div>
-                        <div className="text-muted" style={{ fontSize: '0.6rem' }}>
-                          Mín: {art.existenciaMinima}
-                        </div>
-                      </div>
-                    </div>
-                  ))
+                    );
+                  })
                 ) : (
                   <div className="text-center py-5">
                     <FontAwesomeIcon icon={faBoxes} size="3x" className="text-light mb-2" />

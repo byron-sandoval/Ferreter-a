@@ -26,10 +26,10 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
 }) => {
   return (
     <Col md="7">
-      <Card className="shadow-sm mb-2 border">
-        <CardBody className="py-2 px-3 bg-white rounded">
+      <Card className="shadow-sm mb-2 border rounded-3 overflow-hidden">
+        <CardBody className="py-2 px-3 bg-white">
           <Row className="align-items-center g-0">
-            <Col className="d-flex align-items-center">
+            <Col className="d-flex align-items-center ps-2">
               <span className="text-muted me-2">
                 <FontAwesomeIcon icon={faSearch} />
               </span>

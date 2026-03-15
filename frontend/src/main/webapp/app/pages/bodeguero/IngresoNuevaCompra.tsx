@@ -795,46 +795,54 @@ export const IngresoNuevaCompra = () => {
                 )}
 
                 {/* TABLA COMPARTIDA */}
-                <Table responsive size="sm" hover className="mt-4 border">
-                  <thead className="table-dark small">
-                    <tr>
-                      <th>Código</th>
-                      <th>Producto</th>
-                      <th className="text-center">Cant.</th>
-                      <th className="text-end">Costo Unit.</th>
-                      {(isAdmin || isJefeBodega) && <th className="text-end">Monto</th>}
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {detalles.length > 0 ? (
-                      detalles.map((d, index) => (
-                        <tr key={index} className="align-middle">
-                          <td className="small text-muted">{d.articulo?.codigo}</td>
-                          <td className="fw-bold text-dark">{d.articulo?.nombre}</td>
-                          <td className="text-center">
-                            <Badge color="secondary" pill bg="light" className="text-dark border">
-                              {d.cantidad}
-                            </Badge>
-                          </td>
-                          <td className="text-end text-muted">C$ {d.costoUnitario?.toLocaleString()}</td>
-                          {(isAdmin || isJefeBodega) && <td className="text-end fw-bold">C$ {d.monto?.toLocaleString()}</td>}
-                          <td className="text-center">
-                            <Button color="danger" size="sm" outline onClick={() => eliminarDetalle(index)} className="border-0">
-                              <FontAwesomeIcon icon={faTrash} />
-                            </Button>
+                <div
+                  className="custom-scrollbar mt-4"
+                  style={{
+                    maxHeight: detalles.length > 5 ? '253px' : 'none',
+                    overflowY: detalles.length > 5 ? 'auto' : 'visible',
+                  }}
+                >
+                  <Table responsive size="sm" hover className="border" style={{ marginBottom: 0 }}>
+                    <thead className="table-dark small">
+                      <tr>
+                        <th>Código</th>
+                        <th>Producto</th>
+                        <th className="text-center">Cant.</th>
+                        <th className="text-end">Costo Unit.</th>
+                        {(isAdmin || isJefeBodega) && <th className="text-end">Monto</th>}
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {detalles.length > 0 ? (
+                        detalles.map((d, index) => (
+                          <tr key={index} className="align-middle">
+                            <td className="small text-muted">{d.articulo?.codigo}</td>
+                            <td className="fw-bold text-dark">{d.articulo?.nombre}</td>
+                            <td className="text-center">
+                              <Badge color="secondary" pill bg="light" className="text-dark border">
+                                {d.cantidad}
+                              </Badge>
+                            </td>
+                            <td className="text-end text-muted">C$ {d.costoUnitario?.toLocaleString()}</td>
+                            {(isAdmin || isJefeBodega) && <td className="text-end fw-bold">C$ {d.monto?.toLocaleString()}</td>}
+                            <td className="text-center">
+                              <Button color="danger" size="sm" outline onClick={() => eliminarDetalle(index)} className="border-0">
+                                <FontAwesomeIcon icon={faTrash} />
+                              </Button>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={isAdmin || isJefeBodega ? 6 : 5} className="text-center py-4 text-muted fst-italic">
+                            No hay productos añadidos a esta factura.
                           </td>
                         </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={isAdmin || isJefeBodega ? 6 : 5} className="text-center py-4 text-muted fst-italic">
-                          No hay productos añadidos a esta factura.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </Table>
+                      )}
+                    </tbody>
+                  </Table>
+                </div>
               </CardBody>
             </Card>
           )}

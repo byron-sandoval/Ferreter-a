@@ -14,6 +14,7 @@ import {
   faUndoAlt,
   faPlusCircle,
   faBan,
+  faFilter,
 } from '@fortawesome/free-solid-svg-icons';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import VentaService from 'app/services/venta.service';
@@ -32,6 +33,16 @@ export const HistorialVentas = () => {
   const [ventas, setVentas] = useState<IVenta[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
+  const [fechaInicio, setFechaInicio] = useState('');
+  const [fechaFin, setFechaFin] = useState('');
+
+  const [fechaInicioInput, setFechaInicioInput] = useState('');
+  const [fechaFinInput, setFechaFinInput] = useState('');
+
+  const aplicarFiltros = () => {
+    setFechaInicio(fechaInicioInput);
+    setFechaFin(fechaFinInput);
+  };
 
   const [showDevolucionModal, setShowDevolucionModal] = useState(false);
   const [showDetalleModal, setShowDetalleModal] = useState(false);
@@ -43,7 +54,7 @@ export const HistorialVentas = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [filter]);
+  }, [filter, fechaInicio, fechaFin]);
 
   useEffect(() => {
     loadVentas();
@@ -123,9 +134,20 @@ export const HistorialVentas = () => {
     }
   };
 
-  const filtered = ventas.filter(
-    v => (v.noFactura?.toString() || '').includes(filter) || (v.cliente?.nombre || '').toLowerCase().includes(filter.toLowerCase()),
-  );
+  const filtered = ventas.filter(v => {
+    const searchLow = filter.toLowerCase();
+    const matchText = (v.noFactura?.toString() || '').includes(searchLow) || (v.cliente?.nombre || '').toLowerCase().includes(searchLow);
+    
+    let matchFecha = true;
+    if (fechaInicio && v.fecha) {
+      matchFecha = matchFecha && dayjs(v.fecha).valueOf() >= dayjs(fechaInicio).startOf('day').valueOf();
+    }
+    if (fechaFin && v.fecha) {
+      matchFecha = matchFecha && dayjs(v.fecha).valueOf() <= dayjs(fechaFin).endOf('day').valueOf();
+    }
+
+    return matchText && matchFecha;
+  });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -150,30 +172,68 @@ export const HistorialVentas = () => {
           >
             <FontAwesomeIcon icon={faUndoAlt} className="me-1" /> Devoluciones
           </Button>
-          <Button color="light" size="sm" onClick={loadVentas} disabled={loading} style={{ fontSize: '0.75rem' }}>
-            <FontAwesomeIcon icon={faSync} spin={loading} className="me-1" /> Actualizar
-          </Button>
         </div>
       </div>
 
       <Card className="shadow-sm border-0 mb-2 bg-light">
-        <CardBody className="p-2">
-          <div
-            className="d-flex align-items-center"
-            style={{
-              maxWidth: '350px',
-              borderBottom: '2px solid #18a1bcff',
-              paddingBottom: '2px',
-            }}
-          >
-            <FontAwesomeIcon icon={faSearch} className="text-info opacity-75 me-2" />
-            <Input
-              placeholder="Buscar por Folio o Cliente..."
-              value={filter}
-              onChange={e => setFilter(e.target.value)}
-              className="border-0 shadow-none p-0 bg-transparent"
-              style={{ fontSize: '0.8rem' }}
-            />
+        <CardBody className="p-3">
+          <div className="row align-items-end g-3">
+            <div className="col-md-4 d-flex justify-content-md-start mb-2 mb-md-0">
+              <div
+                className="d-flex align-items-center w-100 bg-white"
+                style={{
+                  maxWidth: '350px',
+                  border: '2px solid #adb5bd',
+                  borderRadius: '6px',
+                  padding: '6px 12px',
+                }}
+              >
+                <FontAwesomeIcon icon={faSearch} className="opacity-75 me-2" style={{ color: '#a855f7' }} />
+                <Input
+                  placeholder="Buscar por Folio o Cliente..."
+                  value={filter}
+                  onChange={e => setFilter(e.target.value)}
+                  className="border-0 shadow-none p-0 bg-transparent flex-grow-1"
+                  style={{ fontSize: '0.9rem' }}
+                />
+              </div>
+            </div>
+            
+            <div className="col-md-8 d-flex justify-content-start align-items-end gap-3">
+              <div className="d-flex flex-column">
+                <span className="text-dark mb-1 text-uppercase" style={{ fontSize: '0.75rem', fontWeight: 'bold' }}>FECHA INICIO</span>
+                <div className="d-flex align-items-center bg-white" style={{ border: '2px solid #adb5bd', borderRadius: '6px', padding: '4px 8px' }}>
+                  <Input
+                    type="date"
+                    bsSize="sm"
+                    value={fechaInicioInput}
+                    onChange={e => setFechaInicioInput(e.target.value)}
+                    className="border-0 bg-transparent shadow-none p-0 text-dark"
+                    style={{ fontSize: '0.9rem', outline: 'none', boxShadow: 'none' }}
+                  />
+                </div>
+              </div>
+              <div className="d-flex flex-column">
+                <span className="text-dark mb-1 text-uppercase" style={{ fontSize: '0.75rem', fontWeight: 'bold' }}>FECHA FIN</span>
+                <div className="d-flex align-items-center bg-white" style={{ border: '2px solid #adb5bd', borderRadius: '6px', padding: '4px 8px' }}>
+                  <Input
+                    type="date"
+                    bsSize="sm"
+                    value={fechaFinInput}
+                    onChange={e => setFechaFinInput(e.target.value)}
+                    className="border-0 bg-transparent shadow-none p-0 text-dark"
+                    style={{ fontSize: '0.9rem', outline: 'none', boxShadow: 'none' }}
+                  />
+                </div>
+              </div>
+              <Button color="primary" onClick={aplicarFiltros} className="shadow-none d-flex align-items-center" style={{ padding: '0.45rem 1.2rem', borderRadius: '6px', fontWeight: '500' }}>
+                <FontAwesomeIcon icon={faFilter} className="me-2" /> FILTRAR
+              </Button>
+            </div>
+
+            <div className="col-md-2 d-none d-md-block">
+              {/* Espaciador */}
+            </div>
           </div>
         </CardBody>
       </Card>

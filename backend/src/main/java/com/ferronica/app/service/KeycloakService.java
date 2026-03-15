@@ -145,6 +145,18 @@ public class KeycloakService {
 
             keycloak.realm(targetRealm).users().get(userId).update(user);
             log.info(">>> KEYCLOAK: Perfil actualizado para el usuario {}", userId);
+
+            // Si se envió una nueva contraseña desde la pantalla de edición, actualizarla
+            if (usuarioDTO.getPassword() != null && !usuarioDTO.getPassword().trim().isEmpty()) {
+                CredentialRepresentation credential = new CredentialRepresentation();
+                credential.setTemporary(true); // Fuerza a cambiar la contraseña al entrar
+                credential.setType(CredentialRepresentation.PASSWORD);
+                credential.setValue(usuarioDTO.getPassword());
+                
+                keycloak.realm(targetRealm).users().get(userId).resetPassword(credential);
+                log.info(">>> KEYCLOAK: Contraseña restablecida correctamente para el usuario {}", userId);
+            }
+
         } catch (Exception e) {
             log.error(">>> KEYCLOAK ERROR: No se pudo actualizar el perfil para {}: {}", userId, e.getMessage());
         }
