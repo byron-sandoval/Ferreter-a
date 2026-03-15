@@ -36,12 +36,10 @@ export const HistorialVentas = () => {
   const [fechaInicio, setFechaInicio] = useState('');
   const [fechaFin, setFechaFin] = useState('');
 
-  const [filterInput, setFilterInput] = useState('');
   const [fechaInicioInput, setFechaInicioInput] = useState('');
   const [fechaFinInput, setFechaFinInput] = useState('');
 
   const aplicarFiltros = () => {
-    setFilter(filterInput);
     setFechaInicio(fechaInicioInput);
     setFechaFin(fechaFinInput);
   };
@@ -182,53 +180,54 @@ export const HistorialVentas = () => {
           <div className="row align-items-end g-3">
             <div className="col-md-4 d-flex justify-content-md-start mb-2 mb-md-0">
               <div
-                className="d-flex align-items-center w-100"
+                className="d-flex align-items-center w-100 bg-white"
                 style={{
                   maxWidth: '350px',
-                  borderBottom: '2px solid #18a1bd',
-                  paddingBottom: '4px',
+                  border: '2px solid #adb5bd',
+                  borderRadius: '6px',
+                  padding: '6px 12px',
                 }}
               >
-                <FontAwesomeIcon icon={faSearch} className="text-info opacity-75 me-2" style={{ color: '#a855f7' }} />
+                <FontAwesomeIcon icon={faSearch} className="opacity-75 me-2" style={{ color: '#a855f7' }} />
                 <Input
                   placeholder="Buscar por Folio o Cliente..."
-                  value={filterInput}
-                  onChange={e => setFilterInput(e.target.value)}
+                  value={filter}
+                  onChange={e => setFilter(e.target.value)}
                   className="border-0 shadow-none p-0 bg-transparent flex-grow-1"
                   style={{ fontSize: '0.9rem' }}
                 />
               </div>
             </div>
             
-            <div className="col-md-6 d-flex justify-content-center align-items-end gap-3">
+            <div className="col-md-8 d-flex justify-content-start align-items-end gap-3">
               <div className="d-flex flex-column">
-                <span className="text-muted mb-1 text-uppercase" style={{ fontSize: '0.75rem', fontWeight: 'bold' }}>FECHA INICIO</span>
-                <div className="d-flex align-items-center bg-light px-2 py-1 rounded-1" style={{ border: '1px solid #eef2f7' }}>
+                <span className="text-dark mb-1 text-uppercase" style={{ fontSize: '0.75rem', fontWeight: 'bold' }}>FECHA INICIO</span>
+                <div className="d-flex align-items-center bg-white" style={{ border: '2px solid #adb5bd', borderRadius: '6px', padding: '4px 8px' }}>
                   <Input
                     type="date"
                     bsSize="sm"
                     value={fechaInicioInput}
                     onChange={e => setFechaInicioInput(e.target.value)}
-                    className="border-0 bg-transparent shadow-none p-0 text-muted"
+                    className="border-0 bg-transparent shadow-none p-0 text-dark"
                     style={{ fontSize: '0.9rem', outline: 'none', boxShadow: 'none' }}
                   />
                 </div>
               </div>
               <div className="d-flex flex-column">
-                <span className="text-muted mb-1 text-uppercase" style={{ fontSize: '0.75rem', fontWeight: 'bold' }}>FECHA FIN</span>
-                <div className="d-flex align-items-center bg-light px-2 py-1 rounded-1" style={{ border: '1px solid #eef2f7' }}>
+                <span className="text-dark mb-1 text-uppercase" style={{ fontSize: '0.75rem', fontWeight: 'bold' }}>FECHA FIN</span>
+                <div className="d-flex align-items-center bg-white" style={{ border: '2px solid #adb5bd', borderRadius: '6px', padding: '4px 8px' }}>
                   <Input
                     type="date"
                     bsSize="sm"
                     value={fechaFinInput}
                     onChange={e => setFechaFinInput(e.target.value)}
-                    className="border-0 bg-transparent shadow-none p-0 text-muted"
+                    className="border-0 bg-transparent shadow-none p-0 text-dark"
                     style={{ fontSize: '0.9rem', outline: 'none', boxShadow: 'none' }}
                   />
                 </div>
               </div>
-              <Button color="primary" onClick={aplicarFiltros} className="shadow-sm" style={{ padding: '0.3rem 1rem', borderRadius: '8px' }}>
-                <FontAwesomeIcon icon={faFilter} className="me-2" /> Filtrar
+              <Button color="primary" onClick={aplicarFiltros} className="shadow-none d-flex align-items-center" style={{ padding: '0.45rem 1.2rem', borderRadius: '6px', fontWeight: '500' }}>
+                <FontAwesomeIcon icon={faFilter} className="me-2" /> FILTRAR
               </Button>
             </div>
 
