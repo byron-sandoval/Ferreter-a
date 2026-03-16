@@ -62,6 +62,7 @@ export const AdminDashboard = () => {
   const [revisionPrecios, setRevisionPrecios] = useState<IArticulo[]>([]);
   const [categoryData, setCategoryData] = useState<ICategoryData[]>([]);
   const [topProductsData, setTopProductsData] = useState<any[]>([]);
+  const [topPeriod, setTopPeriod] = useState<'day' | 'week' | 'month'>('month');
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -137,7 +138,58 @@ export const AdminDashboard = () => {
     }));
 
     setCategoryData(pieData.sort((a, b) => b.value - a.value).filter(d => d.value > 0));
-  }, [selectedDate, loading, allArticulos, allDetallesVenta, allDetallesDevolucion]);
+
+    // 3. Top Productos (dinámico por período)
+    const productSales: Record<string, number> = {};
+    allDetallesVenta.forEach(det => {
+      if (det.venta?.anulada) return;
+
+      const fechaVenta = dayjs(det.venta?.fecha);
+      let match = false;
+
+      if (topPeriod === 'day') {
+        match = fechaVenta.isSame(dayjs(), 'day');
+      } else if (topPeriod === 'week') {
+        match = fechaVenta.isAfter(dayjs().subtract(7, 'day'));
+      } else {
+        match = fechaVenta.isSame(selectedDate, 'month');
+      }
+
+      if (!match) return;
+
+      const name = det.articulo?.nombre || 'Desconocido';
+      productSales[name] = (productSales[name] || 0) + (det.monto || 0);
+    });
+
+    allDetallesDevolucion.forEach(det => {
+      const fechaDev = dayjs(det.devolucion?.fecha);
+      let match = false;
+
+      if (topPeriod === 'day') {
+        match = fechaDev.isSame(dayjs(), 'day');
+      } else if (topPeriod === 'week') {
+        match = fechaDev.isAfter(dayjs().subtract(7, 'day'));
+      } else {
+        match = fechaDev.isSame(selectedDate, 'month');
+      }
+
+      if (!match) return;
+
+      const name = det.articulo?.nombre || 'Desconocido';
+      const montoNeto = (det.cantidad || 0) * (det.precioUnitario || 0);
+      if (productSales[name] !== undefined) {
+        productSales[name] -= montoNeto;
+      }
+    });
+
+    const topProducts = Object.keys(productSales)
+      .map(name => ({ name, total: productSales[name] }))
+      .filter(p => p.total > 0)
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 5);
+
+    setTopProductsData(topProducts);
+  }, [selectedDate, loading, allArticulos, allDetallesVenta, allDetallesDevolucion, topPeriod]);
 
   // Procesar datos para la gráfica (Ventas Netas últimos 7 días)
   const chartData = [6, 5, 4, 3, 2, 1, 0].map(daysAgo => {
@@ -274,9 +326,9 @@ export const AdminDashboard = () => {
         </Col>
       </Row>
 
-      <Row>
+      <Row className="mb-4">
         <Col md="8">
-          <Card className="shadow mb-4">
+          <Card className="shadow h-100">
             <CardBody>
               <CardTitle tag="h6" className="text-black border-bottom pb-2 mb-3">
                 <span> Tendencia de Ventas (Últimos 7 días)</span>
@@ -319,9 +371,8 @@ export const AdminDashboard = () => {
           </Card>
         </Col>
 
-        {/* Alertas de Stock */}
         <Col md="4">
-          <Card className="shadow mb-4 h-100">
+          <Card className="shadow h-100">
             <CardBody>
               <CardTitle tag="h6" className="text-danger border-bottom pb-2 mb-3 d-flex justify-content-between align-items-center">
                 <span>
@@ -332,57 +383,59 @@ export const AdminDashboard = () => {
                 </Badge>
               </CardTitle>
 
-              {loading ? (
-                <div className="text-center py-5">
-                  <div className="spinner-border spinner-border-sm text-danger" role="status"></div>
-                </div>
-              ) : bajoStock.length > 0 ? (
-                <div className="d-flex flex-column gap-2 custom-scrollbar" style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                  {bajoStock.map(p => {
-                    const existencia = p.existencia || 0;
-                    const minima = p.existenciaMinima || 0;
+              <div style={{ height: '220px', display: 'flex', flexDirection: 'column' }}>
+                {loading ? (
+                  <div className="text-center py-5 my-auto">
+                    <div className="spinner-border spinner-border-sm text-danger" role="status"></div>
+                  </div>
+                ) : bajoStock.length > 0 ? (
+                  <div className="d-flex flex-column gap-2 custom-scrollbar overflow-auto" style={{ maxHeight: '220px' }}>
+                    {bajoStock.map(p => {
+                      const existencia = p.existencia || 0;
+                      const minima = p.existenciaMinima || 0;
 
-                    let nivel: 'critico' | 'bajo';
-                    if (existencia === 0) {
-                      nivel = 'critico';
-                    } else {
-                      nivel = 'bajo';
-                    }
+                      let nivel: 'critico' | 'bajo';
+                      if (existencia === 0) {
+                        nivel = 'critico';
+                      } else {
+                        nivel = 'bajo';
+                      }
 
-                    const estilos = {
-                      critico: { bg: '#fff0f0', border: '#e53e3e', badgeText: 'CRÍTICO', dot: '#e53e3e', countColor: '#e53e3e', countBg: '#ffe5e5' },
-                      bajo: { bg: '#fffbeb', border: '#d97706', badgeText: 'BAJO', dot: '#d97706', countColor: '#d97706', countBg: '#fef3c7' },
-                    }[nivel];
+                      const estilos = {
+                        critico: { bg: '#fff0f0', border: '#e53e3e', badgeText: 'CRÍTICO', dot: '#e53e3e', countColor: '#e53e3e', countBg: '#ffe5e5' },
+                        bajo: { bg: '#fffbeb', border: '#d97706', badgeText: 'BAJO', dot: '#d97706', countColor: '#d97706', countBg: '#fef3c7' },
+                      }[nivel];
 
-                    return (
-                      <div
-                        key={p.id}
-                        className="d-flex justify-content-between align-items-center px-3 py-2 rounded-3"
-                        style={{ backgroundColor: estilos.bg, borderLeft: `4px solid ${estilos.border}` }}
-                      >
-                        <div className="text-truncate me-2">
-                          <div className="fw-bold small text-truncate" style={{ maxWidth: '150px' }}>{p.nombre}</div>
-                          <div className="text-muted" style={{ fontSize: '0.65rem' }}>{p.codigo}</div>
+                      return (
+                        <div
+                          key={p.id}
+                          className="d-flex justify-content-between align-items-center px-3 py-2 rounded-3"
+                          style={{ backgroundColor: estilos.bg, borderLeft: `4px solid ${estilos.border}` }}
+                        >
+                          <div className="text-truncate me-2">
+                            <div className="fw-bold small text-truncate" style={{ maxWidth: '150px' }}>{p.nombre}</div>
+                            <div className="text-muted" style={{ fontSize: '0.65rem' }}>{p.codigo}</div>
+                          </div>
+                          <div className="d-flex align-items-center gap-2" style={{ minWidth: '110px', justifyContent: 'flex-end' }}>
+                            <span className="d-flex align-items-center gap-1 fw-semibold" style={{ fontSize: '0.72rem', color: estilos.dot }}>
+                              <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: estilos.dot, display: 'inline-block' }} />
+                              {estilos.badgeText}
+                            </span>
+                            <span className="fw-bold rounded-2 px-2 py-1" style={{ fontSize: '0.72rem', color: estilos.countColor, backgroundColor: estilos.countBg, whiteSpace: 'nowrap' }}>
+                              {existencia} / {minima}
+                            </span>
+                          </div>
                         </div>
-                        <div className="d-flex align-items-center gap-2" style={{ minWidth: '110px', justifyContent: 'flex-end' }}>
-                          <span className="d-flex align-items-center gap-1 fw-semibold" style={{ fontSize: '0.72rem', color: estilos.dot }}>
-                            <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: estilos.dot, display: 'inline-block' }} />
-                            {estilos.badgeText}
-                          </span>
-                          <span className="fw-bold rounded-2 px-2 py-1" style={{ fontSize: '0.72rem', color: estilos.countColor, backgroundColor: estilos.countBg, whiteSpace: 'nowrap' }}>
-                            {existencia} / {minima}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="text-center text-success py-5">
-                  <FontAwesomeIcon icon={faBoxes} size="2x" className="mb-2 opacity-25" />
-                  <p className="small mb-0">¡Todo en orden!</p>
-                </div>
-              )}
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="text-center text-success my-auto py-4">
+                    <FontAwesomeIcon icon={faBoxes} size="2x" className="mb-2 opacity-25" />
+                    <p className="small mb-0">¡Todo en orden!</p>
+                  </div>
+                )}
+              </div>
             </CardBody>
           </Card>
         </Col>
@@ -390,7 +443,7 @@ export const AdminDashboard = () => {
 
       <Row>
         <Col md="8">
-          <Card className="shadow mb-4">
+          <Card className="shadow h-100">
             <CardBody>
               <CardTitle tag="h6" className="text-black border-bottom pb-2 mb-3">
                 Ventas por Categoría ({selectedDate.format('MMMM YYYY')})
@@ -416,6 +469,85 @@ export const AdminDashboard = () => {
                     <Legend verticalAlign="bottom" height={36} iconType="circle" />
                   </PieChart>
                 </ResponsiveContainer>
+              </div>
+            </CardBody>
+          </Card>
+        </Col>
+
+        <Col md="4">
+          <Card className="shadow h-100">
+            <CardBody>
+              <div className="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+                <CardTitle tag="h6" className="text-primary mb-0">
+                  Top 5 Artículos por Ingresos
+                </CardTitle>
+                <div className="d-flex gap-1">
+                  <Button
+                    size="xs"
+                    color={topPeriod === 'day' ? 'primary' : 'outline-primary'}
+                    className="py-0 px-2"
+                    style={{ fontSize: '0.65rem', color: 'black' }}
+                    onClick={() => setTopPeriod('day')}
+                  >
+                    Hoy
+                  </Button>
+                  <Button
+                    size="xs"
+                    color={topPeriod === 'week' ? 'primary' : 'outline-primary'}
+                    className="py-0 px-2"
+                    style={{ fontSize: '0.65rem', color: 'black' }}
+                    onClick={() => setTopPeriod('week')}
+                  >
+                    Semana
+                  </Button>
+                  <Button
+                    size="xs"
+                    color={topPeriod === 'month' ? 'primary' : 'outline-primary'}
+                    className="py-0 px-2"
+                    style={{ fontSize: '0.65rem', color: 'black' }}
+                    onClick={() => setTopPeriod('month')}
+                  >
+                    Mes
+                  </Button>
+                </div>
+              </div>
+              <div style={{ height: '300px', width: '100%' }}>
+                {topProductsData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      layout="vertical"
+                      data={topProductsData}
+                      margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f0f0f0" />
+                      <XAxis type="number" hide />
+                      <YAxis
+                        dataKey="name"
+                        type="category"
+                        axisLine={false}
+                        tickLine={false}
+                        width={100}
+                        tick={{ fill: '#475569', fontSize: 11, fontWeight: 'bold' }}
+                      />
+                      <Tooltip
+                        cursor={{ fill: 'transparent' }}
+                        formatter={(value: any) => [`C$ ${Number(value).toLocaleString()}`, 'Monto Neto']}
+                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                      />
+                      <Bar
+                        dataKey="total"
+                        fill="#3b82f6"
+                        radius={[0, 4, 4, 0]}
+                        barSize={20}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="d-flex flex-column align-items-center justify-content-center h-100 text-muted opacity-50">
+                    <FontAwesomeIcon icon={faChartLine} size="3x" className="mb-2" />
+                    <p className="small">Sin datos en este mes</p>
+                  </div>
+                )}
               </div>
             </CardBody>
           </Card>
