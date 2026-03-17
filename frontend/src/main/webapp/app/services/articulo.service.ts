@@ -3,13 +3,11 @@ import { IArticulo } from '../shared/model/articulo.model';
 
 const API_URL = 'api/articulos';
 
-const getAll = (page = 0, size = 1000, sort?: string) => {
-  const params = new URLSearchParams();
-  params.append('page', page.toString());
-  params.append('size', size.toString());
-  if (sort !== undefined) params.append('sort', sort);
-  const queryString = params.toString();
-  return axios.get<IArticulo[]>(`${API_URL}?${queryString}`);
+const getAll = (params?: any) => {
+  if (!params) {
+    params = { page: 0, size: 1000 };
+  }
+  return axios.get<IArticulo[]>(API_URL, { params });
 };
 
 const getById = (id: number) => {
