@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Button, Row, Col, Form, FormGroup, Label, Input, Card, CardBody, CardHeader, CardTitle, Badge } from 'reactstrap';
+import { Button, Row, Col, Form, FormGroup, Label, Input, Card, CardBody, CardHeader } from 'reactstrap';
 import { useForm, Controller } from 'react-hook-form';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faSave, faImage, faTimes, faExclamationTriangle, faBarcode } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faSave, faImage, faTimes, faExclamationTriangle, faBarcode, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { AUTHORITIES } from 'app/config/constants';
 import ArticuloService from 'app/services/articulo.service';
 import CategoriaService from 'app/services/categoria.service';
 import UnidadMedidaService from 'app/services/unidad-medida.service';
+import { uploadArticuloImage, deleteArticuloImage } from 'app/services/supabase.service';
 import { IArticulo } from 'app/shared/model/articulo.model';
 import { ICategoria } from 'app/shared/model/categoria.model';
 import { IUnidadMedida } from 'app/shared/model/unidad-medida.model';
@@ -25,6 +26,9 @@ export const ArticuloUpdate = () => {
   const [unidades, setUnidades] = useState<IUnidadMedida[]>([]);
   const [loadingObj, setLoadingObj] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [originalImagenUrl, setOriginalImagenUrl] = useState<string | null>(null);
   const [originalPrecio, setOriginalPrecio] = useState<number | null>(null);
 
   const {
@@ -49,7 +53,6 @@ export const ArticuloUpdate = () => {
   const esPrecioBajo = precioVenta > 0 && costoUnitario > 0 && Number(precioVenta) < Number(costoUnitario);
 
   useEffect(() => {
-    // Cargar catálogos
     CategoriaService.getAll().then(res => setCategorias(res.data));
     UnidadMedidaService.getAll().then(res => setUnidades(res.data));
 
@@ -60,11 +63,12 @@ export const ArticuloUpdate = () => {
           const articulo = res.data;
           reset(articulo);
           setOriginalPrecio(articulo.precio || 0);
-          if (articulo.imagen && articulo.imagenContentType) {
-            setImagePreview(`data:${articulo.imagenContentType};base64,${articulo.imagen}`);
+          if (articulo.imagenUrl) {
+            setImagePreview(articulo.imagenUrl);
+            setOriginalImagenUrl(articulo.imagenUrl);
           }
         })
-        .catch(err => toast.error('Error al cargar el artículo'))
+        .catch(() => toast.error('Error al cargar el artículo'))
         .finally(() => setLoadingObj(false));
     }
   }, [id, isNew, reset]);
@@ -72,39 +76,54 @@ export const ArticuloUpdate = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        // Split metadata from content
-        const contentIndex = base64String.indexOf(',') + 1;
-        const contentType = base64String.substring(5, contentIndex - 8);
-        const content = base64String.substring(contentIndex);
-
-        setValue('imagen', content);
-        setValue('imagenContentType', contentType);
-        setImagePreview(base64String);
-      };
-      reader.readAsDataURL(file);
+      setSelectedFile(file);
+      // Vista previa local inmediata sin subir aún
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
   const clearImage = () => {
-    setValue('imagen', null);
-    setValue('imagenContentType', null);
+    setSelectedFile(null);
     setImagePreview(null);
+    setValue('imagenUrl', null);
   };
 
   const onSubmit = async (data: IArticulo) => {
     try {
+      let imagenUrlFinal = data.imagenUrl;
+
+      // Si hay un archivo nuevo seleccionado, subirlo a Supabase primero
+      if (selectedFile) {
+        setUploadingImage(true);
+        try {
+          // Si había imagen anterior, eliminarla de Supabase
+          if (originalImagenUrl) {
+            await deleteArticuloImage(originalImagenUrl).catch(() => {
+              // No bloquear si falla la eliminación de la imagen vieja
+            });
+          }
+          imagenUrlFinal = await uploadArticuloImage(selectedFile, data.id ?? `new_${Date.now()}`);
+        } finally {
+          setUploadingImage(false);
+        }
+      } else if (originalImagenUrl && !data.imagenUrl) {
+        // Si el usuario eliminó la imagen cargada previamente sin subir una nueva
+        await deleteArticuloImage(originalImagenUrl).catch(() => {});
+        imagenUrlFinal = null;
+      }
+
+      data.imagenUrl = imagenUrlFinal;
+
       if (isNew) {
         data.ultimoCosto = data.costo;
         await ArticuloService.create(data);
-        toast.success('Articulo creado exitosamente');
+        toast.success('Artículo creado exitosamente');
       } else {
         data.ultimoCosto = data.costo;
         await ArticuloService.update(data);
-        toast.success('Articulo actualizado exitosamente');
+        toast.success('Artículo actualizado exitosamente');
       }
+
       navigate('/admin/articulos');
     } catch (error) {
       console.error(error);
@@ -346,12 +365,13 @@ export const ArticuloUpdate = () => {
                         >
                           {imagePreview ? (
                             <>
-                              <img src={imagePreview} alt="Preview" style={{ maxHeight: '100%', maxWidth: '100%' }} />
+                              <img src={imagePreview} alt="Preview" style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }} />
                               <Button
                                 color="danger"
                                 size="sm"
                                 className="position-absolute top-0 end-0 m-1 rounded-circle"
                                 onClick={clearImage}
+                                type="button"
                               >
                                 <FontAwesomeIcon icon={faTimes} />
                               </Button>
@@ -364,9 +384,26 @@ export const ArticuloUpdate = () => {
                           )}
                         </div>
 
+                        {selectedFile && (
+                          <div className="small text-info mb-2">
+                            <FontAwesomeIcon icon={faImage} className="me-1" />
+                            {selectedFile.name}
+                            <div className="text-muted" style={{ fontSize: '0.7rem' }}>
+                              Se subirá al guardar el artículo
+                            </div>
+                          </div>
+                        )}
+
                         <div className="d-grid">
                           <Label className="btn btn-outline-primary btn-sm mb-0">
-                            Subir Imagen <Input type="file" hidden accept="image/*" onChange={handleImageChange} />
+                            {uploadingImage ? (
+                              <>
+                                <FontAwesomeIcon icon={faSpinner} spin className="me-1" /> Subiendo...
+                              </>
+                            ) : (
+                              'Cambiar Imagen'
+                            )}
+                            <Input type="file" hidden accept="image/*" onChange={handleImageChange} disabled={uploadingImage} />
                           </Label>
                         </div>
                       </CardBody>
@@ -394,9 +431,18 @@ export const ArticuloUpdate = () => {
                   <Button tag={Link} to="/admin/articulos" color="light" className="text-dark border bg-white fw-bold text-uppercase px-4">
                     Cancelar
                   </Button>
-                  <Button color="primary" type="submit" disabled={isSubmitting} className="px-4">
-                    <FontAwesomeIcon icon={faSave} className="me-2" />
-                    {isSubmitting ? 'Guardando...' : 'Guardar Artículo'}
+                  <Button color="primary" type="submit" disabled={isSubmitting || uploadingImage} className="px-4">
+                    {isSubmitting || uploadingImage ? (
+                      <>
+                        <FontAwesomeIcon icon={faSpinner} spin className="me-2" />
+                        {uploadingImage ? 'Subiendo imagen...' : 'Guardando...'}
+                      </>
+                    ) : (
+                      <>
+                        <FontAwesomeIcon icon={faSave} className="me-2" />
+                        Guardar Artículo
+                      </>
+                    )}
                   </Button>
                 </div>
               </Form>

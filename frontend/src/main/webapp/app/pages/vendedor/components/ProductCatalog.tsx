@@ -143,9 +143,9 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
                       className="text-center d-flex align-items-center justify-content-center bg-white"
                       style={{ height: '100px', padding: '5px', position: 'relative' }}
                     >
-                      {prod.imagen ? (
+                      {prod.imagenUrl ? (
                         <img
-                          src={`data:${prod.imagenContentType};base64,${prod.imagen}`}
+                          src={prod.imagenUrl}
                           alt={prod.nombre}
                           style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }}
                         />

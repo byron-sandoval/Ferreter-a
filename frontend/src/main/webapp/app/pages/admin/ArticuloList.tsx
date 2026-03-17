@@ -586,12 +586,12 @@ export const ArticuloList = () => {
             <CardBody>
               <Row>
                 <Col md="2" className="text-center border-end">
-                  {selectedArticulo.imagen ? (
+                  {selectedArticulo.imagenUrl ? (
                     <img
-                      src={`data:${selectedArticulo.imagenContentType};base64,${selectedArticulo.imagen}`}
+                      src={selectedArticulo.imagenUrl}
                       alt={selectedArticulo.nombre}
                       className="img-fluid rounded shadow-sm mb-2"
-                      style={{ maxHeight: '120px' }}
+                      style={{ maxHeight: '120px', objectFit: 'contain' }}
                     />
                   ) : (
                     <div
