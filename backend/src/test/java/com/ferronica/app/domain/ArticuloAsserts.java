@@ -67,9 +67,7 @@ public class ArticuloAsserts {
                 assertThat(a.getPrecio()).as("check precio").usingComparator(bigDecimalCompareTo).isEqualTo(expected.getPrecio())
             )
             .satisfies(a -> assertThat(a.getCosto()).as("check costo").usingComparator(bigDecimalCompareTo).isEqualTo(expected.getCosto()))
-            .satisfies(a -> assertThat(a.getImagen()).as("check imagen").isEqualTo(expected.getImagen()))
-            .satisfies(a -> assertThat(a.getImagenContentType()).as("check imagen contenty type").isEqualTo(expected.getImagenContentType())
-            )
+            .satisfies(a -> assertThat(a.getImagenUrl()).as("check imagenUrl").isEqualTo(expected.getImagenUrl()))
             .satisfies(a -> assertThat(a.getActivo()).as("check activo").isEqualTo(expected.getActivo()));
     }
 
