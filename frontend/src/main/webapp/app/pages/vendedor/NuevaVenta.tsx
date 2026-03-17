@@ -82,14 +82,12 @@ export const NuevaVenta = () => {
 
   const cargarDatosIniciales = async () => {
     try {
-      const [resArt, resMon, resNum, resEmp, resCat] = await Promise.all([
-        ArticuloService.getAll(),
+      const [resMon, resNum, resEmp, resCat] = await Promise.all([
         MonedaService.getAll(),
         NumeracionService.getAll(),
         EmpresaService.getAll(),
         CategoriaService.getAll(),
       ]);
-      setArticulos(resArt.data);
       setCategorias(resCat.data);
       setMonedas(resMon.data);
       if (resMon.data.length > 0) setMonedaSeleccionada(resMon.data[0]);
