@@ -42,6 +42,7 @@ export const HistorialVentas = () => {
   const aplicarFiltros = () => {
     setFechaInicio(fechaInicioInput);
     setFechaFin(fechaFinInput);
+    setCurrentPage(0);
   };
 
   const [showDevolucionModal, setShowDevolucionModal] = useState(false);
@@ -49,15 +50,17 @@ export const HistorialVentas = () => {
   const [ventaSeleccionada, setVentaSeleccionada] = useState<IVenta | null>(null);
   const [empresa, setEmpresa] = useState<IEmpresa | null>(null);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filter, fechaInicio, fechaFin]);
+  // Paginación del BACKEND (page es 0-indexed en JHipster)
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
+  const itemsPerPage = 20;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   useEffect(() => {
     loadVentas();
+  }, [currentPage, fechaInicio, fechaFin]);
+
+  useEffect(() => {
     loadEmpresa();
   }, []);
 
@@ -73,10 +76,22 @@ export const HistorialVentas = () => {
   const loadVentas = async () => {
     setLoading(true);
     try {
-      const res = await VentaService.getAll({ size: 1000, sort: 'fecha,desc' });
+      const params: any = {
+        page: currentPage,
+        size: itemsPerPage,
+        sort: 'fecha,desc',
+      };
+      // Filtros de fecha: convertimos medianoche/fin de día en hora LOCAL a UTC con dayjs
+      if (fechaInicio) params['fecha.greaterThanOrEqual'] = dayjs(fechaInicio).startOf('day').toISOString();
+      if (fechaFin)    params['fecha.lessThanOrEqual']    = dayjs(fechaFin).endOf('day').toISOString();
+
+      const res = await VentaService.getAll(params);
       // JHipster returns the list directly or in an array. Let's ensure it's an array.
       const data = Array.isArray(res.data) ? res.data : (res.data as any).content || [];
       setVentas(data);
+      // JHipster devuelve el total en el header X-Total-Count
+      const total = res.headers?.['x-total-count'];
+      setTotalItems(total ? parseInt(total, 10) : data.length);
     } catch (e) {
       toast.error('Error al cargar historial');
     } finally {
@@ -134,25 +149,11 @@ export const HistorialVentas = () => {
     }
   };
 
+  // Búsqueda local por folio/cliente dentro de la página actual
   const filtered = ventas.filter(v => {
     const searchLow = filter.toLowerCase();
-    const matchText = (v.noFactura?.toString() || '').includes(searchLow) || (v.cliente?.nombre || '').toLowerCase().includes(searchLow);
-    
-    let matchFecha = true;
-    if (fechaInicio && v.fecha) {
-      matchFecha = matchFecha && dayjs(v.fecha).valueOf() >= dayjs(fechaInicio).startOf('day').valueOf();
-    }
-    if (fechaFin && v.fecha) {
-      matchFecha = matchFecha && dayjs(v.fecha).valueOf() <= dayjs(fechaFin).endOf('day').valueOf();
-    }
-
-    return matchText && matchFecha;
+    return (v.noFactura?.toString() || '').includes(searchLow) || (v.cliente?.nombre || '').toLowerCase().includes(searchLow);
   });
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filtered.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
@@ -252,7 +253,7 @@ export const HistorialVentas = () => {
             </tr>
           </thead>
           <tbody>
-            {currentItems.map(v => {
+            {filtered.map(v => {
               const activa = puedeDevolver(v.fecha);
               return (
                 <tr key={v.id}>
@@ -326,20 +327,20 @@ export const HistorialVentas = () => {
         {totalPages > 1 && (
           <div className="d-flex justify-content-between align-items-center p-2 border-top bg-light">
             <small className="text-muted ps-2">
-              Mostrando {Math.min(indexOfLastItem, filtered.length)} de {filtered.length} ventas
+              Mostrando {currentPage * itemsPerPage + filtered.length} de {totalItems} ventas
             </small>
             <Pagination size="sm" className="mb-0 pe-2">
-              <PaginationItem disabled={currentPage === 1}>
+              <PaginationItem disabled={currentPage === 0}>
                 <PaginationLink previous onClick={() => paginate(currentPage - 1)}>
                   <FontAwesomeIcon icon={faChevronLeft} />
                 </PaginationLink>
               </PaginationItem>
               {[...Array(totalPages)].map((_, i) => (
-                <PaginationItem active={i + 1 === currentPage} key={i}>
-                  <PaginationLink onClick={() => paginate(i + 1)}>{i + 1}</PaginationLink>
+                <PaginationItem active={i === currentPage} key={i}>
+                  <PaginationLink onClick={() => paginate(i)}>{i + 1}</PaginationLink>
                 </PaginationItem>
               ))}
-              <PaginationItem disabled={currentPage === totalPages}>
+              <PaginationItem disabled={currentPage === totalPages - 1}>
                 <PaginationLink next onClick={() => paginate(currentPage + 1)}>
                   <FontAwesomeIcon icon={faChevronRight} />
                 </PaginationLink>
