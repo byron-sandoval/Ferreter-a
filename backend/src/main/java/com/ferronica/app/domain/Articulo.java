@@ -55,12 +55,8 @@ public class Articulo implements Serializable {
     @Column(name = "costo", precision = 21, scale = 2, nullable = false)
     private BigDecimal costo;
 
-    @Lob
-    @Column(name = "imagen")
-    private byte[] imagen;
-
-    @Column(name = "imagen_content_type")
-    private String imagenContentType;
+    @Column(name = "imagen_url", length = 500)
+    private String imagenUrl;
 
     @Column(name = "activo")
     private Boolean activo;
@@ -181,30 +177,17 @@ public class Articulo implements Serializable {
         this.costo = costo;
     }
 
-    public byte[] getImagen() {
-        return this.imagen;
+    public String getImagenUrl() {
+        return this.imagenUrl;
     }
 
-    public Articulo imagen(byte[] imagen) {
-        this.setImagen(imagen);
+    public Articulo imagenUrl(String imagenUrl) {
+        this.setImagenUrl(imagenUrl);
         return this;
     }
 
-    public void setImagen(byte[] imagen) {
-        this.imagen = imagen;
-    }
-
-    public String getImagenContentType() {
-        return this.imagenContentType;
-    }
-
-    public Articulo imagenContentType(String imagenContentType) {
-        this.imagenContentType = imagenContentType;
-        return this;
-    }
-
-    public void setImagenContentType(String imagenContentType) {
-        this.imagenContentType = imagenContentType;
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
     }
 
     public Boolean getActivo() {
@@ -287,8 +270,7 @@ public class Articulo implements Serializable {
                 ", existenciaMinima=" + getExistenciaMinima() +
                 ", precio=" + getPrecio() +
                 ", costo=" + getCosto() +
-                ", imagen='" + getImagen() + "'" +
-                ", imagenContentType='" + getImagenContentType() + "'" +
+                ", imagenUrl='" + getImagenUrl() + "'" +
                 ", activo='" + getActivo() + "'" +
                 "}";
     }

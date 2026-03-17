@@ -1,6 +1,5 @@
 package com.ferronica.app.service.dto;
 
-import jakarta.persistence.Lob;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -40,10 +39,7 @@ public class ArticuloDTO implements Serializable {
     @DecimalMin(value = "0")
     private BigDecimal costo;
 
-    @Lob
-    private byte[] imagen;
-
-    private String imagenContentType;
+    private String imagenUrl;
 
     private Boolean activo;
 
@@ -119,20 +115,12 @@ public class ArticuloDTO implements Serializable {
         this.costo = costo;
     }
 
-    public byte[] getImagen() {
-        return imagen;
+    public String getImagenUrl() {
+        return imagenUrl;
     }
 
-    public void setImagen(byte[] imagen) {
-        this.imagen = imagen;
-    }
-
-    public String getImagenContentType() {
-        return imagenContentType;
-    }
-
-    public void setImagenContentType(String imagenContentType) {
-        this.imagenContentType = imagenContentType;
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
     }
 
     public Boolean getActivo() {
@@ -208,7 +196,7 @@ public class ArticuloDTO implements Serializable {
                 ", existenciaMinima=" + getExistenciaMinima() +
                 ", precio=" + getPrecio() +
                 ", costo=" + getCosto() +
-                ", imagen='" + getImagen() + "'" +
+                ", imagenUrl='" + getImagenUrl() + "'" +
                 ", activo='" + getActivo() + "'" +
                 ", categoria=" + getCategoria() +
                 ", unidadMedida=" + getUnidadMedida() +
