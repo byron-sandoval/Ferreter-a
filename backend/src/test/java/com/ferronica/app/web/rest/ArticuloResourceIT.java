@@ -19,7 +19,7 @@ import com.ferronica.app.service.dto.ArticuloDTO;
 import com.ferronica.app.service.mapper.ArticuloMapper;
 import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
-import java.util.Base64;
+
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.AfterEach;
@@ -65,10 +65,8 @@ class ArticuloResourceIT {
     private static final BigDecimal UPDATED_COSTO = new BigDecimal(1);
     private static final BigDecimal SMALLER_COSTO = new BigDecimal(0 - 1);
 
-    private static final byte[] DEFAULT_IMAGEN = TestUtil.createByteArray(1, "0");
-    private static final byte[] UPDATED_IMAGEN = TestUtil.createByteArray(1, "1");
-    private static final String DEFAULT_IMAGEN_CONTENT_TYPE = "image/jpg";
-    private static final String UPDATED_IMAGEN_CONTENT_TYPE = "image/png";
+    private static final String DEFAULT_IMAGEN_URL = "https://example.com/imagen-default.jpg";
+    private static final String UPDATED_IMAGEN_URL = "https://example.com/imagen-updated.jpg";
 
     private static final Boolean DEFAULT_ACTIVO = false;
     private static final Boolean UPDATED_ACTIVO = true;
@@ -113,8 +111,7 @@ class ArticuloResourceIT {
             .existenciaMinima(DEFAULT_EXISTENCIA_MINIMA)
             .precio(DEFAULT_PRECIO)
             .costo(DEFAULT_COSTO)
-            .imagen(DEFAULT_IMAGEN)
-            .imagenContentType(DEFAULT_IMAGEN_CONTENT_TYPE)
+            .imagenUrl(DEFAULT_IMAGEN_URL)
             .activo(DEFAULT_ACTIVO);
     }
 
@@ -133,8 +130,7 @@ class ArticuloResourceIT {
             .existenciaMinima(UPDATED_EXISTENCIA_MINIMA)
             .precio(UPDATED_PRECIO)
             .costo(UPDATED_COSTO)
-            .imagen(UPDATED_IMAGEN)
-            .imagenContentType(UPDATED_IMAGEN_CONTENT_TYPE)
+            .imagenUrl(UPDATED_IMAGEN_URL)
             .activo(UPDATED_ACTIVO);
     }
 
@@ -316,8 +312,7 @@ class ArticuloResourceIT {
             .andExpect(jsonPath("$.[*].existenciaMinima").value(hasItem(sameNumber(DEFAULT_EXISTENCIA_MINIMA))))
             .andExpect(jsonPath("$.[*].precio").value(hasItem(sameNumber(DEFAULT_PRECIO))))
             .andExpect(jsonPath("$.[*].costo").value(hasItem(sameNumber(DEFAULT_COSTO))))
-            .andExpect(jsonPath("$.[*].imagenContentType").value(hasItem(DEFAULT_IMAGEN_CONTENT_TYPE)))
-            .andExpect(jsonPath("$.[*].imagen").value(hasItem(Base64.getEncoder().encodeToString(DEFAULT_IMAGEN))))
+            .andExpect(jsonPath("$.[*].imagenUrl").value(hasItem(DEFAULT_IMAGEN_URL)))
             .andExpect(jsonPath("$.[*].activo").value(hasItem(DEFAULT_ACTIVO)));
     }
 
@@ -340,8 +335,7 @@ class ArticuloResourceIT {
             .andExpect(jsonPath("$.existenciaMinima").value(sameNumber(DEFAULT_EXISTENCIA_MINIMA)))
             .andExpect(jsonPath("$.precio").value(sameNumber(DEFAULT_PRECIO)))
             .andExpect(jsonPath("$.costo").value(sameNumber(DEFAULT_COSTO)))
-            .andExpect(jsonPath("$.imagenContentType").value(DEFAULT_IMAGEN_CONTENT_TYPE))
-            .andExpect(jsonPath("$.imagen").value(Base64.getEncoder().encodeToString(DEFAULT_IMAGEN)))
+            .andExpect(jsonPath("$.imagenUrl").value(DEFAULT_IMAGEN_URL))
             .andExpect(jsonPath("$.activo").value(DEFAULT_ACTIVO));
     }
 
@@ -909,8 +903,7 @@ class ArticuloResourceIT {
             .andExpect(jsonPath("$.[*].existenciaMinima").value(hasItem(sameNumber(DEFAULT_EXISTENCIA_MINIMA))))
             .andExpect(jsonPath("$.[*].precio").value(hasItem(sameNumber(DEFAULT_PRECIO))))
             .andExpect(jsonPath("$.[*].costo").value(hasItem(sameNumber(DEFAULT_COSTO))))
-            .andExpect(jsonPath("$.[*].imagenContentType").value(hasItem(DEFAULT_IMAGEN_CONTENT_TYPE)))
-            .andExpect(jsonPath("$.[*].imagen").value(hasItem(Base64.getEncoder().encodeToString(DEFAULT_IMAGEN))))
+            .andExpect(jsonPath("$.[*].imagenUrl").value(hasItem(DEFAULT_IMAGEN_URL)))
             .andExpect(jsonPath("$.[*].activo").value(hasItem(DEFAULT_ACTIVO)));
 
         // Check, that the count call also returns 1
@@ -967,8 +960,7 @@ class ArticuloResourceIT {
             .existenciaMinima(UPDATED_EXISTENCIA_MINIMA)
             .precio(UPDATED_PRECIO)
             .costo(UPDATED_COSTO)
-            .imagen(UPDATED_IMAGEN)
-            .imagenContentType(UPDATED_IMAGEN_CONTENT_TYPE)
+            .imagenUrl(UPDATED_IMAGEN_URL)
             .activo(UPDATED_ACTIVO);
         ArticuloDTO articuloDTO = articuloMapper.toDto(updatedArticulo);
 
@@ -1099,8 +1091,7 @@ class ArticuloResourceIT {
             .existenciaMinima(UPDATED_EXISTENCIA_MINIMA)
             .precio(UPDATED_PRECIO)
             .costo(UPDATED_COSTO)
-            .imagen(UPDATED_IMAGEN)
-            .imagenContentType(UPDATED_IMAGEN_CONTENT_TYPE)
+            .imagenUrl(UPDATED_IMAGEN_URL)
             .activo(UPDATED_ACTIVO);
 
         restArticuloMockMvc

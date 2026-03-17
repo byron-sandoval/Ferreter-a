@@ -1,9 +1,10 @@
-import React from 'react';
-import { Row, Col, Card, CardBody, Input, Badge } from 'reactstrap';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Row, Col, Card, CardBody, Input, Badge, Spinner } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faBoxOpen } from '@fortawesome/free-solid-svg-icons';
 import { IArticulo } from 'app/shared/model/articulo.model';
 import { ICategoria } from 'app/shared/model/categoria.model';
+import ArticuloService from 'app/services/articulo.service';
 
 interface IProductCatalogProps {
   articulos: IArticulo[];
@@ -16,7 +17,7 @@ interface IProductCatalogProps {
 }
 
 export const ProductCatalog: React.FC<IProductCatalogProps> = ({
-  articulos,
+  articulos, // Se conserva por compatibilidad con el padre, pero usaremos paginación interna
   categorias,
   termino,
   setTermino,
@@ -24,6 +25,106 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
   setCategoriaFiltro,
   agregarAlCarrito,
 }) => {
+  const [localArticulos, setLocalArticulos] = useState<IArticulo[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [debouncedTermino, setDebouncedTermino] = useState(termino);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+
+  // 1. Debounce para el buscador
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedTermino(termino);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [termino]);
+
+  // 2. Reiniciar página cuando cambian los filtros
+  useEffect(() => {
+    setPage(0);
+    setLocalArticulos([]);
+    setHasMore(true);
+  }, [debouncedTermino, categoriaFiltro]);
+
+  // 3. Cargar datos desde el backend usando paginación
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const pageSize = 12; // 12 para mostrar 3 filas de 4
+        const baseParams: any = { page, size: pageSize, sort: 'nombre,asc' };
+        baseParams['activo.equals'] = true;
+
+        if (categoriaFiltro !== 'todas') {
+          const cat = categorias.find(c => c.nombre === categoriaFiltro);
+          if (cat) {
+            baseParams['categoriaId.equals'] = cat.id;
+          }
+        }
+
+        let data: IArticulo[] = [];
+        let totalFetched = 0;
+
+        if (debouncedTermino) {
+          // Buscar en AMBOS campos (código y nombre) en paralelo para cubrir
+          // códigos de barra alfanuméricos que contienen letras y números
+          const paramsCodigo = { ...baseParams, 'codigo.contains': debouncedTermino };
+          const paramsNombre = { ...baseParams, 'nombre.contains': debouncedTermino };
+
+          const [resCodigo, resNombre] = await Promise.all([
+            ArticuloService.getAll(paramsCodigo),
+            ArticuloService.getAll(paramsNombre),
+          ]);
+
+          // Unificar resultados y eliminar duplicados por ID
+          const combinados = [...(resCodigo.data || []), ...(resNombre.data || [])];
+          const vistos = new Set<number>();
+          data = combinados.filter(art => {
+            if (vistos.has(art.id!)) return false;
+            vistos.add(art.id!);
+            return true;
+          });
+
+          totalFetched = Math.max((resCodigo.data || []).length, (resNombre.data || []).length);
+        } else {
+          const res = await ArticuloService.getAll(baseParams);
+          data = res.data || [];
+          totalFetched = data.length;
+        }
+
+        // Filtramos precios > 0 por si el backend no lo soporta directamente en el query builder
+        data = data.filter(p => (p.precio || 0) > 0);
+
+        setLocalArticulos(prev => (page === 0 ? data : [...prev, ...data]));
+        setHasMore(totalFetched === pageSize);
+      } catch (e) {
+        console.error("Error al cargar productos", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Si ya tenemos las categorías listas, cargamos
+    if (categorias.length > 0) {
+      loadData();
+    }
+  }, [page, debouncedTermino, categoriaFiltro, categorias]);
+
+  // 4. Scroll infinito Observer
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastElementRef = useCallback((node: HTMLDivElement | null) => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        setPage(prevPage => prevPage + 1);
+      }
+    });
+
+    if (node) observer.current.observe(node);
+  }, [loading, hasMore]);
+
   return (
     <Col md="7">
       <Card className="shadow-sm mb-2 border rounded-3 overflow-hidden">
@@ -41,6 +142,7 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
                 value={termino}
                 onChange={e => setTermino(e.target.value)}
               />
+              {loading && page === 0 && <Spinner size="sm" color="primary" className="ms-2" />}
             </Col>
             <Col xs="auto" className="border-start ps-3">
               <Input
@@ -66,40 +168,20 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
 
       <div style={{ height: 'calc(100vh - 180px)', overflowY: 'auto', overflowX: 'hidden', paddingRight: '10px' }}>
         <Row className="g-3">
-          {articulos
-            .filter(p => {
-              const term = termino
-                .toLowerCase()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '');
-              const nombre = (p.nombre || '')
-                .toLowerCase()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '');
-              const codigo = (p.codigo || '')
-                .toLowerCase()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '');
-              const uniNombre = (p.unidadMedida?.nombre || '')
-                .toLowerCase()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '');
-              const uniSimbolo = (p.unidadMedida?.simbolo || '')
-                .toLowerCase()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '');
+          {localArticulos.length === 0 && !loading && (
+            <Col md="12" className="text-center py-5 text-muted">
+              <FontAwesomeIcon icon={faBoxOpen} size="3x" className="mb-3 opacity-50" />
+              <h5>No se encontraron productos</h5>
+              <p>Intenta buscar con otro nombre, código o categoría.</p>
+            </Col>
+          )}
+          {localArticulos.map((prod, index) => {
+            const isPendingReview = !!(prod.ultimoCosto && (prod.costo || 0) > (prod.ultimoCosto || 0));
+            const isLastElement = index === localArticulos.length - 1;
 
-              const matchesSearch = nombre.includes(term) || codigo.includes(term) || uniNombre.includes(term) || uniSimbolo.includes(term);
-
-              const matchesCategory = categoriaFiltro === 'todas' || p.categoria?.nombre === categoriaFiltro;
-              const categoryIsActive = p.categoria ? p.categoria.activo !== false : true;
-              return p.activo !== false && categoryIsActive && matchesSearch && matchesCategory && (p.precio || 0) > 0;
-            })
-            .map(prod => {
-              const isPendingReview = !!(prod.ultimoCosto && (prod.costo || 0) > (prod.ultimoCosto || 0));
-
-              return (
-                <Col md="3" key={prod.id}>
+            return (
+              <Col md="3" key={prod.id}>
+                <div ref={isLastElement ? lastElementRef : null} className="h-100">
                   <Card
                     className={`h-100 shadow-sm border-0 product-card overflow-hidden ${isPendingReview ? 'pending-product' : 'cursor-pointer'}`}
                     onClick={() => !isPendingReview && agregarAlCarrito(prod)}
@@ -143,9 +225,9 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
                       className="text-center d-flex align-items-center justify-content-center bg-white"
                       style={{ height: '100px', padding: '5px', position: 'relative' }}
                     >
-                      {prod.imagen ? (
+                      {prod.imagenUrl ? (
                         <img
-                          src={`data:${prod.imagenContentType};base64,${prod.imagen}`}
+                          src={prod.imagenUrl}
                           alt={prod.nombre}
                           style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }}
                         />
@@ -202,9 +284,15 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
                       </div>
                     </div>
                   </Card>
-                </Col>
-              );
-            })}
+                </div>
+              </Col>
+            );
+          })}
+          {loading && page > 0 && (
+            <Col md="12" className="text-center py-3">
+              <Spinner size="sm" color="primary" /> <span className="text-muted ms-2 small">Cargando más productos...</span>
+            </Col>
+          )}
         </Row>
       </div>
     </Col>

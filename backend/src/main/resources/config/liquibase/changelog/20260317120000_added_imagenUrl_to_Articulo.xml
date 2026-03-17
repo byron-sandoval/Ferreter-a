@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Migración: Reemplazar almacenamiento de imagen binaria en BD
+        por URL de Supabase Storage.
+        - Se agrega columna imagen_url (VARCHAR 500) para guardar la URL pública.
+        - Las columnas imagen y imagen_content_type se dejan en la BD como legacy
+          (ya no serán usadas por la aplicación).
+    -->
+    <changeSet id="20260317120000-1" author="ferronica">
+        <addColumn tableName="articulo">
+            <column name="imagen_url" type="varchar(500)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>
