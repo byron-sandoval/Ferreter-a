@@ -14,33 +14,58 @@ interface IClientSelectionModalProps {
 export const ClientSelectionModal: React.FC<IClientSelectionModalProps> = ({ isOpen, toggle, onSelect }) => {
   const [clientes, setClientes] = useState<ICliente[]>([]);
   const [filtro, setFiltro] = useState('');
+  const [debouncedFiltro, setDebouncedFiltro] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Debounce para la búsqueda
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedFiltro(filtro);
+    }, 400); 
+    return () => clearTimeout(timer);
+  }, [filtro]);
+
+  // Cargar clientes cuando se abre la modal o cambia el filtro de búsqueda
   useEffect(() => {
     if (isOpen) {
       cargarClientes();
+    } else {
+      // Limpiar al cerrar
+      setFiltro('');
+      setClientes([]);
     }
-  }, [isOpen]);
+  }, [isOpen, debouncedFiltro]);
 
   const cargarClientes = async () => {
     try {
       setLoading(true);
-      const res = await ClienteService.getAll();
-      // Filtrar solo clientes activos
-      setClientes(res.data.filter(c => c.activo !== false));
+      const params: any = { page: 0, size: 20, sort: 'nombre,asc', 'activo.equals': true };
+      
+      // Búsqueda inteligente en backend
+      if (debouncedFiltro) {
+        if (/^\d+/.test(debouncedFiltro)) {
+          // Si empieza con números, buscamos por cédula (o teléfono si estuviera mapeado)
+          params['cedula.contains'] = debouncedFiltro;
+        } else {
+          // Buscamos por nombre
+          params['nombre.contains'] = debouncedFiltro;
+        }
+      }
+
+      // Reutilizamos el getAll de venta pasándole params (si el backend lo soporta globalmente, 
+      // y asumiendo que el Service no lo fuerza a sin parámetros. axios.get(API_URL, {params}))
+      // Como ClienteService.getAll en cliente.service.ts quizás no acepta params, usamos axios directo
+      // O ajustamos la petición al endpoint search de Spring:
+      const axios = require('axios').default;
+      const res = await axios.get('api/clientes', { params });
+      
+      setClientes(res.data || []);
     } catch (e) {
       console.error('Error al cargar clientes', e);
     } finally {
       setLoading(false);
     }
   };
-
-  const clientesFiltrados = clientes.filter(
-    c =>
-      c.nombre?.toLowerCase().includes(filtro.toLowerCase()) ||
-      c.cedula?.toLowerCase().includes(filtro.toLowerCase()) ||
-      c.telefono?.includes(filtro),
-  );
 
   return (
     <Modal isOpen={isOpen} toggle={toggle} size="lg" centered scrollable>
@@ -86,11 +111,12 @@ export const ClientSelectionModal: React.FC<IClientSelectionModalProps> = ({ isO
               {loading ? (
                 <tr>
                   <td colSpan={5} className="text-center py-5 text-muted">
-                    Cargando clientes...
+                    <div className="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                    Buscando...
                   </td>
                 </tr>
-              ) : clientesFiltrados.length > 0 ? (
-                clientesFiltrados.map(c => (
+              ) : clientes.length > 0 ? (
+                clientes.map(c => (
                   <tr key={c.id}>
                     <td className="ps-3 py-3">
                       <div className="fw-bold text-primary">{c.nombre}</div>
