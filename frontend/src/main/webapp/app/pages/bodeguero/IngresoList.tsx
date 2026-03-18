@@ -30,27 +30,61 @@ export const IngresoList = () => {
   const [showDetalleModal, setShowDetalleModal] = useState(false);
   const [ingresoSeleccionado, setIngresoSeleccionado] = useState<IIngreso | null>(null);
 
-  const [currentPage, setCurrentPage] = useState(1);
+  // PAGINACIÓN DEL BACKEND
+  const [currentPage, setCurrentPage] = useState(0); // 0-indexed para JHipster
+  const [totalItems, setTotalItems] = useState(0);
   const itemsPerPage = 10;
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filter]);
-
-  const loadAll = () => {
+  const loadAll = async () => {
     setLoading(true);
-    // Solicitamos un tamaño grande para que la paginación y el filtro del cliente funcionen
-    // y ordenamos por ID de forma descendente para ver lo más nuevo primero.
-    IngresoService.getAll({ sort: 'id,desc', size: 2000 })
-      .then(res => {
+    try {
+      const baseParams = {
+        page: currentPage,
+        size: itemsPerPage,
+        sort: 'id,desc',
+      };
+
+      if (filter) {
+        // Realizamos búsquedas en paralelo para simular un "OR" (Documento o Proveedor)
+        const paramsDoc = { ...baseParams, 'noDocumento.contains': filter };
+        const paramsProv = { ...baseParams, 'proveedorNombre.contains': filter };
+
+        const [resDoc, resProv] = await Promise.all([
+          IngresoService.getAll(paramsDoc),
+          IngresoService.getAll(paramsProv),
+        ]);
+
+        // Unificar resultados y eliminar duplicados por ID
+        const combined = [...resDoc.data, ...resProv.data];
+        const seen = new Set();
+        const uniqueEntries = combined.filter(item => {
+          if (seen.has(item.id)) return false;
+          seen.add(item.id);
+          return true;
+        });
+
+        setIngresos(uniqueEntries);
+
+        // El total es aproximado a la suma de ambos o el máximo encontrado en los headers
+        const totalDoc = parseInt(resDoc.headers['x-total-count'] || '0', 10);
+        const totalProv = parseInt(resProv.headers['x-total-count'] || '0', 10);
+        setTotalItems(Math.max(totalDoc, totalProv, uniqueEntries.length));
+      } else {
+        const res = await IngresoService.getAll(baseParams);
         setIngresos(res.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+        const total = res.headers['x-total-count'];
+        setTotalItems(total ? parseInt(total, 10) : res.data.length);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    loadAll();
+  }, [currentPage, filter]);
 
   const verDetalles = async (id: number) => {
     try {
@@ -62,24 +96,8 @@ export const IngresoList = () => {
     }
   };
 
-  useEffect(() => {
-    loadAll();
-  }, []);
-
-  const filtrados = ingresos.filter(
-    i =>
-      (i.noDocumento || '').toLowerCase().includes(filter.toLowerCase()) ||
-      (i.proveedor?.nombre || '').toLowerCase().includes(filter.toLowerCase()),
-  );
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filtrados.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filtrados.length / itemsPerPage);
-
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-
-  const headerStyle = { backgroundColor: '#2d0a4e', color: 'white' };
 
   return (
     <div className="animate__animated animate__fadeIn p-1">
@@ -97,7 +115,10 @@ export const IngresoList = () => {
               type="text"
               placeholder="Factura o proveedor..."
               value={filter}
-              onChange={e => setFilter(e.target.value)}
+              onChange={e => {
+                setFilter(e.target.value);
+                setCurrentPage(0);
+              }}
               className="border-end-0 border-secondary bg-white text-dark"
               style={{ fontSize: '0.8rem' }}
             />
@@ -135,8 +156,8 @@ export const IngresoList = () => {
             </tr>
           </thead>
           <tbody>
-            {currentItems.length > 0 ? (
-              currentItems.map(i => (
+            {ingresos.length > 0 ? (
+              ingresos.map(i => (
                 <tr key={i.id} className="text-center align-middle" style={{ fontSize: '0.8rem' }}>
                   <td>{dayjs(i.fecha).format('DD/MM/YY')}</td>
                   <td className="fw-bold">{i.noDocumento}</td>
@@ -171,20 +192,20 @@ export const IngresoList = () => {
         {totalPages > 1 && (
           <div className="d-flex justify-content-between align-items-center p-2 border-top bg-light">
             <small className="text-muted ps-2">
-              Mostrando {Math.min(indexOfLastItem, filtrados.length)} de {filtrados.length} facturas de compra
+              Mostrando {ingresos.length} de {totalItems} facturas de compra
             </small>
             <Pagination size="sm" className="mb-0 pe-2">
-              <PaginationItem disabled={currentPage === 1}>
+              <PaginationItem disabled={currentPage === 0}>
                 <PaginationLink previous onClick={() => paginate(currentPage - 1)}>
                   <FontAwesomeIcon icon={faChevronLeft} />
                 </PaginationLink>
               </PaginationItem>
               {[...Array(totalPages)].map((_, i) => (
-                <PaginationItem active={i + 1 === currentPage} key={i}>
-                  <PaginationLink onClick={() => paginate(i + 1)}>{i + 1}</PaginationLink>
+                <PaginationItem active={i === currentPage} key={i}>
+                  <PaginationLink onClick={() => paginate(i)}>{i + 1}</PaginationLink>
                 </PaginationItem>
               ))}
-              <PaginationItem disabled={currentPage === totalPages}>
+              <PaginationItem disabled={currentPage === totalPages - 1}>
                 <PaginationLink next onClick={() => paginate(currentPage + 1)}>
                   <FontAwesomeIcon icon={faChevronRight} />
                 </PaginationLink>
