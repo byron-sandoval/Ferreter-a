@@ -12,7 +12,9 @@ import {
   faClipboardList,
   faBarcode,
   faBoxOpen,
+  faFileExcel,
 } from '@fortawesome/free-solid-svg-icons';
+import * as XLSX from 'xlsx';
 import { toast } from 'react-toastify';
 import { useAppSelector } from 'app/config/store';
 import { AUTHORITIES } from 'app/config/constants';
@@ -112,6 +114,63 @@ export const IngresoUpdate = () => {
     return detalles.reduce((acc, curr) => acc + (curr.monto || 0), 0);
   };
 
+  const handleExcelImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = evt => {
+      const bstr = evt.target?.result;
+      const wb = XLSX.read(bstr, { type: 'binary' });
+      const wsname = wb.SheetNames[0];
+      const ws = wb.Sheets[wsname];
+      const data = XLSX.utils.sheet_to_json(ws);
+
+      const nuevosDetalles: IDetalleIngreso[] = [];
+      let encontrados = 0;
+      let noEncontrados = 0;
+
+      data.forEach((row: any) => {
+        // Buscamos columnas por variaciones de nombre (Codigo, Código, CODIGO)
+        const codigo = row.Codigo || row.Código || row.CODIGO || row.codigo;
+        const cant = parseFloat(row.Cantidad || row.CANTIDAD || row.cantidad || '0');
+        const costo = parseFloat(row.Costo || row.COSTO || row.costo || row['Costo Unitario'] || '0');
+
+        if (codigo) {
+          const articulo = articulos.find(a => a.codigo?.toString().toLowerCase() === codigo.toString().toLowerCase());
+          if (articulo) {
+            // Evitar duplicados en la lista actual
+            const yaEnLista = detalles.find(d => d.articulo?.id === articulo.id) || nuevosDetalles.find(d => d.articulo?.id === articulo.id);
+            if (!yaEnLista) {
+              nuevosDetalles.push({
+                articulo,
+                cantidad: cant,
+                costoUnitario: costo || articulo.costo || 0,
+                monto: cant * (costo || articulo.costo || 0),
+              });
+              encontrados++;
+            }
+          } else {
+            noEncontrados++;
+          }
+        }
+      });
+
+      if (nuevosDetalles.length > 0) {
+        setDetalles([...detalles, ...nuevosDetalles]);
+        toast.success(`Se importaron ${encontrados} productos correctamente.`);
+      }
+
+      if (noEncontrados > 0) {
+        toast.warning(`${noEncontrados} códigos no se encontraron en el inventario y fueron ignorados.`);
+      }
+
+      // Resetear el input para permitir cargar el mismo archivo
+      e.target.value = '';
+    };
+    reader.readAsBinaryString(file);
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -155,9 +214,15 @@ export const IngresoUpdate = () => {
           </h4>
           <p className="text-muted small m-0">Incremente las existencias de productos ya registrados</p>
         </div>
-        <Button color="dark" size="sm" outline className="fw-bold px-3" onClick={() => navigate('/bodeguero/ingresos')}>
-          <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Volver al Historial
-        </Button>
+        <div className="d-flex gap-2">
+          <Button color="success" size="sm" outline className="fw-bold px-3" onClick={() => document.getElementById('excel-import')?.click()}>
+            <FontAwesomeIcon icon={faFileExcel} className="me-2" /> Importar Excel
+          </Button>
+          <input type="file" id="excel-import" hidden accept=".xlsx, .xls" onChange={handleExcelImport} />
+          <Button color="dark" size="sm" outline className="fw-bold px-3" onClick={() => navigate('/bodeguero/ingresos')}>
+            <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Volver al Historial
+          </Button>
+        </div>
       </div>
 
       <Row>
