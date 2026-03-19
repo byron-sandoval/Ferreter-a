@@ -14,6 +14,7 @@ interface IProductCatalogProps {
   categoriaFiltro: string;
   setCategoriaFiltro: (val: string) => void;
   agregarAlCarrito: (prod: IArticulo) => void;
+  refreshTrigger?: number;
 }
 
 export const ProductCatalog: React.FC<IProductCatalogProps> = ({
@@ -24,6 +25,7 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
   categoriaFiltro,
   setCategoriaFiltro,
   agregarAlCarrito,
+  refreshTrigger = 0,
 }) => {
   const [localArticulos, setLocalArticulos] = useState<IArticulo[]>([]);
   const [loading, setLoading] = useState(false);
@@ -39,76 +41,78 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
     return () => clearTimeout(timer);
   }, [termino]);
 
-  // 2. Reiniciar página cuando cambian los filtros
+  // 3. Cargar datos desde el backend usando paginación (useCallback para ser llamado desde efectos)
+  const loadData = useCallback(async (p: number, isReset = false) => {
+    setLoading(true);
+    try {
+      const pageSize = 12; // 12 para mostrar 3 filas de 4
+      const baseParams: any = { page: p, size: pageSize, sort: 'nombre,asc' };
+      baseParams['activo.equals'] = true;
+
+      if (categoriaFiltro !== 'todas') {
+        const cat = categorias.find(c => c.nombre === categoriaFiltro);
+        if (cat) {
+          baseParams['categoriaId.equals'] = cat.id;
+        }
+      }
+
+      let data: IArticulo[] = [];
+      let totalFetched = 0;
+
+      if (debouncedTermino) {
+        const paramsCodigo = { ...baseParams, 'codigo.contains': debouncedTermino };
+        const paramsNombre = { ...baseParams, 'nombre.contains': debouncedTermino };
+
+        const [resCodigo, resNombre] = await Promise.all([
+          ArticuloService.getAll(paramsCodigo),
+          ArticuloService.getAll(paramsNombre),
+        ]);
+
+        const combinados = [...(resCodigo.data || []), ...(resNombre.data || [])];
+        const vistos = new Set<number>();
+        data = combinados.filter(art => {
+          if (vistos.has(art.id!)) return false;
+          vistos.add(art.id!);
+          return true;
+        });
+
+        totalFetched = Math.max((resCodigo.data || []).length, (resNombre.data || []).length);
+      } else {
+        const res = await ArticuloService.getAll(baseParams);
+        data = res.data || [];
+        totalFetched = data.length;
+      }
+
+      data = data.filter(p => (p.precio || 0) > 0);
+
+      if (isReset) {
+        setLocalArticulos(data);
+      } else {
+        setLocalArticulos(prev => [...prev, ...data]);
+      }
+      setHasMore(totalFetched === pageSize);
+    } catch (e) {
+      console.error("Error al cargar productos", e);
+    } finally {
+      setLoading(false);
+    }
+  }, [debouncedTermino, categoriaFiltro, categorias]);
+
+  // 4. Reiniciar página cuando cambian los filtros o se pide refresh
   useEffect(() => {
     setPage(0);
-    setLocalArticulos([]);
     setHasMore(true);
-  }, [debouncedTermino, categoriaFiltro]);
-
-  // 3. Cargar datos desde el backend usando paginación
-  useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        const pageSize = 12; // 12 para mostrar 3 filas de 4
-        const baseParams: any = { page, size: pageSize, sort: 'nombre,asc' };
-        baseParams['activo.equals'] = true;
-
-        if (categoriaFiltro !== 'todas') {
-          const cat = categorias.find(c => c.nombre === categoriaFiltro);
-          if (cat) {
-            baseParams['categoriaId.equals'] = cat.id;
-          }
-        }
-
-        let data: IArticulo[] = [];
-        let totalFetched = 0;
-
-        if (debouncedTermino) {
-          // Buscar en AMBOS campos (código y nombre) en paralelo para cubrir
-          // códigos de barra alfanuméricos que contienen letras y números
-          const paramsCodigo = { ...baseParams, 'codigo.contains': debouncedTermino };
-          const paramsNombre = { ...baseParams, 'nombre.contains': debouncedTermino };
-
-          const [resCodigo, resNombre] = await Promise.all([
-            ArticuloService.getAll(paramsCodigo),
-            ArticuloService.getAll(paramsNombre),
-          ]);
-
-          // Unificar resultados y eliminar duplicados por ID
-          const combinados = [...(resCodigo.data || []), ...(resNombre.data || [])];
-          const vistos = new Set<number>();
-          data = combinados.filter(art => {
-            if (vistos.has(art.id!)) return false;
-            vistos.add(art.id!);
-            return true;
-          });
-
-          totalFetched = Math.max((resCodigo.data || []).length, (resNombre.data || []).length);
-        } else {
-          const res = await ArticuloService.getAll(baseParams);
-          data = res.data || [];
-          totalFetched = data.length;
-        }
-
-        // Filtramos precios > 0 por si el backend no lo soporta directamente en el query builder
-        data = data.filter(p => (p.precio || 0) > 0);
-
-        setLocalArticulos(prev => (page === 0 ? data : [...prev, ...data]));
-        setHasMore(totalFetched === pageSize);
-      } catch (e) {
-        console.error("Error al cargar productos", e);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    // Si ya tenemos las categorías listas, cargamos
     if (categorias.length > 0) {
-      loadData();
+      loadData(0, true);
     }
-  }, [page, debouncedTermino, categoriaFiltro, categorias]);
+  }, [debouncedTermino, categoriaFiltro, refreshTrigger, loadData, categorias.length]);
+
+  // 5. Cargar siguiente página
+  useEffect(() => {
+    if (page > 0) {
+      loadData(page, false);
+    }
+  }, [page, loadData]);
 
   // 4. Scroll infinito Observer
   const observer = useRef<IntersectionObserver | null>(null);
