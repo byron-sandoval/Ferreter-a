@@ -8,7 +8,7 @@ import ClienteService from 'app/services/cliente.service';
 import ArticuloService from 'app/services/articulo.service';
 import { IVenta } from 'app/shared/model/venta.model';
 import { useAppSelector } from 'app/config/store';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 
@@ -23,7 +23,40 @@ export const UsuarioDashboard = () => {
     productosBajoStock: 0,
   });
   const [chartData, setChartData] = useState<any[]>([]);
+  const [allMisDetalles, setAllMisDetalles] = useState<any[]>([]);
+  const [topProductsData, setTopProductsData] = useState<any[]>([]);
+  const [topPeriod, setTopPeriod] = useState<'day' | 'week' | 'month'>('month');
   const [loading, setLoading] = useState(true);
+
+  // Recalcular Top 5 productos cada vez que cambie de período
+  useEffect(() => {
+    if (loading) return;
+    const productSales: Record<string, number> = {};
+
+    allMisDetalles.forEach(det => {
+      const fechaDev = dayjs(det.fecha);
+      let match = false;
+
+      if (topPeriod === 'day') {
+        match = fechaDev.isSame(dayjs(), 'day');
+      } else if (topPeriod === 'week') {
+        match = fechaDev.isAfter(dayjs().subtract(7, 'day'));
+      } else {
+        match = fechaDev.isSame(dayjs(), 'month');
+      }
+
+      if (match) {
+        productSales[det.nombre] = (productSales[det.nombre] || 0) + det.cantidad;
+      }
+    });
+
+    const top5 = Object.keys(productSales)
+      .map(name => ({ name, total: productSales[name] }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 5);
+
+    setTopProductsData(top5);
+  }, [topPeriod, allMisDetalles, loading]);
 
   useEffect(() => {
     if (account && account.login) {
@@ -34,26 +67,27 @@ export const UsuarioDashboard = () => {
   const loadStats = async () => {
     setLoading(true);
     try {
-      // Pedimos ventas de los últimos 7 días para la gráfica
-      const sevenDaysAgo = dayjs().subtract(7, 'day').startOf('day');
-      
-      const [resVentasHoy, resVentasSemana, resClie, resArt] = await Promise.all([
+      // Pedimos ventas de los últimos 30 días para asegurar que abarca semanas y mes
+      const startOfLastMonth = dayjs().subtract(1, 'month').startOf('month');
+
+      const [resVentasHoy, resVentasRecientes, resClie, resArt, resDetalles] = await Promise.all([
         VentaService.getVentasHoy(),
-        VentaService.getAll({ 
-          'fecha.greaterThanOrEqual': sevenDaysAgo.toISOString(),
-          size: 1000,
-          sort: 'fecha,desc' 
+        VentaService.getAll({
+          'fecha.greaterThanOrEqual': startOfLastMonth.toISOString(),
+          size: 2000,
+          sort: 'fecha,desc'
         }),
         ClienteService.getAll(),
         ArticuloService.getAll(),
+        VentaService.getAllDetalles({ size: 2000 })
       ]);
 
-      // Filtrar ventas para que solo aparezcan las del usuario logueado
+      // Filtrar ventas para calcular los totales de Hoy
       const loginActual = account.login;
-      
+
       const misVentasHoy = resVentasHoy.data.filter(v => !v.anulada && v.usuario?.username === loginActual);
       const monto = misVentasHoy.reduce((acc, v) => acc + (v.total || 0), 0);
-      
+
       const bajoStock = resArt.data.filter(a => a.activo && (a.existencia || 0) <= (a.existenciaMinima || 0)).length;
 
       setStats({
@@ -63,15 +97,21 @@ export const UsuarioDashboard = () => {
         productosBajoStock: bajoStock,
       });
 
-      // Procesar datos para la gráfica de los últimos 7 días
-      const misVentasSemana = resVentasSemana.data.filter(v => !v.anulada && v.usuario?.username === loginActual);
-      
+      // Mapear todas las ventas recientes validadas del usuario para cruzarlas con los detalles
+      const misVentasMap = new Map();
+      resVentasRecientes.data.forEach(v => {
+        if (!v.anulada && v.usuario?.username === loginActual) {
+          misVentasMap.set(v.id, v.fecha);
+        }
+      });
+
+      // Procesar datos para la gráfica de tendencia de los últimos 7 días
       const last7DaysData = [6, 5, 4, 3, 2, 1, 0].map(daysAgo => {
         const date = dayjs().subtract(daysAgo, 'day');
-        const dailyTotal = misVentasSemana
-          .filter(v => dayjs(v.fecha).isSame(date, 'day'))
+        const dailyTotal = resVentasRecientes.data
+          .filter(v => v.usuario?.username === loginActual && !v.anulada && dayjs(v.fecha).isSame(date, 'day'))
           .reduce((acc, v) => acc + (v.total || 0), 0);
-        
+
         return {
           name: date.format('ddd'),
           total: dailyTotal,
@@ -79,6 +119,20 @@ export const UsuarioDashboard = () => {
       });
 
       setChartData(last7DaysData);
+
+      // Pre-filtrar todos los detalles que pertenecen al usuario para las gráficas dinámicas
+      const validDetails: any[] = [];
+      resDetalles.data.forEach(det => {
+        if (det.venta && det.venta.id && misVentasMap.has(det.venta.id)) {
+          validDetails.push({
+            fecha: misVentasMap.get(det.venta.id),
+            nombre: det.articulo?.nombre || 'Desconocido',
+            cantidad: det.cantidad || 0
+          });
+        }
+      });
+
+      setAllMisDetalles(validDetails);
     } catch (e) {
       console.error(e);
     } finally {
@@ -95,88 +149,87 @@ export const UsuarioDashboard = () => {
         </Button>
       </div>
 
-      <Row className="g-4 mb-5">
+      <Row className="g-3 mb-4">
         <Col md="4">
           <Card
-            className="border-0 shadow-lg rounded-4 overflow-hidden h-100"
-            style={{ background: 'linear-gradient(135deg, #4e73df 0%, #224abe 100%)', color: 'white' }}
+            className="border-0 shadow-sm rounded-3 overflow-hidden"
+            style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #1a103d 100%)', color: 'white' }}
           >
-            <CardBody className="p-4">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <div
-                  className="rounded-circle bg-white p-3 d-flex align-items-center justify-content-center shadow-sm"
-                  style={{ width: '54px', height: '54px' }}
-                >
-                  <FontAwesomeIcon icon={faShoppingBag} size="lg" className="text-primary" />
+            <CardBody className="py-3 px-3">
+              <div className="d-flex justify-content-between align-items-center">
+                <div style={{ fontSize: '1.8rem', color: 'rgba(255, 255, 255, 0.25)' }}>
+                  <FontAwesomeIcon icon={faShoppingBag} />
+                </div>
+                <div className="text-end">
+                  <div style={{ fontSize: '1.35rem', fontWeight: 700, color: 'white' }}>{stats.ventasHoy}</div>
+                  <div style={{ color: 'rgba(255, 255, 255, 0.8)', fontWeight: 600, fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Ventas Realizadas
+                  </div>
                 </div>
               </div>
-              <h6 className="text-white-50 small text-uppercase fw-bold mb-1" style={{ letterSpacing: '0.5px' }}>
-                Ventas Realizadas
-              </h6>
-              <h3 className="fw-bold text-white m-0">{stats.ventasHoy}</h3>
             </CardBody>
           </Card>
         </Col>
 
         <Col md="4">
           <Card
-            className="border-0 shadow-lg rounded-4 overflow-hidden h-100"
-            style={{ background: 'linear-gradient(135deg, #1cc88a 0%, #13855c 100%)', color: 'white' }}
+            className="border-0 shadow-sm rounded-3 overflow-hidden"
+            style={{ background: 'linear-gradient(135deg, #536976 0%, #292e49 100%)', color: 'white' }}
           >
-            <CardBody className="p-4">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <div
-                  className="rounded-circle bg-white p-3 d-flex align-items-center justify-content-center shadow-sm"
-                  style={{ width: '54px', height: '54px' }}
-                >
-                  <FontAwesomeIcon icon={faChartLine} size="lg" className="text-success" />
+            <CardBody className="py-2 px-3">
+              <div className="d-flex justify-content-between align-items-center">
+                <div style={{ fontSize: '1.8rem', color: 'rgba(255, 255, 255, 0.25)' }}>
+                  <FontAwesomeIcon icon={faChartLine} />
+                </div>
+                <div className="text-end">
+                  <div style={{ fontSize: '1.35rem', fontWeight: 700, color: 'white' }}>C$ {stats.montoHoy.toFixed(2)}</div>
+                  <div style={{ color: 'rgba(255, 255, 255, 0.8)', fontWeight: 600, fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Total del Día
+                  </div>
                 </div>
               </div>
-              <h6 className="text-white-50 small text-uppercase fw-bold mb-1" style={{ letterSpacing: '0.5px' }}>
-                Total del Día
-              </h6>
-              <h3 className="fw-bold text-white m-0">C$ {stats.montoHoy.toFixed(2)}</h3>
             </CardBody>
           </Card>
         </Col>
 
         <Col md="4">
           <Card
-            className="border-0 shadow-lg rounded-4 overflow-hidden h-100"
-            style={{ background: 'linear-gradient(135deg, #8e44ad 0%, #6c3483 100%)', color: 'white' }}
+            className="border-0 shadow-sm rounded-3 overflow-hidden"
+            style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #1a103d 100%)', color: 'white' }}
           >
-            <CardBody className="p-4">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <div
-                  className="rounded-circle bg-white p-3 d-flex align-items-center justify-content-center shadow-sm"
-                  style={{ width: '54px', height: '54px' }}
-                >
-                  <FontAwesomeIcon icon={faUserFriends} size="lg" style={{ color: '#8e44ad' }} />
+            <CardBody className="py-2 px-3">
+              <div className="d-flex justify-content-between align-items-center">
+                <div style={{ fontSize: '1.8rem', color: 'rgba(255, 255, 255, 0.25)' }}>
+                  <FontAwesomeIcon icon={faUserFriends} />
+                </div>
+                <div className="text-end">
+                  <div style={{ fontSize: '1.35rem', fontWeight: 700, color: 'white' }}>{stats.clientesTotal}</div>
+                  <div style={{ color: 'rgba(255, 255, 255, 0.8)', fontWeight: 600, fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Clientes Registrados
+                  </div>
                 </div>
               </div>
-              <h6 className="text-white-50 small text-uppercase fw-bold mb-1" style={{ letterSpacing: '0.5px' }}>
-                Clientes Registrados
-              </h6>
-              <h3 className="fw-bold text-white m-0">{stats.clientesTotal}</h3>
             </CardBody>
           </Card>
         </Col>
       </Row>
 
       <Row className="mb-4">
+        {/* Gráfica de Tendencia (Ocupa la mitad) */}
         <Col md="6">
-          <Card className="border-0 shadow-lg rounded-4 overflow-hidden bg-white">
-            <CardBody className="p-4">
-              <div className="d-flex justify-content-between align-items-center mb-4">
-                <CardTitle tag="h5" className="fw-bold text-dark m-0">
-                  <FontAwesomeIcon icon={faChartLine} className="text-primary me-2" />
+          <Card className="border-0 shadow-sm rounded-3 overflow-hidden bg-white h-100">
+            <div style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #1a103d 100%)', padding: '10px 15px' }}>
+              <div className="d-flex justify-content-between align-items-center text-white">
+                <h6 className="m-0 fw-bold" style={{ fontSize: '0.85rem' }}>
+                  <FontAwesomeIcon icon={faChartLine} className="me-2 opacity-50" />
                   Mi Tendencia de Ventas
-                </CardTitle>
-                <Badge color="soft-primary" className="rounded-pill px-3 py-2 text-primary" style={{ backgroundColor: '#eef2ff' }}>
+                </h6>
+                <Badge color="light" text="dark" pill style={{ fontSize: '0.65rem' }}>
                   Personal
                 </Badge>
               </div>
-              
+            </div>
+            <CardBody className="p-3">
               <div style={{ height: '220px', width: '100%' }}>
                 {loading ? (
                   <div className="d-flex justify-content-center align-items-center h-100">
@@ -192,23 +245,23 @@ export const UsuarioDashboard = () => {
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                      <XAxis 
-                        dataKey="name" 
-                        axisLine={false} 
-                        tickLine={false} 
-                        tick={{ fill: '#94a3b8', fontSize: 12 }} 
-                        dy={10} 
+                      <XAxis
+                        dataKey="name"
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: '#94a3b8', fontSize: 11 }}
+                        dy={10}
                       />
-                      <YAxis 
-                        axisLine={false} 
-                        tickLine={false} 
-                        tick={{ fill: '#94a3b8', fontSize: 12 }} 
+                      <YAxis
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: '#94a3b8', fontSize: 11 }}
                         tickFormatter={(value) => `C$${value}`}
                       />
-                      <Tooltip 
-                        contentStyle={{ 
-                          borderRadius: '12px', 
-                          border: 'none', 
+                      <Tooltip
+                        contentStyle={{
+                          borderRadius: '12px',
+                          border: 'none',
                           boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
                           padding: '10px'
                         }}
@@ -226,6 +279,93 @@ export const UsuarioDashboard = () => {
                       />
                     </AreaChart>
                   </ResponsiveContainer>
+                )}
+              </div>
+            </CardBody>
+          </Card>
+        </Col>
+
+        {/* Gráfica de Top Productos (Ocupa la otra mitad) */}
+        <Col md="6">
+          <Card className="border-0 shadow-sm rounded-3 overflow-hidden bg-white h-100">
+            <div style={{ background: 'linear-gradient(135deg, #292e49 0%, #292e49 100%)', padding: '7px 12px' }}>
+              <div className="d-flex justify-content-between align-items-center text-white">
+                <h6 className="m-0 fw-bold" style={{ fontSize: '0.85rem' }}>
+                  <FontAwesomeIcon icon={faBoxes} className="me-2 opacity-50" />
+                  Mis 5 Artículos más Vendidos
+                </h6>
+                <div className="d-flex gap-1 bg-white bg-opacity-10 rounded-pill p-1">
+                  <Badge
+                    pill
+                    style={{ cursor: 'pointer', fontSize: '0.65rem' }}
+                    color={topPeriod === 'day' ? 'light' : 'transparent'}
+                    className={topPeriod === 'day' ? 'text-dark fw-bold' : 'text-white'}
+                    onClick={() => setTopPeriod('day')}
+                  >
+                    HOY
+                  </Badge>
+                  <Badge
+                    pill
+                    style={{ cursor: 'pointer', fontSize: '0.65rem' }}
+                    color={topPeriod === 'week' ? 'light' : 'transparent'}
+                    className={topPeriod === 'week' ? 'text-dark fw-bold' : 'text-white'}
+                    onClick={() => setTopPeriod('week')}
+                  >
+                    SEMANA
+                  </Badge>
+                  <Badge
+                    pill
+                    style={{ cursor: 'pointer', fontSize: '0.65rem' }}
+                    color={topPeriod === 'month' ? 'light' : 'transparent'}
+                    className={topPeriod === 'month' ? 'text-dark fw-bold' : 'text-white'}
+                    onClick={() => setTopPeriod('month')}
+                  >
+                    MES
+                  </Badge>
+                </div>
+              </div>
+            </div>
+            <CardBody className="p-3">
+              <div style={{ height: '220px', width: '100%' }}>
+                {loading ? (
+                  <div className="d-flex justify-content-center align-items-center h-100">
+                    <div className="spinner-border text-secondary" role="status"></div>
+                  </div>
+                ) : topProductsData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      layout="vertical"
+                      data={topProductsData}
+                      margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f0f0f0" />
+                      <XAxis type="number" hide />
+                      <YAxis
+                        dataKey="name"
+                        type="category"
+                        axisLine={false}
+                        tickLine={false}
+                        width={100}
+                        tick={{ fill: '#475569', fontSize: 10, fontWeight: 'bold' }}
+                      />
+                      <Tooltip
+                        cursor={{ fill: 'transparent' }}
+                        formatter={(value: any) => [`${value} unidades`, 'Cantidad']}
+                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                      />
+                      <Bar
+                        dataKey="total"
+                        fill="#3b82f6"
+                        radius={[0, 4, 4, 0]}
+                        barSize={18}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="d-flex flex-column align-items-center justify-content-center h-100 text-muted opacity-50">
+                    <FontAwesomeIcon icon={faChartLine} size="3x" className="mb-2" />
+                    <p className="small">Sin datos de ventas</p>
+                  </div>
                 )}
               </div>
             </CardBody>

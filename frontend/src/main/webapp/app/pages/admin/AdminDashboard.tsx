@@ -16,6 +16,7 @@ import {
   faBuilding,
   faReceipt,
   faCalendarAlt,
+  faChartPie,
 } from '@fortawesome/free-solid-svg-icons';
 import ArticuloService from 'app/services/articulo.service';
 import VentaService from 'app/services/venta.service';
@@ -328,11 +329,16 @@ export const AdminDashboard = () => {
 
       <Row className="mb-4">
         <Col md="8">
-          <Card className="shadow h-100">
-            <CardBody>
-              <CardTitle tag="h6" className="text-black border-bottom pb-2 mb-3">
-                <span> Tendencia de Ventas (Últimos 7 días)</span>
-              </CardTitle>
+          <Card className="shadow h-100 border-0 overflow-hidden">
+            <div style={{ background: 'linear-gradient(135deg, #292e49 0%, #292e49 100%)', padding: '8px 12px' }}>
+              <div className="d-flex justify-content-between align-items-center text-white">
+                <h6 className="m-0 fw-bold" style={{ fontSize: '0.85rem' }}>
+                  <FontAwesomeIcon icon={faChartLine} className="me-2 opacity-50" />
+                  Tendencia de Ventas (Últimos 7 días)
+                </h6>
+              </div>
+            </div>
+            <CardBody className="p-3">
               <div style={{ height: '220px', width: '100%' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={chartData}>
@@ -443,11 +449,16 @@ export const AdminDashboard = () => {
 
       <Row>
         <Col md="8">
-          <Card className="shadow h-100">
-            <CardBody>
-              <CardTitle tag="h6" className="text-black border-bottom pb-2 mb-3">
-                Ventas por Categoría ({selectedDate.format('MMMM YYYY')})
-              </CardTitle>
+          <Card className="shadow h-100 border-0 overflow-hidden">
+            <div style={{ background: 'linear-gradient(135deg, #292e49 0%, #292e49 100%)', padding: '8px 12px' }}>
+              <div className="d-flex justify-content-between align-items-center text-white">
+                <h6 className="m-0 fw-bold" style={{ fontSize: '0.85rem' }}>
+                  <FontAwesomeIcon icon={faChartPie} className="me-2 opacity-50" />
+                  Ventas por Categoría ({selectedDate.format('MMMM YYYY')})
+                </h6>
+              </div>
+            </div>
+            <CardBody className="p-3">
               <div style={{ height: '300px', width: '100%' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -475,42 +486,45 @@ export const AdminDashboard = () => {
         </Col>
 
         <Col md="4">
-          <Card className="shadow h-100">
-            <CardBody>
-              <div className="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
-                <CardTitle tag="h6" className="text-primary mb-0">
+          <Card className="shadow h-100 border-0 overflow-hidden">
+            <div style={{ background: 'linear-gradient(135deg, #292e49 0%, #292e49 100%)', padding: '5px 12px' }}>
+              <div className="d-flex justify-content-between align-items-center text-white">
+                <h6 className="m-0 fw-bold" style={{ fontSize: '0.85rem' }}>
+                  <FontAwesomeIcon icon={faBoxes} className="me-2 opacity-50" />
                   Top 5 Artículos por Ingresos
-                </CardTitle>
-                <div className="d-flex gap-1">
-                  <Button
-                    size="xs"
-                    color={topPeriod === 'day' ? 'primary' : 'outline-primary'}
-                    className="py-0 px-2"
-                    style={{ fontSize: '0.65rem', color: 'black' }}
+                </h6>
+                <div className="d-flex gap-1 bg-white bg-opacity-10 rounded-pill p-1 border-0">
+                  <Badge
+                    pill
+                    style={{ cursor: 'pointer', fontSize: '0.65rem', padding: '4px 8px' }}
+                    color={topPeriod === 'day' ? 'light' : 'transparent'}
+                    className={topPeriod === 'day' ? 'text-dark fw-bold shadow-sm' : 'text-white fw-semibold'}
                     onClick={() => setTopPeriod('day')}
                   >
-                    Hoy
-                  </Button>
-                  <Button
-                    size="xs"
-                    color={topPeriod === 'week' ? 'primary' : 'outline-primary'}
-                    className="py-0 px-2"
-                    style={{ fontSize: '0.65rem', color: 'black' }}
+                    HOY
+                  </Badge>
+                  <Badge
+                    pill
+                    style={{ cursor: 'pointer', fontSize: '0.65rem', padding: '4px 8px' }}
+                    color={topPeriod === 'week' ? 'light' : 'transparent'}
+                    className={topPeriod === 'week' ? 'text-dark fw-bold shadow-sm' : 'text-white fw-semibold'}
                     onClick={() => setTopPeriod('week')}
                   >
-                    Semana
-                  </Button>
-                  <Button
-                    size="xs"
-                    color={topPeriod === 'month' ? 'primary' : 'outline-primary'}
-                    className="py-0 px-2"
-                    style={{ fontSize: '0.65rem', color: 'black' }}
+                    SEMANA
+                  </Badge>
+                  <Badge
+                    pill
+                    style={{ cursor: 'pointer', fontSize: '0.65rem', padding: '4px 8px' }}
+                    color={topPeriod === 'month' ? 'light' : 'transparent'}
+                    className={topPeriod === 'month' ? 'text-dark fw-bold shadow-sm' : 'text-white fw-semibold'}
                     onClick={() => setTopPeriod('month')}
                   >
-                    Mes
-                  </Button>
+                    MES
+                  </Badge>
                 </div>
               </div>
+            </div>
+            <CardBody className="p-3">
               <div style={{ height: '300px', width: '100%' }}>
                 {topProductsData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
@@ -558,7 +572,7 @@ export const AdminDashboard = () => {
         {/* Alertas de Margen: Ahora en una fila propia abajo */}
         <Col md="12">
           <Card className="shadow mb-4 border-0 overflow-hidden" style={{ borderRadius: '15px' }}>
-            <div style={{ background: 'linear-gradient(135deg, #29128cff 0%, #888f87ff 100%)', padding: '10px 15px' }}>
+            <div style={{ background: 'linear-gradient(135deg, #292e49 0%, #536976 100%)', padding: '10px 15px' }}>
               <div className="d-flex justify-content-between align-items-center text-white">
                 <h6 className="m-0 fw-bold">
                   <FontAwesomeIcon icon={faMoneyBillWave} className="me-2" /> Alerta: Costo de Compra
