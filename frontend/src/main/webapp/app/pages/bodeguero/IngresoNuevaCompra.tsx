@@ -13,7 +13,9 @@ import {
   faBarcode,
   faBoxes,
   faBoxOpen,
+  faFileExcel,
 } from '@fortawesome/free-solid-svg-icons';
+import * as XLSX from 'xlsx';
 import { toast } from 'react-toastify';
 import { useAppSelector } from 'app/config/store';
 import { AUTHORITIES } from 'app/config/constants';
@@ -211,6 +213,108 @@ export const IngresoNuevaCompra = () => {
     return detalles.reduce((acc, curr) => acc + (curr.monto || 0), 0);
   };
 
+  const handleExcelImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = evt => {
+      try {
+        const data = new Uint8Array(evt.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        
+        const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
+        if (!rows || rows.length < 2) {
+          toast.error('El archivo está vacío o no tiene datos válidos.');
+          return;
+        }
+
+        let colIdxCodigo = -1;
+        let colIdxCantidad = -1;
+        let colIdxCosto = -1;
+
+        const normalize = (str: string) => 
+          str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+
+        // Buscar encabezados en las primeras 10 filas
+        for (let i = 0; i < Math.min(rows.length, 10); i++) {
+          const row = rows[i];
+          row.forEach((cell, idx) => {
+            const val = normalize(String(cell || ''));
+            if (colIdxCodigo === -1 && (val.includes('cod') || val.includes('sku') || val.includes('ref'))) {
+              colIdxCodigo = idx;
+            } else if (colIdxCantidad === -1 && (val.includes('cant') || val.includes('stock') || val.includes('unid'))) {
+              colIdxCantidad = idx;
+            } else if (colIdxCosto === -1 && (val.includes('costo') || val.includes('precio') || val.includes('compra'))) {
+              colIdxCosto = idx;
+            }
+          });
+          if (colIdxCodigo !== -1) {
+            rows.splice(0, i + 1);
+            break;
+          }
+        }
+
+        if (colIdxCodigo === -1) {
+          toast.error('No se encontró la columna de "CÓDIGO". Verifique los nombres en la primera fila.');
+          return;
+        }
+
+        const nuevosDetalles: IDetalleIngreso[] = [];
+        let encontrados = 0;
+        let noEncontrados = 0;
+
+        rows.forEach((row: any[]) => {
+          const rawCodigo = String(row[colIdxCodigo] || '').trim();
+          if (!rawCodigo || rawCodigo.toLowerCase() === 'undefined') return;
+
+          // Limpiar cantidad y costo de símbolos como C$, $, comas, etc.
+          const cleanNum = (val: any) => parseFloat(String(val || '0').replace(/[^0-9.]/g, ''));
+          
+          const cant = colIdxCantidad !== -1 ? (cleanNum(row[colIdxCantidad]) || 1) : 1;
+          const costo = colIdxCosto !== -1 ? cleanNum(row[colIdxCosto]) : 0;
+
+          const articulo = articulos.find(a => 
+            normalize(a.codigo || '') === normalize(rawCodigo)
+          );
+          
+          if (articulo) {
+            const yaEnLista = detalles.find(d => d.articulo?.id === articulo.id) || nuevosDetalles.find(d => d.articulo?.id === articulo.id);
+            if (!yaEnLista) {
+              nuevosDetalles.push({
+                articulo,
+                cantidad: cant,
+                costoUnitario: costo || articulo.costo || 0,
+                monto: cant * (costo || articulo.costo || 0),
+              });
+              encontrados++;
+            }
+          } else {
+            noEncontrados++;
+          }
+        });
+
+        if (nuevosDetalles.length > 0) {
+          setDetalles([...detalles, ...nuevosDetalles]);
+          toast.success(`Se cargaron ${encontrados} productos con éxito.`);
+        } else {
+          toast.warning('No se encontraron productos coincidentes en el catálogo.');
+        }
+
+        if (noEncontrados > 0) {
+          toast.info(`${noEncontrados} códigos no existen en el sistema.`);
+        }
+
+      } catch (err) {
+        toast.error('Error al leer el archivo Excel.');
+      }
+      e.target.value = '';
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -283,9 +387,15 @@ export const IngresoNuevaCompra = () => {
           </h4>
           <p className="text-muted small m-0">Ingrese facturas agrupando productos nuevos y ya existentes.</p>
         </div>
-        <Button color="dark" size="sm" outline className="fw-bold px-3" onClick={() => navigate('/bodeguero/ingresos')}>
-          <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Volver
-        </Button>
+        <div className="d-flex gap-2">
+          <Button color="success" size="sm" outline className="fw-bold px-3" onClick={() => document.getElementById('excel-import')?.click()}>
+            <FontAwesomeIcon icon={faFileExcel} className="me-2" /> Importar Excel
+          </Button>
+          <input type="file" id="excel-import" hidden accept=".xlsx, .xls" onChange={handleExcelImport} />
+          <Button color="dark" size="sm" outline className="fw-bold px-3" onClick={() => navigate('/bodeguero/ingresos')}>
+            <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Volver
+          </Button>
+        </div>
       </div>
 
       <Row>

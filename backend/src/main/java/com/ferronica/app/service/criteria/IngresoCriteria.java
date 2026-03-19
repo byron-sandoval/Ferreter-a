@@ -43,6 +43,8 @@ public class IngresoCriteria implements Serializable, Criteria {
 
     private LongFilter proveedorId;
 
+    private StringFilter proveedorNombre;
+
     private Boolean distinct;
 
     public IngresoCriteria() {
@@ -58,6 +60,7 @@ public class IngresoCriteria implements Serializable, Criteria {
         this.detallesId = other.optionalDetallesId().map(LongFilter::copy).orElse(null);
         this.usuarioId = other.optionalUsuarioId().map(LongFilter::copy).orElse(null);
         this.proveedorId = other.optionalProveedorId().map(LongFilter::copy).orElse(null);
+        this.proveedorNombre = other.optionalProveedorNombre().map(StringFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
@@ -237,6 +240,25 @@ public class IngresoCriteria implements Serializable, Criteria {
         this.proveedorId = proveedorId;
     }
 
+    public StringFilter getProveedorNombre() {
+        return proveedorNombre;
+    }
+
+    public Optional<StringFilter> optionalProveedorNombre() {
+        return Optional.ofNullable(proveedorNombre);
+    }
+
+    public StringFilter proveedorNombre() {
+        if (proveedorNombre == null) {
+            setProveedorNombre(new StringFilter());
+        }
+        return proveedorNombre;
+    }
+
+    public void setProveedorNombre(StringFilter proveedorNombre) {
+        this.proveedorNombre = proveedorNombre;
+    }
+
     public Boolean getDistinct() {
         return distinct;
     }
@@ -274,13 +296,14 @@ public class IngresoCriteria implements Serializable, Criteria {
                 Objects.equals(detallesId, that.detallesId) &&
                 Objects.equals(usuarioId, that.usuarioId) &&
                 Objects.equals(proveedorId, that.proveedorId) &&
+                Objects.equals(proveedorNombre, that.proveedorNombre) &&
                 Objects.equals(distinct, that.distinct));
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, fecha, noDocumento, total, observaciones, activo, detallesId, usuarioId, proveedorId,
-                distinct);
+                proveedorNombre, distinct);
     }
 
     // prettier-ignore
@@ -296,6 +319,7 @@ public class IngresoCriteria implements Serializable, Criteria {
                 optionalDetallesId().map(f -> "detallesId=" + f + ", ").orElse("") +
                 optionalUsuarioId().map(f -> "usuarioId=" + f + ", ").orElse("") +
                 optionalProveedorId().map(f -> "proveedorId=" + f + ", ").orElse("") +
+                optionalProveedorNombre().map(f -> "proveedorNombre=" + f + ", ").orElse("") +
                 optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
                 "}";
     }

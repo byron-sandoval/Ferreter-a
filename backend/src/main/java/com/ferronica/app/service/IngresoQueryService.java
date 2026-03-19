@@ -7,6 +7,8 @@ import com.ferronica.app.service.criteria.IngresoCriteria;
 import com.ferronica.app.service.dto.IngresoDTO;
 import com.ferronica.app.service.mapper.IngresoMapper;
 import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -94,6 +96,12 @@ public class IngresoQueryService extends QueryService<Ingreso> {
                             root -> root.join(Ingreso_.usuario, JoinType.LEFT).get(Usuario_.id)),
                     buildSpecification(criteria.getProveedorId(),
                             root -> root.join(Ingreso_.proveedor, JoinType.LEFT).get(Proveedor_.id)));
+
+            if (criteria.getProveedorNombre() != null && criteria.getProveedorNombre().getContains() != null) {
+                specification = specification.and((root, query, cb) -> cb.like(
+                        cb.lower(root.join(Ingreso_.proveedor, JoinType.LEFT).get(Proveedor_.nombre)),
+                        "%" + criteria.getProveedorNombre().getContains().toLowerCase() + "%"));
+            }
         }
         return specification;
     }
