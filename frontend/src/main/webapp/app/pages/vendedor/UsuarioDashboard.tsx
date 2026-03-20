@@ -143,7 +143,7 @@ export const UsuarioDashboard = () => {
   return (
     <div className="animate__animated animate__fadeIn p-2">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="fw-bold text-black mb-0">Bienvenido al Panel de Ventas</h2>
+        <h4 className="fw-bold text-black mb-0">👋 Bienvenido(a), {account?.firstName || account?.login}</h4>
         <Button color="primary" tag={Link} to="/vendedor/nueva-venta" className="rounded-pill px-4 fw-bold shadow-sm">
           <FontAwesomeIcon icon={faCashRegister} className="me-2" /> Nueva Factura
         </Button>
@@ -152,10 +152,10 @@ export const UsuarioDashboard = () => {
       <Row className="g-3 mb-4">
         <Col md="4">
           <Card
-            className="border-0 shadow-sm rounded-3 overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #1a103d 100%)', color: 'white' }}
+            className="border-0 shadow-sm rounded-3 overflow-hidden d-flex flex-column justify-content-center"
+            style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #1a103d 100%)', color: 'white', minHeight: '100px' }}
           >
-            <CardBody className="py-3 px-3">
+            <CardBody style={{ padding: '4rem 1.5rem' }}>
               <div className="d-flex justify-content-between align-items-center">
                 <div style={{ fontSize: '1.8rem', color: 'rgba(255, 255, 255, 0.25)' }}>
                   <FontAwesomeIcon icon={faShoppingBag} />
@@ -173,10 +173,10 @@ export const UsuarioDashboard = () => {
 
         <Col md="4">
           <Card
-            className="border-0 shadow-sm rounded-3 overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, #536976 0%, #292e49 100%)', color: 'white' }}
+            className="border-0 shadow-sm rounded-3 overflow-hidden d-flex flex-column justify-content-center"
+            style={{ background: 'linear-gradient(135deg, #536976 0%, #292e49 100%)', color: 'white', minHeight: '100px' }}
           >
-            <CardBody className="py-2 px-3">
+            <CardBody style={{ padding: '4rem 1.5rem' }}>
               <div className="d-flex justify-content-between align-items-center">
                 <div style={{ fontSize: '1.8rem', color: 'rgba(255, 255, 255, 0.25)' }}>
                   <FontAwesomeIcon icon={faChartLine} />
@@ -194,10 +194,10 @@ export const UsuarioDashboard = () => {
 
         <Col md="4">
           <Card
-            className="border-0 shadow-sm rounded-3 overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #1a103d 100%)', color: 'white' }}
+            className="border-0 shadow-sm rounded-3 overflow-hidden d-flex flex-column justify-content-center"
+            style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #1a103d 100%)', color: 'white', minHeight: '100px' }}
           >
-            <CardBody className="py-2 px-3">
+            <CardBody style={{ padding: '4rem 1.5rem' }}>
               <div className="d-flex justify-content-between align-items-center">
                 <div style={{ fontSize: '1.8rem', color: 'rgba(255, 255, 255, 0.25)' }}>
                   <FontAwesomeIcon icon={faUserFriends} />

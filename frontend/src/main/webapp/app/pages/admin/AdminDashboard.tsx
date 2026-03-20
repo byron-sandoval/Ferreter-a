@@ -45,6 +45,7 @@ import { IDetalleVenta } from 'app/shared/model/detalle-venta.model';
 import DetalleDevolucionService from 'app/services/detalle-devolucion.service';
 import { IDetalleDevolucion } from 'app/shared/model/detalle-devolucion.model';
 import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+import { useAppSelector } from 'app/config/store';
 
 dayjs.locale('es');
 
@@ -56,6 +57,7 @@ interface ICategoryData {
 }
 
 export const AdminDashboard = () => {
+  const account = useAppSelector(state => state.authentication.account);
   const navigate = useNavigate();
   const [bajoStock, setBajoStock] = useState<IArticulo[]>([]);
   const [ventasRecientes, setVentasRecientes] = useState<IVenta[]>([]);
@@ -212,8 +214,8 @@ export const AdminDashboard = () => {
   return (
     <div className="dashboard-container animate__animated animate__fadeIn p-2 px-md-3">
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4 className="text-primary fw-bold m-0">
-          <FontAwesomeIcon icon={faChartLine} className="me-2" /> Panel de Control
+        <h4 className="text-black fw-bold m-0">
+          👋 Bienvenido(a), {account?.firstName || account?.login}
         </h4>
         <div className="d-flex gap-2 align-items-center">
           <Dropdown isOpen={dropdownOpen} toggle={toggleDropdown} size="sm">
@@ -242,8 +244,8 @@ export const AdminDashboard = () => {
       {/* KPI Cards */}
       <Row className="mb-4 g-3">
         <Col md="3">
-          <Card className="kpi-palette-cyan h-100">
-            <CardBody className="py-2 px-3">
+          <Card className="kpi-palette-cyan h-100 d-flex flex-column justify-content-center" style={{ minHeight: '85px', border: 'none' }}>
+            <CardBody style={{ padding: '1.2rem 1.2rem' }}>
               <div className="d-flex justify-content-between align-items-center">
                 <div className="kpi-icon-palette">
                   <FontAwesomeIcon icon={faMoneyBillWave} />
@@ -267,8 +269,8 @@ export const AdminDashboard = () => {
           </Card>
         </Col>
         <Col md="3">
-          <Card className="kpi-palette-grey h-100">
-            <CardBody className="py-2 px-3">
+          <Card className="kpi-palette-grey h-100 d-flex flex-column justify-content-center" style={{ minHeight: '80px', border: 'none' }}>
+            <CardBody style={{ padding: '1.2rem 1.2rem' }}>
               <div className="d-flex justify-content-between align-items-center">
                 <div className="kpi-icon-palette">
                   <FontAwesomeIcon icon={faChartLine} />
@@ -292,8 +294,8 @@ export const AdminDashboard = () => {
           </Card>
         </Col>
         <Col md="3">
-          <Card className="kpi-palette-cyan h-100">
-            <CardBody className="py-2 px-3">
+          <Card className="kpi-palette-cyan h-100 d-flex flex-column justify-content-center" style={{ minHeight: '80px', border: 'none' }}>
+            <CardBody style={{ padding: '1.2rem 1.2rem' }}>
               <div className="d-flex justify-content-between align-items-center">
                 <div className="kpi-icon-palette">
                   <FontAwesomeIcon icon={faReceipt} />
@@ -309,8 +311,8 @@ export const AdminDashboard = () => {
           </Card>
         </Col>
         <Col md="3">
-          <Card className="kpi-palette-grey h-100">
-            <CardBody className="py-2 px-3">
+          <Card className="kpi-palette-grey h-100 d-flex flex-column justify-content-center" style={{ minHeight: '80px', border: 'none' }}>
+            <CardBody style={{ padding: '1.2rem 1.2rem' }}>
               <div className="d-flex justify-content-between align-items-center">
                 <div className="kpi-icon-palette">
                   <FontAwesomeIcon icon={faHistory} />
@@ -487,7 +489,7 @@ export const AdminDashboard = () => {
 
         <Col md="4">
           <Card className="shadow h-100 border-0 overflow-hidden">
-            <div style={{ background: 'linear-gradient(135deg, #292e49 0%, #292e49 100%)', padding: '5px 12px' }}>
+            <div style={{ background: 'linear-gradient(135deg, #292e49 0%, #292e49 100%)', padding: '4px 12px' }}>
               <div className="d-flex justify-content-between align-items-center text-white">
                 <h6 className="m-0 fw-bold" style={{ fontSize: '0.85rem' }}>
                   <FontAwesomeIcon icon={faBoxes} className="me-2 opacity-50" />

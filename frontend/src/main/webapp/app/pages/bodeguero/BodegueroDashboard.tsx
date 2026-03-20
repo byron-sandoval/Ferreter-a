@@ -83,8 +83,7 @@ export const BodegueroDashboard = () => {
       {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h2 className="fw-bold text-dark mb-1">Panel de Bodega</h2>
-          <p className="text-muted small mb-0">Gestión de inventario y entradas de mercancía</p>
+          <h4 className="fw-bold text-dark mb-1">👋 Bienvenido(a), {account?.firstName || account?.login}</h4>
         </div>
       </div>
 
@@ -93,10 +92,10 @@ export const BodegueroDashboard = () => {
         {/* Total Productos */}
         <Col md="3">
           <Card
-            className="border-0 shadow-lg rounded-4 overflow-hidden h-100"
-            style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)', color: 'white' }}
+            className="border-0 shadow-sm rounded-3 overflow-hidden d-flex flex-column justify-content-center"
+            style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #1a103d 100%)', color: 'white', minHeight: '100px' }}
           >
-            <CardBody className="p-4">
+            <CardBody style={{ padding: '2rem 1.5rem' }}>
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <div
                   className="rounded-circle bg-white bg-opacity-25 p-3 d-flex align-items-center justify-content-center"
@@ -116,10 +115,10 @@ export const BodegueroDashboard = () => {
         {/* Bajo Stock */}
         <Col md="3">
           <Card
-            className="border-0 shadow-lg rounded-4 overflow-hidden h-100"
-            style={{ background: 'linear-gradient(135deg, #dc2626 0%, #f87171 100%)', color: 'white' }}
+            className="border-0 shadow-sm rounded-3 overflow-hidden d-flex flex-column justify-content-center"
+            style={{ background: 'linear-gradient(135deg, #536976 0%, #292e49 100%)', color: 'white', minHeight: '100px' }}
           >
-            <CardBody className="p-4">
+            <CardBody style={{ padding: '2rem 1.5rem' }}>
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <div
                   className="rounded-circle bg-white bg-opacity-25 p-3 d-flex align-items-center justify-content-center"
@@ -144,10 +143,10 @@ export const BodegueroDashboard = () => {
         {/* Compras Hoy */}
         <Col md="3">
           <Card
-            className="border-0 shadow-lg rounded-4 overflow-hidden h-100"
-            style={{ background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', color: 'white' }}
+            className="border-0 shadow-sm rounded-3 overflow-hidden d-flex flex-column justify-content-center"
+            style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #1a103d 100%)', color: 'white', minHeight: '100px' }}
           >
-            <CardBody className="p-4">
+            <CardBody style={{ padding: '2rem 1.5rem' }}>
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <div
                   className="rounded-circle bg-white bg-opacity-25 p-3 d-flex align-items-center justify-content-center"
@@ -167,10 +166,10 @@ export const BodegueroDashboard = () => {
         {/* Categorías */}
         <Col md="3">
           <Card
-            className="border-0 shadow-lg rounded-4 overflow-hidden h-100"
-            style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%)', color: 'white' }}
+            className="border-0 shadow-sm rounded-3 overflow-hidden d-flex flex-column justify-content-center"
+            style={{ background: 'linear-gradient(135deg, #536976 0%, #292e49 100%)', color: 'white', minHeight: '100px' }}
           >
-            <CardBody className="p-4">
+            <CardBody style={{ padding: '2rem 1.5rem' }}>
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <div
                   className="rounded-circle bg-white bg-opacity-25 p-3 d-flex align-items-center justify-content-center"
