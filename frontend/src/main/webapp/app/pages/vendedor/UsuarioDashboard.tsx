@@ -218,13 +218,13 @@ export const UsuarioDashboard = () => {
         {/* Gráfica de Tendencia (Ocupa la mitad) */}
         <Col md="6">
           <Card className="border-0 shadow-sm rounded-3 overflow-hidden bg-white h-100">
-            <div style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #1a103d 100%)', padding: '10px 15px' }}>
-              <div className="d-flex justify-content-between align-items-center text-white">
-                <h6 className="m-0 fw-bold" style={{ fontSize: '0.85rem' }}>
-                  <FontAwesomeIcon icon={faChartLine} className="me-2 opacity-50" />
+            <div className="bg-white border-bottom" style={{ padding: '12px 15px' }}>
+              <div className="d-flex justify-content-between align-items-center text-dark">
+                <h6 className="m-0 fw-bold" style={{ fontSize: '0.9rem' }}>
+                  <FontAwesomeIcon icon={faChartLine} className="me-2 text-primary" />
                   Mi Tendencia de Ventas
                 </h6>
-                <Badge color="light" text="dark" pill style={{ fontSize: '0.65rem' }}>
+                <Badge color="primary" pill style={{ fontSize: '0.65rem' }}>
                   Personal
                 </Badge>
               </div>
@@ -288,36 +288,36 @@ export const UsuarioDashboard = () => {
         {/* Gráfica de Top Productos (Ocupa la otra mitad) */}
         <Col md="6">
           <Card className="border-0 shadow-sm rounded-3 overflow-hidden bg-white h-100">
-            <div style={{ background: 'linear-gradient(135deg, #292e49 0%, #292e49 100%)', padding: '7px 12px' }}>
-              <div className="d-flex justify-content-between align-items-center text-white">
-                <h6 className="m-0 fw-bold" style={{ fontSize: '0.85rem' }}>
-                  <FontAwesomeIcon icon={faBoxes} className="me-2 opacity-50" />
+            <div className="bg-white border-bottom" style={{ padding: '8px 12px' }}>
+              <div className="d-flex justify-content-between align-items-center text-dark">
+                <h6 className="m-0 fw-bold" style={{ fontSize: '0.9rem' }}>
+                  <FontAwesomeIcon icon={faBoxes} className="me-2 text-primary" />
                   Mis 5 Artículos más Vendidos
                 </h6>
-                <div className="d-flex gap-1 bg-white bg-opacity-10 rounded-pill p-1">
+                <div className="d-flex gap-1 bg-light rounded-pill p-1 border">
                   <Badge
                     pill
-                    style={{ cursor: 'pointer', fontSize: '0.65rem' }}
-                    color={topPeriod === 'day' ? 'light' : 'transparent'}
-                    className={topPeriod === 'day' ? 'text-dark fw-bold' : 'text-white'}
+                    style={{ cursor: 'pointer', fontSize: '0.65rem', padding: '4px 8px' }}
+                    color={topPeriod === 'day' ? 'success' : 'transparent'}
+                    className={topPeriod === 'day' ? 'text-white fw-bold shadow-sm' : 'text-muted fw-semibold'}
                     onClick={() => setTopPeriod('day')}
                   >
                     HOY
                   </Badge>
                   <Badge
                     pill
-                    style={{ cursor: 'pointer', fontSize: '0.65rem' }}
-                    color={topPeriod === 'week' ? 'light' : 'transparent'}
-                    className={topPeriod === 'week' ? 'text-dark fw-bold' : 'text-white'}
+                    style={{ cursor: 'pointer', fontSize: '0.65rem', padding: '4px 8px' }}
+                    color={topPeriod === 'week' ? 'success' : 'transparent'}
+                    className={topPeriod === 'week' ? 'text-white fw-bold shadow-sm' : 'text-muted fw-semibold'}
                     onClick={() => setTopPeriod('week')}
                   >
                     SEMANA
                   </Badge>
                   <Badge
                     pill
-                    style={{ cursor: 'pointer', fontSize: '0.65rem' }}
-                    color={topPeriod === 'month' ? 'light' : 'transparent'}
-                    className={topPeriod === 'month' ? 'text-dark fw-bold' : 'text-white'}
+                    style={{ cursor: 'pointer', fontSize: '0.65rem', padding: '4px 8px' }}
+                    color={topPeriod === 'month' ? 'success' : 'transparent'}
+                    className={topPeriod === 'month' ? 'text-white fw-bold shadow-sm' : 'text-muted fw-semibold'}
                     onClick={() => setTopPeriod('month')}
                   >
                     MES
@@ -355,7 +355,7 @@ export const UsuarioDashboard = () => {
                       />
                       <Bar
                         dataKey="total"
-                        fill="#3b82f6"
+                        fill="#ff6c28ff"
                         radius={[0, 4, 4, 0]}
                         barSize={18}
                       />
