@@ -36,6 +36,7 @@ export const NuevaVenta = () => {
   const [carrito, setCarrito] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [empresa, setEmpresa] = useState<IEmpresa | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Datos del Cliente
   const [cliente, setCliente] = useState<ICliente | null>(null);
@@ -342,6 +343,7 @@ export const NuevaVenta = () => {
       }
 
       toast.success(`¡Venta #${resVenta.data.noFactura} registrada con éxito!`);
+      setRefreshTrigger(prev => prev + 1); // Refrescar de inmediato
 
       // Si la respuesta no trae usuario (porque es un Admin sin record en DB),
       // le inyectamos manualmente el usuarioActual para que el modal lo muestre.
@@ -368,6 +370,7 @@ export const NuevaVenta = () => {
     setVoucher('');
     setVentaExitosa(null);
     cargarDatosIniciales(); // Recargar stock y numeracion
+    setRefreshTrigger(prev => prev + 1); // Doble seguridad
   };
 
   return (
@@ -381,6 +384,7 @@ export const NuevaVenta = () => {
           categoriaFiltro={categoriaFiltro}
           setCategoriaFiltro={setCategoriaFiltro}
           agregarAlCarrito={agregarAlCarrito}
+          refreshTrigger={refreshTrigger}
         />
 
         <VentaSidebar
