@@ -10,6 +10,15 @@ export const MonedaService = {
   getById(id: number) {
     return axios.get<IMoneda>(`${API_URL}/${id}`);
   },
+  create(moneda: IMoneda) {
+    return axios.post<IMoneda>(API_URL, moneda);
+  },
+  update(moneda: IMoneda) {
+    return axios.put<IMoneda>(`${API_URL}/${moneda.id}`, moneda);
+  },
+  delete(id: number) {
+    return axios.delete(`${API_URL}/${id}`);
+  },
 };
 
 export default MonedaService;
