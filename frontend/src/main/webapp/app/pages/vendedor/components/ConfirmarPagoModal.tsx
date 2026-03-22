@@ -20,8 +20,10 @@ export const ConfirmarPagoModal: React.FC<IConfirmarPagoModalProps> = ({ isOpen,
   const [montoRecibido, setMontoRecibido] = useState<string>('');
   const [voucher, setVoucher] = useState('');
 
-  const cordoba = monedas.find(m => m.simbolo === 'C$') || { tipoCambio: 1, simbolo: 'C$', id: 1 };
-  const dolar = monedas.find(m => m.simbolo === '$') || { tipoCambio: 36.60, simbolo: '$', id: 2 };
+  const activeMonedas = monedas.filter(m => m.activo !== false);
+
+  const cordoba = activeMonedas.find(m => m.simbolo === 'C$') || activeMonedas[0] || { tipoCambio: 1, simbolo: 'C$', id: 1, nombre: 'Córdobas' };
+  const dolar = activeMonedas.find(m => m.simbolo === '$') || { tipoCambio: 36.60, simbolo: '$', id: 2, nombre: 'Dólares' };
 
   useEffect(() => {
     if (isOpen) {
@@ -59,7 +61,7 @@ export const ConfirmarPagoModal: React.FC<IConfirmarPagoModalProps> = ({ isOpen,
           <h3 className="fw-bold text-dark m-0">C$ {total.toFixed(2)}</h3>
           {monedaPago?.simbolo !== 'C$' && (
             <Badge color="info" pill className="mt-1 px-2 py-1" style={{ fontSize: '0.75rem' }}>
-              $ {totalEnMoneda.toFixed(2)}
+              {monedaPago?.simbolo} {totalEnMoneda.toFixed(2)}
             </Badge>
           )}
         </div>
@@ -96,11 +98,11 @@ export const ConfirmarPagoModal: React.FC<IConfirmarPagoModalProps> = ({ isOpen,
               bsSize="sm"
               className="fw-bold border-0 shadow-sm"
               value={monedaPago?.id || ''}
-              onChange={(e) => setMonedaPago(monedas.find(m => m.id === Number(e.target.value)) || null)}
+              onChange={(e) => setMonedaPago(activeMonedas.find(m => m.id === Number(e.target.value)) || null)}
             >
-              {monedas.map(m => (
+              {activeMonedas.map(m => (
                 <option key={m.id} value={m.id}>
-                  {m.simbolo === 'C$' ? 'Córdobas (C$)' : 'Dólares ($)'}
+                  {m.nombre} ({m.simbolo})
                 </option>
               ))}
             </Input>
