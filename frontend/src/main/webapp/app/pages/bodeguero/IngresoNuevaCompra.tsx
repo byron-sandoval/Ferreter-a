@@ -482,7 +482,7 @@ export const IngresoNuevaCompra = () => {
                   />
                 </FormGroup>
                 <div className="p-3 bg-primary bg-opacity-10 rounded text-center mb-3">
-                  <span className="text-dark fw-bold me-2 fs-6">TOTAL A PAGAR:</span>
+                  <span className="text-white fw-bold me-2 fs-6">TOTAL A PAGAR:</span>
                   <span className="fw-bold text-primary fs-4">C$ {calcularTotal().toLocaleString()}</span>
                 </div>
                 <Button color="primary" block type="submit" className="fw-bolder shadow-sm py-3">
