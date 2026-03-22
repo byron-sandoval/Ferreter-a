@@ -92,8 +92,12 @@ export const NuevaVenta = () => {
         CategoriaService.getAll(),
       ]);
       setCategorias(resCat.data);
-      setMonedas(resMon.data);
-      if (resMon.data.length > 0) setMonedaSeleccionada(resMon.data[0]);
+      const activeMonedas = resMon.data.filter(m => m.activo !== false);
+      setMonedas(activeMonedas);
+      if (activeMonedas.length > 0) {
+        const cordoba = activeMonedas.find(m => m.simbolo === 'C$') || activeMonedas[0];
+        setMonedaSeleccionada(cordoba);
+      }
       if (resNum.data.length > 0) setNumeracion(resNum.data.find(n => n.activo) || resNum.data[0]);
       if (resEmp.data.length > 0) setEmpresa(resEmp.data[0]);
 
