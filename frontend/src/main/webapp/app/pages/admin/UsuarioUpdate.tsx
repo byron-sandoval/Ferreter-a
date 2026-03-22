@@ -297,13 +297,13 @@ export const UsuarioUpdate = () => {
                   )}
                 </FormGroup>
 
-                <div className="d-flex gap-2">
-                  <Button color="success" size="lg" type="submit" className="fw-bold flex-fill shadow-sm">
-                    <FontAwesomeIcon icon={faSave} className="me-2" />
-                    {isNew ? 'CREAR USUARIO' : 'GUARDAR CAMBIOS'}
-                  </Button>
+                <div className="d-flex gap-2 justify-content-end">
                   <Button color="black" outline onClick={() => navigate('/admin/usuarios')} className="px-4">
                     CANCELAR
+                  </Button>
+                  <Button color="success" size="lg" type="submit" className="fw-bold px-4 shadow-sm">
+                    <FontAwesomeIcon icon={faSave} className="me-2" />
+                    {isNew ? 'CREAR USUARIO' : 'GUARDAR CAMBIOS'}
                   </Button>
                 </div>
               </Form>

@@ -138,7 +138,7 @@ export const CategoriaList = () => {
 
       <Card className="shadow-sm border-0">
         <CardBody className="p-0">
-          <Table hover striped size="sm" className="mb-0 align-middle">
+          <Table hover size="sm" className="mb-0 align-middle">
             <thead className="bg-light text-muted small text-uppercase fw-bold" style={{ fontSize: '0.75rem' }}>
               <tr>
                 <th className="py-2 px-3">ID</th>
