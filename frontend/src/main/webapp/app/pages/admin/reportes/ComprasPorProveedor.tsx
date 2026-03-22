@@ -81,7 +81,7 @@ export const ComprasPorProveedor = () => {
     // Cargamos los artículos solo para obtener los códigos para el Excel
     let todosLosArticulos: any[] = [];
     try {
-      const artRes = await ArticuloService.getAll(0, 5000);
+      const artRes = await ArticuloService.getAll({ page: 0, size: 5000 });
       todosLosArticulos = artRes.data;
     } catch (e) {
       console.error('Error al obtener códigos de artículos para el reporte', e);

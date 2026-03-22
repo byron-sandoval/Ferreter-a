@@ -49,7 +49,7 @@ import { useAppSelector } from 'app/config/store';
 
 dayjs.locale('es');
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658'];
+const COLORS = ['#fe004cff', '#007cc4ff', '#fab114ff', '#8e12aaff', '#8884d8', '#82ca9d', '#ffc658'];
 
 interface ICategoryData {
   name: string;
@@ -332,10 +332,10 @@ export const AdminDashboard = () => {
       <Row className="mb-4">
         <Col md="8">
           <Card className="shadow h-100 border-0 overflow-hidden">
-            <div style={{ background: 'linear-gradient(135deg, #292e49 0%, #292e49 100%)', padding: '8px 12px' }}>
-              <div className="d-flex justify-content-between align-items-center text-white">
-                <h6 className="m-0 fw-bold" style={{ fontSize: '0.85rem' }}>
-                  <FontAwesomeIcon icon={faChartLine} className="me-2 opacity-50" />
+            <div className="bg-white border-bottom" style={{ padding: '12px 15px' }}>
+              <div className="d-flex justify-content-between align-items-center text-dark">
+                <h6 className="m-0 fw-bold" style={{ fontSize: '0.9rem' }}>
+                  <FontAwesomeIcon icon={faChartLine} className="me-2 text-primary" />
                   Tendencia de Ventas (Últimos 7 días)
                 </h6>
               </div>
@@ -452,36 +452,43 @@ export const AdminDashboard = () => {
       <Row>
         <Col md="8">
           <Card className="shadow h-100 border-0 overflow-hidden">
-            <div style={{ background: 'linear-gradient(135deg, #292e49 0%, #292e49 100%)', padding: '8px 12px' }}>
-              <div className="d-flex justify-content-between align-items-center text-white">
-                <h6 className="m-0 fw-bold" style={{ fontSize: '0.85rem' }}>
-                  <FontAwesomeIcon icon={faChartPie} className="me-2 opacity-50" />
+            <div className="bg-white border-bottom" style={{ padding: '12px 15px' }}>
+              <div className="d-flex justify-content-between align-items-center text-dark">
+                <h6 className="m-0 fw-bold" style={{ fontSize: '0.9rem' }}>
+                  <FontAwesomeIcon icon={faChartPie} className="me-2 text-primary" />
                   Ventas por Categoría ({selectedDate.format('MMMM YYYY')})
                 </h6>
               </div>
             </div>
             <CardBody className="p-3">
               <div style={{ height: '300px', width: '100%' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={categoryData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={90}
-                      paddingAngle={5}
-                      dataKey="value"
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    >
-                      {categoryData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={value => [`C$ ${Number(value).toLocaleString()}`, 'Ventas']} />
-                    <Legend verticalAlign="bottom" height={36} iconType="circle" />
-                  </PieChart>
-                </ResponsiveContainer>
+                {categoryData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={categoryData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={90}
+                        paddingAngle={5}
+                        dataKey="value"
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      >
+                        {categoryData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={value => [`C$ ${Number(value).toLocaleString()}`, 'Ventas']} />
+                      <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="d-flex flex-column align-items-center justify-content-center h-100 text-muted opacity-50">
+                    <FontAwesomeIcon icon={faChartPie} size="3x" className="mb-2" />
+                    <p className="small">Sin datos en este mes</p>
+                  </div>
+                )}
               </div>
             </CardBody>
           </Card>
@@ -489,18 +496,18 @@ export const AdminDashboard = () => {
 
         <Col md="4">
           <Card className="shadow h-100 border-0 overflow-hidden">
-            <div style={{ background: 'linear-gradient(135deg, #292e49 0%, #292e49 100%)', padding: '4px 12px' }}>
-              <div className="d-flex justify-content-between align-items-center text-white">
-                <h6 className="m-0 fw-bold" style={{ fontSize: '0.85rem' }}>
-                  <FontAwesomeIcon icon={faBoxes} className="me-2 opacity-50" />
+            <div className="bg-white border-bottom" style={{ padding: '10px 12px' }}>
+              <div className="d-flex justify-content-between align-items-center text-dark">
+                <h6 className="m-0 fw-bold" style={{ fontSize: '0.9rem' }}>
+                  <FontAwesomeIcon icon={faBoxes} className="me-2 text-primary" />
                   Top 5 Artículos por Ingresos
                 </h6>
-                <div className="d-flex gap-1 bg-white bg-opacity-10 rounded-pill p-1 border-0">
+                <div className="d-flex gap-1 bg-light rounded-pill p-1 border">
                   <Badge
                     pill
                     style={{ cursor: 'pointer', fontSize: '0.65rem', padding: '4px 8px' }}
-                    color={topPeriod === 'day' ? 'light' : 'transparent'}
-                    className={topPeriod === 'day' ? 'text-dark fw-bold shadow-sm' : 'text-white fw-semibold'}
+                    color={topPeriod === 'day' ? 'success' : 'transparent'}
+                    className={topPeriod === 'day' ? 'text-white fw-bold shadow-sm' : 'text-muted fw-semibold'}
                     onClick={() => setTopPeriod('day')}
                   >
                     HOY
@@ -508,8 +515,8 @@ export const AdminDashboard = () => {
                   <Badge
                     pill
                     style={{ cursor: 'pointer', fontSize: '0.65rem', padding: '4px 8px' }}
-                    color={topPeriod === 'week' ? 'light' : 'transparent'}
-                    className={topPeriod === 'week' ? 'text-dark fw-bold shadow-sm' : 'text-white fw-semibold'}
+                    color={topPeriod === 'week' ? 'success' : 'transparent'}
+                    className={topPeriod === 'week' ? 'text-white fw-bold shadow-sm' : 'text-muted fw-semibold'}
                     onClick={() => setTopPeriod('week')}
                   >
                     SEMANA
@@ -517,8 +524,8 @@ export const AdminDashboard = () => {
                   <Badge
                     pill
                     style={{ cursor: 'pointer', fontSize: '0.65rem', padding: '4px 8px' }}
-                    color={topPeriod === 'month' ? 'light' : 'transparent'}
-                    className={topPeriod === 'month' ? 'text-dark fw-bold shadow-sm' : 'text-white fw-semibold'}
+                    color={topPeriod === 'month' ? 'success' : 'transparent'}
+                    className={topPeriod === 'month' ? 'text-white fw-bold shadow-sm' : 'text-muted fw-semibold'}
                     onClick={() => setTopPeriod('month')}
                   >
                     MES

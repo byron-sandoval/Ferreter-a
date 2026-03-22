@@ -34,6 +34,7 @@ import {
   faChevronLeft,
   faChevronRight,
   faUserCircle,
+  faEye,
 } from '@fortawesome/free-solid-svg-icons';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import ClienteService from 'app/services/cliente.service';
@@ -147,7 +148,7 @@ export const GestionClientes = () => {
 
   const eliminarCliente = async (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
-    if (window.confirm('¿Estás seguro de que deseas eliminar este cliente?')) {
+    if (window.confirm('¿Estás seguro de que deseas desactivar este cliente?')) {
       try {
         await ClienteService.delete(id);
         // El backend decide si borra físico o solo desactiva según si tiene ventas
@@ -249,7 +250,6 @@ export const GestionClientes = () => {
                   {currentItems.map(c => (
                     <tr
                       key={c.id}
-                      onClick={() => verDetalle(c)}
                       style={{ cursor: 'pointer', fontSize: '0.8rem' }}
                       className={clienteSeleccionado?.id === c.id ? 'table-primary border-start border-primary border-4' : ''}
                     >
@@ -263,6 +263,15 @@ export const GestionClientes = () => {
                         </Badge>
                       </td>
                       <td className="text-end px-3">
+                        <Button
+                          color="light"
+                          size="sm"
+                          className="p-1 me-1 text-info"
+                          title="Ver Detalle"
+                          onClick={() => verDetalle(c)}
+                        >
+                          <FontAwesomeIcon icon={faEye} fixedWidth />
+                        </Button>
                         <Button color="light" size="sm" className="p-1 me-1 text-primary" onClick={e => abrirEditar(e, c)}>
                           <FontAwesomeIcon icon={faUserEdit} fixedWidth />
                         </Button>

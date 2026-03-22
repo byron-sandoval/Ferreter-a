@@ -169,13 +169,13 @@ export const ProveedorUpdate = () => {
                   </Label>
                 </FormGroup>
 
-                <div className="d-flex gap-2 mt-4">
-                  <Button color="success" type="submit" className="fw-bold flex-fill">
-                    <FontAwesomeIcon icon={faSave} className="me-2" />
-                    {isNew ? 'Crear Proveedor' : 'Guardar Cambios'}
-                  </Button>
+                <div className="d-flex gap-2 mt-4 justify-content-end">
                   <Button color="black" outline onClick={() => navigate('/admin/proveedores')}>
                     Cancelar
+                  </Button>
+                  <Button color="success" type="submit" className="fw-bold px-4">
+                    <FontAwesomeIcon icon={faSave} className="me-2" />
+                    {isNew ? 'Crear Proveedor' : 'Guardar Cambios'}
                   </Button>
                 </div>
               </Form>

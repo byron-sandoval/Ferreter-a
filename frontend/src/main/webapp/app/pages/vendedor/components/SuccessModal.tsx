@@ -339,7 +339,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                 {/* Info Recibido/Cambio Alineada */}
                 <div style={{ borderTop: '1.2px solid #ccc', display: 'flex', fontSize: '12px', color: '#333' }}>
                   <div style={{ width: '50%', padding: '6px 10px', borderRight: '1.2px solid #ccc', textAlign: 'right' }}>
-                    <strong>Recibido:</strong> C$ {ventaExitosa?.importeRecibido?.toFixed(2)}
+                    <strong>Recibido:</strong> {ventaExitosa?.moneda?.simbolo === 'U$' ? '$' : (ventaExitosa?.moneda?.simbolo || 'C$')} {ventaExitosa?.importeRecibido?.toFixed(2)}
                   </div>
                   <div style={{ width: '50%', padding: '6px 10px', textAlign: 'right' }}>
                     <strong>Cambio:</strong> C$ {ventaExitosa?.cambio?.toFixed(2)}
@@ -440,7 +440,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
               <span>C$ {ventaExitosa?.total?.toFixed(2)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', marginTop: '2px' }}>
-              <span>Recibido: C$ {ventaExitosa?.importeRecibido?.toFixed(2)}</span>
+              <span>Recibido: {ventaExitosa?.moneda?.simbolo === 'U$' ? '$' : (ventaExitosa?.moneda?.simbolo || 'C$')} {ventaExitosa?.importeRecibido?.toFixed(2)}</span>
               <span>Cambio: C$ {ventaExitosa?.cambio?.toFixed(2)}</span>
             </div>
             <div style={{ borderTop: '1px dashed #000', margin: '8px 0 4px' }} />

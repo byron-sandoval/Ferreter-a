@@ -37,7 +37,7 @@ export const ReporteGanancias = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const artRes = await ArticuloService.getAll(0, 2000);
+      const artRes = await ArticuloService.getAll({ page: 0, size: 2000 });
       const detRes = await VentaService.getAllDetalles({ size: 5000, sort: 'id,desc' });
       const devRes = await DetalleDevolucionService.getAll({ size: 2000, sort: 'id,desc' });
       setArticulos(artRes.data);

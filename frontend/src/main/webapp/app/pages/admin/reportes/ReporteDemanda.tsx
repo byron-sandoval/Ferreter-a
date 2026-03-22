@@ -28,7 +28,7 @@ export const ReporteDemanda = () => {
     setLoading(true);
     try {
       const [artRes, detRes, devRes] = await Promise.all([
-        ArticuloService.getAll(0, 5000),
+        ArticuloService.getAll({ page: 0, size: 5000 }),
         VentaService.getAllDetalles({ size: 10000, sort: 'id,desc' }),
         DevolucionService.getAllDetalles({ size: 10000, sort: 'id,desc' }),
       ]);

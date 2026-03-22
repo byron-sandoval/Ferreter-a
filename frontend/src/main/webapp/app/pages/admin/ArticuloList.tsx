@@ -21,6 +21,8 @@ import {
   faTimes,
   faChevronLeft,
   faChevronRight,
+  faTools,
+  faCheck
 } from '@fortawesome/free-solid-svg-icons';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import { useAppSelector } from 'app/config/store';
@@ -96,8 +98,18 @@ export const ArticuloList = () => {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
+  const handleToggleActive = (articulo: IArticulo) => {
+    const action = articulo.activo ? 'desactivar' : 'reactivar';
+    if (window.confirm(`¿Estás seguro de ${action} el artículo ${articulo.nombre}?`)) {
+      ArticuloService.update({ ...articulo, activo: !articulo.activo }).then(() => {
+        loadAll();
+        setSelectedArticulo(null);
+      });
+    }
+  };
+
   const handleDelete = (id: number) => {
-    if (window.confirm('¿Estás seguro de eliminar este artículo?')) {
+    if (window.confirm('¿Estás seguro de desactivar este artículo?')) {
       ArticuloService.delete(id).then(() => {
         loadAll();
         setSelectedArticulo(null);
@@ -412,7 +424,7 @@ export const ArticuloList = () => {
         {/* 2. Tabla Densa */}
         <Card className="shadow-sm mb-4 border-0">
           <div className="table-responsive">
-            <Table hover striped size="sm" className="mb-0 align-middle">
+            <Table hover size="sm" className="mb-0 align-middle">
               <thead
                 className="text-center text-uppercase mt-2"
                 style={{ backgroundColor: '#343a40', color: 'black', fontSize: '0.75rem' }}
@@ -425,7 +437,7 @@ export const ArticuloList = () => {
                   <th className="py-2">Stock</th>
                   <th className="py-2">Mín.</th>
                   {(isAdmin || isJefeBodega) && <th className="py-2 text-end">Costo</th>}
-                  <th className="py-2 text-end">Venta</th>
+                  <th className="py-2 text-center">Venta</th>
                   {isAdmin && <th className="py-2 text-end">Total</th>}
                   <th className="py-2 text-center">Observación</th>
                   <th className="py-2">Acciones</th>
@@ -449,9 +461,20 @@ export const ArticuloList = () => {
                         <td className="text-start">
                           <div className="fw-bold">{articulo.nombre}</div>
                           {missingPrice && (
-                            <div className="text-warning fw-bold text-uppercase" style={{ fontSize: '0.65rem', letterSpacing: '0.5px' }}>
-                              PRECIO PENDIENTE
-                            </div>
+                            <Badge
+                              pill
+                              className="d-inline-flex align-items-center gap-1 border-0"
+                              style={{
+                                backgroundColor: '#fef2f2',
+                                color: '#dc2626',
+                                padding: '4px 12px',
+                                fontSize: '0.65rem',
+                                fontWeight: '700'
+                              }}
+                            >
+                              <FontAwesomeIcon icon={faTools} style={{ fontSize: '0.7rem' }} />
+                              ASIGNAR PRECIO DE VENTA
+                            </Badge>
                           )}
                         </td>
                         <td>
@@ -465,7 +488,25 @@ export const ArticuloList = () => {
                         <td style={{ backgroundColor: stockBg, color: 'white', fontWeight: 'bold' }}>{articulo.existencia}</td>
                         <td>{articulo.existenciaMinima}</td>
                         {(isAdmin || isJefeBodega) && <td className="text-end">C$ {articulo.costo?.toFixed(2)}</td>}
-                        <td className="text-end">C$ {articulo.precio?.toFixed(2)}</td>
+                        <td className="text-center">
+                          {missingPrice ? (
+                            <Badge
+                              pill
+                              className="d-inline-flex align-items-center gap-1 border-0"
+                              style={{
+                                backgroundColor: '#fef2f2',
+                                color: '#dc2626',
+                                padding: '4px 12px',
+                                fontSize: '0.65rem',
+                                fontWeight: '700'
+                              }}
+                            >
+                              <FontAwesomeIcon icon={faTools} style={{ fontSize: '0.7rem' }} /> No asignado
+                            </Badge>
+                          ) : (
+                            `C$ ${articulo.precio?.toFixed(2)}`
+                          )}
+                        </td>
                         {isAdmin && (
                           <td className="text-end fw-bold">C$ {((articulo.existencia || 0) * (articulo.precio || 0)).toFixed(2)}</td>
                         )}
@@ -503,6 +544,20 @@ export const ArticuloList = () => {
                                 onClick={e => e.stopPropagation()}
                               >
                                 <FontAwesomeIcon icon={faPencilAlt} />
+                              </Button>
+                            )}
+                            {!articulo.activo && (isAdmin || isJefeBodega) && (
+                              <Button
+                                size="sm"
+                                color="success"
+                                outline
+                                title="Reactivar"
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  handleToggleActive(articulo);
+                                }}
+                              >
+                                <FontAwesomeIcon icon={faSync} />
                               </Button>
                             )}
                             {isAdmin && (
