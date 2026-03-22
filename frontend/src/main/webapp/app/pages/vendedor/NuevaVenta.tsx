@@ -24,6 +24,7 @@ import { VentaSidebar } from './components/VentaSidebar';
 import { ClientRegistrationModal } from './components/ClientRegistrationModal';
 import { SuccessModal } from './components/SuccessModal';
 import { ClientSelectionModal } from './components/ClientSelectionModal';
+import { ConfirmarPagoModal } from './components/ConfirmarPagoModal';
 import { EmpresaService } from 'app/services/empresa.service';
 import { IEmpresa } from 'app/shared/model/empresa.model';
 
@@ -61,6 +62,7 @@ export const NuevaVenta = () => {
   const [montoPagado, setMontoPagado] = useState('');
   const [descuento, setDescuento] = useState<string>('0');
   const [voucher, setVoucher] = useState('');
+  const [showPagoModal, setShowPagoModal] = useState(false);
 
   // Impresion A4
   const componentRef = useRef<any>(null);
@@ -278,18 +280,19 @@ export const NuevaVenta = () => {
       return;
     }
 
-    if (metodoPago === MetodoPagoEnum.EFECTIVO && montoPagadoNum < total) {
-      toast.error('El efectivo recibido es insuficiente para cubrir el total de la venta.');
-      return;
-    }
+    setShowPagoModal(true);
+  };
 
-    if (metodoPago === MetodoPagoEnum.TARJETA_STRIPE && (!voucher || voucher.trim() === '')) {
-      toast.error('Por favor ingrese el número de voucher o referencia de la tarjeta.');
-      return;
-    }
-
+  const confirmarYFinalizarVenta = async (
+    metodo: MetodoPagoEnum,
+    recibido: number,
+    cambioCalculado: number,
+    voucherRef: string,
+    monedaId: number
+  ) => {
     try {
       setLoading(true);
+      const monedaFinal = monedas.find(m => m.id === monedaId) || monedaSeleccionada;
 
       const ventaData: any = {
         fecha: dayjs().toISOString(),
@@ -298,14 +301,14 @@ export const NuevaVenta = () => {
         descuento: descuentoNum,
         total,
         totalEnMonedaBase: total, // Todo se asume en base C$ inicialmente
-        metodoPago,
-        stripeId: voucher.trim() ? voucher.trim() : null,
-        importeRecibido: metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? total : montoPagadoNum,
-        cambio: metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? 0 : cambio > 0 ? cambio : 0,
+        metodoPago: metodo,
+        stripeId: voucherRef.trim() ? voucherRef.trim() : null,
+        importeRecibido: metodo === MetodoPagoEnum.TARJETA_STRIPE ? total : recibido,
+        cambio: metodo === MetodoPagoEnum.TARJETA_STRIPE ? 0 : cambioCalculado > 0 ? cambioCalculado : 0,
         esContado,
         cliente,
         usuario: usuarioActual,
-        moneda: monedaSeleccionada,
+        moneda: monedaFinal,
         numeracion,
         noFactura: (numeracion?.correlativoActual || 0) + 1,
       };
@@ -343,6 +346,7 @@ export const NuevaVenta = () => {
       }
 
       toast.success(`¡Venta #${resVenta.data.noFactura} registrada con éxito!`);
+      setShowPagoModal(false);
       setRefreshTrigger(prev => prev + 1); // Refrescar de inmediato
 
       // Si la respuesta no trae usuario (porque es un Admin sin record en DB),
@@ -456,6 +460,15 @@ export const NuevaVenta = () => {
             toast.success(`Cliente seleccionado: ${c.nombre}`);
           }
         }}
+      />
+
+      <ConfirmarPagoModal
+        isOpen={showPagoModal}
+        toggle={() => setShowPagoModal(!showPagoModal)}
+        total={total}
+        monedas={monedas}
+        loading={loading}
+        onConfirm={confirmarYFinalizarVenta}
       />
     </div>
   );

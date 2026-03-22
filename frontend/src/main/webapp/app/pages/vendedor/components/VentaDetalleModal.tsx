@@ -101,7 +101,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
           {venta.importeRecibido != null && !venta.anulada && (
             <div className="d-flex justify-content-between mt-2 pt-2 border-top border-light">
               <span className="text-muted">Efectivo:</span>
-              <span className="fw-bold">C$ {venta.importeRecibido?.toFixed(2)}</span>
+              <span className="fw-bold">{venta.moneda?.simbolo === 'U$' ? '$' : (venta.moneda?.simbolo || 'C$')} {venta.importeRecibido?.toFixed(2)}</span>
             </div>
           )}
           {venta.cambio != null && !venta.anulada && (
@@ -423,7 +423,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                 {!venta.anulada && (
                   <div style={{ borderTop: '1.2px solid #ccc', display: 'flex', fontSize: '12px', color: '#333' }}>
                     <div style={{ width: '50%', padding: '6px 10px', borderRight: '1.2px solid #ccc', textAlign: 'right' }}>
-                      <strong>Recibido:</strong> C$ {venta.importeRecibido?.toFixed(2)}
+                      <strong>Recibido:</strong> {venta.moneda?.simbolo === 'U$' ? '$' : (venta.moneda?.simbolo || 'C$')} {venta.importeRecibido?.toFixed(2)}
                     </div>
                     <div style={{ width: '50%', padding: '6px 10px', textAlign: 'right' }}>
                       <strong>Cambio:</strong> C$ {venta.cambio?.toFixed(2)}
@@ -537,7 +537,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
               <span>C$ {venta.total?.toFixed(2)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', marginTop: '2px' }}>
-              <span>Recibido: C$ {venta.importeRecibido?.toFixed(2)}</span>
+              <span>Recibido: {venta.moneda?.simbolo === 'U$' ? '$' : (venta.moneda?.simbolo || 'C$')} {venta.importeRecibido?.toFixed(2)}</span>
               <span>Cambio: C$ {venta.cambio?.toFixed(2)}</span>
             </div>
             <div style={{ borderTop: '1px dashed #000', margin: '8px 0 4px' }} />

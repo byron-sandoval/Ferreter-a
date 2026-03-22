@@ -125,7 +125,7 @@ export const DevolucionModal: React.FC<DevolucionModalProps> = ({ isOpen, toggle
         ) : (
           <>
             <div className="mb-4">
-              <Label className="small fw-bold text-secondary text-uppercase mb-2">1. Motivo de la Devolución</Label>
+              <Label className="small fw-bold text-black text-uppercase mb-2">1. Motivo de la Devolución</Label>
               <Input
                 type="textarea"
                 rows="3"
@@ -138,7 +138,7 @@ export const DevolucionModal: React.FC<DevolucionModalProps> = ({ isOpen, toggle
             </div>
 
             <div className="mb-4">
-              <Label className="small fw-bold text-secondary text-uppercase mb-2">2. Seleccione Productos y Cantidades</Label>
+              <Label className="small fw-bold text-black text-uppercase mb-2">2. Seleccione Productos y Cantidades</Label>
               <div className="border rounded-4 overflow-hidden shadow-sm bg-white">
                 <Table hover responsive borderless className="mb-0 align-middle">
                   <thead style={{ backgroundColor: '#f8f9fa' }}>
@@ -242,7 +242,7 @@ export const DevolucionModal: React.FC<DevolucionModalProps> = ({ isOpen, toggle
             borderRadius: '10px',
             padding: '10px 30px',
           }}
-          className="fw-bold shadow-sm"
+          className="fw-bold shadow-sm text-white"
         >
           <FontAwesomeIcon icon={faUndo} className="me-2" />
           Procesar Devolución

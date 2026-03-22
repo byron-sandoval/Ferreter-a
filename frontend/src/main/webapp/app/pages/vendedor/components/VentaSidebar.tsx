@@ -153,22 +153,7 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
             <FontAwesomeIcon icon={faShoppingCart} className="me-2 text-primary" /> Ticket #
             {numeracion ? (numeracion.correlativoActual || 0) + 1 : '...'}
           </small>
-          <div className="d-flex gap-2">
-            <Input
-              type="select"
-              bsSize="sm"
-              className="bg-primary text-white border-0 fw-bold"
-              style={{ width: '80px' }}
-              value={(monedaSeleccionada?.id || '') as any}
-              onChange={e => setMonedaSeleccionada(monedas.find(m => m.id === Number(e.target.value)) || null)}
-            >
-              {monedas.map(m => (
-                <option key={m.id} value={m.id || ''}>
-                  {m.simbolo}
-                </option>
-              ))}
-            </Input>
-          </div>
+
         </CardHeader>
         <div className="table-responsive flex-grow-1 px-3" style={{ height: 'calc(100vh - 480px)', minHeight: '300px', overflowY: 'auto' }}>
           <Table borderless hover className="align-middle mb-0" style={{ fontSize: '0.8rem' }}>
@@ -237,16 +222,26 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
               <span>Subtotal:</span>
               <span>C$ {subtotal.toFixed(2)}</span>
             </div>
-            {metodoPago === MetodoPagoEnum.EFECTIVO && (
+            
+            <div className="d-flex justify-content-between align-items-center mb-1 small text-muted">
+              <span>Descuento (C$):</span>
+              <Input
+                type="number"
+                bsSize="sm"
+                className="fw-bold text-end text-success border-0 bg-white"
+                style={{ height: '24px', fontSize: '0.8rem', width: '100px' }}
+                placeholder="0.00"
+                value={descuento}
+                onChange={e => setDescuento(e.target.value)}
+              />
+            </div>
+
+            {iva > 0 && (
               <div className="d-flex justify-content-between mb-1 small text-muted">
-                <span>Descuento:</span>
-                <span className="text-success fw-bold">- C$ {parseFloat(descuento || '0').toFixed(2)}</span>
+                <span>IVA (15%):</span>
+                <span className="text-danger fw-bold">C$ {iva.toFixed(2)}</span>
               </div>
             )}
-            <div className="d-flex justify-content-between mb-1 small text-muted">
-              <span>IVA (15%):</span>
-              <span className="text-danger fw-bold">C$ {iva.toFixed(2)}</span>
-            </div>
           </div>
 
           <div className="d-flex justify-content-between align-items-center my-1 bg-dark text-white p-2 px-3 rounded-3 shadow-sm">
@@ -265,137 +260,42 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
             </div>
           </div>
 
-          <div className="p-2 bg-white rounded-3 border mb-2">
-            <Row className="g-2 align-items-center">
-              <Col xs="4">
-                <Label className="small text-muted mb-0 d-block text-uppercase fw-bold" style={{ fontSize: '0.6rem' }}>
-                  Pago con:
-                </Label>
-                <div className="d-flex gap-1 mt-1">
-                  <Button
-                    size="sm"
-                    color={metodoPago === MetodoPagoEnum.EFECTIVO ? 'primary' : 'outline-dark'}
-                    className="p-1 px-2 border-0"
-                    title="Efectivo"
-                    onClick={() => setMetodoPago(MetodoPagoEnum.EFECTIVO)}
-                  >
-                    <FontAwesomeIcon icon={faMoneyBillWave} />
-                  </Button>
-                  <Button
-                    size="sm"
-                    color={metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? 'primary' : 'outline-dark'}
-                    className="p-1 px-2 border-0"
-                    title="Tarjeta"
-                    onClick={() => {
-                      setMetodoPago(MetodoPagoEnum.TARJETA_STRIPE);
-                      setDescuento('0');
-                    }}
-                  >
-                    <FontAwesomeIcon icon={faCreditCard} />
-                  </Button>
-                </div>
-              </Col>
-
-              {metodoPago === MetodoPagoEnum.EFECTIVO ? (
-                <>
-                  <Col xs="4">
-                    <Label className="small text-muted mb-0 d-block text-uppercase fw-bold" style={{ fontSize: '0.6rem' }}>
-                      Desc. (C$)
-                    </Label>
-                    <Input
-                      type="number"
-                      bsSize="sm"
-                      className="fw-bold text-end text-success border-0 bg-light"
-                      placeholder="0.00"
-                      value={descuento}
-                      onChange={e => setDescuento(e.target.value)}
-                    />
-                  </Col>
-
-                  <Col xs="4">
-                    <Label className="small text-muted mb-0 d-block text-uppercase fw-bold" style={{ fontSize: '0.6rem' }}>
-                      Recibido
-                    </Label>
-                    <Input
-                      type="number"
-                      bsSize="sm"
-                      className="fw-bold text-end border-0 bg-light"
-                      placeholder="0.00"
-                      value={montoPagado}
-                      onChange={e => setMontoPagado(e.target.value)}
-                    />
-                  </Col>
-                </>
-              ) : (
-                <Col xs="8">
-                  <Label className="small text-muted mb-0 d-block text-uppercase fw-bold" style={{ fontSize: '0.6rem' }}>
-                    N° Voucher / Referencia
-                  </Label>
-                  <Input
-                    type="text"
-                    bsSize="sm"
-                    className="fw-bold text-center border-0 bg-light"
-                    placeholder="Ej: 123456"
-                    value={voucher}
-                    onChange={e => setVoucher(e.target.value)}
-                  />
-                </Col>
-              )}
-            </Row>
-
-            {metodoPago === MetodoPagoEnum.EFECTIVO && parseFloat(montoPagado) >= total && (
-              <div className="d-flex justify-content-between mt-1 px-1 text-success border-top pt-1 mt-2">
-                <small className="fw-bold">Cambio:</small>
-                <small className="fw-bold">C$ {cambio.toFixed(2)}</small>
-              </div>
-            )}
-          </div>
-
-          <div className="d-flex gap-2">
-            <Button
-              color="outline-danger"
-              size="md"
-              title="Limpiar"
-              style={{ borderRadius: '8px', width: '50px' }}
-              onClick={() => {
-                if (carrito.length > 0 && window.confirm('¿Desea limpiar la venta?')) {
-                  limpiarTodo();
-                } else if (carrito.length === 0) {
-                  limpiarTodo();
-                }
-              }}
-              disabled={loading || !!ventaExitosa}
-            >
-              <FontAwesomeIcon icon={faTrashAlt} />
-            </Button>
-            <Button
-              color={
-                (metodoPago === MetodoPagoEnum.EFECTIVO && (parseFloat(montoPagado) || 0) < total) ||
-                (metodoPago === MetodoPagoEnum.TARJETA_STRIPE && !voucher.trim())
-                  ? 'secondary'
-                  : 'success'
-              }
-              size="md"
-              className="flex-grow-1 py-2 fw-bold shadow-sm text-uppercase"
-              style={{ borderRadius: '8px', fontSize: '0.9rem' }}
-              onClick={procesarVenta}
-              disabled={
-                carrito.length === 0 ||
-                loading ||
-                !!ventaExitosa ||
-                (metodoPago === MetodoPagoEnum.EFECTIVO && (parseFloat(montoPagado) || 0) < total) ||
-                (metodoPago === MetodoPagoEnum.TARJETA_STRIPE && !voucher.trim())
-              }
-            >
-              {loading ? (
-                'Procesando...'
-              ) : (
-                <span>
-                  <FontAwesomeIcon icon={faMoneyBillWave} className="me-2" />
-                  {metodoPago === MetodoPagoEnum.EFECTIVO && (parseFloat(montoPagado) || 0) < total ? 'Esperando Pago' : 'Finalizar Venta'}
-                </span>
-              )}
-            </Button>
+          <div className="p-3">
+            <div className="d-flex gap-2">
+              <Button
+                color="outline-danger"
+                size="md"
+                title="Limpiar"
+                style={{ borderRadius: '10px', width: '50px' }}
+                onClick={() => {
+                  if (carrito.length > 0 && window.confirm('¿Desea limpiar la venta?')) {
+                    limpiarTodo();
+                  } else if (carrito.length === 0) {
+                    limpiarTodo();
+                  }
+                }}
+                disabled={loading || !!ventaExitosa}
+              >
+                <FontAwesomeIcon icon={faTrashAlt} />
+              </Button>
+              <Button
+                color="success"
+                size="md"
+                className="flex-grow-1 py-2 fw-bold shadow-sm text-uppercase"
+                style={{ borderRadius: '10px', fontSize: '0.9rem' }}
+                onClick={procesarVenta}
+                disabled={carrito.length === 0 || loading || !!ventaExitosa}
+              >
+                {loading ? (
+                  'Procesando...'
+                ) : (
+                  <span>
+                    <FontAwesomeIcon icon={faMoneyBillWave} className="me-2" />
+                    PAGAR AHORA
+                  </span>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </Card>
