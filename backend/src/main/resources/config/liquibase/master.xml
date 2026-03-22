@@ -48,4 +48,5 @@
     <include file="config/liquibase/changelog/20260208100000_rename_vendedor_to_usuario.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260208101500_make_id_keycloak_optional.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260214090000_added_user_fields.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260322100428_added_activo_to_Moneda.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>
