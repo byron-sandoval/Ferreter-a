@@ -34,8 +34,10 @@ import {
   faTrashAlt,
   faExclamationTriangle,
   faCloudUploadAlt,
+  faCoins,
 } from '@fortawesome/free-solid-svg-icons';
 import GestionUnidadMedida from '../GestionUnidadMedida';
+import GestionMonedas from './GestionMonedas';
 import { EmpresaService } from 'app/services/empresa.service';
 import { IEmpresa, defaultEmpresa } from 'app/shared/model/empresa.model';
 import { toast } from 'react-toastify';
@@ -135,6 +137,18 @@ export const ConfiguracionEmpresa = () => {
                     <FontAwesomeIcon icon={faRulerCombined} className="text-white" />
                   </div>
                   <span className="small fw-bold">Unidades de Medida</span>
+                </NavLink>
+              </NavItem>
+              <NavItem className="mb-2">
+                <NavLink
+                  className={`p-3 d-flex align-items-center rounded-3 ${activeTab === '5' ? 'active-tab' : 'inactive-tab text-dark'}`}
+                  onClick={() => setActiveTab('5')}
+                  style={{ cursor: 'pointer', transition: 'all 0.3s' }}
+                >
+                  <div className={`icon-box me-2`} style={{ backgroundColor: '#0dcaf0' }}>
+                    <FontAwesomeIcon icon={faCoins} className="text-white" />
+                  </div>
+                  <span className="small fw-bold">Monedas y Tasas</span>
                 </NavLink>
               </NavItem>
               <NavItem>
@@ -358,6 +372,9 @@ export const ConfiguracionEmpresa = () => {
             </TabPane>
             <TabPane tabId="4">
               <GestionUnidadMedida />
+            </TabPane>
+            <TabPane tabId="5">
+              <GestionMonedas />
             </TabPane>
           </TabContent>
         </Col>
