@@ -3,6 +3,7 @@ export interface IMoneda {
   nombre?: string;
   simbolo?: string;
   tipoCambio?: number;
+  activo?: boolean;
 }
 
 export const defaultMoneda: Readonly<IMoneda> = {};

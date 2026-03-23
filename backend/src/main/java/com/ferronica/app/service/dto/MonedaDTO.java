@@ -22,6 +22,8 @@ public class MonedaDTO implements Serializable {
     @NotNull
     private BigDecimal tipoCambio;
 
+    private Boolean activo;
+
     public Long getId() {
         return id;
     }
@@ -54,6 +56,14 @@ public class MonedaDTO implements Serializable {
         this.tipoCambio = tipoCambio;
     }
 
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -83,6 +93,7 @@ public class MonedaDTO implements Serializable {
             ", nombre='" + getNombre() + "'" +
             ", simbolo='" + getSimbolo() + "'" +
             ", tipoCambio=" + getTipoCambio() +
+            ", activo=" + getActivo() +
             "}";
     }
 }

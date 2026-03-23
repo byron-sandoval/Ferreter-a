@@ -88,7 +88,11 @@ export const ProductCatalog: React.FC<IProductCatalogProps> = ({
       if (isReset) {
         setLocalArticulos(data);
       } else {
-        setLocalArticulos(prev => [...prev, ...data]);
+        setLocalArticulos(prev => {
+          const idsExistentes = new Set(prev.map(p => p.id));
+          const nuevosUnicos = data.filter(p => !idsExistentes.has(p.id));
+          return [...prev, ...nuevosUnicos];
+        });
       }
       setHasMore(totalFetched === pageSize);
     } catch (e) {
