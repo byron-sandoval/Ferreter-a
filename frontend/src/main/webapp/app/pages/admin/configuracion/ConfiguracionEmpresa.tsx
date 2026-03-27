@@ -38,6 +38,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import GestionUnidadMedida from '../GestionUnidadMedida';
 import GestionMonedas from './GestionMonedas';
+import GestionRespaldo from './GestionRespaldo';
 import { EmpresaService } from 'app/services/empresa.service';
 import { IEmpresa, defaultEmpresa } from 'app/shared/model/empresa.model';
 import { toast } from 'react-toastify';
@@ -375,6 +376,9 @@ export const ConfiguracionEmpresa = () => {
             </TabPane>
             <TabPane tabId="5">
               <GestionMonedas />
+            </TabPane>
+            <TabPane tabId="3">
+              <GestionRespaldo />
             </TabPane>
           </TabContent>
         </Col>

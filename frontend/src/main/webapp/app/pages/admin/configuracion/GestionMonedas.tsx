@@ -71,7 +71,8 @@ export const GestionMonedas = () => {
       const res = await MonedaService.getAll();
       setMonedas(res.data);
     } catch (e) {
-      toast.error('Error al cargar monedas');
+      console.error('Error al cargar monedas', e);
+      // No mostramos toast si el sistema está limpio/vacío
     } finally {
       setLoading(false);
     }

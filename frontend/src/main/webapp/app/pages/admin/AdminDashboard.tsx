@@ -98,7 +98,8 @@ export const AdminDashboard = () => {
         setRevisionPrecios(revision);
         setLoading(false);
       })
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
