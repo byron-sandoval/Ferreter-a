@@ -114,7 +114,7 @@ export const NuevaVenta = () => {
         }
       }
     } catch (e) {
-      toast.error('Error al cargar datos iniciales');
+      console.error('Error al cargar datos iniciales', e);
     }
   };
 
