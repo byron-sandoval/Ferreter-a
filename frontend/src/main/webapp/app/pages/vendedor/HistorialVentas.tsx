@@ -93,7 +93,8 @@ export const HistorialVentas = () => {
       const total = res.headers?.['x-total-count'];
       setTotalItems(total ? parseInt(total, 10) : data.length);
     } catch (e) {
-      toast.error('Error al cargar historial');
+      console.error('Error al cargar historial', e);
+      // No mostramos toast error si el sistema está limpio
     } finally {
       setLoading(false);
     }
