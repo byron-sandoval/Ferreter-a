@@ -234,3 +234,7 @@ jhipster:
 # ===================================================================
 
 # application:
+
+stripe:
+  secret-key: ${env.STRIPE_SECRET_KEY:${STRIPE_SECRET_KEY:}}
+  public-key: ${env.STRIPE_PUBLIC_KEY:${STRIPE_PUBLIC_KEY:}}
