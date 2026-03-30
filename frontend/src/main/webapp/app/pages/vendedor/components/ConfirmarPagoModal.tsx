@@ -46,7 +46,7 @@ export const ConfirmarPagoModal: React.FC<IConfirmarPagoModalProps> = ({ isOpen,
   };
 
   const puedeFinalizar =
-    metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? voucher.trim() !== '' :
+    metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? true :
       montoRecibidoEnCordobas >= (total - 0.01); // Margen por redondeo
 
   return (
@@ -126,6 +126,10 @@ export const ConfirmarPagoModal: React.FC<IConfirmarPagoModalProps> = ({ isOpen,
                   autoFocus
                 />
               </div>
+            ) : metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? (
+              <div className="p-2 bg-white rounded shadow-sm border border-info border-opacity-25 text-center">
+                <small className="text-info fw-bold">Se abrirá el pago seguro con Stripe</small>
+              </div>
             ) : (
               <Input
                 type="text"
@@ -154,12 +158,12 @@ export const ConfirmarPagoModal: React.FC<IConfirmarPagoModalProps> = ({ isOpen,
           <small>CANCELAR</small>
         </Button>
         <Button
-          color="success"
+          color={metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? "primary" : "success"}
           className="px-4 fw-bold shadow-sm"
           disabled={!puedeFinalizar || loading}
           onClick={handleConfirm}
         >
-          {loading ? '...' : 'EMITIR TICKET'}
+          {loading ? '...' : (metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? 'PAGAR CON STRIPE' : 'EMITIR TICKET')}
         </Button>
       </ModalFooter>
     </Modal>

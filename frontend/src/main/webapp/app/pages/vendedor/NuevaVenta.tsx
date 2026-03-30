@@ -25,6 +25,7 @@ import { ClientRegistrationModal } from './components/ClientRegistrationModal';
 import { SuccessModal } from './components/SuccessModal';
 import { ClientSelectionModal } from './components/ClientSelectionModal';
 import { ConfirmarPagoModal } from './components/ConfirmarPagoModal';
+import StripeCheckoutModal from 'app/shared/components/stripe/StripeCheckoutModal';
 import { EmpresaService } from 'app/services/empresa.service';
 import { IEmpresa } from 'app/shared/model/empresa.model';
 
@@ -63,6 +64,8 @@ export const NuevaVenta = () => {
   const [descuento, setDescuento] = useState<string>('0');
   const [voucher, setVoucher] = useState('');
   const [showPagoModal, setShowPagoModal] = useState(false);
+  const [showStripeModal, setShowStripeModal] = useState(false);
+  const [stripePaymentData, setStripePaymentData] = useState<any>(null);
 
   // Impresion A4
   const componentRef = useRef<any>(null);
@@ -294,6 +297,14 @@ export const NuevaVenta = () => {
     voucherRef: string,
     monedaId: number
   ) => {
+    // Si es STRIPE y no hay voucher (recién sale de confirmar modal)
+    if (metodo === MetodoPagoEnum.TARJETA_STRIPE && !voucherRef.trim()) {
+      setStripePaymentData({ metodo, recibido, cambioCalculado, monedaId });
+      setShowPagoModal(false);
+      setShowStripeModal(true);
+      return;
+    }
+
     try {
       setLoading(true);
       const monedaFinal = monedas.find(m => m.id === monedaId) || monedaSeleccionada;
@@ -473,6 +484,30 @@ export const NuevaVenta = () => {
         monedas={monedas}
         loading={loading}
         onConfirm={confirmarYFinalizarVenta}
+      />
+
+      <StripeCheckoutModal
+        isOpen={showStripeModal}
+        amount={stripePaymentData ? total / ((monedas.find(m => m.id === stripePaymentData.monedaId) || monedaSeleccionada)?.tipoCambio || 1) : 0}
+        currency={(monedas.find(m => m.id === stripePaymentData?.monedaId) || monedaSeleccionada)?.simbolo === '$' ? 'usd' : 'nio'}
+        currencySymbol={(monedas.find(m => m.id === stripePaymentData?.monedaId) || monedaSeleccionada)?.simbolo || 'C$'}
+        description={`Pago de Factura`}
+        onSuccess={(intentId) => {
+          setShowStripeModal(false);
+          if (stripePaymentData) {
+            confirmarYFinalizarVenta(
+              stripePaymentData.metodo,
+              stripePaymentData.recibido,
+              stripePaymentData.cambioCalculado,
+              intentId,
+              stripePaymentData.monedaId
+            );
+          }
+        }}
+        onCancel={() => {
+          setShowStripeModal(false);
+          toast.warning('Pago con tarjeta cancelado');
+        }}
       />
     </div>
   );
