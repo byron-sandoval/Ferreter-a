@@ -363,7 +363,7 @@ export const ArticuloList = () => {
   return (
     <div className="animate__animated animate__fadeIn">
       {/* 1. Header de Acciones (Sub-bar style) */}
-      <div className="d-flex justify-content-between align-items-center p-2 mb-0 shadow-sm" style={subHeaderStyle}>
+      <div className="d-flex justify-content-between align-items-center p-2 mb-2 rounded shadow-sm mx-1" style={subHeaderStyle}>
         <div className="d-flex align-items-center gap-3 ps-3">
           <span className="fw-bold text-uppercase" style={{ letterSpacing: '1px' }}>
             Inventario de productos
@@ -401,9 +401,6 @@ export const ArticuloList = () => {
           </div>
           <Button color="success" size="sm" className="opacity-90" onClick={exportAllToExcel}>
             <FontAwesomeIcon icon={faFileExcel} className="me-2" /> Exportar Todo
-          </Button>
-          <Button color="secondary" size="sm" className="opacity-75" onClick={loadAll}>
-            <FontAwesomeIcon icon={faSync} spin={loading} /> Restablecer
           </Button>
           {isAdmin && (
             <Button
