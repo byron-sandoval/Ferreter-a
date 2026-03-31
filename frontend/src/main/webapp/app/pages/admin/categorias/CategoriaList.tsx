@@ -43,8 +43,7 @@ export const CategoriaList = () => {
   }, []);
 
   const filtered = categorias.filter(c => {
-    const matchesSearch =
-      (c.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (c.descripcion || '').toLowerCase().includes(filter.toLowerCase());
+    const matchesSearch = (c.nombre || '').toLowerCase().includes(filter.toLowerCase());
     const matchesStatus = showInactive ? c.activo === false || c.activo === null : c.activo === true;
     return matchesSearch && matchesStatus;
   });
@@ -79,16 +78,32 @@ export const CategoriaList = () => {
 
   return (
     <div className="animate__animated animate__fadeIn p-1">
-      <div className="d-flex justify-content-between align-items-center mb-2 px-2 py-1 bg-primary text-white rounded shadow-sm">
+      <div
+        className="d-flex justify-content-between align-items-center mb-2 px-2 py-2 text-white rounded shadow-sm"
+        style={{ backgroundColor: '#343a40' }}
+      >
         <h5 className="m-0 fw-bold">
           <FontAwesomeIcon icon={faTags} className="me-2" /> Categorías de Productos
         </h5>
         <div className="d-flex gap-2">
-          <Button color="light" size="sm" onClick={loadAll} disabled={loading} style={{ fontSize: '0.75rem' }}>
-            <FontAwesomeIcon icon={faSync} spin={loading} className="me-1" /> Actualizar
-          </Button>
+          <div className="form-check form-switch ms-2 d-flex align-items-center">
+            <Input
+              type="switch"
+              id="showInactiveSwitch"
+              checked={showInactive}
+              onChange={() => setShowInactive(!showInactive)}
+              style={{ cursor: 'pointer' }}
+            />
+            <label
+              className="form-check-label text-white ms-2 small fw-bold"
+              htmlFor="showInactiveSwitch"
+              style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
+            >
+              Ver Inactivos
+            </label>
+          </div>
           {isAdmin && (
-            <Button color="success" size="sm" tag={Link} to="new" style={{ fontSize: '0.75rem' }}>
+            <Button color="primary" size="sm" tag={Link} to="new" style={{ fontSize: '0.75rem' }}>
               <FontAwesomeIcon icon={faPlus} className="me-1" /> Nueva Categoría
             </Button>
           )}
@@ -101,7 +116,7 @@ export const CategoriaList = () => {
             <div
               className="d-flex align-items-center flex-grow-1 bg-white"
               style={{
-                maxWidth: '350px',
+                maxWidth: '400px',
                 border: '2px solid #adb5bd',
                 borderRadius: '6px',
                 padding: '6px 12px',
@@ -116,22 +131,6 @@ export const CategoriaList = () => {
                 style={{ fontSize: '0.9rem' }}
               />
             </div>
-            <div className="form-check form-switch ms-3 d-flex align-items-center">
-              <Input
-                type="switch"
-                id="showInactiveSwitch"
-                checked={showInactive}
-                onChange={() => setShowInactive(!showInactive)}
-                style={{ cursor: 'pointer' }}
-              />
-              <label
-                className="form-check-label text-muted ms-2 small fw-bold"
-                htmlFor="showInactiveSwitch"
-                style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
-              >
-                Ver Inactivos
-              </label>
-            </div>
           </div>
         </CardBody>
       </Card>
@@ -143,7 +142,6 @@ export const CategoriaList = () => {
               <tr>
                 <th className="py-2 px-3">ID</th>
                 <th className="py-2">Nombre</th>
-                <th className="py-2">Descripción</th>
                 <th className="py-2">Estado</th>
                 <th className="py-2 text-end px-3">Acciones</th>
               </tr>
@@ -153,9 +151,6 @@ export const CategoriaList = () => {
                 <tr key={cat.id} style={{ fontSize: '0.8rem' }}>
                   <td className="px-3">{cat.id}</td>
                   <td className="fw-bold">{cat.nombre}</td>
-                  <td className="small text-muted text-truncate" style={{ maxWidth: '200px' }}>
-                    {cat.descripcion}
-                  </td>
                   <td>
                     {cat.activo ? (
                       <Badge color="success" pill style={{ fontSize: '0.65rem' }}>

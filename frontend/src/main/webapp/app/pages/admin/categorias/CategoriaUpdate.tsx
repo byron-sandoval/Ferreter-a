@@ -49,7 +49,7 @@ export const CategoriaUpdate = () => {
 
   return (
     <div className="d-flex justify-content-center">
-      <Col md="8">
+      <Col md="5">
         <Card>
           <CardHeader className="bg-white d-flex justify-content-between align-items-center">
             <h4 className="mb-0 text-black">{isNew ? 'Nueva Categoría' : 'Editar Categoría'}</h4>
@@ -68,11 +68,6 @@ export const CategoriaUpdate = () => {
                   render={({ field }) => <Input {...field} invalid={!!errors.nombre} />}
                 />
                 {errors.nombre && <div className="invalid-feedback d-block">{errors.nombre.message}</div>}
-              </FormGroup>
-
-              <FormGroup>
-                <Label>Descripción</Label>
-                <Controller name="descripcion" control={control} render={({ field }) => <Input {...field} type="textarea" />} />
               </FormGroup>
 
               {isAdmin && (
