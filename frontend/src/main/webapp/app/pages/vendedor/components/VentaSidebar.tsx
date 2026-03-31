@@ -150,7 +150,7 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
       <Card className="shadow-lg border-0 rounded-4 overflow-hidden h-100">
         <CardHeader className="bg-dark text-white d-flex justify-content-between align-items-center py-2 px-3">
           <small className="mb-0 fw-bold">
-            <FontAwesomeIcon icon={faShoppingCart} className="me-2 text-primary" /> Ticket #
+            <FontAwesomeIcon icon={faShoppingCart} className="me-2 text-primary" /> Venta #
             {numeracion ? (numeracion.correlativoActual || 0) + 1 : '...'}
           </small>
 
