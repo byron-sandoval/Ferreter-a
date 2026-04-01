@@ -3,7 +3,7 @@ import { Modal, ModalHeader, ModalBody, Button } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faPrint, faFileAlt, faReceipt } from '@fortawesome/free-solid-svg-icons';
 import dayjs from 'dayjs';
-import { IVenta } from 'app/shared/model/venta.model';
+import { IVenta, MetodoPagoEnum } from 'app/shared/model/venta.model';
 import { IEmpresa } from 'app/shared/model/empresa.model';
 
 interface ISuccessModalProps {
@@ -246,9 +246,9 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                   Observaciones:
                 </p>
                 <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '12px', fontWeight: '500' }}>
-                  <div>Gracias por su compra.</div>
+                  <div>¡Gracias por su compra!</div>
                   <div style={{ marginTop: '5px', fontSize: '11px', color: '#555' }}>
-                    Cambios únicamente con factura y dentro de 24 horas.
+                    <strong>NO SE ACEPTAN DEVOLUCIONES DE MERCANCÍA.</strong><br/>
                   </div>
                 </div>
               </div>
@@ -336,14 +336,27 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                     C$ {ventaExitosa?.total?.toFixed(2)}
                   </div>
                 </div>
-                {/* Info Recibido/Cambio Alineada */}
+                {/* Info Recibido/Cambio Alineada o Tarjeta */}
                 <div style={{ borderTop: '1.2px solid #ccc', display: 'flex', fontSize: '12px', color: '#333' }}>
-                  <div style={{ width: '50%', padding: '6px 10px', borderRight: '1.2px solid #ccc', textAlign: 'right' }}>
-                    <strong>Recibido:</strong> {ventaExitosa?.moneda?.simbolo === 'U$' ? '$' : (ventaExitosa?.moneda?.simbolo || 'C$')} {ventaExitosa?.importeRecibido?.toFixed(2)}
-                  </div>
-                  <div style={{ width: '50%', padding: '6px 10px', textAlign: 'right' }}>
-                    <strong>Cambio:</strong> C$ {ventaExitosa?.cambio?.toFixed(2)}
-                  </div>
+                  {ventaExitosa?.metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? (
+                    <>
+                      <div style={{ width: '50%', padding: '6px 10px', borderRight: '1.2px solid #ccc', textAlign: 'right' }}>
+                        <strong>Método:</strong> Tarjeta
+                      </div>
+                      <div style={{ width: '50%', padding: '6px 15px 6px 10px', textAlign: 'right', fontSize: '10.5px' }}>
+                        <strong>ID:</strong> {ventaExitosa.stripeId?.slice(-10) || 'N/A'}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div style={{ width: '50%', padding: '6px 10px', borderRight: '1.2px solid #ccc', textAlign: 'right' }}>
+                        <strong>Recibido:</strong> {ventaExitosa?.moneda?.simbolo === 'U$' ? '$' : (ventaExitosa?.moneda?.simbolo || 'C$')} {ventaExitosa?.importeRecibido?.toFixed(2)}
+                      </div>
+                      <div style={{ width: '50%', padding: '6px 15px 6px 10px', textAlign: 'right' }}>
+                        <strong>Cambio:</strong> C$ {ventaExitosa?.cambio?.toFixed(2)}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -440,13 +453,22 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
               <span>C$ {ventaExitosa?.total?.toFixed(2)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', marginTop: '2px' }}>
-              <span>Recibido: {ventaExitosa?.moneda?.simbolo === 'U$' ? '$' : (ventaExitosa?.moneda?.simbolo || 'C$')} {ventaExitosa?.importeRecibido?.toFixed(2)}</span>
-              <span>Cambio: C$ {ventaExitosa?.cambio?.toFixed(2)}</span>
+              {ventaExitosa?.metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? (
+                <>
+                  <span>Tarjeta:</span>
+                  <span>{ventaExitosa?.stripeId?.slice(-10) || 'N/A'}</span>
+                </>
+              ) : (
+                <>
+                  <span>Recibido: {ventaExitosa?.moneda?.simbolo === 'U$' ? '$' : (ventaExitosa?.moneda?.simbolo || 'C$')} {ventaExitosa?.importeRecibido?.toFixed(2)}</span>
+                  <span>Cambio: C$ {ventaExitosa?.cambio?.toFixed(2)}</span>
+                </>
+              )}
             </div>
             <div style={{ borderTop: '1px dashed #000', margin: '8px 0 4px' }} />
             <div style={{ textAlign: 'center', fontSize: '10px' }}>
               <div>¡Gracias por su compra!</div>
-              <div>Cambios solo con factura en 24 hrs.</div>
+              <div style={{ fontWeight: 'bold', marginTop: '2px' }}>NO SE ACEPTAN DEVOLUCIONES DE MERCANCÍA.</div>
             </div>
           </div>
         </div>
