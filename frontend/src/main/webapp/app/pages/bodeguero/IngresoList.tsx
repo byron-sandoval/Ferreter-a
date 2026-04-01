@@ -216,7 +216,7 @@ export const IngresoList = () => {
       </Card>
 
       {/* MODAL DETALLES DE COMPRA (INGRESO) */}
-      <Modal isOpen={showDetalleModal} toggle={() => setShowDetalleModal(false)} size="lg" centered>
+      <Modal isOpen={showDetalleModal} toggle={() => setShowDetalleModal(false)} size="lg" centered scrollable>
         <ModalHeader toggle={() => setShowDetalleModal(false)} className="bg-dark text-white">
           <FontAwesomeIcon icon={faFileInvoice} className="me-2 text-info" /> Detalles de Compra #{ingresoSeleccionado?.noDocumento}
         </ModalHeader>

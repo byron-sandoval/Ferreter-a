@@ -91,25 +91,27 @@ export const ConfirmarPagoModal: React.FC<IConfirmarPagoModalProps> = ({ isOpen,
         </Row>
 
         <Row className="mb-3">
-          <Col md="6">
-            <Label className="small fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.6rem' }}>Moneda</Label>
-            <Input
-              type="select"
-              bsSize="sm"
-              className="fw-bold border-0 shadow-sm"
-              value={monedaPago?.id || ''}
-              onChange={(e) => setMonedaPago(activeMonedas.find(m => m.id === Number(e.target.value)) || null)}
-            >
-              {activeMonedas.map(m => (
-                <option key={m.id} value={m.id}>
-                  {m.nombre} ({m.simbolo})
-                </option>
-              ))}
-            </Input>
-          </Col>
-          <Col md="6">
+          {metodoPago === MetodoPagoEnum.EFECTIVO && (
+            <Col md="6">
+              <Label className="small fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.6rem' }}>Moneda</Label>
+              <Input
+                type="select"
+                bsSize="sm"
+                className="fw-bold border-0 shadow-sm"
+                value={monedaPago?.id || ''}
+                onChange={(e) => setMonedaPago(activeMonedas.find(m => m.id === Number(e.target.value)) || null)}
+              >
+                {activeMonedas.map(m => (
+                  <option key={m.id} value={m.id}>
+                    {m.nombre} ({m.simbolo})
+                  </option>
+                ))}
+              </Input>
+            </Col>
+          )}
+          <Col md={metodoPago === MetodoPagoEnum.EFECTIVO ? "6" : "12"}>
             <Label className="small fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.6rem' }}>
-              {metodoPago === MetodoPagoEnum.EFECTIVO ? 'Recibido' : 'Referencia'}
+              {metodoPago === MetodoPagoEnum.EFECTIVO ? 'Monto Recibido' : 'Referencia de Pago'}
             </Label>
             {metodoPago === MetodoPagoEnum.EFECTIVO ? (
               <div className="position-relative shadow-sm rounded">
@@ -127,8 +129,10 @@ export const ConfirmarPagoModal: React.FC<IConfirmarPagoModalProps> = ({ isOpen,
                 />
               </div>
             ) : metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? (
-              <div className="p-2 bg-white rounded shadow-sm border border-info border-opacity-25 text-center">
-                <small className="text-info fw-bold">Se abrirá el pago seguro con Stripe</small>
+              <div className="p-2 bg-white rounded shadow-sm border border-primary border-opacity-25 text-center">
+                <small className="text-primary fw-bold text-uppercase" style={{ letterSpacing: '1px' }}>
+                  Se abrirá el pago seguro con Stripe
+                </small>
               </div>
             ) : (
               <Input
@@ -163,7 +167,7 @@ export const ConfirmarPagoModal: React.FC<IConfirmarPagoModalProps> = ({ isOpen,
           disabled={!puedeFinalizar || loading}
           onClick={handleConfirm}
         >
-          {loading ? '...' : (metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? 'PAGAR CON STRIPE' : 'EMITIR TICKET')}
+          {loading ? '...' : (metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? 'PAGAR CON TARJETA' : 'EMITIR')}
         </Button>
       </ModalFooter>
     </Modal>

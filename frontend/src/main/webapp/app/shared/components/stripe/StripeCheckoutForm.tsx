@@ -23,6 +23,7 @@ const CARD_ELEMENT_OPTIONS = {
     },
   },
   hidePostalCode: true,
+  disableLink: true,
 };
 
 // ─── Props del componente ─────────────────────────────────────────────────────

@@ -55,6 +55,17 @@ export const ProveedorList = () => {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
+  const handleReactivate = (p: IProveedor) => {
+    if (p.id && window.confirm(`¿Desea reactivar al proveedor "${p.nombre}"?`)) {
+      ProveedorService.update({ ...p, activo: true })
+        .then(() => loadAll())
+        .catch(err => {
+          console.error(err);
+          alert('Error al reactivar el proveedor');
+        });
+    }
+  };
+
   const headerStyle = { backgroundColor: '#6f42c1', color: 'white' };
 
   return (
@@ -146,19 +157,31 @@ export const ProveedorList = () => {
                         <FontAwesomeIcon icon={faPencilAlt} fixedWidth />
                       </Button>
                     )}
-                    {isAdmin && (
+                    {isAdmin && p.activo && (
                       <Button
                         size="sm"
                         color="danger"
                         outline
                         className="p-1"
                         onClick={() => {
-                          if (p.id && window.confirm(`¿Está seguro de eliminar al proveedor "${p.nombre}"?`)) {
+                          if (p.id && window.confirm(`¿Está seguro de desactivar al proveedor "${p.nombre}"?`)) {
                             ProveedorService.delete(p.id).then(() => loadAll());
                           }
                         }}
                       >
                         <FontAwesomeIcon icon={faTrash} fixedWidth />
+                      </Button>
+                    )}
+                    {isAdmin && !p.activo && (
+                      <Button
+                        size="sm"
+                        color="success"
+                        outline
+                        className="p-1"
+                        onClick={() => handleReactivate(p)}
+                        title="Reactivar Proveedor"
+                      >
+                        <FontAwesomeIcon icon={faSync} fixedWidth />
                       </Button>
                     )}
                   </td>

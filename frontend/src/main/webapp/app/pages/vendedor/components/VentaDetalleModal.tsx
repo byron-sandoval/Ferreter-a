@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileInvoiceDollar, faPrint, faFileAlt, faReceipt } from '@fortawesome/free-solid-svg-icons';
 import dayjs from 'dayjs';
 import { useReactToPrint } from 'react-to-print';
-import { IVenta } from 'app/shared/model';
+import { IVenta, MetodoPagoEnum } from 'app/shared/model/venta.model';
 import { IEmpresa } from 'app/shared/model/empresa.model';
 
 interface VentaDetalleModalProps {
@@ -98,17 +98,36 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
               C$ {venta.anulada ? '0.00' : venta.total?.toFixed(2)}
             </h5>
           </div>
-          {venta.importeRecibido != null && !venta.anulada && (
-            <div className="d-flex justify-content-between mt-2 pt-2 border-top border-light">
-              <span className="text-muted">Efectivo:</span>
-              <span className="fw-bold">{venta.moneda?.simbolo === 'U$' ? '$' : (venta.moneda?.simbolo || 'C$')} {venta.importeRecibido?.toFixed(2)}</span>
-            </div>
-          )}
-          {venta.cambio != null && !venta.anulada && (
-            <div className="d-flex justify-content-between">
-              <span className="text-muted">Cambio:</span>
-              <span className="fw-bold text-success">C$ {venta.cambio?.toFixed(2)}</span>
-            </div>
+          {!venta.anulada && (
+            <>
+              {venta.metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? (
+                <>
+                  <div className="d-flex justify-content-between mt-2 pt-2 border-top border-light">
+                    <span className="text-muted">Método:</span>
+                    <span className="fw-bold">Tarjeta</span>
+                  </div>
+                  <div className="d-flex justify-content-between">
+                    <span className="text-muted">ID Trans.:</span>
+                    <span className="fw-bold" style={{ fontSize: '0.85em' }}>{venta.stripeId?.slice(-10) || 'N/A'}</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {venta.importeRecibido != null && (
+                    <div className="d-flex justify-content-between mt-2 pt-2 border-top border-light">
+                      <span className="text-muted">Efectivo:</span>
+                      <span className="fw-bold">{venta.moneda?.simbolo === 'U$' ? '$' : (venta.moneda?.simbolo || 'C$')} {venta.importeRecibido?.toFixed(2)}</span>
+                    </div>
+                  )}
+                  {venta.cambio != null && (
+                    <div className="d-flex justify-content-between">
+                      <span className="text-muted">Cambio:</span>
+                      <span className="fw-bold text-success">C$ {venta.cambio?.toFixed(2)}</span>
+                    </div>
+                  )}
+                </>
+              )}
+            </>
           )}
         </div>
 
@@ -329,9 +348,9 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                   Observaciones:
                 </p>
                 <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '12px', fontWeight: '500' }}>
-                  <div>Gracias por su compra.</div>
+                  <div>¡Gracias por su compra!</div>
                   <div style={{ marginTop: '5px', fontSize: '11px', color: '#555' }}>
-                    Cambios únicamente con factura y dentro de 24 horas.
+                    <strong>NO SE ACEPTAN DEVOLUCIONES DE MERCANCÍA.</strong><br/>
                   </div>
                 </div>
               </div>
@@ -422,12 +441,25 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                 {/* Info Recibido/Cambio Alineada */}
                 {!venta.anulada && (
                   <div style={{ borderTop: '1.2px solid #ccc', display: 'flex', fontSize: '12px', color: '#333' }}>
-                    <div style={{ width: '50%', padding: '6px 10px', borderRight: '1.2px solid #ccc', textAlign: 'right' }}>
-                      <strong>Recibido:</strong> {venta.moneda?.simbolo === 'U$' ? '$' : (venta.moneda?.simbolo || 'C$')} {venta.importeRecibido?.toFixed(2)}
-                    </div>
-                    <div style={{ width: '50%', padding: '6px 10px', textAlign: 'right' }}>
-                      <strong>Cambio:</strong> C$ {venta.cambio?.toFixed(2)}
-                    </div>
+                    {venta.metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? (
+                      <>
+                        <div style={{ width: '50%', padding: '6px 15px 6px 10px', borderRight: '1.2px solid #ccc', textAlign: 'right' }}>
+                          <strong>Método:</strong> Tarjeta
+                        </div>
+                        <div style={{ width: '50%', padding: '6px 15px 6px 10px', textAlign: 'right', fontSize: '10.5px' }}>
+                          <strong>ID:</strong> {venta.stripeId?.slice(-10) || 'N/A'}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div style={{ width: '50%', padding: '6px 10px', borderRight: '1.2px solid #ccc', textAlign: 'right' }}>
+                          <strong>Recibido:</strong> {venta.moneda?.simbolo === 'U$' ? '$' : (venta.moneda?.simbolo || 'C$')} {venta.importeRecibido?.toFixed(2)}
+                        </div>
+                        <div style={{ width: '50%', padding: '6px 15px 6px 10px', textAlign: 'right' }}>
+                          <strong>Cambio:</strong> C$ {venta.cambio?.toFixed(2)}
+                        </div>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
@@ -537,13 +569,22 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
               <span>C$ {venta.total?.toFixed(2)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', marginTop: '2px' }}>
-              <span>Recibido: {venta.moneda?.simbolo === 'U$' ? '$' : (venta.moneda?.simbolo || 'C$')} {venta.importeRecibido?.toFixed(2)}</span>
-              <span>Cambio: C$ {venta.cambio?.toFixed(2)}</span>
+              {venta.metodoPago === MetodoPagoEnum.TARJETA_STRIPE ? (
+                <>
+                  <span>Tarjeta:</span>
+                  <span>{venta.stripeId?.slice(-10) || 'N/A'}</span>
+                </>
+              ) : (
+                <>
+                  <span>Recibido: {venta.moneda?.simbolo === 'U$' ? '$' : (venta.moneda?.simbolo || 'C$')} {venta.importeRecibido?.toFixed(2)}</span>
+                  <span>Cambio: C$ {venta.cambio?.toFixed(2)}</span>
+                </>
+              )}
             </div>
             <div style={{ borderTop: '1px dashed #000', margin: '8px 0 4px' }} />
             <div style={{ textAlign: 'center', fontSize: '10px' }}>
               <div>¡Gracias por su compra!</div>
-              <div>Cambios solo con factura en 24 hrs.</div>
+              <div style={{ fontWeight: 'bold', marginTop: '2px' }}>NO SE ACEPTAN DEVOLUCIONES DE MERCANCÍA.</div>
             </div>
           </div>
         </div>
