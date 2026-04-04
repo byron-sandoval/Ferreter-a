@@ -42,9 +42,9 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
           <div
             ref={componentRef}
             style={{
-              padding: '28px',
+              padding: '40px',
               fontFamily: "'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-              width: '800px',
+              width: '794px',
               backgroundColor: '#fff',
               color: '#333',
               margin: '0 auto',
