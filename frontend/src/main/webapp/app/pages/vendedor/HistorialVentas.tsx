@@ -38,6 +38,7 @@ export const HistorialVentas = () => {
 
   const [fechaInicioInput, setFechaInicioInput] = useState('');
   const [fechaFinInput, setFechaFinInput] = useState('');
+  const [devolucionesMap, setDevolucionesMap] = useState<Record<number, number>>({});
 
   const aplicarFiltros = () => {
     setFechaInicio(fechaInicioInput);
@@ -92,9 +93,25 @@ export const HistorialVentas = () => {
       // JHipster devuelve el total en el header X-Total-Count
       const total = res.headers?.['x-total-count'];
       setTotalItems(total ? parseInt(total, 10) : data.length);
+
+      // Cargar devoluciones de estas ventas para identificar saldos
+      if (data.length > 0) {
+        try {
+          const resDev = await DevolucionService.getAll(); // Podemos optimizar esto luego si crece mucho
+          const devData = Array.isArray(resDev.data) ? resDev.data : (resDev.data as any).content || [];
+          const map: Record<number, number> = {};
+          devData.forEach((d: IDevolucion) => {
+            if (d.venta?.id) {
+              map[d.venta.id] = (map[d.venta.id] || 0) + (d.total || 0);
+            }
+          });
+          setDevolucionesMap(map);
+        } catch (e) {
+          console.error('Error al cargar saldos de devolución', e);
+        }
+      }
     } catch (e) {
       console.error('Error al cargar historial', e);
-      // No mostramos toast error si el sistema está limpio
     } finally {
       setLoading(false);
     }
@@ -281,7 +298,7 @@ export const HistorialVentas = () => {
                       <Badge color="soft-danger" style={{ backgroundColor: '#ffebee', color: '#c62828', fontSize: '0.65rem' }}>
                         ANULADA
                       </Badge>
-                    ) : activa ? (
+                    ) : (activa && (devolucionesMap[v.id || 0] || 0) < (v.total || 0) - 0.01) ? (
                       <Badge color="soft-success" style={{ backgroundColor: '#e8f5e9', color: '#2e7d32', fontSize: '0.65rem' }}>
                         Activa
                       </Badge>
@@ -300,7 +317,7 @@ export const HistorialVentas = () => {
                       size="sm"
                       className="p-1 px-2"
                       style={{ fontSize: '0.7rem' }}
-                      disabled={!activa || v.anulada}
+                      disabled={!activa || v.anulada || (devolucionesMap[v.id || 0] || 0) >= (v.total || 0) - 0.01}
                       onClick={() => {
                         setVentaSeleccionada(v);
                         setShowDevolucionModal(true);
