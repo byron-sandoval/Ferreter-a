@@ -224,7 +224,7 @@ export const AdminDashboard = () => {
               <FontAwesomeIcon icon={faCalendarAlt} className="me-2" />
               {selectedDate.format('MMMM YYYY').charAt(0).toUpperCase() + selectedDate.format('MMMM YYYY').slice(1)}
             </DropdownToggle>
-            <DropdownMenu end className="shadow border-0">
+            <DropdownMenu end className="shadow border-0" style={{ maxHeight: '200px', overflowY: 'auto' }}>
               <DropdownItem header>Seleccionar Mes</DropdownItem>
               {Array.from({ length: dayjs().month() + 1 })
                 .map((_, m) => {
@@ -260,7 +260,7 @@ export const AdminDashboard = () => {
                       const dHoy = devolucionesRecientes
                         .filter(d => dayjs(d.fecha).isSame(dayjs(), 'day'))
                         .reduce((acc, d) => acc + (d.total || 0), 0);
-                      return (vHoy - dHoy).toLocaleString('es-NI', { style: 'currency', currency: 'NIO', currencyDisplay: 'narrowSymbol' });
+                      return Math.max(0, vHoy - dHoy).toLocaleString('es-NI', { style: 'currency', currency: 'NIO', currencyDisplay: 'narrowSymbol' });
                     })()}
                   </div>
                   <div className="stat-label-palette">Ventas del Día</div>
@@ -285,7 +285,7 @@ export const AdminDashboard = () => {
                       const dMes = devolucionesRecientes
                         .filter(d => dayjs(d.fecha).isSame(selectedDate, 'month'))
                         .reduce((acc, d) => acc + (d.total || 0), 0);
-                      return (vMes - dMes).toLocaleString('es-NI', { style: 'currency', currency: 'NIO', currencyDisplay: 'narrowSymbol' });
+                      return Math.max(0, vMes - dMes).toLocaleString('es-NI', { style: 'currency', currency: 'NIO', currencyDisplay: 'narrowSymbol' });
                     })()}
                   </div>
                   <div className="stat-label-palette">Ventas de {selectedDate.format('MMMM')}</div>
