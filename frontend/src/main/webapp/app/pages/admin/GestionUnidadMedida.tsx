@@ -21,6 +21,7 @@ import {
   faPlus,
   faEdit,
   faTrash,
+  faSync,
   faSave,
   faTimes,
   faChevronLeft,
@@ -111,6 +112,18 @@ export const GestionUnidadMedida = () => {
     }
   };
 
+  const handleReactivate = async (u: IUnidadMedida) => {
+    if (window.confirm(`¿Está seguro de reactivar la unidad "${u.nombre}"?`)) {
+      try {
+        await UnidadMedidaService.update({ ...u, activo: true });
+        toast.success('Unidad reactivada con éxito');
+        loadUnidades();
+      } catch (e) {
+        toast.error('Error al reactivar la unidad');
+      }
+    }
+  };
+
   const saveUnidad = async () => {
     try {
       if (currentUnidad.id) {
@@ -192,9 +205,14 @@ export const GestionUnidadMedida = () => {
                         <Button color="link" className="text-primary me-2 p-0" onClick={() => handleEdit(u)}>
                           <FontAwesomeIcon icon={faEdit} />
                         </Button>
-                        {isAdmin && (
+                        {isAdmin && u.activo && (
                           <Button color="link" className="text-danger p-0" onClick={() => u.id && handleDelete(u.id, u.nombre)}>
                             <FontAwesomeIcon icon={faTrash} />
+                          </Button>
+                        )}
+                        {isAdmin && !u.activo && (
+                          <Button color="link" className="text-success p-0" onClick={() => handleReactivate(u)} title="Reactivar">
+                            <FontAwesomeIcon icon={faSync} />
                           </Button>
                         )}
                       </td>
