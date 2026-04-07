@@ -557,7 +557,7 @@ export const ArticuloList = () => {
                                 <FontAwesomeIcon icon={faSync} />
                               </Button>
                             )}
-                            {isAdmin && (
+                            {isAdmin && articulo.activo && (
                               <Button
                                 size="sm"
                                 color="danger"
