@@ -35,6 +35,7 @@ import {
   faChevronRight,
   faUserCircle,
   faEye,
+  faSync,
 } from '@fortawesome/free-solid-svg-icons';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import ClienteService from 'app/services/cliente.service';
@@ -161,6 +162,19 @@ export const GestionClientes = () => {
     }
   };
 
+  const reactivarCliente = async (e: React.MouseEvent, cliente: ICliente) => {
+    e.stopPropagation();
+    if (window.confirm('¿Estás seguro de que deseas reactivar este cliente?')) {
+      try {
+        await ClienteService.update({ ...cliente, activo: true });
+        toast.success('Cliente reactivado con éxito');
+        loadData();
+      } catch (err) {
+        toast.error('Ocurrió un error al intentar reactivar el cliente.');
+      }
+    }
+  };
+
   const verDetalle = async (c: ICliente) => {
     setClienteSeleccionado(c);
     try {
@@ -275,9 +289,14 @@ export const GestionClientes = () => {
                         <Button color="light" size="sm" className="p-1 me-1 text-primary" onClick={e => abrirEditar(e, c)}>
                           <FontAwesomeIcon icon={faUserEdit} fixedWidth />
                         </Button>
-                        {isAdmin && (
-                          <Button color="light" size="sm" className="p-1 text-danger" onClick={e => eliminarCliente(e, c.id)}>
+                        {isAdmin && c.activo && (
+                          <Button color="light" size="sm" className="p-1 text-danger" title="Desactivar" onClick={e => eliminarCliente(e, c.id)}>
                             <FontAwesomeIcon icon={faTrash} fixedWidth />
+                          </Button>
+                        )}
+                        {isAdmin && !c.activo && (
+                          <Button color="light" size="sm" className="p-1 text-success" title="Reactivar" onClick={e => reactivarCliente(e, c)}>
+                            <FontAwesomeIcon icon={faSync} fixedWidth />
                           </Button>
                         )}
                       </td>
