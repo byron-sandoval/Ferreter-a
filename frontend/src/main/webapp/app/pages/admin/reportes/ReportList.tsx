@@ -18,8 +18,8 @@ import {
 
 const reports = [
   {
-    title: 'Cierre de Caja',
-    description: 'Resumen de ventas diarias desglosado por método de pago.',
+    title: 'Resumen de Ingresos',
+    description: 'Resumen de ventas diarias desglosado por efectivo y tarjeta.',
     icon: faCashRegister,
     color: 'success',
     path: '/admin/reportes/cierre-caja',
