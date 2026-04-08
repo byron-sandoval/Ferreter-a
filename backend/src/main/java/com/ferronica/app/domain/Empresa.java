@@ -58,6 +58,12 @@ public class Empresa implements Serializable {
     @Column(name = "eslogan", length = 150)
     private String eslogan;
 
+    @NotNull
+    @Min(value = 0)
+    @Max(value = 100)
+    @Column(name = "porcentaje_iva", precision = 5, scale = 2, nullable = false)
+    private java.math.BigDecimal porcentajeIva;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -190,6 +196,19 @@ public class Empresa implements Serializable {
         this.eslogan = eslogan;
     }
 
+    public java.math.BigDecimal getPorcentajeIva() {
+        return this.porcentajeIva;
+    }
+
+    public Empresa porcentajeIva(java.math.BigDecimal porcentajeIva) {
+        this.setPorcentajeIva(porcentajeIva);
+        return this;
+    }
+
+    public void setPorcentajeIva(java.math.BigDecimal porcentajeIva) {
+        this.porcentajeIva = porcentajeIva;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -223,6 +242,7 @@ public class Empresa implements Serializable {
             ", logo='" + getLogo() + "'" +
             ", logoContentType='" + getLogoContentType() + "'" +
             ", eslogan='" + getEslogan() + "'" +
+            ", porcentajeIva=" + getPorcentajeIva() +
             "}";
     }
 }
