@@ -76,6 +76,19 @@ export const CategoriaList = () => {
     }
   };
 
+  const handleReactivate = async (cat: ICategoria) => {
+    if (window.confirm(`¿Está seguro de reactivar la categoría "${cat.nombre}"?`)) {
+      try {
+        const axios = (await import('axios')).default;
+        await axios.put(`api/categorias/${cat.id}`, { ...cat, activo: true });
+        toast.success('Categoría reactivada con éxito');
+        loadAll();
+      } catch (error) {
+        toast.error('Error al reactivar la categoría');
+      }
+    }
+  };
+
   return (
     <div className="animate__animated animate__fadeIn p-1">
       <div
@@ -166,9 +179,14 @@ export const CategoriaList = () => {
                     <Button color="info" size="sm" outline tag={Link} to={`${cat.id}/edit`} className="me-1 p-1">
                       <FontAwesomeIcon icon={faPencilAlt} fixedWidth />
                     </Button>
-                    {isAdmin && (
+                    {isAdmin && cat.activo && (
                       <Button color="danger" size="sm" outline onClick={() => handleDelete(cat.id, cat.nombre)} className="p-1">
                         <FontAwesomeIcon icon={faTrash} fixedWidth />
+                      </Button>
+                    )}
+                    {isAdmin && !cat.activo && (
+                      <Button color="success" size="sm" outline onClick={() => handleReactivate(cat)} className="p-1">
+                        <FontAwesomeIcon icon={faSync} fixedWidth />
                       </Button>
                     )}
                   </td>

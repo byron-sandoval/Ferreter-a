@@ -83,6 +83,20 @@ export const UsuarioList = () => {
     }
   };
 
+  const handleReactivate = (u: IUsuario) => {
+    if (window.confirm(`¿Está seguro de que desea reactivar al usuario "${u.nombre} ${u.apellido}"?`)) {
+      UsuarioService.update({ ...u, activo: true })
+        .then(() => {
+          toast.success('Usuario reactivado con éxito');
+          loadAll();
+        })
+        .catch(err => {
+          console.error(err);
+          toast.error('Error al reactivar el usuario');
+        });
+    }
+  };
+
   const headerStyle = { backgroundColor: '#6f42c1', color: 'white' };
 
   return (
@@ -177,17 +191,31 @@ export const UsuarioList = () => {
                         >
                           <FontAwesomeIcon icon={faPencilAlt} fixedWidth />
                         </Button>
-                        <Button
-                          size="sm"
-                          color="danger"
-                          outline
-                          className="p-1"
-                          disabled={isCurrentUser}
-                          title={isCurrentUser ? 'No puedes eliminar tu propio usuario' : 'Eliminar usuario'}
-                          onClick={() => v.id && handleDelete(v.id)}
-                        >
-                          <FontAwesomeIcon icon={faTrash} fixedWidth />
-                        </Button>
+                        {isAdmin && v.activo && (
+                          <Button
+                            size="sm"
+                            color="danger"
+                            outline
+                            className="p-1"
+                            disabled={isCurrentUser}
+                            title={isCurrentUser ? 'No puedes eliminar tu propio usuario' : 'Eliminar usuario'}
+                            onClick={() => v.id && handleDelete(v.id)}
+                          >
+                            <FontAwesomeIcon icon={faTrash} fixedWidth />
+                          </Button>
+                        )}
+                        {isAdmin && !v.activo && (
+                          <Button
+                            size="sm"
+                            color="success"
+                            outline
+                            className="p-1"
+                            title="Reactivar usuario"
+                            onClick={() => handleReactivate(v)}
+                          >
+                            <FontAwesomeIcon icon={faSync} fixedWidth />
+                          </Button>
+                        )}
                       </td>
                     )}
                   </tr>

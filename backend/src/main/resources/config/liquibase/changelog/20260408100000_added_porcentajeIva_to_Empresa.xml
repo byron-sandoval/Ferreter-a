@@ -4,9 +4,14 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="20260220165500-1" author="antigravity">
-        <addColumn tableName="cierre_caja">
-            <column name="monto_siguiente_caja" type="decimal(21,2)">
+    <changeSet id="20260408100000-1" author="jhipster">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="empresa" columnName="porcentaje_iva"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="empresa">
+            <column name="porcentaje_iva" type="decimal(5,2)" defaultValueNumeric="15.00">
                 <constraints nullable="false" />
             </column>
         </addColumn>

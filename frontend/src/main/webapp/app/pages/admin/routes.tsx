@@ -13,7 +13,7 @@ const ReportList = React.lazy(() => import('./reportes/ReportList'));
 const ComprasPorProveedor = React.lazy(() => import('./reportes/ComprasPorProveedor'));
 const ReporteGanancias = React.lazy(() => import('./reportes/ReporteGanancias'));
 const ReporteDemanda = React.lazy(() => import('./reportes/ReporteDemanda'));
-const CierreCaja = React.lazy(() => import('./reportes/CierreCaja'));
+const ResumenIngresos = React.lazy(() => import('./reportes/ResumenIngresos'));
 const ConfiguracionEmpresa = React.lazy(() => import('./configuracion/ConfiguracionEmpresa'));
 const GestionUnidadMedida = React.lazy(() => import('./GestionUnidadMedida'));
 const UsuarioList = React.lazy(() => import('./UsuarioList'));
@@ -161,7 +161,7 @@ const AdminRoutes = () => (
         path="cierre-caja"
         element={
           <Loadable>
-            <CierreCaja />
+            <ResumenIngresos />
           </Loadable>
         }
       />

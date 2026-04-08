@@ -40,6 +40,7 @@ interface IVentaSidebarProps {
   setEsContado: (v: boolean) => void;
   subtotal: number;
   iva: number;
+  porcentajeIva: number;
   total: number;
   totalEnMoneda: number;
   montoPagado: string;
@@ -77,6 +78,7 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
   setEsContado,
   subtotal,
   iva,
+  porcentajeIva,
   total,
   totalEnMoneda,
   montoPagado,
@@ -238,7 +240,7 @@ export const VentaSidebar: React.FC<IVentaSidebarProps> = ({
 
             {iva > 0 && (
               <div className="d-flex justify-content-between mb-1 small text-muted">
-                <span>IVA (15%):</span>
+                <span>IVA ({porcentajeIva}%):</span>
                 <span className="text-danger fw-bold">C$ {iva.toFixed(2)}</span>
               </div>
             )}

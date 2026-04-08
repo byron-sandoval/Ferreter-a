@@ -42,6 +42,11 @@ public class EmpresaDTO implements Serializable {
     @Size(max = 150)
     private String eslogan;
 
+    @NotNull
+    @Min(value = 0)
+    @Max(value = 100)
+    private java.math.BigDecimal porcentajeIva;
+
     public Long getId() {
         return id;
     }
@@ -122,6 +127,14 @@ public class EmpresaDTO implements Serializable {
         this.eslogan = eslogan;
     }
 
+    public java.math.BigDecimal getPorcentajeIva() {
+        return porcentajeIva;
+    }
+
+    public void setPorcentajeIva(java.math.BigDecimal porcentajeIva) {
+        this.porcentajeIva = porcentajeIva;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -156,6 +169,7 @@ public class EmpresaDTO implements Serializable {
             ", correo='" + getCorreo() + "'" +
             ", logo='" + getLogo() + "'" +
             ", eslogan='" + getEslogan() + "'" +
+            ", porcentajeIva=" + getPorcentajeIva() +
             "}";
     }
 }

@@ -30,6 +30,10 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
 
   if (!venta) return null;
 
+  // Calculamos el porcentaje de IVA histórico aplicando regla de 3 con los montos guardados
+  const baseCalculo = (venta.subtotal || 0) - (venta.descuento || 0);
+  const historicalPorcentajeIva = baseCalculo > 0 ? Math.round(((venta.iva || 0) / baseCalculo) * 100) : (empresa?.porcentajeIva ?? 15);
+
   return (
     <Modal isOpen={isOpen} toggle={toggle} size="lg" centered>
       <ModalHeader toggle={toggle} className="bg-primary text-white">
@@ -89,7 +93,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
             <span className="text-success fw-bold">- C$ {venta.anulada ? '0.00' : (venta.descuento || 0).toFixed(2)}</span>
           </div>
           <div className="d-flex justify-content-between mb-2">
-            <span className="text-muted">IVA (15%):</span>
+            <span className="text-muted">IVA ({historicalPorcentajeIva}%):</span>
             <span className="text-primary fw-bold">C$ {venta.anulada ? '0.00' : venta.iva?.toFixed(2)}</span>
           </div>
           <div className="d-flex justify-content-between border-top pt-2">
@@ -405,7 +409,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                       color: '#444',
                     }}
                   >
-                    IVA (15%)
+                    IVA ({historicalPorcentajeIva}%)
                   </div>
                   <div style={{ width: '50%', padding: '8px', textAlign: 'right', fontSize: '11.5px' }}>
                     C$ {venta.anulada ? '0.00' : venta.iva?.toFixed(2)}
@@ -559,7 +563,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                 </div>
               )}
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>IVA (15%):</span>
+                <span>IVA ({historicalPorcentajeIva}%):</span>
                 <span>C$ {venta.iva?.toFixed(2)}</span>
               </div>
             </div>
