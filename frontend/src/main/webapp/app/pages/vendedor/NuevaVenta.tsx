@@ -259,10 +259,13 @@ export const NuevaVenta = () => {
     }
   };
 
+  const porcentajeIva = empresa?.porcentajeIva ?? 15;
+  const tasaIva = porcentajeIva / 100;
+  
   const subtotal = Math.round(carrito.reduce((acc, item) => acc + item.subtotal, 0) * 100) / 100;
   const descuentoNum = Math.round((parseFloat(descuento) || 0) * 100) / 100;
   const baseImponible = Math.round((subtotal - descuentoNum) * 100) / 100;
-  const iva = Math.round((baseImponible > 0 ? baseImponible * 0.15 : 0) * 100) / 100;
+  const iva = Math.round((baseImponible > 0 ? baseImponible * tasaIva : 0) * 100) / 100;
   const total = Math.round((baseImponible + iva) * 100) / 100;
 
   // Calculo en moneda extranjera
@@ -426,6 +429,7 @@ export const NuevaVenta = () => {
           setEsContado={setEsContado}
           subtotal={subtotal}
           iva={iva}
+          porcentajeIva={porcentajeIva}
           total={total}
           totalEnMoneda={totalEnMoneda}
           montoPagado={montoPagado}

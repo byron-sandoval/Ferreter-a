@@ -196,23 +196,48 @@ export const ConfiguracionEmpresa = () => {
                             <FontAwesomeIcon icon={faUser} className="field-icon text-info" />
                           </div>
                         </FormGroup>
-                        <FormGroup className="mb-3 position-relative">
-                          <Label for="ruc" className="small fw-bold text-dark mb-1">
-                            RUC / Identificación Fiscal *
-                          </Label>
-                          <div className="input-with-icon">
-                            <Input
-                              type="text"
-                              name="ruc"
-                              id="ruc"
-                              value={empresa.ruc || ''}
-                              onChange={handleInputChange}
-                              required
-                              className="custom-input"
-                            />
-                            <FontAwesomeIcon icon={faIdCard} className="field-icon" style={{ color: '#ff9800' }} />
-                          </div>
-                        </FormGroup>
+                        <Row>
+                          <Col md="6">
+                            <FormGroup className="mb-3 position-relative">
+                              <Label for="ruc" className="small fw-bold text-dark mb-1">
+                                RUC / Identificación Fiscal *
+                              </Label>
+                              <div className="input-with-icon">
+                                <Input
+                                  type="text"
+                                  name="ruc"
+                                  id="ruc"
+                                  value={empresa.ruc || ''}
+                                  onChange={handleInputChange}
+                                  required
+                                  className="custom-input"
+                                />
+                                <FontAwesomeIcon icon={faIdCard} className="field-icon" style={{ color: '#ff9800' }} />
+                              </div>
+                            </FormGroup>
+                          </Col>
+                          <Col md="6">
+                            <FormGroup className="mb-3 position-relative">
+                              <Label for="porcentajeIva" className="small fw-bold text-dark mb-1">
+                                Porcentaje IVA / Impuesto (%) *
+                              </Label>
+                              <div className="input-with-icon">
+                                <Input
+                                  type="number"
+                                  name="porcentajeIva"
+                                  id="porcentajeIva"
+                                  value={empresa.porcentajeIva || ''}
+                                  onChange={handleInputChange}
+                                  className="custom-input"
+                                  min="0"
+                                  max="100"
+                                  required
+                                />
+                                <FontAwesomeIcon icon={faCoins} className="field-icon text-warning" />
+                              </div>
+                            </FormGroup>
+                          </Col>
+                        </Row>
                         <FormGroup className="mb-3 position-relative">
                           <Label for="direccion" className="small fw-bold text-dark mb-1">
                             Dirección Exacta *
@@ -284,6 +309,8 @@ export const ConfiguracionEmpresa = () => {
                             />
                           </div>
                         </FormGroup>
+
+
                       </Col>
 
                       <Col md="5" className="ps-md-5">
@@ -348,7 +375,7 @@ export const ConfiguracionEmpresa = () => {
                           <div>
                             <strong className="d-block">¡OJO!</strong>
                             <span className="small">
-                              Esta información aparecerá en sus facturas y reportes oficiales. ¡Revise con cuidado!
+                              Esta información aparecerá en sus facturas oficiales. ¡Revise con cuidado!
                             </span>
                           </div>
                         </div>
@@ -424,6 +451,15 @@ export const ConfiguracionEmpresa = () => {
             background-color: #ffffff !important;
             border-color: #008cff !important;
             box-shadow: 0 0 8px rgba(0, 140, 255, 0.2) !important;
+          }
+          /* Ocultar las flechitas nativas de los inputs de tipo número para que no se sobrepongan al icono de FontAwesome */
+          .custom-input[type='number']::-webkit-inner-spin-button, 
+          .custom-input[type='number']::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+          }
+          .custom-input[type='number'] {
+            -moz-appearance: textfield;
           }
           .field-icon {
             position: absolute;

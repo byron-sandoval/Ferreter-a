@@ -9,6 +9,9 @@ export interface IEmpresa {
   logo?: string | null;
   logoContentType?: string | null;
   eslogan?: string | null;
+  porcentajeIva?: number;
 }
 
-export const defaultEmpresa: Readonly<IEmpresa> = {};
+export const defaultEmpresa: Readonly<IEmpresa> = {
+  porcentajeIva: 15.00
+};

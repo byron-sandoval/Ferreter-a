@@ -303,7 +303,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                       color: '#444',
                     }}
                   >
-                    IVA (15%)
+                    IVA ({empresa?.porcentajeIva ?? 15}%)
                   </div>
                   <div style={{ width: '50%', padding: '8px', textAlign: 'right', fontSize: '11.5px' }}>
                     C$ {ventaExitosa?.iva?.toFixed(2)}
@@ -443,7 +443,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                 </div>
               )}
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>IVA (15%):</span>
+                <span>IVA ({empresa?.porcentajeIva ?? 15}%):</span>
                 <span>C$ {ventaExitosa?.iva?.toFixed(2)}</span>
               </div>
             </div>
