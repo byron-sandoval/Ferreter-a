@@ -126,10 +126,10 @@ export const TopNavbar = () => {
                   <FontAwesomeIcon icon={faUserCircle} size="2x" className="text-white-50" />
                 </div>
               </DropdownToggle>
-              <DropdownMenu end className="shadow border-0 mt-2">
-                <DropdownItem header>Sesión iniciada</DropdownItem>
-                <DropdownItem divider />
-                <DropdownItem tag={Link} to="/logout" className="text-danger">
+              <DropdownMenu end className="shadow border-0 mt-2 py-1" style={{ minWidth: '180px' }}>
+                <DropdownItem header className="py-1 text-uppercase fw-bold" style={{ fontSize: '0.65rem' }}>Sesión iniciada</DropdownItem>
+                <DropdownItem divider className="my-1" />
+                <DropdownItem tag={Link} to="/logout" className="text-danger py-2" style={{ fontSize: '0.85rem' }}>
                   <FontAwesomeIcon icon={faSignOutAlt} className="me-2" /> Salir del sistema
                 </DropdownItem>
               </DropdownMenu>
