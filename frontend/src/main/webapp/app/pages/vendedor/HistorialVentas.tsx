@@ -27,9 +27,13 @@ import { VentaDetalleModal } from './components/VentaDetalleModal';
 import { DevolucionModal } from './components/DevolucionModal';
 import { EmpresaService } from 'app/services/empresa.service';
 import { IEmpresa } from 'app/shared/model/empresa.model';
+import { useAppSelector } from 'app/config/store';
 
 export const HistorialVentas = () => {
   const navigate = useNavigate();
+  const account = useAppSelector(state => state.authentication.account);
+  const isAdmin = account?.authorities?.includes('ROLE_ADMIN');
+
   const [ventas, setVentas] = useState<IVenta[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
@@ -182,15 +186,17 @@ export const HistorialVentas = () => {
           <FontAwesomeIcon icon={faHistory} className="me-2 text-primary" /> Historial de Ventas Recientes
         </h5>
         <div>
-          <Button
-            color="outline-primary"
-            size="sm"
-            className="me-2"
-            onClick={() => navigate('/vendedor/devoluciones')}
-            style={{ fontSize: '0.75rem' }}
-          >
-            <FontAwesomeIcon icon={faUndoAlt} className="me-1" /> Devoluciones
-          </Button>
+          {isAdmin && (
+            <Button
+              color="outline-primary"
+              size="sm"
+              className="me-2"
+              onClick={() => navigate('/vendedor/devoluciones')}
+              style={{ fontSize: '0.75rem' }}
+            >
+              <FontAwesomeIcon icon={faUndoAlt} className="me-1" /> Devoluciones
+            </Button>
+          )}
         </div>
       </div>
 
@@ -317,7 +323,8 @@ export const HistorialVentas = () => {
                       size="sm"
                       className="p-1 px-2"
                       style={{ fontSize: '0.7rem' }}
-                      disabled={!activa || v.anulada || (devolucionesMap[v.id || 0] || 0) >= (v.total || 0) - 0.01}
+                      disabled={!isAdmin || !activa || v.anulada || (devolucionesMap[v.id || 0] || 0) >= (v.total || 0) - 0.01}
+                      title={!isAdmin ? 'Acción permitida solo para Administradores' : ''}
                       onClick={() => {
                         setVentaSeleccionada(v);
                         setShowDevolucionModal(true);
@@ -325,13 +332,24 @@ export const HistorialVentas = () => {
                     >
                       Devolución
                     </Button>
-                    {!v.anulada && (
+                    {!v.anulada && isAdmin && (
                       <Button
                         color="danger"
                         size="sm"
                         className="ms-1 p-1"
                         title="Anular Factura"
                         onClick={() => v.id && v.noFactura && handleAnular(v.id, v.noFactura)}
+                      >
+                        <FontAwesomeIcon icon={faBan} fixedWidth />
+                      </Button>
+                    )}
+                    {!v.anulada && !isAdmin && (
+                      <Button
+                        color="secondary"
+                        size="sm"
+                        className="ms-1 p-1 opacity-50"
+                        title="Solo el Administrador puede anular"
+                        disabled
                       >
                         <FontAwesomeIcon icon={faBan} fixedWidth />
                       </Button>
