@@ -128,69 +128,6 @@ export const ArticuloList = () => {
       .catch(() => setLoadingHistory(false));
   };
 
-  const exportToExcel = () => {
-    if (!selectedArticulo) return;
-
-    // Preparar datos para exportar en formato horizontal (igual a exportAll)
-    const data = [
-      {
-        ID: selectedArticulo.id,
-        Código: selectedArticulo.codigo,
-        Producto: selectedArticulo.nombre,
-        Estado: selectedArticulo.activo ? 'Activo' : 'Inactivo',
-        Stock: selectedArticulo.existencia,
-        'Stock Mínimo': selectedArticulo.existenciaMinima,
-        Unidad: selectedArticulo.unidadMedida?.simbolo || '',
-        'Precio Compra': selectedArticulo.costo?.toFixed(2),
-        'Precio Venta': selectedArticulo.precio?.toFixed(2),
-        'Inversión Total': ((selectedArticulo.existencia || 0) * (selectedArticulo.costo || 0)).toFixed(2),
-        'Valor Total': ((selectedArticulo.existencia || 0) * (selectedArticulo.precio || 0)).toFixed(2),
-        Categoría: selectedArticulo.categoria?.nombre || 'General',
-        Descripción: selectedArticulo.descripcion || '',
-      },
-    ];
-
-    // Crear libro de trabajo
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Producto');
-
-    // Aplicar estilos a los encabezados (Fila 1)
-    const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
-    for (let C = range.s.c; C <= range.e.c; ++C) {
-      const address = XLSX.utils.encode_col(C) + '1';
-      if (!ws[address]) continue;
-      ws[address].s = {
-        font: { bold: true },
-        fill: { fgColor: { rgb: 'EEEEEE' } },
-        alignment: { horizontal: 'center' },
-        border: {
-          bottom: { style: 'thin', color: { rgb: '000000' } },
-        },
-      };
-    }
-
-    // Ajustar ancho de columnas
-    ws['!cols'] = [
-      { wch: 8 }, // ID
-      { wch: 15 }, // Código
-      { wch: 30 }, // Producto
-      { wch: 10 }, // Estado
-      { wch: 10 }, // Stock
-      { wch: 12 }, // Stock Mínimo
-      { wch: 10 }, // Unidad
-      { wch: 15 }, // Precio Compra
-      { wch: 15 }, // Precio Venta
-      { wch: 15 }, // Inversión Total
-      { wch: 15 }, // Valor Total
-      { wch: 20 }, // Categoría
-      { wch: 40 }, // Descripción
-    ];
-
-    // Generar archivo
-    const fileName = `Producto_${selectedArticulo.codigo}_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`;
-    XLSX.writeFile(wb, fileName);
-  };
 
   const exportAllToExcel = () => {
     // Preparar datos de todos los productos filtrados
@@ -252,108 +189,6 @@ export const ArticuloList = () => {
     XLSX.writeFile(wb, fileName);
   };
 
-  const exportToPDF = () => {
-    if (!selectedArticulo) return;
-
-    const doc = new jsPDF();
-
-    // Encabezado
-    doc.setFillColor(52, 58, 64); // Dark gray header
-    doc.rect(0, 0, 210, 30, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(20);
-    doc.text('Ficha Técnica de Producto', 105, 20, { align: 'center' });
-
-    // Información Principal
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(12);
-
-    // Título del Producto
-    doc.setFont(undefined, 'bold');
-    doc.setFontSize(16);
-    doc.setTextColor(111, 66, 193); // Purple color
-    doc.text(selectedArticulo.nombre || 'Producto Sin Nombre', 14, 45);
-
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
-
-    const startY = 55;
-
-    // Columna Izquierda
-    doc.setFont(undefined, 'bold');
-    doc.text(`Código:`, 14, startY);
-    doc.setFont(undefined, 'normal');
-    doc.text(`${selectedArticulo.codigo}`, 50, startY);
-
-    doc.setFont(undefined, 'bold');
-    doc.text(`Categoría:`, 14, startY + 10);
-    doc.setFont(undefined, 'normal');
-    doc.text(`${selectedArticulo.categoria?.nombre || 'General'}`, 50, startY + 10);
-
-    doc.setFont(undefined, 'bold');
-    doc.text(`Estado:`, 14, startY + 20);
-    doc.setFont(undefined, 'normal');
-    const estado = selectedArticulo.activo ? 'Activo' : 'Inactivo';
-    doc.setTextColor(selectedArticulo.activo ? 0 : 200, selectedArticulo.activo ? 128 : 0, 0);
-    doc.text(estado, 50, startY + 20);
-    doc.setTextColor(0, 0, 0);
-
-    // Columna Derecha
-    const col2X = 110;
-    doc.setFont(undefined, 'bold');
-    doc.text(`Stock Actual:`, col2X, startY);
-    doc.setFont(undefined, 'normal');
-    doc.text(`${selectedArticulo.existencia} ${selectedArticulo.unidadMedida?.simbolo || ''}`, col2X + 40, startY);
-
-    doc.setFont(undefined, 'bold');
-    doc.text(`Stock Mínimo:`, col2X, startY + 10);
-    doc.setFont(undefined, 'normal');
-    doc.text(`${selectedArticulo.existenciaMinima}`, col2X + 40, startY + 10);
-
-    // Descripción
-    const descY = startY + 35;
-    doc.setFontSize(12);
-    doc.setFont(undefined, 'bold');
-    doc.text('Descripción:', 14, descY);
-
-    doc.setFont(undefined, 'normal');
-    doc.setFontSize(10);
-
-    const desc = selectedArticulo.descripcion || 'Sin descripción detallada.';
-    const splitDesc = doc.splitTextToSize(desc, 180);
-    doc.text(splitDesc, 14, descY + 6);
-
-    const descHeight = splitDesc.length * 5 + 15;
-
-    // Sección de Precios
-    const priceY = descY + descHeight;
-    doc.setFillColor(240, 240, 240);
-    doc.rect(14, priceY - 5, 182, 35, 'F');
-
-    doc.setFont(undefined, 'bold');
-    doc.text('Información Financiera', 14, priceY);
-
-    // Tabla Precios manual
-    const pY = priceY + 10;
-
-    doc.setFontSize(10);
-    doc.text('Costo Unitario:', 20, pY);
-    doc.text('Precio Venta:', 110, pY);
-
-    doc.setFontSize(14);
-    doc.text(`C$ ${selectedArticulo.costo?.toFixed(2)}`, 20, pY + 8);
-    doc.setTextColor(40, 167, 69); // Green
-    doc.text(`C$ ${selectedArticulo.precio?.toFixed(2)}`, 110, pY + 8);
-    doc.setTextColor(0, 0, 0);
-
-    // Footer
-    const footerY = 280;
-    doc.setFontSize(8);
-    doc.setTextColor(150, 150, 150);
-    doc.text(`Generado el ${dayjs().format('DD/MM/YYYY HH:mm')}`, 105, footerY, { align: 'center' });
-
-    doc.save(`Ficha_Producto_${selectedArticulo.codigo}.pdf`);
-  };
 
   // Estilos "INASOFTWARE" Style
   const headerStyle = { backgroundColor: 'rgba(111, 66, 193, 1)', color: 'white' }; // Purple header from image
@@ -623,12 +458,6 @@ export const ArticuloList = () => {
               <div className="d-flex gap-2">
                 <Button size="sm" color="info" outline onClick={() => loadHistorial(selectedArticulo.id)}>
                   <FontAwesomeIcon icon={faHistory} className="me-2" /> Historial
-                </Button>
-                <Button size="sm" color="success" outline onClick={exportToExcel}>
-                  <FontAwesomeIcon icon={faFileExcel} className="me-2" /> Excel
-                </Button>
-                <Button size="sm" color="danger" outline onClick={exportToPDF}>
-                  <FontAwesomeIcon icon={faFilePdf} className="me-2" /> PDF
                 </Button>
                 <Button size="sm" color="secondary" className="ms-2" onClick={() => setSelectedArticulo(null)}>
                   <FontAwesomeIcon icon={faTimes} />

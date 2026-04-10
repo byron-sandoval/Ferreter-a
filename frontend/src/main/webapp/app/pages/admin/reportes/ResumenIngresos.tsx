@@ -12,13 +12,15 @@ import {
   faCashRegister,
   faCalendarDay,
   faHistory,
-  faChartPie
+  faChartPie,
+  faFileExcel
 } from '@fortawesome/free-solid-svg-icons';
 import VentaService from 'app/services/venta.service';
 import DevolucionService from 'app/services/devolucion.service';
 import { IVenta } from 'app/shared/model/venta.model';
 import { IDevolucion } from 'app/shared/model/devolucion.model';
 import dayjs from 'dayjs';
+import * as XLSX from 'xlsx-js-style';
 
 export const ResumenIngresos = () => {
   const navigate = useNavigate();
@@ -36,7 +38,6 @@ export const ResumenIngresos = () => {
   const [stats, setStats] = useState({
     efectivo: 0,
     tarjeta: 0,
-    transferencia: 0,
     totalBruto: 0,
     totalDevoluciones: 0,
     totalNeto: 0,
@@ -67,15 +68,13 @@ export const ResumenIngresos = () => {
 
       const efectivo = daySales.filter(v => v.metodoPago === 'EFECTIVO').reduce((acc, v) => acc + (v.total || 0), 0);
       const tarjeta = daySales.filter(v => v.metodoPago === 'TARJETA_STRIPE').reduce((acc, v) => acc + (v.total || 0), 0);
-      const transferencia = daySales.filter(v => v.metodoPago === 'TRANSFERENCIA').reduce((acc, v) => acc + (v.total || 0), 0);
       const totalDevs = dayDevs.reduce((acc, d) => acc + (d.total || 0), 0);
 
-      const bruto = efectivo + tarjeta + transferencia;
+      const bruto = efectivo + tarjeta;
 
       setStats({
         efectivo,
         tarjeta,
-        transferencia,
         totalBruto: bruto,
         totalDevoluciones: totalDevs,
         totalNeto: bruto - totalDevs
@@ -87,6 +86,43 @@ export const ResumenIngresos = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const exportToExcel = () => {
+    const wb = XLSX.utils.book_new();
+
+    const wsData = [
+      ['RESUMEN DE INGRESOS DIARIO'],
+      ['Empresa:', 'Ferretería FERRONICA'],
+      ['Fecha Generación:', dayjs().format('DD/MM/YYYY HH:mm')],
+      [''],
+      ['RESUMEN DE CAJA'],
+      ['Medio de Pago', 'Total'],
+      ['Efectivo', stats.efectivo.toFixed(2)],
+      ['Tarjeta/Stripe', stats.tarjeta.toFixed(2)],
+      ['Subtotal Bruto', stats.totalBruto.toFixed(2)],
+      ['Devoluciones', stats.totalDevoluciones.toFixed(2)],
+      ['Total final', stats.totalNeto.toFixed(2)],
+      [''],
+      ['DETALLE DE TRANSACCIONES'],
+      ['No. Factura', 'Hora', 'Cliente', 'Medio de Pago', 'Total']
+    ];
+
+    ventas.forEach(v => {
+      wsData.push([
+        v.noFactura ? v.noFactura.toString() : '',
+        v.fecha ? dayjs(v.fecha).format('hh:mm A') : '',
+        v.cliente?.nombre || 'Consumidor Final',
+        v.metodoPago || '',
+        v.total ? v.total.toFixed(2) : '0.00'
+      ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    ws['!cols'] = [{ wch: 15 }, { wch: 12 }, { wch: 30 }, { wch: 20 }, { wch: 15 }];
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Ingresos');
+    XLSX.writeFile(wb, `Resumen_Ingresos_${fecha}.xlsx`);
   };
 
   return (
@@ -117,6 +153,9 @@ export const ResumenIngresos = () => {
               className="border-0 bg-transparent fw-bold text-primary shadow-none"
               style={{ width: '160px' }}
             />
+            <Button color="success" className="rounded-3 shadow-sm px-3 ms-2 text-white border-0 fw-bold" onClick={exportToExcel}>
+              <FontAwesomeIcon icon={faFileExcel} className="me-2" /> Excel
+            </Button>
             <Button color="primary" className="rounded-3 shadow-sm px-3 ms-2" onClick={handlePrint}>
               <FontAwesomeIcon icon={faPrint} className="me-2" /> Imprimir
             </Button>
@@ -152,7 +191,7 @@ export const ResumenIngresos = () => {
                   C$ {stats.efectivo.toLocaleString('es-NI', { minimumFractionDigits: 2 })}
                 </h4>
                 <div className="mt-1 d-flex align-items-center">
-                  <Badge color="white" className="bg-white text-success px-2 py-1 shadow-sm me-2" style={{fontSize: '0.7rem'}}>
+                  <Badge color="white" className="bg-white text-success px-2 py-1 shadow-sm me-2" style={{ fontSize: '0.7rem' }}>
                     {stats.totalBruto > 0 ? ((stats.efectivo / stats.totalBruto) * 100).toFixed(1) : 0}%
                   </Badge>
                   <small className="text-white opacity-75 fw-semibold" style={{ fontSize: '0.75rem' }}>Participación</small>
@@ -173,7 +212,7 @@ export const ResumenIngresos = () => {
                   C$ {stats.tarjeta.toLocaleString('es-NI', { minimumFractionDigits: 2 })}
                 </h4>
                 <div className="mt-1 d-flex align-items-center">
-                  <Badge color="white" className="bg-white text-dark px-2 py-1 shadow-sm me-2" style={{fontSize: '0.7rem'}}>
+                  <Badge color="white" className="bg-white text-dark px-2 py-1 shadow-sm me-2" style={{ fontSize: '0.7rem' }}>
                     {stats.totalBruto > 0 ? ((stats.tarjeta / stats.totalBruto) * 100).toFixed(1) : 0}%
                   </Badge>
                   <small className="text-white opacity-75 fw-semibold" style={{ fontSize: '0.75rem' }}>Participación</small>
@@ -230,9 +269,9 @@ export const ResumenIngresos = () => {
                         <td>{v.cliente?.nombre || 'Consumidor Final'}</td>
                         <td className="text-center">
                           {v.metodoPago === 'EFECTIVO' ? (
-                            <Badge color="success" pill className="bg-opacity-10 text-success border border-success border-opacity-25 px-3">EFECTIVO</Badge>
+                            <span className="fw-bold text-success small text-uppercase" style={{ letterSpacing: '0.5px' }}>EFECTIVO</span>
                           ) : (
-                            <Badge color="primary" pill className="bg-opacity-10 text-primary border border-primary border-opacity-25 px-3">TARJETA</Badge>
+                            <span className="fw-bold text-primary small text-uppercase" style={{ letterSpacing: '0.5px' }}>TARJETA</span>
                           )}
                         </td>
                         <td className="text-end fw-bold px-4">C$ {v.total?.toLocaleString('es-NI', { minimumFractionDigits: 2 })}</td>
@@ -243,7 +282,7 @@ export const ResumenIngresos = () => {
                 {ventas.length > 0 && (
                   <tfoot className="bg-light fw-bold">
                     <tr>
-                      <td colSpan={4} className="text-end py-3 px-4 h6 mb-0 text-muted">BALANCE FINAL (NETO):</td>
+                      <td colSpan={4} className="text-end py-3 px-4 h6 mb-0 text-muted">Total del día:</td>
                       <td className="text-end py-3 px-4 h5 mb-0 text-primary">C$ {stats.totalNeto.toLocaleString('es-NI', { minimumFractionDigits: 2 })}</td>
                     </tr>
                   </tfoot>
@@ -264,7 +303,7 @@ export const ResumenIngresos = () => {
             <p style={{ margin: '5px 0', fontSize: '12px', fontWeight: 'bold' }}>FECHA DEL REPORTE: {dayjs(fecha).format('DD/MM/YYYY')}</p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '40px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px', marginBottom: '40px' }}>
             <div style={{ border: '1px solid #eee', padding: '20px', borderRadius: '10px' }}>
               <p style={{ margin: '0 0 10px 0', fontSize: '12px', color: '#666', fontWeight: 'bold' }}>VENTAS EFECTIVO</p>
               <h3 style={{ margin: 0, fontWeight: 'bold' }}>C$ {stats.efectivo.toLocaleString()}</h3>
@@ -272,10 +311,6 @@ export const ResumenIngresos = () => {
             <div style={{ border: '1px solid #eee', padding: '20px', borderRadius: '10px' }}>
               <p style={{ margin: '0 0 10px 0', fontSize: '12px', color: '#666', fontWeight: 'bold' }}>PAGOS CON TARJETA</p>
               <h3 style={{ margin: 0, fontWeight: 'bold' }}>C$ {stats.tarjeta.toLocaleString()}</h3>
-            </div>
-            <div style={{ border: '1px solid #eee', padding: '20px', borderRadius: '10px', backgroundColor: '#f8f9fa' }}>
-              <p style={{ margin: '0 0 10px 0', fontSize: '12px', color: '#666', fontWeight: 'bold' }}>Total del día</p>
-              <h3 style={{ margin: 0, fontWeight: 'bold', color: '#2b35af' }}>C$ {stats.totalBruto.toLocaleString()}</h3>
             </div>
           </div>
 

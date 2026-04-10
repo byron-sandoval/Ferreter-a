@@ -14,6 +14,7 @@ const ComprasPorProveedor = React.lazy(() => import('./reportes/ComprasPorProvee
 const ReporteGanancias = React.lazy(() => import('./reportes/ReporteGanancias'));
 const ReporteDemanda = React.lazy(() => import('./reportes/ReporteDemanda'));
 const ResumenIngresos = React.lazy(() => import('./reportes/ResumenIngresos'));
+const ReporteImpuestos = React.lazy(() => import('./reportes/ReporteImpuestos'));
 const ConfiguracionEmpresa = React.lazy(() => import('./configuracion/ConfiguracionEmpresa'));
 const GestionUnidadMedida = React.lazy(() => import('./GestionUnidadMedida'));
 const UsuarioList = React.lazy(() => import('./UsuarioList'));
@@ -162,6 +163,14 @@ const AdminRoutes = () => (
         element={
           <Loadable>
             <ResumenIngresos />
+          </Loadable>
+        }
+      />
+      <Route
+        path="impuestos"
+        element={
+          <Loadable>
+            <ReporteImpuestos />
           </Loadable>
         }
       />

@@ -45,6 +45,13 @@ const reports = [
     color: 'primary',
     path: '/admin/reportes/ganancias',
   },
+  {
+    title: 'Declaración de Impuestos (IVA)',
+    description: 'Desglose mensual de Base Imponible e IVA retenido para contabilidad.',
+    icon: faFileInvoice,
+    color: 'danger',
+    path: '/admin/reportes/impuestos',
+  },
 ];
 
 export const ReportList = () => {
