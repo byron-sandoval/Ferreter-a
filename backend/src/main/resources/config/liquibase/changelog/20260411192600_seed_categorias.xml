@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20260411192600-seed-categorias" author="sandoval">
+        <insert tableName="categoria">
+            <column name="id" valueNumeric="100"/>
+            <column name="nombre" value="Herramientas"/>
+            <column name="descripcion" value="Herramientas manuales y eléctricas"/>
+            <column name="activo" valueBoolean="true"/>
+        </insert>
+        <insert tableName="categoria">
+            <column name="id" valueNumeric="101"/>
+            <column name="nombre" value="Construcción"/>
+            <column name="descripcion" value="Materiales y suministros para construcción"/>
+            <column name="activo" valueBoolean="true"/>
+        </insert>
+        <insert tableName="categoria">
+            <column name="id" valueNumeric="102"/>
+            <column name="nombre" value="Electricidad"/>
+            <column name="descripcion" value="Cables, luminarias y componentes eléctricos"/>
+            <column name="activo" valueBoolean="true"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

@@ -151,6 +151,7 @@ export const UsuarioList = () => {
             <tr>
               <th className="py-2">ID</th>
               <th className="py-2">Nombre Completo</th>
+              <th className="py-2">Cédula</th>
               <th className="py-2">Teléfono</th>
               <th className="py-2">Rol</th>
               <th className="py-2">Estado</th>
@@ -164,10 +165,11 @@ export const UsuarioList = () => {
 
                 return (
                   <tr key={v.id} className="text-center align-middle" style={{ fontSize: '0.8rem' }}>
-                    <td className="fw-bold text-muted">{v.id}</td>
-                    <td className="text-center px-3">
+                    <td className="fw-bold text-muted small">{v.id}</td>
+                    <td className="px-3">
                       {v.nombre} {v.apellido}
                     </td>
+                    <td className="text-center font-monospace small">{v.cedula}</td>
                     <td>{v.telefono || '-'}</td>
                     <td>
                       <Badge color="info" className="text-uppercase" style={{ fontSize: '0.65rem' }}>

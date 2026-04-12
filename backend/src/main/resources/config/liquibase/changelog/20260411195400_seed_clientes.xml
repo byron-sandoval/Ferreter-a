@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20260411195400-seed-clientes" author="sandoval">
+        <insert tableName="cliente">
+            <column name="id" valueNumeric="1"/>
+            <column name="nombre" value="Cliente Genérico"/>
+            <column name="cedula" value="000-000000-0000X"/>
+            <column name="direccion" value="Ciudad"/>
+            <column name="telefono" value="00000000"/>
+            <column name="activo" valueBoolean="true"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

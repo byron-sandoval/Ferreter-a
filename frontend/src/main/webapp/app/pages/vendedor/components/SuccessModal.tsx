@@ -34,7 +34,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
         <FontAwesomeIcon icon={faCheck} className="me-2" /> ¡Venta Exitosa!
       </ModalHeader>
       <ModalBody className="p-4 text-center">
-        <h5 className="fw-bold mb-3">Factura #{ventaExitosa?.noFactura}</h5>
+        <h5 className="fw-bold mb-3">Factura {ventaExitosa?.numeracion?.serie || 'F'}-{String(ventaExitosa?.noFactura || '').padStart(6, '0')}</h5>
         <p className="text-muted small">La transacción se ha registrado correctamente en el sistema.</p>
 
         {/* TICKET DE IMPRESIÓN (OCULTO EN PANTALLA, VISIBLE EN IMPRESIÓN) */}
@@ -138,7 +138,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px' }}>
                   <strong>Nº:</strong>
-                  <span style={{ color: '#1a56db', fontWeight: 'bold' }}>{ventaExitosa?.noFactura}</span>
+                  <span style={{ color: '#333', fontWeight: 'bold' }}>{ventaExitosa?.numeracion?.serie || 'F'}-{String(ventaExitosa?.noFactura || '').padStart(6, '0')}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px' }}>
                   <strong>FECHA:</strong>
@@ -400,7 +400,7 @@ export const SuccessModal: React.FC<ISuccessModalProps> = ({
             </div>
             <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }} />
             <div style={{ textAlign: 'center', fontSize: '10px', marginBottom: '4px' }}>
-              <strong>FACTURA #{ventaExitosa?.noFactura}</strong>
+              <strong>FACTURA {ventaExitosa?.numeracion?.serie || 'F'}-{String(ventaExitosa?.noFactura || '').padStart(6, '0')}</strong>
               <div>{dayjs(ventaExitosa?.fecha).format('DD/MM/YYYY HH:mm')}</div>
               <div>Vendedor: {ventaExitosa?.usuario?.nombre || 'Admin'}</div>
             </div>
