@@ -37,7 +37,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
   return (
     <Modal isOpen={isOpen} toggle={toggle} size="lg" centered>
       <ModalHeader toggle={toggle} className="bg-primary text-white">
-        <FontAwesomeIcon icon={faFileInvoiceDollar} className="me-2" /> Detalles de Factura #{venta.noFactura}
+        <FontAwesomeIcon icon={faFileInvoiceDollar} className="me-2" /> Detalles de Factura {venta.numeracion?.serie || 'F'}-{String(venta.noFactura || '').padStart(6, '0')}
       </ModalHeader>
       <ModalBody>
         <div className="d-flex justify-content-between mb-4 border-bottom pb-2">
@@ -233,7 +233,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px' }}>
                   <strong>Nº:</strong>
-                  <span style={{ color: '#1a56db', fontWeight: 'bold' }}>{venta.noFactura}</span>
+                  <span style={{ color: '#333', fontWeight: 'bold' }}>{venta.numeracion?.serie || 'F'}-{String(venta.noFactura || '').padStart(6, '0')}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px' }}>
                   <strong>FECHA:</strong>
@@ -523,7 +523,7 @@ export const VentaDetalleModal: React.FC<VentaDetalleModalProps> = ({ isOpen, to
               </div>
             )}
             <div style={{ textAlign: 'center', fontSize: '10px', marginBottom: '4px' }}>
-              <strong>COPIA - FACTURA #{venta.noFactura}</strong>
+              <strong>COPIA - FACTURA {venta.numeracion?.serie || 'F'}-{String(venta.noFactura || '').padStart(6, '0')}</strong>
               <div>{dayjs(venta.fecha).format('DD/MM/YYYY HH:mm')}</div>
               <div>Vendedor: {venta.usuario?.nombre || 'Admin'}</div>
             </div>

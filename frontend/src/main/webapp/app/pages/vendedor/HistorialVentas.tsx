@@ -282,7 +282,7 @@ export const HistorialVentas = () => {
               return (
                 <tr key={v.id}>
                   <td className="px-3 fw-bold text-primary" style={{ fontSize: '0.8rem' }}>
-                    #{v.noFactura}
+                    {v.numeracion?.serie || 'F'}-{String(v.noFactura || '').padStart(6, '0')}
                   </td>
                   <td style={{ fontSize: '0.75rem' }}>
                     <FontAwesomeIcon icon={faCalendarAlt} className="me-1 opacity-50" />
