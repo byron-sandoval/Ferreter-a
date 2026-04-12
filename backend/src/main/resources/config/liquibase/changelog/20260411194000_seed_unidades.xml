@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20260411194000-seed-unidades" author="sandoval">
+        <insert tableName="unidad_medida">
+            <column name="id" valueNumeric="100"/>
+            <column name="nombre" value="Unidad"/>
+            <column name="simbolo" value="Und"/>
+            <column name="activo" valueBoolean="true"/>
+        </insert>
+        <insert tableName="unidad_medida">
+            <column name="id" valueNumeric="101"/>
+            <column name="nombre" value="Galón"/>
+            <column name="simbolo" value="gal"/>
+            <column name="activo" valueBoolean="true"/>
+        </insert>
+        <insert tableName="unidad_medida">
+            <column name="id" valueNumeric="102"/>
+            <column name="nombre" value="Libra"/>
+            <column name="simbolo" value="lb"/>
+            <column name="activo" valueBoolean="true"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
