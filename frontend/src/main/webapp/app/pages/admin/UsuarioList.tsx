@@ -150,7 +150,8 @@ export const UsuarioList = () => {
           <thead className="table-light text-dark text-center text-uppercase small fw-bold">
             <tr>
               <th className="py-2">ID</th>
-              <th className="py-2">Nombre Completo</th>
+              <th className="py-2">Nombre</th>
+              <th className="py-2">Apellido</th>
               <th className="py-2">Cédula</th>
               <th className="py-2">Teléfono</th>
               <th className="py-2">Rol</th>
@@ -166,9 +167,8 @@ export const UsuarioList = () => {
                 return (
                   <tr key={v.id} className="text-center align-middle" style={{ fontSize: '0.8rem' }}>
                     <td className="fw-bold text-muted small">{v.id}</td>
-                    <td className="px-3">
-                      {v.nombre} {v.apellido}
-                    </td>
+                    <td className="px-3">{v.nombre}</td>
+                    <td className="px-3">{v.apellido || '-'}</td>
                     <td className="text-center font-monospace small">{v.cedula}</td>
                     <td>{v.telefono || '-'}</td>
                     <td>
@@ -225,7 +225,7 @@ export const UsuarioList = () => {
               })
             ) : (
               <tr>
-                <td colSpan={5} className="text-center py-5 text-muted">
+                <td colSpan={6} className="text-center py-5 text-muted">
                   {loading ? 'Cargando usuarios...' : 'No se encontraron usuarios'}
                 </td>
               </tr>
