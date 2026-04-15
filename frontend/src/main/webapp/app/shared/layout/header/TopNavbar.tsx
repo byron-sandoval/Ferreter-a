@@ -126,10 +126,10 @@ export const TopNavbar = () => {
                   <FontAwesomeIcon icon={faUserCircle} size="2x" className="text-white-50" />
                 </div>
               </DropdownToggle>
-              <DropdownMenu end className="shadow border-0 mt-2 py-1" style={{ minWidth: '180px' }}>
-                <DropdownItem header className="py-1 text-uppercase fw-bold" style={{ fontSize: '0.65rem' }}>Sesión iniciada</DropdownItem>
-                <DropdownItem divider className="my-1" />
-                <DropdownItem tag={Link} to="/logout" className="text-danger py-2" style={{ fontSize: '0.85rem' }}>
+              <DropdownMenu end className="shadow border-0 mt-0 py-0 overflow-hidden" style={{ minWidth: '140px', borderRadius: '12px' }}>
+                <DropdownItem header className="py-2 text-uppercase fw-bold text-center bg-light" style={{ fontSize: '0.55rem', borderTopLeftRadius: '12px', borderTopRightRadius: '12px', letterSpacing: '0.3px' }}>Sesión iniciada</DropdownItem>
+                <DropdownItem divider className="my-0" />
+                <DropdownItem tag={Link} to="/logout" className="text-danger py-2 text-center" style={{ fontSize: '0.75rem' }}>
                   <FontAwesomeIcon icon={faSignOutAlt} className="me-2" /> Salir del sistema
                 </DropdownItem>
               </DropdownMenu>
