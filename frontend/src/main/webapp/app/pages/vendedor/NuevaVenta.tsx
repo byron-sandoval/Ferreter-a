@@ -363,7 +363,7 @@ export const NuevaVenta = () => {
         }
       }
 
-      toast.success(`¡Venta #${resVenta.data.noFactura} registrada con éxito!`);
+      toast.success(`¡Factura ${numeracion?.serie}-${String(resVenta.data.noFactura).padStart(6, '0')} registrada con éxito!`);
       setShowPagoModal(false);
       setRefreshTrigger(prev => prev + 1); // Refrescar de inmediato
 
