@@ -22,7 +22,8 @@ entity Empresa {
     telefono String maxlength(20),
     correo String maxlength(100),
     logo ImageBlob,
-    eslogan String maxlength(150)
+    eslogan String maxlength(150),
+    porcentajeIva BigDecimal required min(0) max(100)
 }
 
 entity UnidadMedida {
@@ -54,8 +55,9 @@ entity Articulo {
     existenciaMinima BigDecimal required min(0),
     precio BigDecimal required min(0),
     costo BigDecimal required min(0),
-    imagen ImageBlob,
-    activo Boolean
+    imagenUrl String maxlength(500),
+    activo Boolean,
+    ultimoCosto BigDecimal
 }
 
 entity HistorialPrecio {
@@ -67,13 +69,16 @@ entity HistorialPrecio {
 
 // ACTORES
 
-entity Vendedor {
-    idKeycloak String required unique,
+entity Usuario {
+    idKeycloak String unique,
     cedula String required unique maxlength(20),
     nombre String required maxlength(50),
     apellido String maxlength(50),
     telefono String maxlength(15),
-    activo Boolean
+    activo Boolean,
+    email String maxlength(254),
+    username String maxlength(50),
+    rol String maxlength(50)
 }
 
 entity Cliente {
@@ -115,7 +120,10 @@ entity Venta {
     stripeId String,
     esContado Boolean required,
     tipoCambioVenta BigDecimal,
-    anulada Boolean
+    anulada Boolean,
+    descuento BigDecimal,
+    importeRecibido BigDecimal,
+    cambio BigDecimal
 }
 
 entity DetalleVenta {
@@ -145,6 +153,12 @@ entity Devolucion {
     total BigDecimal
 }
 
+entity DetalleDevolucion {
+    cantidad BigDecimal required min(0),
+    precioUnitario BigDecimal required min(0),
+    montoTotal BigDecimal required min(0)
+}
+
 // RELACIONES
 
 relationship ManyToOne {
@@ -153,25 +167,28 @@ relationship ManyToOne {
     Articulo{unidadMedida} to UnidadMedida,
     HistorialPrecio{articulo} to Articulo,
     Venta{cliente} to Cliente,
-    Venta{vendedor} to Vendedor,
+    Venta{usuario} to Usuario,
     Venta{moneda} to Moneda,
     Venta{numeracion} to NumeracionFactura,
-    Ingreso{vendedor} to Vendedor,
+    Ingreso{usuario} to Usuario,
     Ingreso{proveedor} to Proveedor,
     DetalleVenta{articulo} to Articulo,
     DetalleIngreso{articulo} to Articulo,
-    Devolucion{venta} to Venta
+    Devolucion{venta} to Venta,
+    DetalleDevolucion{articulo} to Articulo,
+    DetalleDevolucion{devolucion} to Devolucion
 }
 
 relationship OneToMany {
     Venta{detalles} to DetalleVenta{venta},
-    Ingreso{detalles} to DetalleIngreso{ingreso}
+    Ingreso{detalles} to DetalleIngreso{ingreso},
+    Devolucion{detalles} to DetalleDevolucion{devolucion}
 }
 
 // CONFIGURACIÓN JHIPSTER
 
 dto * with mapstruct
 service * with serviceImpl
-paginate Articulo, Categoria, Cliente, Venta, Ingreso, Proveedor, Vendedor with pagination
-filter Articulo, Venta, Ingreso, Cliente
+paginate Articulo, Categoria, Cliente, Venta, Ingreso, Proveedor, Usuario, Devolucion with pagination
+filter Articulo, Venta, Ingreso, Cliente, Usuario, Devolucion
 
