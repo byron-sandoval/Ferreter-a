@@ -342,8 +342,8 @@ export const ArticuloList = () => {
                         {isAdmin && (
                           <td className="text-end fw-bold">C$ {((articulo.existencia || 0) * (articulo.precio || 0)).toFixed(2)}</td>
                         )}
-                        <td className="text-center small text-muted px-3">
-                          <div className="text-truncate" style={{ maxWidth: '120px' }}>
+                        <td className="text-center small text-muted px-4">
+                          <div className="text-truncate mx-auto" style={{ maxWidth: '120px' }}>
                             {articulo.descripcion || '-'}
                           </div>
                         </td>
