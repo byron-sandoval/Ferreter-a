@@ -135,7 +135,7 @@ export const ProveedorList = () => {
                 <tr key={p.id} className="text-center align-middle" style={{ fontSize: '0.8rem' }}>
                   <td className="text-start fw-bold px-3">{p.nombre}</td>
                   <td className="small text-muted">{p.ruc || '-'}</td>
-                  <td className="text-start" style={{ fontSize: '0.75rem' }}>
+                  <td className="text-center" style={{ fontSize: '0.75rem' }}>
                     {p.direccion || '-'}
                   </td>
                   <td>{p.telefono || '-'}</td>

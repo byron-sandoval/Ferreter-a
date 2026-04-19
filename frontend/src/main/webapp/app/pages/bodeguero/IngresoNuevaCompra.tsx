@@ -481,9 +481,9 @@ export const IngresoNuevaCompra = () => {
                     bsSize="sm"
                   />
                 </FormGroup>
-                <div className="p-3 bg-primary bg-opacity-10 rounded text-center mb-3">
-                  <span className="text-white fw-bold me-2 fs-6">TOTAL A PAGAR:</span>
-                  <span className="fw-bold text-primary fs-4">C$ {calcularTotal().toLocaleString()}</span>
+                <div className="p-3 text-center mb-3 border-top">
+                  <span className="text-dark fw-bold me-2 h5 mb-0">TOTAL A PAGAR:</span>
+                  <span className="fw-bold text-primary h4 mb-0">C$ {calcularTotal().toLocaleString()}</span>
                 </div>
                 <Button color="primary" block type="submit" className="fw-bolder shadow-sm py-3">
                   <FontAwesomeIcon icon={faSave} className="me-2" />
