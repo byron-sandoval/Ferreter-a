@@ -108,9 +108,14 @@ export const IngresoNuevaCompra = () => {
   }, [tipoIngreso]);
 
   const agregarDetalle = async () => {
+    // Asegurar valores numéricos limpios
+    const cant = Number(cantidad);
+    const cost = Number(costoUnitario);
+    const precioV = Number(precioVenta);
+
     if (tipoIngreso === 'existente') {
-      if (!articuloSeleccionado || cantidad <= 0 || costoUnitario < 0) {
-        toast.error('Complete correctamente los datos del producto');
+      if (!articuloSeleccionado || cant <= 0 || cost < 0) {
+        toast.error('Complete correctamente los datos del producto (Cantidad > 0 y Costo >= 0)');
         return;
       }
 
@@ -125,10 +130,10 @@ export const IngresoNuevaCompra = () => {
 
       if (cambiarPrecio) {
         try {
-          await ArticuloService.update({ ...articulo, costo: costoUnitario, precio: precioVenta });
-          articulo.costo = costoUnitario;
-          articulo.precio = precioVenta;
-          toast.success('Precio del producto actualizado.');
+          await ArticuloService.update({ ...articulo, costo: cost, precio: precioV });
+          articulo.costo = cost;
+          articulo.precio = precioV;
+          toast.success('Precio del producto actualizado en catálogo.');
         } catch (err) {
           toast.error('Error al actualizar precio del producto');
         }
@@ -136,35 +141,37 @@ export const IngresoNuevaCompra = () => {
 
       const nuevoDetalle: IDetalleIngreso = {
         articulo,
-        cantidad,
-        costoUnitario,
-        monto: cantidad * costoUnitario,
+        cantidad: cant,
+        costoUnitario: cost,
+        monto: cant * cost,
       };
 
       setDetalles([...detalles, nuevoDetalle]);
+      
+      // Limpiar campos
       setArticuloSeleccionado('');
       setSearchTerm('');
       setCantidad(1);
       setCostoUnitario(0);
       setPrecioVenta(0);
       setCambiarPrecio(false);
-      toast.info('Producto  añadido a la factura');
+      toast.success('Producto añadido a la lista');
     } else {
       // Producto Nuevo
-      if (!nombreNuevo || !codigoNuevo || cantidad <= 0 || costoUnitario < 0 || precioVenta < 0) {
-        toast.error('Por favor complete todos los datos del producto');
+      if (!nombreNuevo || !codigoNuevo || cant <= 0 || cost < 0 || precioV < 0) {
+        toast.error('Por favor complete nombre, código, cantidad y precios del producto');
         return;
       }
 
       const duplicadoLista = detalles.find(d => d.articulo?.codigo === codigoNuevo);
       if (duplicadoLista) {
-        toast.warning('Este código ya está en la factura actual');
+        toast.warning('Este código ya está en la lista actual');
         return;
       }
 
       const duplicadoBD = articulos.find(a => a.codigo === codigoNuevo);
       if (duplicadoBD) {
-        toast.warning('Este código ya existe en el catálogo. Seleccione la opción "Producto Existente".');
+        toast.warning('Este código ya existe en el catálogo. Use la opción "Actualizar Stock".');
         return;
       }
 
@@ -172,8 +179,9 @@ export const IngresoNuevaCompra = () => {
         nombre: nombreNuevo,
         codigo: codigoNuevo,
         descripcion: descripcionNuevo,
-        costo: costoUnitario,
-        precio: precioVenta,
+        costo: cost,
+        precio: precioV,
+        ultimoCosto: cost,
         existencia: 0,
         existenciaMinima,
         activo: true,
@@ -185,13 +193,14 @@ export const IngresoNuevaCompra = () => {
 
       const nuevoDetalle: IDetalleIngreso = {
         articulo: nuevoArt,
-        cantidad,
-        costoUnitario,
-        monto: cantidad * costoUnitario,
+        cantidad: cant,
+        costoUnitario: cost,
+        monto: cant * cost,
       };
 
       setDetalles([...detalles, nuevoDetalle]);
 
+      // Limpiar campos de nuevo producto
       setNombreNuevo('');
       setCodigoNuevo('');
       setDescripcionNuevo('');
@@ -199,7 +208,7 @@ export const IngresoNuevaCompra = () => {
       setPrecioVenta(0);
       setCantidad(1);
       setCostoUnitario(0);
-      toast.info('Nuevo producto añadido a la factura');
+      toast.success('Nuevo producto registrado en la lista');
     }
   };
 
@@ -319,47 +328,53 @@ export const IngresoNuevaCompra = () => {
     e.preventDefault();
 
     if (!proveedorId || !noDocumento || detalles.length === 0) {
-      toast.error('Complete proveedor, factura y añada al menos un producto');
+      toast.error('Complete proveedor, factura y añada al menos un producto a la lista');
       return;
     }
 
-    toast.info('Procesando factura y stock...', { autoClose: false, toastId: 'saving' });
+    toast.info('Procesando factura y actualizando inventario...', { autoClose: false, toastId: 'saving' });
 
     try {
       const detallesFinalizados: any[] = [];
 
-      // 1. Guardar primero los artículos que aún no tienen ID (Los Nuevos)
+      // 1. Procesar artículos uno por uno
       for (const d of detalles) {
-        try {
-          if (!d.articulo?.id) {
-            const res = await ArticuloService.create(d.articulo);
+        if (!d.articulo?.id) {
+          // Es un producto nuevo, hay que crearlo primero
+          try {
+            const res = await ArticuloService.create({
+              ...d.articulo,
+              existencia: 0, // Inicia en 0, el ingreso lo aumentará
+              ultimoCosto: d.costoUnitario
+            });
             detallesFinalizados.push({
               articulo: { id: res.data.id },
               cantidad: d.cantidad,
               costoUnitario: d.costoUnitario,
               monto: d.monto,
             });
-          } else {
-            // Ya existe en BD
-            detallesFinalizados.push({
-              articulo: { id: d.articulo.id },
-              cantidad: d.cantidad,
-              costoUnitario: d.costoUnitario,
-              monto: d.monto,
-            });
+          } catch (errArt) {
+            toast.dismiss('saving');
+            toast.error(`Error al crear el producto: ${d.articulo?.nombre}. Posible código duplicado o descripción muy larga.`);
+            return;
           }
-        } catch (errArt) {
-          toast.dismiss('saving');
-          toast.error(`Error al crear producto nuevo: ${d.articulo?.nombre}. Revisar el código.`);
-          return;
+        } else {
+          // Producto ya existente
+          detallesFinalizados.push({
+            articulo: { id: d.articulo.id },
+            cantidad: d.cantidad,
+            costoUnitario: d.costoUnitario,
+            monto: d.monto,
+          });
         }
       }
 
-      // 2. Crear y finalizar la factura completa
+      // 2. Crear el ingreso (factura) con todos sus detalles agrupados
       const nuevoIngreso: any = {
         noDocumento,
         observaciones,
         total: calcularTotal(),
+        fechaIngreso: new Date().toISOString(), // Asegurar fecha
         activo: true,
         proveedor: { id: parseInt(proveedorId, 10) },
         usuario: usuarioActual,
@@ -367,13 +382,14 @@ export const IngresoNuevaCompra = () => {
       };
 
       await IngresoService.create(nuevoIngreso);
+      
       toast.dismiss('saving');
-      toast.success('Compra registrada y stock actualizado con éxito.');
+      toast.success('Compra registrada exitosamente. El stock ha sido actualizado.');
       navigate('/bodeguero/ingresos');
     } catch (error) {
       toast.dismiss('saving');
-      console.error(error);
-      toast.error('Error al procesar la factura');
+      console.error('Error al guardar el ingreso:', error);
+      toast.error('Ocurrió un error al procesar la factura completa.');
     }
   };
 
