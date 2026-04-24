@@ -55,4 +55,5 @@
     <include file="config/liquibase/changelog/20260411195400_seed_clientes.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260411195800_seed_proveedores.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260411200200_seed_monedas.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260424000000_seed_articulos.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>
