@@ -19,6 +19,7 @@ import {
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import VentaService from 'app/services/venta.service';
 import DevolucionService from 'app/services/devolucion.service';
+import UsuarioService from 'app/services/usuario.service';
 import { IVenta, IDevolucion } from 'app/shared/model';
 import { IDetalleDevolucion } from 'app/shared/model/detalle-devolucion.model';
 import dayjs from 'dayjs';
@@ -33,6 +34,7 @@ export const HistorialVentas = () => {
   const navigate = useNavigate();
   const account = useAppSelector(state => state.authentication.account);
   const isAdmin = account?.authorities?.includes('ROLE_ADMIN');
+  const isVendedor = account?.authorities?.includes('ROLE_VENDEDOR');
 
   const [ventas, setVentas] = useState<IVenta[]>([]);
   const [loading, setLoading] = useState(false);
@@ -86,9 +88,29 @@ export const HistorialVentas = () => {
         size: itemsPerPage,
         sort: 'fecha,desc',
       };
-      // Filtros de fecha: convertimos medianoche/fin de día en hora LOCAL a UTC con dayjs
+      // Filtros de fecha
       if (fechaInicio) params['fecha.greaterThanOrEqual'] = dayjs(fechaInicio).startOf('day').toISOString();
       if (fechaFin)    params['fecha.lessThanOrEqual']    = dayjs(fechaFin).endOf('day').toISOString();
+
+      // Si es vendedor (y no admin), filtrar solo sus propias ventas
+      if (isVendedor && !isAdmin && account?.id) {
+        try {
+          const resUsuario = await UsuarioService.getByKeycloakId(account.id);
+          if (resUsuario.data && resUsuario.data.length > 0) {
+            params['usuarioId.equals'] = resUsuario.data[0].id;
+          } else {
+            setVentas([]);
+            setTotalItems(0);
+            setLoading(false);
+            return;
+          }
+        } catch (e) {
+          console.error('Error al obtener usuario del vendedor', e);
+          setVentas([]);
+          setLoading(false);
+          return;
+        }
+      }
 
       const res = await VentaService.getAll(params);
       // JHipster returns the list directly or in an array. Let's ensure it's an array.
@@ -323,8 +345,8 @@ export const HistorialVentas = () => {
                       size="sm"
                       className="p-1 px-2"
                       style={{ fontSize: '0.7rem' }}
-                      disabled={!isAdmin || !activa || v.anulada || (devolucionesMap[v.id || 0] || 0) >= (v.total || 0) - 0.01}
-                      title={!isAdmin ? 'Acción permitida solo para Administradores' : ''}
+                      disabled={(!isAdmin && !isVendedor) || !activa || v.anulada || (devolucionesMap[v.id || 0] || 0) >= (v.total || 0) - 0.01}
+                      title={(!isAdmin && !isVendedor) ? 'Acción permitida solo para Administradores o Vendedores' : ''}
                       onClick={() => {
                         setVentaSeleccionada(v);
                         setShowDevolucionModal(true);
@@ -332,24 +354,13 @@ export const HistorialVentas = () => {
                     >
                       Devolución
                     </Button>
-                    {!v.anulada && isAdmin && (
+                    {!v.anulada && (isAdmin || isVendedor) && (
                       <Button
                         color="danger"
                         size="sm"
                         className="ms-1 p-1"
                         title="Anular Factura"
                         onClick={() => v.id && v.noFactura && handleAnular(v.id, v.noFactura)}
-                      >
-                        <FontAwesomeIcon icon={faBan} fixedWidth />
-                      </Button>
-                    )}
-                    {!v.anulada && !isAdmin && (
-                      <Button
-                        color="secondary"
-                        size="sm"
-                        className="ms-1 p-1 opacity-50"
-                        title="Solo el Administrador puede anular"
-                        disabled
                       >
                         <FontAwesomeIcon icon={faBan} fixedWidth />
                       </Button>
