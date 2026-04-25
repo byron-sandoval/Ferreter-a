@@ -59,9 +59,9 @@ public class UsuarioServiceImpl implements UsuarioService {
                     usuarioDTO.setIdKeycloak(keycloakId);
                 }
             } catch (Exception e) {
-                LOG.error("Failed to create user in Keycloak: {}", e.getMessage());
-                // No lanzamos excepción para permitir que se guarde el usuario localmente
-                // usuarioDTO.setIdKeycloak("ERROR_KEYCLOAK"); // Opcional: Marcar error
+                LOG.error("Failed to create/update user in Keycloak: {}", e.getMessage());
+                // Lanzamos la excepción para que el usuario sepa que falló la sincronización con Keycloak
+                throw new RuntimeException("Error en Keycloak: " + e.getMessage());
             }
         }
 
