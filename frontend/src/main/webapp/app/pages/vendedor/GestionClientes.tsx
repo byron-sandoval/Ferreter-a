@@ -182,7 +182,7 @@ export const GestionClientes = () => {
         size: 1000,
         sort: 'fecha,desc',
       });
-      setHistorial(res.data.filter(v => v.cliente?.id === c.id));
+      setHistorial(res.data.filter(v => v.cliente?.id === c.id && !v.anulada));
     } catch (e) {
       console.error(e);
     }

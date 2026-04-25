@@ -14,6 +14,7 @@ export const UsuarioUpdate = () => {
   const isNew = !id;
   const account = useAppSelector(state => state.authentication.account);
   const [resetContra, setResetContra] = useState(false);
+  const [usuariosExistentes, setUsuariosExistentes] = useState<IUsuario[]>([]);
 
   const [usuario, setUsuario] = useState<IUsuario>({
     cedula: '',
@@ -37,6 +38,11 @@ export const UsuarioUpdate = () => {
           toast.error('Error al cargar el usuario');
         });
     }
+
+    // Cargar todos los usuarios para validar duplicados
+    UsuarioService.getAll()
+      .then(res => setUsuariosExistentes(res.data))
+      .catch(err => console.error('Error al cargar usuarios para validación:', err));
   }, [id, isNew]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -158,6 +164,11 @@ export const UsuarioUpdate = () => {
                     }}
                     required
                   />
+                  {isNew && usuario.cedula && usuariosExistentes.some(u => u.cedula === usuario.cedula) && (
+                    <div className="text-danger mt-1 fw-bold" style={{ fontSize: '0.75rem' }}>
+                      Aviso: Esta cédula ya está registrada en otro usuario.
+                    </div>
+                  )}
                 </FormGroup>
 
                 <FormGroup className="mb-4">
@@ -205,6 +216,11 @@ export const UsuarioUpdate = () => {
                           required={isNew}
                           disabled={!isNew}
                         />
+                        {isNew && usuario.username?.toLowerCase() === 'admin' && (
+                          <div className="text-danger mt-1 fw-bold" style={{ fontSize: '0.75rem' }}>
+                            Aviso: El nombre "admin" ya está en uso.
+                          </div>
+                        )}
                         {!isNew && (
                           <div className="text-muted" style={{ fontSize: '0.75rem' }}>
                             El nombre de usuario no se puede cambiar.
