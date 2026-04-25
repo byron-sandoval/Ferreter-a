@@ -95,15 +95,29 @@ public class KeycloakService {
             String targetRealm = applicationProperties.getKeycloakAdmin().getTargetRealm();
             RealmResource realmResource = keycloak.realm(targetRealm);
 
-            // Log available roles for debugging
-            log.trace("Available roles in realm: {}", realmResource.roles().list().stream().map(r -> r.getName())
-                    .collect(java.util.stream.Collectors.toList()));
+            // 1. Obtener roles actuales del usuario en el Realm
+            var userResource = realmResource.users().get(userId);
+            var currentRoles = userResource.roles().realmLevel().listAll();
 
+            // 2. Identificar roles de JHipster/Negocio actuales (empiezan con ROLE_)
+            var rolesToRemove = currentRoles.stream()
+                    .filter(role -> role.getName().startsWith("ROLE_"))
+                    .collect(java.util.stream.Collectors.toList());
+
+            // 3. Remover los roles viejos si existen
+            if (!rolesToRemove.isEmpty()) {
+                log.debug("Removing old roles from user {}: {}", userId, rolesToRemove.stream().map(r -> r.getName()).collect(java.util.stream.Collectors.toList()));
+                userResource.roles().realmLevel().remove(rolesToRemove);
+            }
+
+            // 4. Asignar el nuevo rol
             var roleRepresentation = realmResource.roles().get(roleName).toRepresentation();
-            realmResource.users().get(userId).roles().realmLevel().add(List.of(roleRepresentation));
-            log.info(">>> ROLE SUCCESS: Assigned {} to user {}", roleName, userId);
+            userResource.roles().realmLevel().add(List.of(roleRepresentation));
+            
+            log.info(">>> ROLE SUCCESS: Assigned {} to user {} (Old roles removed)", roleName, userId);
         } catch (Exception e) {
             log.error(">>> ROLE ERROR: Failed to assign role {} to user {}: {}", roleName, userId, e.getMessage());
+            throw new RuntimeException("Error al asignar rol en Keycloak: " + e.getMessage());
         }
     }
 
@@ -119,6 +133,7 @@ public class KeycloakService {
             log.info(">>> KEYCLOAK: Usuario {} ahora está {}", userId, active ? "HABILITADO" : "DESHABILITADO");
         } catch (Exception e) {
             log.error(">>> KEYCLOAK ERROR: No se pudo actualizar estado para {}: {}", userId, e.getMessage());
+            throw new RuntimeException("Error al actualizar estado en Keycloak: " + e.getMessage());
         }
     }
 
@@ -159,6 +174,7 @@ public class KeycloakService {
 
         } catch (Exception e) {
             log.error(">>> KEYCLOAK ERROR: No se pudo actualizar el perfil para {}: {}", userId, e.getMessage());
+            throw new RuntimeException("Error al actualizar perfil en Keycloak: " + e.getMessage());
         }
     }
 
@@ -172,6 +188,7 @@ public class KeycloakService {
             log.info(">>> KEYCLOAK: Usuario {} eliminado físicamente", userId);
         } catch (Exception e) {
             log.error(">>> KEYCLOAK ERROR: No se pudo eliminar el usuario {}: {}", userId, e.getMessage());
+            throw new RuntimeException("Error al eliminar usuario en Keycloak: " + e.getMessage());
         }
     }
 
