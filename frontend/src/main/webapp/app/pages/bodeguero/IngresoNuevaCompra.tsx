@@ -129,21 +129,18 @@ export const IngresoNuevaCompra = () => {
       }
 
       if (cambiarPrecio) {
-        try {
-          await ArticuloService.update({ ...articulo, costo: cost, precio: precioV });
-          articulo.costo = cost;
-          articulo.precio = precioV;
-          toast.success('Precio del producto actualizado en catálogo.');
-        } catch (err) {
-          toast.error('Error al actualizar precio del producto');
-        }
+        articulo.costo = cost;
+        articulo.precio = precioV;
+        articulo.ultimoCosto = cost;
+        toast.info('Precio pendiente de actualización. Se guardará al realizar la compra.');
       }
 
-      const nuevoDetalle: IDetalleIngreso = {
+      const nuevoDetalle: any = {
         articulo,
         cantidad: cant,
         costoUnitario: cost,
         monto: cant * cost,
+        actualizarPrecioEnBD: cambiarPrecio
       };
 
       setDetalles([...detalles, nuevoDetalle]);
@@ -360,6 +357,13 @@ export const IngresoNuevaCompra = () => {
           }
         } else {
           // Producto ya existente
+          if ((d as any).actualizarPrecioEnBD) {
+            try {
+              await ArticuloService.update(d.articulo);
+            } catch (e) {
+              console.error("Error al actualizar precio del articulo", e);
+            }
+          }
           detallesFinalizados.push({
             articulo: { id: d.articulo.id },
             cantidad: d.cantidad,
