@@ -243,18 +243,21 @@ export const ArticuloUpdate = () => {
                           <Controller
                             name="precio"
                             control={control}
-                            rules={{ required: true, min: 0 }}
+                            rules={{ required: true, min: { value: 0, message: 'El precio no puede ser negativo' } }}
                             render={({ field }) => (
                               <Input
                                 type="number"
                                 step="0.01"
                                 {...field}
-                                invalid={esPrecioBajo}
                                 readOnly={!isAdmin}
-                                className={!isAdmin ? 'bg-light text-muted' : ''}
+                                className={
+                                  (!!errors.precio || esPrecioBajo ? 'border-danger ' : '') +
+                                  (!isAdmin ? 'bg-light text-muted' : '')
+                                }
                               />
                             )}
                           />
+                          {errors.precio && <div className="text-danger small mt-1 d-block">{errors.precio.message}</div>}
                           {esPrecioBajo && (
                             <div
                               className="animate__animated animate__headShake p-2 mt-2"
@@ -268,7 +271,7 @@ export const ArticuloUpdate = () => {
                               }}
                             >
                               <FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />
-                              ¡Precio menor al costo! Perderás dinero.
+                              ¡Precio menor al costo!
                             </div>
                           )}
                           {!isNew && Number(watch('precio')) !== Number(originalPrecio) && (
@@ -297,9 +300,17 @@ export const ArticuloUpdate = () => {
                           <Controller
                             name="costo"
                             control={control}
-                            rules={{ required: true, min: 0 }}
-                            render={({ field }) => <Input type="number" step="0.01" {...field} />}
+                            rules={{ required: true, min: { value: 0, message: 'El costo no puede ser negativo' } }}
+                            render={({ field }) => (
+                              <Input 
+                                type="number" 
+                                step="0.01" 
+                                {...field} 
+                                className={errors.costo ? 'border-danger' : ''} 
+                              />
+                            )}
                           />
+                          {errors.costo && <div className="text-danger small mt-1 d-block">{errors.costo.message}</div>}
                         </FormGroup>
                       </Col>
                     </Row>
@@ -308,7 +319,19 @@ export const ArticuloUpdate = () => {
                       <Col md="4">
                         <FormGroup>
                           <Label>Stock Actual</Label>
-                          <Controller name="existencia" control={control} render={({ field }) => <Input type="number" {...field} />} />
+                          <Controller 
+                            name="existencia" 
+                            control={control} 
+                            rules={{ min: { value: 0, message: 'El stock no puede ser negativo' } }}
+                            render={({ field }) => (
+                              <Input 
+                                type="number" 
+                                {...field} 
+                                className={errors.existencia ? 'border-danger' : ''} 
+                              />
+                            )} 
+                          />
+                          {errors.existencia && <div className="text-danger small mt-1 d-block">{errors.existencia.message}</div>}
                         </FormGroup>
                       </Col>
                       <Col md="4">
@@ -317,8 +340,16 @@ export const ArticuloUpdate = () => {
                           <Controller
                             name="existenciaMinima"
                             control={control}
-                            render={({ field }) => <Input type="number" {...field} />}
+                            rules={{ min: { value: 0, message: 'El stock no puede ser negativo' } }}
+                            render={({ field }) => (
+                              <Input 
+                                type="number" 
+                                {...field} 
+                                className={errors.existenciaMinima ? 'border-danger' : ''} 
+                              />
+                            )}
                           />
+                          {errors.existenciaMinima && <div className="text-danger small mt-1 d-block">{errors.existenciaMinima.message}</div>}
                         </FormGroup>
                       </Col>
                       <Col md="4">
