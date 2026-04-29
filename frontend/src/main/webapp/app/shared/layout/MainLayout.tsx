@@ -10,7 +10,7 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="app-container d-flex flex-column min-vh-100">
       {isAuthenticated && <TopNavbar />}
-      <div className="flex-grow-1 p-0" style={{ backgroundColor: '#f8f9fa' }}>
+      <div className="flex-grow-1 py-3 px-3 px-md-4" style={{ backgroundColor: '#f8f9fa' }}>
         <ErrorBoundary>{children}</ErrorBoundary>
       </div>
     </div>

@@ -5,6 +5,8 @@ import com.ferronica.app.repository.VentaRepository;
 import com.ferronica.app.service.VentaService;
 import com.ferronica.app.service.dto.VentaDTO;
 import com.ferronica.app.service.mapper.VentaMapper;
+import com.ferronica.app.repository.UsuarioRepository;
+import com.ferronica.app.security.SecurityUtils;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,14 +27,20 @@ public class VentaServiceImpl implements VentaService {
     private final VentaMapper ventaMapper;
 
     private final com.ferronica.app.repository.NumeracionFacturaRepository numeracionFacturaRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final com.ferronica.app.repository.ArticuloRepository articuloRepository;
 
     public VentaServiceImpl(
             VentaRepository ventaRepository,
             VentaMapper ventaMapper,
-            com.ferronica.app.repository.NumeracionFacturaRepository numeracionFacturaRepository) {
+            com.ferronica.app.repository.NumeracionFacturaRepository numeracionFacturaRepository,
+            UsuarioRepository usuarioRepository,
+            com.ferronica.app.repository.ArticuloRepository articuloRepository) {
         this.ventaRepository = ventaRepository;
         this.ventaMapper = ventaMapper;
         this.numeracionFacturaRepository = numeracionFacturaRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.articuloRepository = articuloRepository;
     }
 
     @Override
@@ -59,6 +67,11 @@ public class VentaServiceImpl implements VentaService {
         if (venta.getAnulada() == null) {
             venta.setAnulada(false);
         }
+
+        // Automatización de Usuario por Usuario Autenticado
+        SecurityUtils.getCurrentUserKeycloakId().ifPresent(idKeycloak -> {
+            usuarioRepository.findByIdKeycloak(idKeycloak).ifPresent(venta::setUsuario);
+        });
 
         Venta savedVenta = ventaRepository.save(venta);
         return ventaMapper.toDto(savedVenta);
@@ -98,6 +111,26 @@ public class VentaServiceImpl implements VentaService {
     public void delete(Long id) {
         LOG.debug("Request to delete Venta (Anulacion Logica) : {}", id);
         ventaRepository.findById(id).ifPresent(venta -> {
+            // Si ya está anulada, no hacemos nada para evitar duplicar stock devuelto
+            if (venta.getAnulada() != null && venta.getAnulada()) {
+                return;
+            }
+
+            // 1. Devolver productos al inventario
+            if (venta.getDetalles() != null) {
+                venta.getDetalles().forEach(detalle -> {
+                    if (detalle.getArticulo() != null) {
+                        articuloRepository.findById(detalle.getArticulo().getId()).ifPresent(articulo -> {
+                            LOG.debug("Restaurando stock para articulo {}: {} + {}", articulo.getNombre(),
+                                    articulo.getExistencia(), detalle.getCantidad());
+                            articulo.setExistencia(articulo.getExistencia().add(detalle.getCantidad()));
+                            articuloRepository.save(articulo);
+                        });
+                    }
+                });
+            }
+
+            // 2. Marcar como anulada
             venta.setAnulada(true);
             ventaRepository.save(venta);
         });

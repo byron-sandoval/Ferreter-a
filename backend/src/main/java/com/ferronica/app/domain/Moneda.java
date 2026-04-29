@@ -33,6 +33,9 @@ public class Moneda implements Serializable {
     @Column(name = "tipo_cambio", precision = 21, scale = 2, nullable = false)
     private BigDecimal tipoCambio;
 
+    @Column(name = "activo")
+    private Boolean activo;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -87,6 +90,19 @@ public class Moneda implements Serializable {
         this.tipoCambio = tipoCambio;
     }
 
+    public Boolean getActivo() {
+        return this.activo;
+    }
+
+    public Moneda activo(Boolean activo) {
+        this.setActivo(activo);
+        return this;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -114,6 +130,7 @@ public class Moneda implements Serializable {
             ", nombre='" + getNombre() + "'" +
             ", simbolo='" + getSimbolo() + "'" +
             ", tipoCambio=" + getTipoCambio() +
+            ", activo=" + getActivo() +
             "}";
     }
 }

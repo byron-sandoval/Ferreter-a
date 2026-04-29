@@ -65,7 +65,7 @@ public class ArticuloResource {
      *         the articulo has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA')")
     @PostMapping("")
     public ResponseEntity<ArticuloDTO> createArticulo(@Valid @RequestBody ArticuloDTO articuloDTO)
             throws URISyntaxException {
@@ -93,7 +93,7 @@ public class ArticuloResource {
      *         couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA', 'ROLE_VENDEDOR')")
     @PutMapping("/{id}")
     public ResponseEntity<ArticuloDTO> updateArticulo(
             @PathVariable(value = "id", required = false) final Long id,
@@ -133,7 +133,7 @@ public class ArticuloResource {
      *         couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA', 'ROLE_VENDEDOR')")
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<ArticuloDTO> partialUpdateArticulo(
             @PathVariable(value = "id", required = false) final Long id,
@@ -166,7 +166,7 @@ public class ArticuloResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
      *         of articulos in body.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA', 'ROLE_VENDEDOR')")
     @GetMapping("")
     public ResponseEntity<List<ArticuloDTO>> getAllArticulos(
             ArticuloCriteria criteria,
@@ -186,7 +186,7 @@ public class ArticuloResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count
      *         in body.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA', 'ROLE_VENDEDOR')")
     @GetMapping("/count")
     public ResponseEntity<Long> countArticulos(ArticuloCriteria criteria) {
         LOG.debug("REST request to count Articulos by criteria: {}", criteria);
@@ -200,7 +200,7 @@ public class ArticuloResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
      *         the articuloDTO, or with status {@code 404 (Not Found)}.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JEFE_BODEGA', 'ROLE_VENDEDOR')")
     @GetMapping("/{id}")
     public ResponseEntity<ArticuloDTO> getArticulo(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Articulo : {}", id);

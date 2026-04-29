@@ -5,7 +5,7 @@ import VentaService from 'app/services/venta.service';
 import ClienteService from 'app/services/cliente.service';
 import MonedaService from 'app/services/moneda.service';
 import NumeracionService from 'app/services/numeracion.service';
-import VendedorService from 'app/services/vendedor.service';
+import UsuarioService from 'app/services/usuario.service';
 import { IArticulo } from 'app/shared/model/articulo.model';
 import { ICliente, GeneroEnum } from 'app/shared/model/cliente.model';
 import { IMoneda } from 'app/shared/model/moneda.model';
@@ -23,6 +23,9 @@ import { ProductCatalog } from './components/ProductCatalog';
 import { VentaSidebar } from './components/VentaSidebar';
 import { ClientRegistrationModal } from './components/ClientRegistrationModal';
 import { SuccessModal } from './components/SuccessModal';
+import { ClientSelectionModal } from './components/ClientSelectionModal';
+import { ConfirmarPagoModal } from './components/ConfirmarPagoModal';
+import StripeCheckoutModal from 'app/shared/components/stripe/StripeCheckoutModal';
 import { EmpresaService } from 'app/services/empresa.service';
 import { IEmpresa } from 'app/shared/model/empresa.model';
 
@@ -35,11 +38,13 @@ export const NuevaVenta = () => {
   const [carrito, setCarrito] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [empresa, setEmpresa] = useState<IEmpresa | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Datos del Cliente
   const [cliente, setCliente] = useState<ICliente | null>(null);
   const [busquedaCedula, setBusquedaCedula] = useState('');
   const [showClienteModal, setShowClienteModal] = useState(false);
+  const [showSelectionModal, setShowSelectionModal] = useState(false);
   const [nuevoCliente, setNuevoCliente] = useState<ICliente>({
     cedula: '',
     nombre: '',
@@ -54,14 +59,25 @@ export const NuevaVenta = () => {
   const [monedas, setMonedas] = useState<IMoneda[]>([]);
   const [monedaSeleccionada, setMonedaSeleccionada] = useState<IMoneda | null>(null);
   const [numeracion, setNumeracion] = useState<INumeracionFactura | null>(null);
-  const [vendedorActual, setVendedorActual] = useState<any>(null);
+  const [usuarioActual, setUsuarioActual] = useState<any>(null);
   const [montoPagado, setMontoPagado] = useState('');
   const [descuento, setDescuento] = useState<string>('0');
+  const [voucher, setVoucher] = useState('');
+  const [showPagoModal, setShowPagoModal] = useState(false);
+  const [showStripeModal, setShowStripeModal] = useState(false);
+  const [stripePaymentData, setStripePaymentData] = useState<any>(null);
 
-  // Impresion
+  // Impresion A4
   const componentRef = useRef<any>(null);
   const handlePrint = useReactToPrint({
     contentRef: componentRef,
+  });
+
+  // Impresion Ticket Termico
+  const ticketRef = useRef<any>(null);
+  const handlePrintTicket = useReactToPrint({
+    contentRef: ticketRef,
+    pageStyle: `@page { size: 80mm auto; margin: 0; } body { margin: 0; display: flex; justify-content: center; }`,
   });
 
   const [ventaExitosa, setVentaExitosa] = useState<IVenta | null>(null);
@@ -72,45 +88,82 @@ export const NuevaVenta = () => {
 
   const cargarDatosIniciales = async () => {
     try {
-      const [resArt, resMon, resNum, resEmp, resCat] = await Promise.all([
-        ArticuloService.getAll(),
+      const [resMon, resNum, resEmp, resCat] = await Promise.all([
         MonedaService.getAll(),
         NumeracionService.getAll(),
         EmpresaService.getAll(),
         CategoriaService.getAll(),
       ]);
-      setArticulos(resArt.data);
       setCategorias(resCat.data);
-      setMonedas(resMon.data);
-      if (resMon.data.length > 0) setMonedaSeleccionada(resMon.data[0]);
+      const activeMonedas = resMon.data.filter(m => m.activo !== false);
+      setMonedas(activeMonedas);
+      if (activeMonedas.length > 0) {
+        const cordoba = activeMonedas.find(m => m.simbolo === 'C$') || activeMonedas[0];
+        setMonedaSeleccionada(cordoba);
+      }
       if (resNum.data.length > 0) setNumeracion(resNum.data.find(n => n.activo) || resNum.data[0]);
       if (resEmp.data.length > 0) setEmpresa(resEmp.data[0]);
 
-      // Cargar vendedor por Keycloak ID
+      // Cargar usuario por Keycloak ID
       if (account?.id) {
-        const resVend = await VendedorService.getByKeycloakId(account.id);
-        if (resVend.data.length > 0) setVendedorActual(resVend.data[0]);
+        const resUser = await UsuarioService.getByKeycloakId(account.id);
+        if (resUser.data.length > 0) {
+          setUsuarioActual(resUser.data[0]);
+        } else {
+          // Fallback: Si no existe en la tabla Usuario, usamos los datos de la cuenta
+          setUsuarioActual({
+            nombre: account.firstName && account.lastName ? `${account.firstName} ${account.lastName}` : account.login || 'Admin',
+          });
+        }
       }
     } catch (e) {
-      toast.error('Error al cargar datos iniciales');
+      console.error('Error al cargar datos iniciales', e);
     }
   };
 
   const buscarCliente = async () => {
-    if (!busquedaCedula) return;
+    if (!busquedaCedula) {
+      setShowSelectionModal(true);
+      return;
+    }
     try {
-      const res = await ClienteService.getByCedula(busquedaCedula);
+      // 1. Intentar por Cédula (Exacta)
+      let res = await ClienteService.getByCedula(busquedaCedula);
+
+      // 2. Si no hay por cédula, intentar por Nombre (Contiene)
+      if (res.data.length === 0) {
+        res = await ClienteService.search(busquedaCedula);
+      }
+
       if (res.data.length > 0) {
-        const c = res.data[0];
+        // Filtrar solo los activos para la venta
+        const clientesActivos = res.data.filter(cli => cli.activo !== false);
+
+        if (clientesActivos.length === 0) {
+          toast.error('El cliente encontrado está DESACTIVADO.');
+          return;
+        }
+
+        const c = clientesActivos[0];
         setCliente(c);
-        if ((c.saldo || 0) > 0) {
-          toast.warning(`Atención: El cliente ${c.nombre} tiene un saldo pendiente de C$ ${c.saldo?.toFixed(2)}`, { autoClose: 5000 });
+
+        if (clientesActivos.length > 1) {
+          toast.info(`Se encontraron ${clientesActivos.length} coincidencias activas. Se seleccionó: ${c.nombre}.`);
         } else {
-          toast.success(`Cliente seleccionado: ${c.nombre}`);
+          if ((c.saldo || 0) > 0) {
+            toast.warning(`Atención: El cliente ${c.nombre} tiene un saldo pendiente de C$ ${c.saldo?.toFixed(2)}`, { autoClose: 5000 });
+          } else {
+            toast.success(`Cliente seleccionado: ${c.nombre}`);
+          }
         }
       } else {
-        toast.info('Cliente no encontrado. Por favor regístrelo.');
-        setNuevoCliente({ ...nuevoCliente, cedula: busquedaCedula });
+        toast.info('No se encontró el cliente. Puede registrarlo ahora.');
+        // Si parece una cédula (contiene guiones o muchos números), la pre-llenamos
+        if (/[0-9]/.test(busquedaCedula)) {
+          setNuevoCliente({ ...nuevoCliente, cedula: busquedaCedula, nombre: '' });
+        } else {
+          setNuevoCliente({ ...nuevoCliente, nombre: busquedaCedula, cedula: '' });
+        }
         setShowClienteModal(true);
       }
     } catch (e) {
@@ -124,16 +177,41 @@ export const NuevaVenta = () => {
         toast.error('Cédula y Nombre son obligatorios');
         return;
       }
-      const res = await ClienteService.create(nuevoCliente);
+
+      // Validación de Cédula Nicaragüense (Formato: 001-010180-0005Y o 0010101800005Y)
+      const cedulaLimpia = nuevoCliente.cedula.replace(/-/g, '').toUpperCase();
+      const cedulaRegex = /^\d{13}[A-Z]$/;
+
+      if (!cedulaRegex.test(cedulaLimpia)) {
+        toast.error('La cédula no tiene un formato válido (Ej: 001-010180-0005Y)');
+        return;
+      }
+
+      const clienteParaGuardar = {
+        ...nuevoCliente,
+        cedula: cedulaLimpia, // Guardamos la cédula limpia o formateada si prefieres
+      };
+
+      const res = await ClienteService.create(clienteParaGuardar);
       setCliente(res.data);
       setShowClienteModal(false);
       toast.success('Cliente registrado con éxito');
-    } catch (e) {
-      toast.error('Error al registrar cliente');
+    } catch (e: any) {
+      if (e.response?.status === 400) {
+        toast.error('Error: Ya existe un cliente registrado con esta cédula.');
+      } else {
+        toast.error('cédula existente');
+      }
     }
   };
 
   const agregarAlCarrito = (producto: IArticulo) => {
+    const isPendingReview = producto.ultimoCosto && (producto.costo || 0) > (producto.ultimoCosto || 0);
+    if (isPendingReview) {
+      toast.error(`El producto ${producto.nombre} tiene un aumento de costo y está pendiente de revisión de precio por el administrador.`);
+      return;
+    }
+
     const existente = carrito.find(item => item.articulo.id === producto.id);
     const cantActual = existente ? existente.cantidad : 0;
 
@@ -181,10 +259,13 @@ export const NuevaVenta = () => {
     }
   };
 
+  const porcentajeIva = empresa?.porcentajeIva ?? 15;
+  const tasaIva = porcentajeIva / 100;
+  
   const subtotal = Math.round(carrito.reduce((acc, item) => acc + item.subtotal, 0) * 100) / 100;
   const descuentoNum = Math.round((parseFloat(descuento) || 0) * 100) / 100;
   const baseImponible = Math.round((subtotal - descuentoNum) * 100) / 100;
-  const iva = Math.round((baseImponible > 0 ? baseImponible * 0.15 : 0) * 100) / 100;
+  const iva = Math.round((baseImponible > 0 ? baseImponible * tasaIva : 0) * 100) / 100;
   const total = Math.round((baseImponible + iva) * 100) / 100;
 
   // Calculo en moneda extranjera
@@ -209,13 +290,27 @@ export const NuevaVenta = () => {
       return;
     }
 
-    if (metodoPago === MetodoPagoEnum.EFECTIVO && montoPagadoNum < total) {
-      toast.error('El efectivo recibido es insuficiente para cubrir el total de la venta.');
+    setShowPagoModal(true);
+  };
+
+  const confirmarYFinalizarVenta = async (
+    metodo: MetodoPagoEnum,
+    recibido: number,
+    cambioCalculado: number,
+    voucherRef: string,
+    monedaId: number
+  ) => {
+    // Si es STRIPE y no hay voucher (recién sale de confirmar modal)
+    if (metodo === MetodoPagoEnum.TARJETA_STRIPE && !voucherRef.trim()) {
+      setStripePaymentData({ metodo, recibido, cambioCalculado, monedaId });
+      setShowPagoModal(false);
+      setShowStripeModal(true);
       return;
     }
 
     try {
       setLoading(true);
+      const monedaFinal = monedas.find(m => m.id === monedaId) || monedaSeleccionada;
 
       const ventaData: any = {
         fecha: dayjs().toISOString(),
@@ -224,13 +319,14 @@ export const NuevaVenta = () => {
         descuento: descuentoNum,
         total,
         totalEnMonedaBase: total, // Todo se asume en base C$ inicialmente
-        metodoPago,
-        importeRecibido: montoPagadoNum,
-        cambio: cambio > 0 ? cambio : 0,
+        metodoPago: metodo,
+        stripeId: voucherRef.trim() ? voucherRef.trim() : null,
+        importeRecibido: metodo === MetodoPagoEnum.TARJETA_STRIPE ? total : recibido,
+        cambio: metodo === MetodoPagoEnum.TARJETA_STRIPE ? 0 : cambioCalculado > 0 ? cambioCalculado : 0,
         esContado,
         cliente,
-        vendedor: vendedorActual,
-        moneda: monedaSeleccionada,
+        usuario: usuarioActual,
+        moneda: monedaFinal,
         numeracion,
         noFactura: (numeracion?.correlativoActual || 0) + 1,
       };
@@ -267,8 +363,18 @@ export const NuevaVenta = () => {
         }
       }
 
-      toast.success(`¡Venta #${resVenta.data.noFactura} registrada con éxito!`);
-      setVentaExitosa(resVenta.data);
+      toast.success(`¡Factura ${numeracion?.serie}-${String(resVenta.data.noFactura).padStart(6, '0')} registrada con éxito!`);
+      setShowPagoModal(false);
+      setRefreshTrigger(prev => prev + 1); // Refrescar de inmediato
+
+      // Si la respuesta no trae usuario (porque es un Admin sin record en DB),
+      // le inyectamos manualmente el usuarioActual para que el modal lo muestre.
+      const ventaFinal = {
+        ...resVenta.data,
+        usuario: resVenta.data.usuario || usuarioActual,
+      };
+
+      setVentaExitosa(ventaFinal);
       // Limpieza se hace despues de cerrar el modal de ticket o manual
     } catch (error) {
       console.error(error);
@@ -283,8 +389,10 @@ export const NuevaVenta = () => {
     setCliente(null);
     setBusquedaCedula('');
     setMontoPagado('');
+    setVoucher('');
     setVentaExitosa(null);
     cargarDatosIniciales(); // Recargar stock y numeracion
+    setRefreshTrigger(prev => prev + 1); // Doble seguridad
   };
 
   return (
@@ -298,11 +406,12 @@ export const NuevaVenta = () => {
           categoriaFiltro={categoriaFiltro}
           setCategoriaFiltro={setCategoriaFiltro}
           agregarAlCarrito={agregarAlCarrito}
+          refreshTrigger={refreshTrigger}
         />
 
         <VentaSidebar
           cliente={cliente}
-          vendedorActual={vendedorActual}
+          usuarioActual={usuarioActual}
           busquedaCedula={busquedaCedula}
           setBusquedaCedula={setBusquedaCedula}
           buscarCliente={buscarCliente}
@@ -320,6 +429,7 @@ export const NuevaVenta = () => {
           setEsContado={setEsContado}
           subtotal={subtotal}
           iva={iva}
+          porcentajeIva={porcentajeIva}
           total={total}
           totalEnMoneda={totalEnMoneda}
           montoPagado={montoPagado}
@@ -327,11 +437,14 @@ export const NuevaVenta = () => {
           descuento={descuento}
           setDescuento={setDescuento}
           cambio={cambio}
+          voucher={voucher}
+          setVoucher={setVoucher}
           procesarVenta={procesarVenta}
           loading={loading}
           ventaExitosa={ventaExitosa}
           quitarUnoDelCarrito={quitarUnoDelCarrito}
           agregarAlCarrito={agregarAlCarrito}
+          limpiarTodo={finalizarVentaYLimpiar}
         />
       </Row>
 
@@ -347,9 +460,58 @@ export const NuevaVenta = () => {
         ventaExitosa={ventaExitosa}
         finalizarVentaYLimpiar={finalizarVentaYLimpiar}
         handlePrint={handlePrint}
+        handlePrintTicket={handlePrintTicket}
         componentRef={componentRef}
+        ticketRef={ticketRef}
         carrito={carrito}
         empresa={empresa}
+      />
+
+      <ClientSelectionModal
+        isOpen={showSelectionModal}
+        toggle={() => setShowSelectionModal(!showSelectionModal)}
+        onSelect={c => {
+          setCliente(c);
+          setShowSelectionModal(false);
+          if ((c.saldo || 0) > 0) {
+            toast.warning(`Atención: El cliente ${c.nombre} tiene un saldo pendiente de C$ ${c.saldo?.toFixed(2)}`, { autoClose: 5000 });
+          } else {
+            toast.success(`Cliente seleccionado: ${c.nombre}`);
+          }
+        }}
+      />
+
+      <ConfirmarPagoModal
+        isOpen={showPagoModal}
+        toggle={() => setShowPagoModal(!showPagoModal)}
+        total={total}
+        monedas={monedas}
+        loading={loading}
+        onConfirm={confirmarYFinalizarVenta}
+      />
+
+      <StripeCheckoutModal
+        isOpen={showStripeModal}
+        amount={stripePaymentData ? total / ((monedas.find(m => m.id === stripePaymentData.monedaId) || monedaSeleccionada)?.tipoCambio || 1) : 0}
+        currency={(monedas.find(m => m.id === stripePaymentData?.monedaId) || monedaSeleccionada)?.simbolo === '$' ? 'usd' : 'nio'}
+        currencySymbol={(monedas.find(m => m.id === stripePaymentData?.monedaId) || monedaSeleccionada)?.simbolo || 'C$'}
+        description={`Pago de Factura`}
+        onSuccess={(intentId) => {
+          setShowStripeModal(false);
+          if (stripePaymentData) {
+            confirmarYFinalizarVenta(
+              stripePaymentData.metodo,
+              stripePaymentData.recibido,
+              stripePaymentData.cambioCalculado,
+              intentId,
+              stripePaymentData.monedaId
+            );
+          }
+        }}
+        onCancel={() => {
+          setShowStripeModal(false);
+          toast.warning('Pago con tarjeta cancelado');
+        }}
       />
     </div>
   );

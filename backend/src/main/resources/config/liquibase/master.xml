@@ -27,6 +27,11 @@
     <include file="config/liquibase/changelog/20260128152753_added_entity_Ingreso.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260128152754_added_entity_DetalleIngreso.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260128152755_added_entity_Devolucion.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260210230000_added_entity_DetalleDevolucion.xml" relativeToChangelogFile="false"/>
+
+    <include file="config/liquibase/changelog/20260309212000_added_ultimoCosto_to_Articulo.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260317120000_added_imagenUrl_to_Articulo.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260317140000_remove_imagen_blob_from_Articulo.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20260128152744_added_entity_constraints_Categoria.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260128152745_added_entity_constraints_Articulo.xml" relativeToChangelogFile="false"/>
@@ -39,4 +44,16 @@
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
     <include file="config/liquibase/changelog/20260202000000_added_missing_fields.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260208100000_rename_vendedor_to_usuario.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260208101500_make_id_keycloak_optional.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260214090000_added_user_fields.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260322100428_added_activo_to_Moneda.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260408100000_added_porcentajeIva_to_Empresa.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260411192600_seed_categorias.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260411194000_seed_unidades.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260411195000_seed_numeracion.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260411195400_seed_clientes.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260411195800_seed_proveedores.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260411200200_seed_monedas.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260424000000_seed_articulos.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

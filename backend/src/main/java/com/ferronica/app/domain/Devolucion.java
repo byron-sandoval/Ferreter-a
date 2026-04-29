@@ -6,6 +6,8 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A Devolucion.
@@ -23,6 +25,10 @@ public class Devolucion implements Serializable {
     @Column(name = "id")
     private Long id;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "devolucion", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties(value = { "articulo", "devolucion" }, allowSetters = true)
+    private Set<DetalleDevolucion> detalles = new HashSet<>();
+
     @NotNull
     @Column(name = "fecha", nullable = false)
     private Instant fecha;
@@ -35,7 +41,7 @@ public class Devolucion implements Serializable {
     private BigDecimal total;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "detalles", "cliente", "vendedor", "moneda", "numeracion" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "detalles", "cliente", "usuario", "moneda", "numeracion" }, allowSetters = true)
     private Venta venta;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -51,6 +57,37 @@ public class Devolucion implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Set<DetalleDevolucion> getDetalles() {
+        return this.detalles;
+    }
+
+    public void setDetalles(Set<DetalleDevolucion> detalleDevolucions) {
+        if (this.detalles != null) {
+            this.detalles.forEach(i -> i.setDevolucion(null));
+        }
+        if (detalleDevolucions != null) {
+            detalleDevolucions.forEach(i -> i.setDevolucion(this));
+        }
+        this.detalles = detalleDevolucions;
+    }
+
+    public Devolucion detalles(Set<DetalleDevolucion> detalleDevolucions) {
+        this.setDetalles(detalleDevolucions);
+        return this;
+    }
+
+    public Devolucion addDetalles(DetalleDevolucion detalleDevolucion) {
+        this.detalles.add(detalleDevolucion);
+        detalleDevolucion.setDevolucion(this);
+        return this;
+    }
+
+    public Devolucion removeDetalles(DetalleDevolucion detalleDevolucion) {
+        this.detalles.remove(detalleDevolucion);
+        detalleDevolucion.setDevolucion(null);
+        return this;
     }
 
     public Instant getFecha() {
@@ -105,7 +142,8 @@ public class Devolucion implements Serializable {
         return this;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and
+    // setters here
 
     @Override
     public boolean equals(Object o) {
@@ -120,7 +158,8 @@ public class Devolucion implements Serializable {
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        // see
+        // https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 
@@ -128,10 +167,10 @@ public class Devolucion implements Serializable {
     @Override
     public String toString() {
         return "Devolucion{" +
-            "id=" + getId() +
-            ", fecha='" + getFecha() + "'" +
-            ", motivo='" + getMotivo() + "'" +
-            ", total=" + getTotal() +
-            "}";
+                "id=" + getId() +
+                ", fecha='" + getFecha() + "'" +
+                ", motivo='" + getMotivo() + "'" +
+                ", total=" + getTotal() +
+                "}";
     }
 }

@@ -28,7 +28,7 @@ public class IngresoDTO implements Serializable {
 
     private Boolean activo;
 
-    private VendedorDTO vendedor;
+    private UsuarioDTO usuario;
 
     private ProveedorDTO proveedor;
 
@@ -82,12 +82,12 @@ public class IngresoDTO implements Serializable {
         this.activo = activo;
     }
 
-    public VendedorDTO getVendedor() {
-        return vendedor;
+    public UsuarioDTO getUsuario() {
+        return usuario;
     }
 
-    public void setVendedor(VendedorDTO vendedor) {
-        this.vendedor = vendedor;
+    public void setUsuario(UsuarioDTO usuario) {
+        this.usuario = usuario;
     }
 
     public ProveedorDTO getProveedor() {
@@ -137,7 +137,7 @@ public class IngresoDTO implements Serializable {
                 ", total=" + getTotal() +
                 ", observaciones='" + getObservaciones() + "'" +
                 ", activo='" + getActivo() + "'" +
-                ", vendedor=" + getVendedor() +
+                ", usuario=" + getUsuario() +
                 ", proveedor=" + getProveedor() +
                 ", detalles=" + getDetalles() +
                 "}";

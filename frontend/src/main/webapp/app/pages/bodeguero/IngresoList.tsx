@@ -4,10 +4,25 @@ import { Table, Button, Input, Card, Badge, Modal, ModalHeader, ModalBody, Modal
 import { IIngreso } from 'app/shared/model/ingreso.model';
 import IngresoService from 'app/services/ingreso.service';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faSync, faSearch, faEye, faFileInvoice } from '@fortawesome/free-solid-svg-icons';
+import {
+  faPlus,
+  faSync,
+  faSearch,
+  faEye,
+  faFileInvoice,
+  faChevronLeft,
+  faChevronRight,
+  faShoppingCart,
+} from '@fortawesome/free-solid-svg-icons';
+import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import dayjs from 'dayjs';
+import { useAppSelector } from 'app/config/store';
+import { AUTHORITIES } from 'app/config/constants';
 
 export const IngresoList = () => {
+  const account = useAppSelector(state => state.authentication.account);
+  const isAdmin = account?.authorities?.includes(AUTHORITIES.ADMIN);
+  const isJefeBodega = account?.authorities?.includes(AUTHORITIES.JEFE_BODEGA);
   const navigate = useNavigate();
   const [ingresos, setIngresos] = useState<IIngreso[]>([]);
   const [loading, setLoading] = useState(false);
@@ -15,18 +30,61 @@ export const IngresoList = () => {
   const [showDetalleModal, setShowDetalleModal] = useState(false);
   const [ingresoSeleccionado, setIngresoSeleccionado] = useState<IIngreso | null>(null);
 
-  const loadAll = () => {
+  // PAGINACIÓN DEL BACKEND
+  const [currentPage, setCurrentPage] = useState(0); // 0-indexed para JHipster
+  const [totalItems, setTotalItems] = useState(0);
+  const itemsPerPage = 10;
+
+  const loadAll = async () => {
     setLoading(true);
-    IngresoService.getAll()
-      .then(res => {
+    try {
+      const baseParams = {
+        page: currentPage,
+        size: itemsPerPage,
+        sort: 'id,desc',
+      };
+
+      if (filter) {
+        // Realizamos búsquedas en paralelo para simular un "OR" (Documento o Proveedor)
+        const paramsDoc = { ...baseParams, 'noDocumento.contains': filter };
+        const paramsProv = { ...baseParams, 'proveedorNombre.contains': filter };
+
+        const [resDoc, resProv] = await Promise.all([
+          IngresoService.getAll(paramsDoc),
+          IngresoService.getAll(paramsProv),
+        ]);
+
+        // Unificar resultados y eliminar duplicados por ID
+        const combined = [...resDoc.data, ...resProv.data];
+        const seen = new Set();
+        const uniqueEntries = combined.filter(item => {
+          if (seen.has(item.id)) return false;
+          seen.add(item.id);
+          return true;
+        });
+
+        setIngresos(uniqueEntries);
+
+        // El total es aproximado a la suma de ambos o el máximo encontrado en los headers
+        const totalDoc = parseInt(resDoc.headers['x-total-count'] || '0', 10);
+        const totalProv = parseInt(resProv.headers['x-total-count'] || '0', 10);
+        setTotalItems(Math.max(totalDoc, totalProv, uniqueEntries.length));
+      } else {
+        const res = await IngresoService.getAll(baseParams);
         setIngresos(res.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+        const total = res.headers['x-total-count'];
+        setTotalItems(total ? parseInt(total, 10) : res.data.length);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    loadAll();
+  }, [currentPage, filter]);
 
   const verDetalles = async (id: number) => {
     try {
@@ -38,17 +96,8 @@ export const IngresoList = () => {
     }
   };
 
-  useEffect(() => {
-    loadAll();
-  }, []);
-
-  const filtrados = ingresos.filter(
-    i =>
-      (i.noDocumento || '').toLowerCase().includes(filter.toLowerCase()) ||
-      (i.proveedor?.nombre || '').toLowerCase().includes(filter.toLowerCase()),
-  );
-
-  const headerStyle = { backgroundColor: '#2d0a4e', color: 'white' };
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
     <div className="animate__animated animate__fadeIn p-1">
@@ -66,7 +115,10 @@ export const IngresoList = () => {
               type="text"
               placeholder="Factura o proveedor..."
               value={filter}
-              onChange={e => setFilter(e.target.value)}
+              onChange={e => {
+                setFilter(e.target.value);
+                setCurrentPage(0);
+              }}
               className="border-end-0 border-secondary bg-white text-dark"
               style={{ fontSize: '0.8rem' }}
             />
@@ -74,32 +126,48 @@ export const IngresoList = () => {
               <FontAwesomeIcon icon={faSearch} size="sm" />
             </span>
           </div>
-          <Button color="success" size="sm" onClick={() => navigate('/bodeguero/ingresos/nuevo')} style={{ fontSize: '0.75rem' }}>
-            <FontAwesomeIcon icon={faPlus} className="me-1" /> Nueva Compra
-          </Button>
+          {(isAdmin || isJefeBodega) && (
+            <Button
+              color="success"
+              size="sm"
+              onClick={() => navigate('/bodeguero/ingresos/nueva-compra')}
+              style={{ fontSize: '0.75rem' }}
+              className="fw-bold px-3"
+            >
+              <FontAwesomeIcon icon={faPlus} className="me-1" /> NUEVA COMPRA
+            </Button>
+          )}
         </div>
       </div>
 
       <Card className="shadow-sm border-0">
         <Table hover responsive size="sm" className="mb-0">
-          <thead className="text-center text-uppercase small" style={headerStyle}>
+          <thead className="table-light text-dark text-center text-uppercase small fw-bold">
             <tr>
               <th className="py-2">Fecha</th>
               <th className="py-2">No. Documento</th>
               <th className="py-2 text-start">Proveedor</th>
-              <th className="py-2 text-end">Total</th>
+              <th className="py-2 text-center" style={{ width: '100px' }}>
+                Usuario
+              </th>
+              {isAdmin && <th className="py-2 text-end">Total</th>}
               <th className="py-2">Estado</th>
               <th className="py-2">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {filtrados.length > 0 ? (
-              filtrados.map(i => (
+            {ingresos.length > 0 ? (
+              ingresos.map(i => (
                 <tr key={i.id} className="text-center align-middle" style={{ fontSize: '0.8rem' }}>
                   <td>{dayjs(i.fecha).format('DD/MM/YY')}</td>
                   <td className="fw-bold">{i.noDocumento}</td>
                   <td className="text-start">{i.proveedor?.nombre}</td>
-                  <td className="text-end fw-bold text-primary">C$ {i.total?.toLocaleString()}</td>
+                  <td className="text-center">
+                    <Badge color="light" className="text-dark border shadow-sm px-2 py-1">
+                      {i.usuario?.username}
+                    </Badge>
+                  </td>
+                  {isAdmin && <td className="text-end fw-bold text-primary">C$ {i.total?.toLocaleString()}</td>}
                   <td>
                     <Badge color={i.activo ? 'success' : 'secondary'} pill style={{ fontSize: '0.65rem' }}>
                       {i.activo ? 'Recibido' : 'Anulado'}
@@ -114,20 +182,41 @@ export const IngresoList = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="text-center py-5 text-muted">
+                <td colSpan={7} className="text-center py-5 text-muted">
                   {loading ? 'Cargando registros...' : 'No se encontraron compras registradas'}
                 </td>
               </tr>
             )}
           </tbody>
         </Table>
+        {totalPages > 1 && (
+          <div className="d-flex justify-content-between align-items-center p-2 border-top bg-light">
+            <small className="text-muted ps-2">
+              Mostrando {ingresos.length} de {totalItems} facturas de compra
+            </small>
+            <Pagination size="sm" className="mb-0 pe-2">
+              <PaginationItem disabled={currentPage === 0}>
+                <PaginationLink previous onClick={() => paginate(currentPage - 1)}>
+                  <FontAwesomeIcon icon={faChevronLeft} />
+                </PaginationLink>
+              </PaginationItem>
+              {[...Array(totalPages)].map((_, i) => (
+                <PaginationItem active={i === currentPage} key={i}>
+                  <PaginationLink onClick={() => paginate(i)}>{i + 1}</PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem disabled={currentPage === totalPages - 1}>
+                <PaginationLink next onClick={() => paginate(currentPage + 1)}>
+                  <FontAwesomeIcon icon={faChevronRight} />
+                </PaginationLink>
+              </PaginationItem>
+            </Pagination>
+          </div>
+        )}
       </Card>
-      <div className="mt-3 text-muted small">
-        <p>* Los ingresos representan las entradas de mercancía al almacén que aumentan el stock.</p>
-      </div>
 
       {/* MODAL DETALLES DE COMPRA (INGRESO) */}
-      <Modal isOpen={showDetalleModal} toggle={() => setShowDetalleModal(false)} size="lg" centered>
+      <Modal isOpen={showDetalleModal} toggle={() => setShowDetalleModal(false)} size="lg" centered scrollable>
         <ModalHeader toggle={() => setShowDetalleModal(false)} className="bg-dark text-white">
           <FontAwesomeIcon icon={faFileInvoice} className="me-2 text-info" /> Detalles de Compra #{ingresoSeleccionado?.noDocumento}
         </ModalHeader>
@@ -136,12 +225,25 @@ export const IngresoList = () => {
             <div>
               <Label className="text-muted small text-uppercase fw-bold mb-0">Proveedor</Label>
               <div className="fw-bold fs-5 text-dark">{ingresoSeleccionado?.proveedor?.nombre}</div>
-              <small className="text-muted">{ingresoSeleccionado?.proveedor?.telefono}</small>
+              <small className="d-block text-dark">
+                <span className="fw-bold">RUC:</span> {ingresoSeleccionado?.proveedor?.ruc || 'N/D'}
+              </small>
+              <small className="text-dark">
+                <span className="fw-bold">Teléfono:</span> {ingresoSeleccionado?.proveedor?.telefono || 'N/D'}
+              </small>
             </div>
             <div className="text-end">
-              <Label className="text-muted small text-uppercase fw-bold mb-0">Fecha de Ingreso</Label>
-              <div className="fw-bold">{dayjs(ingresoSeleccionado?.fecha).format('DD/MM/YYYY')}</div>
-              <Badge color={ingresoSeleccionado?.activo ? 'success' : 'danger'}>
+              <Label className="text-muted small text-uppercase fw-bold mb-0">Fecha de Compra</Label>
+              <div className="fw-bold text-dark">{dayjs(ingresoSeleccionado?.fecha).format('DD/MM/YYYY')}</div>
+              <div className="small mt-1">
+                <span className="text-muted">Gestionado por:</span>{' '}
+                <span className="fw-bold text-dark">{ingresoSeleccionado?.usuario?.username}</span>
+              </div>
+              <Badge
+                color={ingresoSeleccionado?.activo ? 'success' : 'danger'}
+                className="mt-2 shadow-sm border-0"
+                style={{ fontSize: '0.7rem' }}
+              >
                 {ingresoSeleccionado?.activo ? 'Procesado' : 'Anulado'}
               </Badge>
             </div>
@@ -152,8 +254,8 @@ export const IngresoList = () => {
               <tr>
                 <th>Producto</th>
                 <th className="text-center">Cantidad</th>
-                <th className="text-end">Costo Unit.</th>
-                <th className="text-end">Monto</th>
+                {isAdmin && <th className="text-end">Costo Unit.</th>}
+                {isAdmin && <th className="text-end">Monto</th>}
               </tr>
             </thead>
             <tbody>
@@ -164,37 +266,36 @@ export const IngresoList = () => {
                     <small className="text-muted">{det.articulo?.codigo}</small>
                   </td>
                   <td className="text-center">
-                    <Badge color="info" outline className="px-3">
+                    <Badge color="info" pill className="px-3">
                       {det.cantidad}
                     </Badge>
                   </td>
-                  <td className="text-end">C$ {det.costoUnitario?.toLocaleString()}</td>
-                  <td className="text-end fw-bold">C$ {det.monto?.toLocaleString()}</td>
+                  {isAdmin && <td className="text-end">C$ {det.costoUnitario?.toLocaleString()}</td>}
+                  {isAdmin && <td className="text-end fw-bold">C$ {det.monto?.toLocaleString()}</td>}
                 </tr>
               ))}
             </tbody>
           </Table>
 
-          <div className="mt-4 p-3 bg-light rounded-4 ms-auto" style={{ maxWidth: '300px' }}>
-            <div className="d-flex justify-content-between border-top pt-2">
-              <h5 className="fw-bold m-0">Total Compra:</h5>
-              <h5 className="fw-bold text-dark m-0">C$ {ingresoSeleccionado?.total?.toLocaleString()}</h5>
+          {isAdmin && (
+            <div className="mt-4 p-3 bg-light rounded-4 ms-auto" style={{ maxWidth: '300px' }}>
+              <div className="d-flex justify-content-between border-top pt-2">
+                <h5 className="fw-bold m-0">Total Compra:</h5>
+                <h5 className="fw-bold text-dark m-0">C$ {ingresoSeleccionado?.total?.toLocaleString()}</h5>
+              </div>
             </div>
-          </div>
+          )}
 
           {ingresoSeleccionado?.observaciones && (
-            <div className="mt-3 p-2 bg-warning bg-opacity-10 border-start border-warning border-3 rounded">
-              <small className="fw-bold text-muted d-block text-uppercase">Observaciones:</small>
-              {ingresoSeleccionado.observaciones}
+            <div className="mt-4 p-3 bg-warning bg-opacity-10 border-start border-4 border-warning rounded">
+              <h6 className="fw-bold text-dark mb-1">OBSERVACIONES:</h6>
+              <p className="mb-0 text-dark fst-italic">{ingresoSeleccionado.observaciones}</p>
             </div>
           )}
         </ModalBody>
         <ModalFooter className="border-0">
           <Button color="secondary" size="sm" onClick={() => setShowDetalleModal(false)}>
             Cerrar
-          </Button>
-          <Button color="dark" size="sm">
-            <FontAwesomeIcon icon={faEye} className="me-2 text-info" /> Imprimir Comprobante
           </Button>
         </ModalFooter>
       </Modal>

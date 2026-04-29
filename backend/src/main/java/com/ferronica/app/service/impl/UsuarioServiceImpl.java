@@ -1,0 +1,209 @@
+package com.ferronica.app.service.impl;
+
+import com.ferronica.app.domain.Usuario;
+import com.ferronica.app.repository.IngresoRepository;
+import com.ferronica.app.repository.UsuarioRepository;
+import com.ferronica.app.repository.VentaRepository;
+import com.ferronica.app.service.KeycloakService;
+import com.ferronica.app.service.UsuarioService;
+import com.ferronica.app.service.dto.UsuarioDTO;
+import com.ferronica.app.service.mapper.UsuarioMapper;
+import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Service Implementation for managing
+ * {@link com.ferronica.app.domain.Usuario}.
+ */
+@Service
+@Transactional
+public class UsuarioServiceImpl implements UsuarioService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(UsuarioServiceImpl.class);
+
+    private final UsuarioRepository usuarioRepository;
+
+    private final UsuarioMapper usuarioMapper;
+
+    private final KeycloakService keycloakService;
+
+    private final VentaRepository ventaRepository;
+
+    private final IngresoRepository ingresoRepository;
+
+    public UsuarioServiceImpl(UsuarioRepository usuarioRepository, UsuarioMapper usuarioMapper,
+            KeycloakService keycloakService, VentaRepository ventaRepository, IngresoRepository ingresoRepository) {
+        this.usuarioRepository = usuarioRepository;
+        this.usuarioMapper = usuarioMapper;
+        this.keycloakService = keycloakService;
+        this.ventaRepository = ventaRepository;
+        this.ingresoRepository = ingresoRepository;
+    }
+
+    @Override
+    public UsuarioDTO save(UsuarioDTO usuarioDTO) {
+        LOG.debug("Request to save Usuario : {}", usuarioDTO);
+
+        // Integración con Keycloak: Si viene email y password, crear usuario en
+        // Keycloak
+        if (usuarioDTO.getEmail() != null && !usuarioDTO.getEmail().isEmpty() &&
+                usuarioDTO.getPassword() != null && !usuarioDTO.getPassword().isEmpty()) {
+            try {
+                String keycloakId = keycloakService.createKeycloakUser(usuarioDTO);
+                if (keycloakId != null) {
+                    usuarioDTO.setIdKeycloak(keycloakId);
+                }
+            } catch (Exception e) {
+                LOG.error("Failed to create/update user in Keycloak: {}", e.getMessage());
+                // Lanzamos la excepción para que el usuario sepa que falló la sincronización con Keycloak
+                throw new RuntimeException("Error en Keycloak: " + e.getMessage());
+            }
+        }
+
+        if (usuarioDTO.getIdKeycloak() != null && usuarioDTO.getIdKeycloak().trim().isEmpty()) {
+            usuarioDTO.setIdKeycloak(null);
+        }
+        Usuario usuario = usuarioMapper.toEntity(usuarioDTO);
+
+        // Asegurar que los nuevos campos se guarden localmente
+        usuario.setEmail(usuarioDTO.getEmail());
+        usuario.setUsername(usuarioDTO.getUsername());
+        usuario.setRol(usuarioDTO.getRol());
+
+        // Asegurar que el ID de Keycloak se guarde realmente
+        if (usuarioDTO.getIdKeycloak() != null) {
+            usuario.setIdKeycloak(usuarioDTO.getIdKeycloak());
+        }
+
+        usuario = usuarioRepository.save(usuario);
+        return enrichWithRole(usuario);
+    }
+
+    @Override
+    public UsuarioDTO update(UsuarioDTO usuarioDTO) {
+        LOG.debug("Request to update Usuario : {}", usuarioDTO);
+        if (usuarioDTO.getIdKeycloak() != null && usuarioDTO.getIdKeycloak().trim().isEmpty()) {
+            usuarioDTO.setIdKeycloak(null);
+        }
+
+        // Sincronizar perfil completo con Keycloak si tiene ID
+        if (usuarioDTO.getIdKeycloak() != null) {
+            keycloakService.updateUserProfile(usuarioDTO);
+        }
+
+        Usuario usuario = usuarioMapper.toEntity(usuarioDTO);
+
+        // Sincronizar campos locales en actualización
+        usuario.setEmail(usuarioDTO.getEmail());
+        usuario.setUsername(usuarioDTO.getUsername());
+        usuario.setRol(usuarioDTO.getRol());
+
+        // Asegurar que el ID de Keycloak se mantenga
+        if (usuarioDTO.getIdKeycloak() != null) {
+            usuario.setIdKeycloak(usuarioDTO.getIdKeycloak());
+        }
+
+        usuario = usuarioRepository.save(usuario);
+        return enrichWithRole(usuario);
+    }
+
+    @Override
+    public Optional<UsuarioDTO> partialUpdate(UsuarioDTO usuarioDTO) {
+        LOG.debug("Request to partially update Usuario : {}", usuarioDTO);
+
+        return usuarioRepository
+                .findById(usuarioDTO.getId())
+                .map(existingUsuario -> {
+                    usuarioMapper.partialUpdate(existingUsuario, usuarioDTO);
+
+                    // Sincronizar cambios con Keycloak
+                    if (existingUsuario.getIdKeycloak() != null) {
+                        UsuarioDTO updatedDto = usuarioMapper.toDto(existingUsuario);
+                        keycloakService.updateUserProfile(updatedDto);
+                    }
+
+                    return existingUsuario;
+                })
+                .map(usuarioRepository::save)
+                .map(this::enrichWithRole);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<UsuarioDTO> findAll(Pageable pageable) {
+        LOG.debug("Request to get all Usuarios");
+        return usuarioRepository.findAll(pageable).map(this::enrichWithRole);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<UsuarioDTO> findOne(Long id) {
+        LOG.debug("Request to get Usuario : {}", id);
+        return usuarioRepository.findById(id).map(this::enrichWithRole);
+    }
+
+    @Override
+    public boolean delete(Long id) {
+        LOG.debug("Request to delete Usuario (Smart Delete) : {}", id);
+        return usuarioRepository.findById(id).map(usuario -> {
+            // Contar si tiene ventas o ingresos asociados
+            long ventasCount = ventaRepository.countByUsuarioId(id);
+            long ingresosCount = ingresoRepository.countByUsuarioId(id);
+
+            if (ventasCount > 0 || ingresosCount > 0) {
+                // TIENE HISTORIAL: Borrado Lógico (Inactivar)
+                usuario.setActivo(false);
+                usuarioRepository.save(usuario);
+
+                // Desactivar en Keycloak
+                if (usuario.getIdKeycloak() != null) {
+                    keycloakService.updateUserStatus(usuario.getIdKeycloak(), false);
+                }
+                LOG.info(">>> SMART DELETE: User {} has history ({} sales, {} entries). Marked as INACTIVE.",
+                        usuario.getNombre(), ventasCount, ingresosCount);
+                return false; // Borrado lógico
+            } else {
+                // NO TIENE HISTORIAL: Borrado Físico total
+                String keycloakId = usuario.getIdKeycloak();
+
+                // 1. Borrar de la DB local
+                usuarioRepository.deleteById(id);
+
+                // 2. Borrar de Keycloak
+                if (keycloakId != null && !keycloakId.isEmpty()) {
+                    keycloakService.deleteKeycloakUser(keycloakId);
+                }
+                LOG.info(">>> SMART DELETE: User {} was a test user (no history). DELETED physically.",
+                        usuario.getNombre());
+                return true; // Borrado físico
+            }
+        }).orElse(false);
+    }
+
+    private UsuarioDTO enrichWithRole(Usuario usuario) {
+        UsuarioDTO dto = usuarioMapper.toDto(usuario);
+
+        // Si ya tenemos el rol en la base de datos local, lo usamos directamente para
+        // ahorrar tiempo
+        if (usuario.getRol() != null && !usuario.getRol().isEmpty()) {
+            dto.setRol(usuario.getRol());
+            return dto;
+        }
+
+        String keycloakId = usuario.getIdKeycloak();
+        if (keycloakId != null && !keycloakId.trim().isEmpty()) {
+            LOG.debug("Fetching role for user {} from Keycloak ID: {}", usuario.getNombre(), keycloakId);
+            String role = keycloakService.getUserRole(keycloakId);
+            if (role != null) {
+                dto.setRol(role);
+                LOG.info(">>> ROLE FOUND: User {} role fetched from Keycloak", usuario.getNombre());
+            }
+        }
+        return dto;
+    }
+}

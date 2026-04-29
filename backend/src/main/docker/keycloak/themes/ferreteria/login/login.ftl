@@ -10,8 +10,8 @@ html, body {
     height: 100%;
     font-family: 'Inter', sans-serif;
     overflow: hidden;
-    /* Fondo principal negro */
-    background: #000 !important;
+    /* Fondo principal oscuro con un toque morado profundo */
+    background: #0a0a0c !important;
     
     display: flex;
     align-items: center;
@@ -31,26 +31,26 @@ html, body {
 /* ---------- TARJETA CENTRADA ---------- */
 .split-container {
     display: flex;
-    width: 900px; /* Ancho fijo para aspecto de tarjeta */
-    max-width: 90%;
+    width: 900px; 
+    max-width: 95%;
     height: 600px;
     max-height: 90vh;
     
-    background: rgba(30, 41, 59, 0.5); /* Fondo semitransparente */
-    backdrop-filter: blur(20px); /* Efecto cristal */
+    background: rgba(15, 12, 25, 0.7); /* Fondo oscuro semitransparente */
+    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px; /* Bordes redondeados */
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); /* Sombra elegante */
-    overflow: hidden; /* Recortar contenido para respetar bordes */
+    border: 1px solid rgba(139, 92, 246, 0.2); /* Borde sutil morado */
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+    overflow: hidden;
 }
 
 /* LADO IZQUIERDO LOGIN */
 .left-panel {
     width: 45%;
-    /* Cambio de Azul a Gris Cálido (Stone/Carbón) para combinar con Naranja */
-    background: rgba(60, 56, 53, 0.98); 
+    /* Morado muy oscuro tirando a negro */
+    background: rgba(18, 14, 28, 0.98); 
     padding: 40px;
     color: white;
     display: flex;
@@ -62,36 +62,29 @@ html, body {
 /* LADO DERECHO IMAGEN */
 .right-panel {
     flex: 1;
-    /* Más brillo: Gradiente más suave y filtro de brillo */
+    /* Gradiente más claro para que el logo resalte */
     background: 
-        linear-gradient(135deg, rgba(255, 120, 0, 0.3), rgba(0, 0, 0, 0.1)),
+        linear-gradient(135deg, rgba(88, 28, 135, 0.2), rgba(10, 10, 15, 0.4)),
         url("${url.resourcesPath}/img/ferroN.png"); 
     background-size: cover;
     background-position: center;
     position: relative;
-    background-color: #0f172a;
+    background-color: #1a1625;
     filter: brightness(1.1) contrast(1.1);
 }
 
-/* Overlay eliminado para mayor claridad */
-/* .right-panel::after { ... } */
-
 /* ---------- ESTILO LOGIN ---------- */
-.logo {
-    width: 60px;
-    margin-bottom: 20px;
-    filter: drop-shadow(0 0 8px rgba(255,107,0,0.5));
-}
-
 .title {
-    font-size: 1.8rem;
-    font-weight: 700;
+    font-size: 2.2rem;
+    font-weight: 800;
     margin-bottom: 8px;
     color: #fff;
+    letter-spacing: -1px;
+    text-transform: uppercase; /* FERRONICA en mayúsculas como pediste */
 }
 
 .subtitle {
-    color: #94a3b8;
+    color: #a78bfa; /* Morado claro */
     margin-bottom: 30px;
     font-size: 0.9rem;
 }
@@ -100,7 +93,7 @@ html, body {
 
 label {
     font-size: 0.85rem;
-    color: #cbd5e1;
+    color: #94a3b8;
     margin-bottom: 6px;
     display:block;
     font-weight: 500;
@@ -109,50 +102,53 @@ label {
 input {
     width: 100%;
     padding: 12px 14px;
-    border-radius: 10px;
-    border: 1px solid #44403c; /* Borde gris cálido */
-    background: #292524;       /* Fondo gris cálido oscuro */
+    border-radius: 12px;
+    border: 1px solid #2e2a3d; 
+    background: #1a1625; 
     color: white;
     font-size: 0.95rem;
-    box-sizing: border-box; /* Importante para padding */
-    transition: all 0.2s;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
 }
 
 input:focus {
     outline:none;
-    border-color:#ff6b00;
-    background: #44403c; /* Fondo un poco más claro al foco */
-    box-shadow:0 0 0 3px rgba(255,107,0,0.15);
+    border-color:#8b5cf6; /* Morado vibrante al hacer foco */
+    background: #241e33;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
 }
 
 .btn-primary {
     width:100%;
-    padding:12px;
-    background: linear-gradient(90deg, #ff6b00, #ff8c00);
+    padding:14px;
+    /* Gradiente Morado */
+    background: linear-gradient(90deg, #6d28d9, #8b5cf6);
     color:white;
     border:none;
-    border-radius:10px;
-    font-weight: 600;
+    border-radius:12px;
+    font-weight: 700;
     font-size: 1rem;
     margin-top:20px;
     cursor:pointer;
-    transition: transform 0.1s, box-shadow 0.2s;
+    transition: all 0.3s;
+    text-transform: uppercase;
 }
 
 .btn-primary:hover {
-    box-shadow: 0 10px 20px -5px rgba(255, 107, 0, 0.4);
-    transform: translateY(-1px);
+    box-shadow: 0 10px 20px -5px rgba(139, 92, 246, 0.5);
+    transform: translateY(-2px);
+    filter: brightness(1.1);
 }
 
 .link {
-    color:#ff6b00;
+    color:#a78bfa;
     text-decoration:none;
     font-size:.85rem;
     transition: color 0.2s;
 }
 
 .link:hover {
-    color: #ff9d4d;
+    color: #c4b5fd;
     text-decoration: underline;
 }
 
@@ -160,7 +156,7 @@ input:focus {
     margin-top: auto;
     padding-top: 20px;
     font-size:.75rem;
-    color:#64748b;
+    color:#4b5563;
     text-align: center;
 }
 
@@ -174,7 +170,7 @@ input:focus {
     }
     .left-panel{
         width:100%;
-        padding: 30px;
+        padding: 40px 30px;
         box-sizing: border-box;
     }
     .right-panel{display:none;}
@@ -184,52 +180,42 @@ input:focus {
 <#elseif section = "form">
 <div class="split-container">
 
-    <!-- LOGIN -->
     <div class="left-panel">
-        <div class="title">FerroNica</div>
-        <div class="subtitle">Bienvenido de nuevo</div>
+        <div class="title">FERRONICA</div>
 
         <#if realm.password>
         <form action="${url.loginAction}" method="post">
 
             <div class="form-group">
                 <label>${msg("usernameOrEmail")}</label>
-                <input name="username" type="text" value="${(login.username!'')}" autofocus autocomplete="off" />
+                <input name="username" type="text" value="${(login.username!'')}" autofocus autocomplete="off" placeholder="Username" />
             </div>
 
             <div class="form-group">
                 <label>${msg("password")}</label>
                 <div style="position:relative">
-                    <input name="password" type="password" id="password" autocomplete="off"/>
+                    <input name="password" type="password" id="password" autocomplete="off" placeholder="••••••••"/>
                 </div>
             </div>
 
-            <#if realm.resetPasswordAllowed>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <div style="font-size:0.8rem; color:#94a3b8">
-                         <#if realm.rememberMe && !usernameEditDisabled??>
-                            <#if login.rememberMe??>
-                                <input id="rememberMe" name="rememberMe" type="checkbox" checked style="width:auto; margin-right:5px;">
-                            <#else>
-                                <input id="rememberMe" name="rememberMe" type="checkbox" style="width:auto; margin-right:5px;">
-                            </#if>
-                            <label for="rememberMe" style="display:inline; color:#94a3b8">${msg("rememberMe")}</label>
-                        </#if>
-                    </div>
-                    <a href="${url.loginResetCredentialsUrl}" class="link">${msg("doForgotPassword")}</a>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <div style="font-size:0.8rem; color:#94a3b8">
+                     <#if realm.rememberMe && !usernameEditDisabled??>
+                        <input id="rememberMe" name="rememberMe" type="checkbox" <#if login.rememberMe??>checked</#if> style="width:auto; margin-right:5px;">
+                        <label for="rememberMe" style="display:inline; color:#94a3b8">${msg("rememberMe")}</label>
+                    </#if>
                 </div>
-            </#if>
+                <#if realm.resetPasswordAllowed>
+                    <a href="${url.loginResetCredentialsUrl}" class="link">Forgot Password?</a>
+                </#if>
+            </div>
 
-            <button class="btn-primary" type="submit">${msg("doLogIn")}</button>
+            <button class="btn-primary" type="submit">SIGN IN</button>
         </form>
         </#if>
 
-        <div class="footer">
-            &copy; 2026 Sistema de Gestión Ferretera
-        </div>
     </div>
 
-    <!-- IMAGEN -->
     <div class="right-panel">
     </div>
 

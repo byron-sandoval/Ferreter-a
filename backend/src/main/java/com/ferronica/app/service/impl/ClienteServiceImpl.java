@@ -2,6 +2,7 @@ package com.ferronica.app.service.impl;
 
 import com.ferronica.app.domain.Cliente;
 import com.ferronica.app.repository.ClienteRepository;
+import com.ferronica.app.repository.VentaRepository;
 import com.ferronica.app.service.ClienteService;
 import com.ferronica.app.service.dto.ClienteDTO;
 import com.ferronica.app.service.mapper.ClienteMapper;
@@ -21,11 +22,13 @@ public class ClienteServiceImpl implements ClienteService {
     private static final Logger LOG = LoggerFactory.getLogger(ClienteServiceImpl.class);
 
     private final ClienteRepository clienteRepository;
-
+    private final VentaRepository ventaRepository;
     private final ClienteMapper clienteMapper;
 
-    public ClienteServiceImpl(ClienteRepository clienteRepository, ClienteMapper clienteMapper) {
+    public ClienteServiceImpl(ClienteRepository clienteRepository, VentaRepository ventaRepository,
+            ClienteMapper clienteMapper) {
         this.clienteRepository = clienteRepository;
+        this.ventaRepository = ventaRepository;
         this.clienteMapper = clienteMapper;
     }
 
@@ -69,10 +72,20 @@ public class ClienteServiceImpl implements ClienteService {
 
     @Override
     public void delete(Long id) {
-        LOG.debug("Request to delete Cliente (Logical) : {}", id);
-        clienteRepository.findById(id).ifPresent(cliente -> {
-            cliente.setActivo(false);
-            clienteRepository.save(cliente);
-        });
+        long ventasCount = ventaRepository.countByClienteId(id);
+        LOG.debug("Request to delete Cliente : {}. Sales count: {}", id, ventasCount);
+
+        if (ventasCount > 0) {
+            // Si tiene ventas, solo desactivar (Borrado Lógico)
+            clienteRepository.findById(id).ifPresent(cliente -> {
+                cliente.setActivo(false);
+                clienteRepository.save(cliente);
+                LOG.debug("Cliente {} deactivated (logical delete) because it has sales.", id);
+            });
+        } else {
+            // Si NO tiene ventas, borrar físicamente
+            clienteRepository.deleteById(id);
+            LOG.debug("Cliente {} physically deleted because it has NO sales.", id);
+        }
     }
 }

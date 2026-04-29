@@ -23,6 +23,8 @@ public class DevolucionDTO implements Serializable {
 
     private VentaDTO venta;
 
+    private java.util.Set<DetalleDevolucionDTO> detalles = new java.util.HashSet<>();
+
     public Long getId() {
         return id;
     }
@@ -61,6 +63,14 @@ public class DevolucionDTO implements Serializable {
 
     public void setVenta(VentaDTO venta) {
         this.venta = venta;
+    }
+
+    public java.util.Set<DetalleDevolucionDTO> getDetalles() {
+        return detalles;
+    }
+
+    public void setDetalles(java.util.Set<DetalleDevolucionDTO> detalles) {
+        this.detalles = detalles;
     }
 
     @Override

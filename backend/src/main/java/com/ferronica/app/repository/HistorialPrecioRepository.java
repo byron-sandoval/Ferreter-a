@@ -1,6 +1,7 @@
 package com.ferronica.app.repository;
 
 import com.ferronica.app.domain.HistorialPrecio;
+import java.util.List;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
@@ -9,4 +10,6 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface HistorialPrecioRepository extends JpaRepository<HistorialPrecio, Long> {}
+public interface HistorialPrecioRepository extends JpaRepository<HistorialPrecio, Long> {
+    List<HistorialPrecio> findByArticuloIdOrderByFechaDesc(Long articuloId);
+}

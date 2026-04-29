@@ -5,9 +5,11 @@ import { faTruck, faArrowLeft, faEye, faFileExcel, faCalendar, faClipboardList }
 import { useNavigate } from 'react-router-dom';
 import IngresoService from 'app/services/ingreso.service';
 import ProveedorService from 'app/services/proveedor.service';
+import ArticuloService from 'app/services/articulo.service';
 import { IIngreso } from 'app/shared/model/ingreso.model';
 import { IProveedor } from 'app/shared/model/proveedor.model';
 import dayjs from 'dayjs';
+import * as XLSX from 'xlsx-js-style';
 
 export const ComprasPorProveedor = () => {
   const navigate = useNavigate();
@@ -25,7 +27,7 @@ export const ComprasPorProveedor = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [provRes, ingRes] = await Promise.all([ProveedorService.getAll(), IngresoService.getAll()]);
+      const [provRes, ingRes] = await Promise.all([ProveedorService.getAll(), IngresoService.getAll({ size: 5000, sort: 'id,desc' })]);
       setProveedores(provRes.data);
       setIngresos(ingRes.data);
     } catch (error) {
@@ -73,6 +75,51 @@ export const ComprasPorProveedor = () => {
     setLoadingItems(false);
   };
 
+  const exportDetalleExcel = async () => {
+    if (!proveedorSeleccionado) return;
+
+    // Cargamos los artículos solo para obtener los códigos para el Excel
+    let todosLosArticulos: any[] = [];
+    try {
+      const artRes = await ArticuloService.getAll({ page: 0, size: 5000 });
+      todosLosArticulos = artRes.data;
+    } catch (e) {
+      console.error('Error al obtener códigos de artículos para el reporte', e);
+    }
+
+    const wb = XLSX.utils.book_new();
+    const totalHistorico = itemsProveedor.reduce((sum, item) => sum + (item.monto || 0), 0);
+    const wsData = [
+      ['HISTORIAL DE COMPRAS'],
+      [`Proveedor: ${proveedorSeleccionado.nombre}`],
+      [`RUC: ${proveedorSeleccionado.ruc || '-'}`],
+      [''],
+      ['Fecha', 'No. Factura', 'Producto', 'Código', 'Cantidad', 'Costo Unit. (C$)', 'Subtotal (C$)'],
+    ];
+    itemsProveedor.forEach(item => {
+      // Buscamos el código real del artículo en la lista que acabamos de traer
+      const artCompleto = todosLosArticulos.find(a => a.id === item.articulo?.id);
+      const codigoReal = artCompleto?.codigo || item.articulo?.codigo || '-';
+
+      wsData.push([
+        dayjs(item.fecha).format('DD/MM/YYYY'),
+        item.noDocumento || '-',
+        item.articulo?.nombre || '-',
+        codigoReal,
+        item.cantidad?.toString(),
+        item.costoUnitario?.toLocaleString(),
+        item.monto?.toLocaleString(),
+      ]);
+    });
+
+    // Añadir fila de TOTAL
+    wsData.push(['', '', '', '', '', 'TOTAL:', totalHistorico.toLocaleString()]);
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    XLSX.utils.book_append_sheet(wb, ws, 'Historial');
+    XLSX.writeFile(wb, `Compras_${proveedorSeleccionado.nombre.replace(/ /g, '_')}.xlsx`);
+  };
+
   const headerStyle = { backgroundColor: '#08c4d1ff', color: 'white' };
 
   if (proveedorSeleccionado) {
@@ -89,9 +136,20 @@ export const ComprasPorProveedor = () => {
               <small className="opacity-75">RUC / ID: {proveedorSeleccionado.ruc || '-'}</small>
             </div>
           </div>
-          <Button color="light" size="sm" onClick={() => setProveedorSeleccionado(null)} style={{ fontSize: '0.75rem' }}>
-            <FontAwesomeIcon icon={faArrowLeft} className="me-1" /> Volver a Lista
-          </Button>
+          <div className="d-flex gap-2">
+            <Button
+              color="success"
+              size="sm"
+              onClick={exportDetalleExcel}
+              style={{ fontSize: '0.75rem' }}
+              className="fw-bold border-0 shadow-sm"
+            >
+              <FontAwesomeIcon icon={faFileExcel} className="me-1" /> EXCEL
+            </Button>
+            <Button color="light" size="sm" onClick={() => setProveedorSeleccionado(null)} style={{ fontSize: '0.75rem' }}>
+              <FontAwesomeIcon icon={faArrowLeft} className="me-1" /> Volver a Lista
+            </Button>
+          </div>
         </div>
 
         <Card className="shadow-sm border-0 mb-3">
@@ -172,9 +230,11 @@ export const ComprasPorProveedor = () => {
           <FontAwesomeIcon icon={faTruck} />
           <h5 className="m-0 fw-bold">Reporte de Compras por Proveedor</h5>
         </div>
-        <Button color="secondary" size="sm" outline onClick={() => navigate('/admin/reportes')} style={{ fontSize: '0.75rem' }}>
-          <FontAwesomeIcon icon={faArrowLeft} className="me-1" /> Volver
-        </Button>
+        <div className="d-flex gap-2">
+          <Button color="secondary" size="sm" outline onClick={() => navigate('/admin/reportes')} style={{ fontSize: '0.75rem' }}>
+            <FontAwesomeIcon icon={faArrowLeft} className="me-1" /> Volver
+          </Button>
+        </div>
       </div>
 
       <Card className="shadow-sm border-0">
@@ -212,7 +272,7 @@ export const ComprasPorProveedor = () => {
                     </td>
                     <td className="text-end fw-bold text-success">C$ {totalCompras.toLocaleString()}</td>
                     <td className="text-center">
-                      <Badge color={prov.activo ? 'success' : 'secondary'} pill style={{ fontSize: '0.65rem' }}>
+                      <Badge color={prov.activo ? 'success' : 'danger'} pill style={{ fontSize: '0.65rem' }}>
                         {prov.activo ? 'Activo' : 'Inactivo'}
                       </Badge>
                     </td>

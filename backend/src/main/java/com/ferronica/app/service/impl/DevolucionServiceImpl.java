@@ -1,5 +1,7 @@
 package com.ferronica.app.service.impl;
 
+import com.ferronica.app.domain.Articulo;
+import com.ferronica.app.domain.DetalleDevolucion;
 import com.ferronica.app.domain.Devolucion;
 import com.ferronica.app.repository.DevolucionRepository;
 import com.ferronica.app.service.DevolucionService;
@@ -28,9 +30,15 @@ public class DevolucionServiceImpl implements DevolucionService {
 
     private final DevolucionMapper devolucionMapper;
 
-    public DevolucionServiceImpl(DevolucionRepository devolucionRepository, DevolucionMapper devolucionMapper) {
+    private final com.ferronica.app.repository.ArticuloRepository articuloRepository;
+
+    public DevolucionServiceImpl(
+            DevolucionRepository devolucionRepository,
+            DevolucionMapper devolucionMapper,
+            com.ferronica.app.repository.ArticuloRepository articuloRepository) {
         this.devolucionRepository = devolucionRepository;
         this.devolucionMapper = devolucionMapper;
+        this.articuloRepository = articuloRepository;
     }
 
     @Override
@@ -41,8 +49,24 @@ public class DevolucionServiceImpl implements DevolucionService {
         // Automatización de Fecha
         devolucion.setFecha(java.time.Instant.now());
 
-        devolucion = devolucionRepository.save(devolucion);
-        return devolucionMapper.toDto(devolucion);
+        // Asegurar relación bidireccional y actualización de inventario
+        if (devolucion.getDetalles() != null) {
+            final Devolucion fixedDev = devolucion; // Efectivamente final para lambda
+            devolucion.getDetalles().forEach((DetalleDevolucion detalleDev) -> {
+                detalleDev.setDevolucion(fixedDev);
+
+                // 1. Actualizar inventario (Sumar al stock)
+                if (detalleDev.getArticulo() != null && detalleDev.getArticulo().getId() != null) {
+                    articuloRepository.findById(detalleDev.getArticulo().getId()).ifPresent((Articulo articulo) -> {
+                        articulo.setExistencia(articulo.getExistencia().add(detalleDev.getCantidad()));
+                        articuloRepository.save(articulo);
+                    });
+                }
+            });
+        }
+
+        Devolucion result = devolucionRepository.save(devolucion);
+        return devolucionMapper.toDto(result);
     }
 
     @Override
@@ -87,5 +111,14 @@ public class DevolucionServiceImpl implements DevolucionService {
     public void delete(Long id) {
         LOG.debug("Request to delete Devolucion : {}", id);
         devolucionRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<DevolucionDTO> findAllByVenta(Long ventaId) {
+        LOG.debug("Request to get all Devolucions by Venta : {}", ventaId);
+        return devolucionRepository.findAllByVentaId(ventaId).stream()
+                .map(devolucionMapper::toDto)
+                .collect(Collectors.toCollection(LinkedList::new));
     }
 }

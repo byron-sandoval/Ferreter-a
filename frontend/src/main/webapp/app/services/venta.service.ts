@@ -18,8 +18,9 @@ export const VentaService = {
 
   // Obtener ventas del día (para el Dashboard)
   getVentasHoy() {
-    const hoy = new Date().toISOString().split('T')[0];
-    return axios.get<IVenta[]>(`${API_VENTAS}?fecha.greaterThanOrEqual=${hoy}T00:00:00Z&size=1000`);
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    return axios.get<IVenta[]>(`${API_VENTAS}?fecha.greaterThanOrEqual=${startOfToday.toISOString()}&size=1000`);
   },
 
   // Obtener una factura completa por ID
@@ -33,6 +34,11 @@ export const VentaService = {
 
   getAllDetalles(params?: any) {
     return axios.get<IDetalleVenta[]>(API_DETALLES, { params });
+  },
+
+  // Anular una venta (Llamada al Delete que implementamos en el backend)
+  anular(id: number) {
+    return axios.delete(`${API_VENTAS}/${id}`);
   },
 };
 

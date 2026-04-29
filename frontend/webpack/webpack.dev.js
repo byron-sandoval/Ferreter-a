@@ -47,6 +47,10 @@ module.exports = async options =>
     devServer: {
       hot: true,
       host: '127.0.0.1',
+      allowedHosts: 'all',
+      client: {
+        webSocketURL: 'ws://127.0.0.1:9060/ws',
+      },
       static: {
         directory: './target/classes/static/',
       },
@@ -74,13 +78,14 @@ module.exports = async options =>
       process.env.JHI_DISABLE_WEBPACK_LOGS
         ? null
         : new SimpleProgressWebpackPlugin({
-            format: options.stats === 'minimal' ? 'compact' : 'expanded',
-          }),
+          format: options.stats === 'minimal' ? 'compact' : 'expanded',
+        }),
       new BrowserSyncPlugin(
         {
           https: options.tls,
           host: '127.0.0.1',
           port: 9000,
+          ui: false,
           proxy: {
             target: `http${options.tls ? 's' : ''}://127.0.0.1:${options.watch ? '8081' : '9060'}`,
             ws: true,

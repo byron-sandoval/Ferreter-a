@@ -96,6 +96,8 @@ module.exports = async options => {
           DEVELOPMENT: JSON.stringify(development),
           VERSION: JSON.stringify(environment.VERSION),
           SERVER_API_URL: JSON.stringify(environment.SERVER_API_URL),
+          // Stripe: clave pública disponible en la app como process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY
+          'process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY': JSON.stringify(environment.STRIPE_PUBLISHABLE_KEY),
         }),
         /*
         new ESLintPlugin({

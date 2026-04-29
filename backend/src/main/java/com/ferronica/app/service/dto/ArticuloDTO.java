@@ -1,6 +1,5 @@
 package com.ferronica.app.service.dto;
 
-import jakarta.persistence.Lob;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -40,16 +39,17 @@ public class ArticuloDTO implements Serializable {
     @DecimalMin(value = "0")
     private BigDecimal costo;
 
-    @Lob
-    private byte[] imagen;
-
-    private String imagenContentType;
+    private String imagenUrl;
 
     private Boolean activo;
+
+    private BigDecimal ultimoCosto;
 
     private CategoriaDTO categoria;
 
     private UnidadMedidaDTO unidadMedida;
+
+    private String priceChangeReason;
 
     public Long getId() {
         return id;
@@ -115,20 +115,12 @@ public class ArticuloDTO implements Serializable {
         this.costo = costo;
     }
 
-    public byte[] getImagen() {
-        return imagen;
+    public String getImagenUrl() {
+        return imagenUrl;
     }
 
-    public void setImagen(byte[] imagen) {
-        this.imagen = imagen;
-    }
-
-    public String getImagenContentType() {
-        return imagenContentType;
-    }
-
-    public void setImagenContentType(String imagenContentType) {
-        this.imagenContentType = imagenContentType;
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
     }
 
     public Boolean getActivo() {
@@ -137,6 +129,14 @@ public class ArticuloDTO implements Serializable {
 
     public void setActivo(Boolean activo) {
         this.activo = activo;
+    }
+
+    public BigDecimal getUltimoCosto() {
+        return ultimoCosto;
+    }
+
+    public void setUltimoCosto(BigDecimal ultimoCosto) {
+        this.ultimoCosto = ultimoCosto;
     }
 
     public CategoriaDTO getCategoria() {
@@ -153,6 +153,14 @@ public class ArticuloDTO implements Serializable {
 
     public void setUnidadMedida(UnidadMedidaDTO unidadMedida) {
         this.unidadMedida = unidadMedida;
+    }
+
+    public String getPriceChangeReason() {
+        return priceChangeReason;
+    }
+
+    public void setPriceChangeReason(String priceChangeReason) {
+        this.priceChangeReason = priceChangeReason;
     }
 
     @Override
@@ -180,18 +188,18 @@ public class ArticuloDTO implements Serializable {
     @Override
     public String toString() {
         return "ArticuloDTO{" +
-            "id=" + getId() +
-            ", codigo='" + getCodigo() + "'" +
-            ", nombre='" + getNombre() + "'" +
-            ", descripcion='" + getDescripcion() + "'" +
-            ", existencia=" + getExistencia() +
-            ", existenciaMinima=" + getExistenciaMinima() +
-            ", precio=" + getPrecio() +
-            ", costo=" + getCosto() +
-            ", imagen='" + getImagen() + "'" +
-            ", activo='" + getActivo() + "'" +
-            ", categoria=" + getCategoria() +
-            ", unidadMedida=" + getUnidadMedida() +
-            "}";
+                "id=" + getId() +
+                ", codigo='" + getCodigo() + "'" +
+                ", nombre='" + getNombre() + "'" +
+                ", descripcion='" + getDescripcion() + "'" +
+                ", existencia=" + getExistencia() +
+                ", existenciaMinima=" + getExistenciaMinima() +
+                ", precio=" + getPrecio() +
+                ", costo=" + getCosto() +
+                ", imagenUrl='" + getImagenUrl() + "'" +
+                ", activo='" + getActivo() + "'" +
+                ", categoria=" + getCategoria() +
+                ", unidadMedida=" + getUnidadMedida() +
+                "}";
     }
 }

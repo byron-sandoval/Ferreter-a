@@ -15,12 +15,25 @@ import {
   faTrash,
   faEye,
   faFileExcel,
+  faFilePdf,
   faBoxOpen,
   faHistory,
   faTimes,
+  faChevronLeft,
+  faChevronRight,
+  faTools,
+  faCheck
 } from '@fortawesome/free-solid-svg-icons';
+import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
+import { useAppSelector } from 'app/config/store';
+import { AUTHORITIES } from 'app/config/constants';
+import * as XLSX from 'xlsx-js-style';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export const ArticuloList = () => {
+  const isAdmin = useAppSelector(state => state.authentication.account.authorities.includes(AUTHORITIES.ADMIN));
+  const isJefeBodega = useAppSelector(state => state.authentication.account.authorities.includes(AUTHORITIES.JEFE_BODEGA));
   const [articulos, setArticulos] = useState<IArticulo[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
@@ -28,6 +41,7 @@ export const ArticuloList = () => {
   const [showHistory, setShowHistory] = useState(false);
   const [historial, setHistorial] = useState<IHistorialPrecio[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [showInactive, setShowInactive] = useState(false);
 
   const loadAll = () => {
     setLoading(true);
@@ -42,16 +56,60 @@ export const ArticuloList = () => {
       });
   };
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter]);
+
   useEffect(() => {
     loadAll();
   }, []);
 
-  const articulosFiltrados = articulos.filter(
-    a => (a.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (a.codigo || '').toLowerCase().includes(filter.toLowerCase()),
-  );
+  const articulosFiltrados = articulos
+    .filter(a => {
+      const matchesSearch =
+        (a.nombre || '').toLowerCase().includes(filter.toLowerCase()) || (a.codigo || '').toLowerCase().includes(filter.toLowerCase());
+      const matchesStatus = showInactive ? a.activo === false : a.activo !== false;
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      const aPending = (a.precio || 0) <= 0 && a.activo;
+      const bPending = (b.precio || 0) <= 0 && b.activo;
+
+      if (aPending && !bPending) return -1;
+      if (!aPending && bPending) return 1;
+
+      // Opcional: Prioridad secundaria para los que tienen aumento de costo (pendientes de revisión)
+      const aReview = a.ultimoCosto && (a.costo || 0) > (a.ultimoCosto || 0);
+      const bReview = b.ultimoCosto && (b.costo || 0) > (b.ultimoCosto || 0);
+
+      if (aReview && !bReview) return -1;
+      if (!aReview && bReview) return 1;
+
+      return 0; // Mantener orden original si ambos son iguales en prioridad
+    });
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = articulosFiltrados.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(articulosFiltrados.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  const handleToggleActive = (articulo: IArticulo) => {
+    const action = articulo.activo ? 'desactivar' : 'reactivar';
+    if (window.confirm(`¿Estás seguro de ${action} el artículo ${articulo.nombre}?`)) {
+      ArticuloService.update({ ...articulo, activo: !articulo.activo }).then(() => {
+        loadAll();
+        setSelectedArticulo(null);
+      });
+    }
+  };
 
   const handleDelete = (id: number) => {
-    if (window.confirm('¿Estás seguro de eliminar este artículo?')) {
+    if (window.confirm('¿Estás seguro de desactivar este artículo?')) {
       ArticuloService.delete(id).then(() => {
         loadAll();
         setSelectedArticulo(null);
@@ -70,6 +128,68 @@ export const ArticuloList = () => {
       .catch(() => setLoadingHistory(false));
   };
 
+
+  const exportAllToExcel = () => {
+    // Preparar datos de todos los productos filtrados
+    const data = articulosFiltrados.map(articulo => ({
+      ID: articulo.id,
+      Código: articulo.codigo,
+      Producto: articulo.nombre,
+      Estado: articulo.activo ? 'Activo' : 'Inactivo',
+      Stock: articulo.existencia,
+      'Stock Mínimo': articulo.existenciaMinima,
+      Unidad: articulo.unidadMedida?.simbolo || '',
+      'Precio Compra': articulo.costo?.toFixed(2),
+      'Precio Venta': articulo.precio?.toFixed(2),
+      'Inversión Total': ((articulo.existencia || 0) * (articulo.costo || 0)).toFixed(2),
+      'Valor Total': ((articulo.existencia || 0) * (articulo.precio || 0)).toFixed(2),
+      Categoría: articulo.categoria?.nombre || 'General',
+      Descripción: articulo.descripcion || '',
+    }));
+
+    // Crear libro de trabajo
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
+
+    // Aplicar estilos a los encabezados (Fila 1)
+    const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const address = XLSX.utils.encode_col(C) + '1';
+      if (!ws[address]) continue;
+      ws[address].s = {
+        font: { bold: true },
+        fill: { fgColor: { rgb: 'EEEEEE' } },
+        alignment: { horizontal: 'center' },
+        border: {
+          bottom: { style: 'thin', color: { rgb: '000000' } },
+        },
+      };
+    }
+
+    // Ajustar ancho de columnas
+    ws['!cols'] = [
+      { wch: 8 }, // ID
+      { wch: 15 }, // Código
+      { wch: 30 }, // Producto
+      { wch: 10 }, // Estado
+      { wch: 10 }, // Stock
+      { wch: 12 }, // Stock Mínimo
+      { wch: 10 }, // Unidad
+      { wch: 15 }, // Precio Compra
+      { wch: 15 }, // Precio Venta
+      { wch: 15 }, // Inversión Total
+      { wch: 15 }, // Valor Total
+      { wch: 20 }, // Categoría
+      { wch: 40 }, // Descripción
+    ];
+
+    // Generar archivo
+    const fileName = `Inventario_Completo_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+  };
+
+
   // Estilos "INASOFTWARE" Style
   const headerStyle = { backgroundColor: 'rgba(111, 66, 193, 1)', color: 'white' }; // Purple header from image
   const subHeaderStyle = { backgroundColor: '#343a40', color: 'white', fontSize: '0.85rem' };
@@ -78,7 +198,7 @@ export const ArticuloList = () => {
   return (
     <div className="animate__animated animate__fadeIn">
       {/* 1. Header de Acciones (Sub-bar style) */}
-      <div className="d-flex justify-content-between align-items-center p-2 mb-0 shadow-sm" style={subHeaderStyle}>
+      <div className="d-flex justify-content-between align-items-center p-2 mb-2 rounded shadow-sm mx-1" style={subHeaderStyle}>
         <div className="d-flex align-items-center gap-3 ps-3">
           <span className="fw-bold text-uppercase" style={{ letterSpacing: '1px' }}>
             Inventario de productos
@@ -98,19 +218,37 @@ export const ArticuloList = () => {
               <FontAwesomeIcon icon={faSearch} />
             </span>
           </div>
-          <Button color="secondary" size="sm" className="opacity-75" onClick={loadAll}>
-            <FontAwesomeIcon icon={faSync} spin={loading} /> Restablecer
+          <div className="form-check form-switch ms-2 me-2 d-flex align-items-center">
+            <Input
+              type="switch"
+              id="showInactiveSwitch"
+              checked={showInactive}
+              onChange={() => setShowInactive(!showInactive)}
+              style={{ cursor: 'pointer' }}
+            />
+            <label
+              className="form-check-label text-white ms-2 small fw-bold"
+              htmlFor="showInactiveSwitch"
+              style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
+            >
+              Ver Inactivos
+            </label>
+          </div>
+          <Button color="success" size="sm" className="opacity-90" onClick={exportAllToExcel}>
+            <FontAwesomeIcon icon={faFileExcel} className="me-2" /> Exportar Todo
           </Button>
-          <Button
-            color="dark"
-            size="sm"
-            tag={Link}
-            to="new"
-            className="fw-bold border-secondary shadow-sm"
-            style={{ backgroundColor: '#2d0a4e' }}
-          >
-            <FontAwesomeIcon icon={faPlus} className="me-2" /> Nuevo Artículo
-          </Button>
+          {isAdmin && (
+            <Button
+              color="dark"
+              size="sm"
+              tag={Link}
+              to="new"
+              className="fw-bold border-secondary shadow-sm"
+              style={{ backgroundColor: '#2d0a4e' }}
+            >
+              <FontAwesomeIcon icon={faPlus} className="me-2" /> Nuevo Artículo
+            </Button>
+          )}
         </div>
       </div>
 
@@ -118,7 +256,7 @@ export const ArticuloList = () => {
         {/* 2. Tabla Densa */}
         <Card className="shadow-sm mb-4 border-0">
           <div className="table-responsive">
-            <Table hover striped size="sm" className="mb-0 align-middle">
+            <Table hover size="sm" className="mb-0 align-middle">
               <thead
                 className="text-center text-uppercase mt-2"
                 style={{ backgroundColor: '#343a40', color: 'black', fontSize: '0.75rem' }}
@@ -130,30 +268,47 @@ export const ArticuloList = () => {
                   <th className="py-2">Estado</th>
                   <th className="py-2">Stock</th>
                   <th className="py-2">Mín.</th>
-                  <th className="py-2 text-end">Costo</th>
-                  <th className="py-2 text-end">Venta</th>
-                  <th className="py-2 text-end">Total</th>
-                  <th className="py-2 text-start">Observación</th>
+                  {(isAdmin || isJefeBodega) && <th className="py-2 text-end">Costo</th>}
+                  <th className="py-2 text-center">Venta</th>
+                  {isAdmin && <th className="py-2 text-end">Total</th>}
+                  <th className="py-2 text-center">Observación</th>
                   <th className="py-2">Acciones</th>
                 </tr>
               </thead>
               <tbody>
-                {articulosFiltrados.length > 0 ? (
-                  articulosFiltrados.map(articulo => {
+                {currentItems.length > 0 ? (
+                  currentItems.map(articulo => {
                     const hasStock = (articulo.existencia || 0) > 0;
                     const isLowStock = (articulo.existencia || 0) <= (articulo.existenciaMinima || 0);
+                    const missingPrice = (articulo.precio || 0) <= 0 && articulo.activo;
                     const stockBg = !hasStock ? '#ff0000' : isLowStock ? '#ffc107' : '#00a000';
                     const isSelected = selectedArticulo?.id === articulo.id;
 
+                    const rowStyle = isSelected ? rowSelectedStyle : {};
+
                     return (
-                      <tr
-                        key={articulo.id}
-                        style={isSelected ? rowSelectedStyle : {}}
-                        className={`text-center ${!articulo.activo ? 'text-muted' : ''}`}
-                      >
+                      <tr key={articulo.id} style={rowStyle} className={`text-center ${!articulo.activo ? 'text-muted' : ''}`}>
                         <td className="fw-bold text-primary">{articulo.id}</td>
                         <td>{articulo.codigo}</td>
-                        <td className="text-start">{articulo.nombre}</td>
+                        <td className="text-start">
+                          <div className="fw-bold">{articulo.nombre}</div>
+                          {missingPrice && (
+                            <Badge
+                              pill
+                              className="d-inline-flex align-items-center gap-1 border-0"
+                              style={{
+                                backgroundColor: '#fef2f2',
+                                color: '#dc2626',
+                                padding: '4px 12px',
+                                fontSize: '0.65rem',
+                                fontWeight: '700'
+                              }}
+                            >
+                              <FontAwesomeIcon icon={faTools} style={{ fontSize: '0.7rem' }} />
+                              ASIGNAR PRECIO DE VENTA
+                            </Badge>
+                          )}
+                        </td>
                         <td>
                           <Badge
                             color={articulo.activo ? 'light' : 'danger'}
@@ -164,11 +319,31 @@ export const ArticuloList = () => {
                         </td>
                         <td style={{ backgroundColor: stockBg, color: 'white', fontWeight: 'bold' }}>{articulo.existencia}</td>
                         <td>{articulo.existenciaMinima}</td>
-                        <td className="text-end">C$ {articulo.costo?.toFixed(2)}</td>
-                        <td className="text-end">C$ {articulo.precio?.toFixed(2)}</td>
-                        <td className="text-end fw-bold">C$ {((articulo.existencia || 0) * (articulo.precio || 0)).toFixed(2)}</td>
-                        <td className="text-start small text-muted">
-                          <div className="text-truncate" style={{ maxWidth: '120px' }}>
+                        {(isAdmin || isJefeBodega) && <td className="text-end">C$ {articulo.costo?.toFixed(2)}</td>}
+                        <td className="text-center">
+                          {missingPrice ? (
+                            <Badge
+                              pill
+                              className="d-inline-flex align-items-center gap-1 border-0"
+                              style={{
+                                backgroundColor: '#fef2f2',
+                                color: '#dc2626',
+                                padding: '4px 12px',
+                                fontSize: '0.65rem',
+                                fontWeight: '700'
+                              }}
+                            >
+                              <FontAwesomeIcon icon={faTools} style={{ fontSize: '0.7rem' }} /> No asignado
+                            </Badge>
+                          ) : (
+                            `C$ ${articulo.precio?.toFixed(2)}`
+                          )}
+                        </td>
+                        {isAdmin && (
+                          <td className="text-end fw-bold">C$ {((articulo.existencia || 0) * (articulo.precio || 0)).toFixed(2)}</td>
+                        )}
+                        <td className="text-center small text-muted px-4">
+                          <div className="text-truncate mx-auto" style={{ maxWidth: '120px' }}>
                             {articulo.descripcion || '-'}
                           </div>
                         </td>
@@ -190,29 +365,47 @@ export const ArticuloList = () => {
                             >
                               <FontAwesomeIcon icon={faEye} />
                             </Button>
-                            <Button
-                              size="sm"
-                              color="warning"
-                              outline
-                              tag={Link}
-                              to={`${articulo.id}/edit`}
-                              title="Editar"
-                              onClick={e => e.stopPropagation()}
-                            >
-                              <FontAwesomeIcon icon={faPencilAlt} />
-                            </Button>
-                            <Button
-                              size="sm"
-                              color="danger"
-                              outline
-                              title="Eliminar"
-                              onClick={e => {
-                                e.stopPropagation();
-                                handleDelete(articulo.id);
-                              }}
-                            >
-                              <FontAwesomeIcon icon={faTrash} />
-                            </Button>
+                            {(isAdmin || isJefeBodega) && (
+                              <Button
+                                size="sm"
+                                color="warning"
+                                outline
+                                tag={Link}
+                                to={`${articulo.id}/edit`}
+                                title="Editar"
+                                onClick={e => e.stopPropagation()}
+                              >
+                                <FontAwesomeIcon icon={faPencilAlt} />
+                              </Button>
+                            )}
+                            {!articulo.activo && (isAdmin || isJefeBodega) && (
+                              <Button
+                                size="sm"
+                                color="success"
+                                outline
+                                title="Reactivar"
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  handleToggleActive(articulo);
+                                }}
+                              >
+                                <FontAwesomeIcon icon={faSync} />
+                              </Button>
+                            )}
+                            {isAdmin && articulo.activo && (
+                              <Button
+                                size="sm"
+                                color="danger"
+                                outline
+                                title="Eliminar"
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  handleDelete(articulo.id);
+                                }}
+                              >
+                                <FontAwesomeIcon icon={faTrash} />
+                              </Button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -227,6 +420,30 @@ export const ArticuloList = () => {
                 )}
               </tbody>
             </Table>
+            {totalPages > 1 && (
+              <div className="d-flex justify-content-between align-items-center p-2 border-top bg-light">
+                <small className="text-muted ps-2">
+                  Mostrando {Math.min(indexOfLastItem, articulosFiltrados.length)} de {articulosFiltrados.length} artículos
+                </small>
+                <Pagination size="sm" className="mb-0 pe-2">
+                  <PaginationItem disabled={currentPage === 1}>
+                    <PaginationLink previous onClick={() => paginate(currentPage - 1)}>
+                      <FontAwesomeIcon icon={faChevronLeft} />
+                    </PaginationLink>
+                  </PaginationItem>
+                  {[...Array(totalPages)].map((_, i) => (
+                    <PaginationItem active={i + 1 === currentPage} key={i}>
+                      <PaginationLink onClick={() => paginate(i + 1)}>{i + 1}</PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  <PaginationItem disabled={currentPage === totalPages}>
+                    <PaginationLink next onClick={() => paginate(currentPage + 1)}>
+                      <FontAwesomeIcon icon={faChevronRight} />
+                    </PaginationLink>
+                  </PaginationItem>
+                </Pagination>
+              </div>
+            )}
           </div>
         </Card>
 
@@ -242,9 +459,6 @@ export const ArticuloList = () => {
                 <Button size="sm" color="info" outline onClick={() => loadHistorial(selectedArticulo.id)}>
                   <FontAwesomeIcon icon={faHistory} className="me-2" /> Historial
                 </Button>
-                <Button size="sm" color="success" outline>
-                  <FontAwesomeIcon icon={faFileExcel} className="me-2" /> Exportar
-                </Button>
                 <Button size="sm" color="secondary" className="ms-2" onClick={() => setSelectedArticulo(null)}>
                   <FontAwesomeIcon icon={faTimes} />
                 </Button>
@@ -253,12 +467,12 @@ export const ArticuloList = () => {
             <CardBody>
               <Row>
                 <Col md="2" className="text-center border-end">
-                  {selectedArticulo.imagen ? (
+                  {selectedArticulo.imagenUrl ? (
                     <img
-                      src={`data:${selectedArticulo.imagenContentType};base64,${selectedArticulo.imagen}`}
+                      src={selectedArticulo.imagenUrl}
                       alt={selectedArticulo.nombre}
                       className="img-fluid rounded shadow-sm mb-2"
-                      style={{ maxHeight: '120px' }}
+                      style={{ maxHeight: '120px', objectFit: 'contain' }}
                     />
                   ) : (
                     <div
@@ -273,10 +487,12 @@ export const ArticuloList = () => {
                 <Col md="10">
                   <Row>
                     <Col md="4">
-                      <div className="mb-3">
-                        <label className="text-muted small text-uppercase fw-bold">Precio Compra</label>
-                        <div className="fs-5">C$ {selectedArticulo.costo?.toFixed(2)}</div>
-                      </div>
+                      {(isAdmin || isJefeBodega) && (
+                        <div className="mb-3">
+                          <label className="text-muted small text-uppercase fw-bold">Precio Compra</label>
+                          <div className="fs-5">C$ {selectedArticulo.costo?.toFixed(2)}</div>
+                        </div>
+                      )}
                       <div>
                         <label className="text-muted small text-uppercase fw-bold">Precio Venta</label>
                         <div className="fs-4 fw-bold text-success">C$ {selectedArticulo.precio?.toFixed(2)}</div>
@@ -291,15 +507,19 @@ export const ArticuloList = () => {
                           {selectedArticulo.existencia} {selectedArticulo.unidadMedida?.simbolo}
                         </div>
                       </div>
-                      <div>
-                        <label className="text-muted small text-uppercase fw-bold">Inversión Total</label>
-                        <div className="fs-5">C$ {((selectedArticulo.existencia || 0) * (selectedArticulo.costo || 0)).toFixed(2)}</div>
-                      </div>
+                      {isAdmin && (
+                        <div>
+                          <label className="text-muted small text-uppercase fw-bold">Inversión Total</label>
+                          <div className="fs-5">C$ {((selectedArticulo.existencia || 0) * (selectedArticulo.costo || 0)).toFixed(2)}</div>
+                        </div>
+                      )}
                     </Col>
                     <Col md="4">
                       <div className="mb-2">
                         <label className="text-muted small text-uppercase fw-bold">Descripción</label>
-                        <p className="text-secondary small">{selectedArticulo.descripcion || 'Sin descripción detallada.'}</p>
+                        <p className="text-dark mb-0" style={{ lineHeight: '1.4' }}>
+                          {selectedArticulo.descripcion || 'Sin descripción detallada.'}
+                        </p>
                       </div>
                       <div>
                         <label className="text-muted small text-uppercase fw-bold">Categoría</label>

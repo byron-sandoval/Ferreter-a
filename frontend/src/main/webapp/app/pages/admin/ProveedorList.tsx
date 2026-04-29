@@ -4,13 +4,26 @@ import { Table, Button, Input, Card, Badge } from 'reactstrap';
 import { IProveedor } from 'app/shared/model/proveedor.model';
 import ProveedorService from 'app/services/proveedor.service';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faSync, faSearch, faPencilAlt, faTrash, faTruck } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSync, faSearch, faPencilAlt, faTrash, faTruck, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
+import { useAppSelector } from 'app/config/store';
+import { AUTHORITIES } from 'app/config/constants';
 
 export const ProveedorList = () => {
+  const isAdmin = useAppSelector(state => state.authentication.account.authorities.includes(AUTHORITIES.ADMIN));
+  const isJefeBodega = useAppSelector(state => state.authentication.account.authorities.includes(AUTHORITIES.JEFE_BODEGA));
   const navigate = useNavigate();
   const [proveedores, setProveedores] = useState<IProveedor[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
+  const [showInactive, setShowInactive] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter]);
 
   const loadAll = () => {
     setLoading(true);
@@ -29,7 +42,29 @@ export const ProveedorList = () => {
     loadAll();
   }, []);
 
-  const filtrados = proveedores.filter(p => (p.nombre || '').toLowerCase().includes(filter.toLowerCase()));
+  const filtrados = proveedores.filter(p => {
+    const matchesSearch = (p.nombre || '').toLowerCase().includes(filter.toLowerCase());
+    const matchesStatus = showInactive ? p.activo === false || p.activo === null : p.activo === true;
+    return matchesSearch && matchesStatus;
+  });
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filtrados.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filtrados.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  const handleReactivate = (p: IProveedor) => {
+    if (p.id && window.confirm(`¿Desea reactivar al proveedor "${p.nombre}"?`)) {
+      ProveedorService.update({ ...p, activo: true })
+        .then(() => loadAll())
+        .catch(err => {
+          console.error(err);
+          alert('Error al reactivar el proveedor');
+        });
+    }
+  };
 
   const headerStyle = { backgroundColor: '#6f42c1', color: 'white' };
 
@@ -57,17 +92,35 @@ export const ProveedorList = () => {
               <FontAwesomeIcon icon={faSearch} size="sm" />
             </span>
           </div>
-          <Button color="primary" size="sm" onClick={() => navigate('/admin/proveedores/new')} style={{ fontSize: '0.75rem' }}>
-            <FontAwesomeIcon icon={faPlus} className="me-1" /> Nuevo
-          </Button>
+          <div className="form-check form-switch ms-2 d-flex align-items-center">
+            <Input
+              type="switch"
+              id="showInactiveSwitchProv"
+              checked={showInactive}
+              onChange={() => setShowInactive(!showInactive)}
+              style={{ cursor: 'pointer' }}
+            />
+            <label
+              className="form-check-label text-white ms-2 small fw-bold"
+              htmlFor="showInactiveSwitchProv"
+              style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
+            >
+              Ver Inactivos
+            </label>
+          </div>
+          {isAdmin && (
+            <Button color="primary" size="sm" onClick={() => navigate('/admin/proveedores/new')} style={{ fontSize: '0.75rem' }}>
+              <FontAwesomeIcon icon={faPlus} className="me-1" /> Nuevo
+            </Button>
+          )}
         </div>
       </div>
 
       <Card className="shadow-sm border-0">
         <Table hover responsive size="sm" className="mb-0">
-          <thead className="text-center text-uppercase small" style={headerStyle}>
+          <thead className="table-light text-dark text-center text-uppercase small fw-bold">
             <tr>
-              <th className="py-2">Nombre</th>
+              <th className="py-2">Proveedores</th>
               <th className="py-2">RUC / ID</th>
               <th className="py-2">Dirección</th>
               <th className="py-2">Teléfono</th>
@@ -77,28 +130,60 @@ export const ProveedorList = () => {
             </tr>
           </thead>
           <tbody>
-            {filtrados.length > 0 ? (
-              filtrados.map(p => (
+            {currentItems.length > 0 ? (
+              currentItems.map(p => (
                 <tr key={p.id} className="text-center align-middle" style={{ fontSize: '0.8rem' }}>
                   <td className="text-start fw-bold px-3">{p.nombre}</td>
                   <td className="small text-muted">{p.ruc || '-'}</td>
-                  <td className="text-start" style={{ fontSize: '0.75rem' }}>
+                  <td className="text-center" style={{ fontSize: '0.75rem' }}>
                     {p.direccion || '-'}
                   </td>
                   <td>{p.telefono || '-'}</td>
                   <td style={{ fontSize: '0.75rem' }}>{p.email || '-'}</td>
                   <td>
-                    <Badge color={p.activo ? 'success' : 'secondary'} pill style={{ fontSize: '0.65rem' }}>
+                    <Badge color={p.activo ? 'success' : 'danger'} pill style={{ fontSize: '0.65rem' }}>
                       {p.activo ? 'Activo' : 'Inactivo'}
                     </Badge>
                   </td>
                   <td className="px-3">
-                    <Button size="sm" color="info" outline className="p-1 me-1">
-                      <FontAwesomeIcon icon={faPencilAlt} fixedWidth />
-                    </Button>
-                    <Button size="sm" color="danger" outline className="p-1">
-                      <FontAwesomeIcon icon={faTrash} fixedWidth />
-                    </Button>
+                    {isAdmin && (
+                      <Button
+                        size="sm"
+                        color="info"
+                        outline
+                        className="p-1 me-1"
+                        onClick={() => p.id && navigate(`/admin/proveedores/${p.id}/edit`)}
+                      >
+                        <FontAwesomeIcon icon={faPencilAlt} fixedWidth />
+                      </Button>
+                    )}
+                    {isAdmin && p.activo && (
+                      <Button
+                        size="sm"
+                        color="danger"
+                        outline
+                        className="p-1"
+                        onClick={() => {
+                          if (p.id && window.confirm(`¿Está seguro de desactivar al proveedor "${p.nombre}"?`)) {
+                            ProveedorService.delete(p.id).then(() => loadAll());
+                          }
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faTrash} fixedWidth />
+                      </Button>
+                    )}
+                    {isAdmin && !p.activo && (
+                      <Button
+                        size="sm"
+                        color="success"
+                        outline
+                        className="p-1"
+                        onClick={() => handleReactivate(p)}
+                        title="Reactivar Proveedor"
+                      >
+                        <FontAwesomeIcon icon={faSync} fixedWidth />
+                      </Button>
+                    )}
                   </td>
                 </tr>
               ))
@@ -111,6 +196,30 @@ export const ProveedorList = () => {
             )}
           </tbody>
         </Table>
+        {totalPages > 1 && (
+          <div className="d-flex justify-content-between align-items-center p-2 border-top bg-light">
+            <small className="text-muted ps-2">
+              Mostrando {Math.min(indexOfLastItem, filtrados.length)} de {filtrados.length} proveedores
+            </small>
+            <Pagination size="sm" className="mb-0 pe-2">
+              <PaginationItem disabled={currentPage === 1}>
+                <PaginationLink previous onClick={() => paginate(currentPage - 1)}>
+                  <FontAwesomeIcon icon={faChevronLeft} />
+                </PaginationLink>
+              </PaginationItem>
+              {[...Array(totalPages)].map((_, i) => (
+                <PaginationItem active={i + 1 === currentPage} key={i}>
+                  <PaginationLink onClick={() => paginate(i + 1)}>{i + 1}</PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem disabled={currentPage === totalPages}>
+                <PaginationLink next onClick={() => paginate(currentPage + 1)}>
+                  <FontAwesomeIcon icon={faChevronRight} />
+                </PaginationLink>
+              </PaginationItem>
+            </Pagination>
+          </div>
+        )}
       </Card>
     </div>
   );

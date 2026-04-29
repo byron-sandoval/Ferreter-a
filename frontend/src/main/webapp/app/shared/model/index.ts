@@ -9,7 +9,7 @@ export * from './moneda.model';
 export * from './numeracion-factura.model';
 export * from './proveedor.model';
 export * from './unidad-medida.model';
-export * from './vendedor.model';
+export * from './usuario.model';
 export * from './venta.model';
 export * from './user.model';
 export * from './empresa.model';

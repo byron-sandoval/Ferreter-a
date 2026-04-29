@@ -49,7 +49,7 @@ public class Ingreso implements Serializable {
     private Set<DetalleIngreso> detalles = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Vendedor vendedor;
+    private Usuario usuario;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Proveedor proveedor;
@@ -165,16 +165,16 @@ public class Ingreso implements Serializable {
         return this;
     }
 
-    public Vendedor getVendedor() {
-        return this.vendedor;
+    public Usuario getUsuario() {
+        return this.usuario;
     }
 
-    public void setVendedor(Vendedor vendedor) {
-        this.vendedor = vendedor;
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 
-    public Ingreso vendedor(Vendedor vendedor) {
-        this.setVendedor(vendedor);
+    public Ingreso usuario(Usuario usuario) {
+        this.setUsuario(usuario);
         return this;
     }
 

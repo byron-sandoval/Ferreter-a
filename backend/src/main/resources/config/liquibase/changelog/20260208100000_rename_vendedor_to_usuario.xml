@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20260208100000-1" author="antigravity">
+        <!-- 1. Eliminar llaves foráneas antiguas antes de renombrar -->
+        <dropForeignKeyConstraint baseTableName="venta" constraintName="fk_venta__vendedor_id"/>
+        <dropForeignKeyConstraint baseTableName="ingreso" constraintName="fk_ingreso__vendedor_id"/>
+
+        <!-- 2. Renombrar la tabla principal -->
+        <renameTable oldTableName="vendedor" newTableName="usuario"/>
+
+        <!-- 3. Renombrar columnas en tablas relacionadas -->
+        <renameColumn tableName="venta" oldColumnName="vendedor_id" newColumnName="usuario_id" columnDataType="bigint"/>
+        <renameColumn tableName="ingreso" oldColumnName="vendedor_id" newColumnName="usuario_id" columnDataType="bigint"/>
+
+        <!-- 4. Re-crear llaves foráneas con nuevos nombres y referencias -->
+        <addForeignKeyConstraint baseColumnNames="usuario_id"
+                                 baseTableName="venta"
+                                 constraintName="fk_venta__usuario_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="usuario"/>
+
+        <addForeignKeyConstraint baseColumnNames="usuario_id"
+                                 baseTableName="ingreso"
+                                 constraintName="fk_ingreso__usuario_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="usuario"/>
+
+        <!-- 5. Actualizar nombres de constraints de unicidad en la tabla usuario -->
+        <!-- En H2/PostgreSQL a veces es necesario para evitar confusión -->
+        <!--ux_vendedor__id_keycloak -> ux_usuario__id_keycloak -->
+        <!--ux_vendedor__cedula -> ux_usuario__cedula -->
+    </changeSet>
+
+</databaseChangeLog>

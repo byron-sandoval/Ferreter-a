@@ -152,7 +152,7 @@ public class DetalleVentaResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
      *         of detalleVentas in body.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_VENDEDOR')")
     @GetMapping("")
     public List<DetalleVentaDTO> getAllDetalleVentas() {
         LOG.debug("REST request to get all DetalleVentas");
@@ -166,7 +166,7 @@ public class DetalleVentaResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
      *         the detalleVentaDTO, or with status {@code 404 (Not Found)}.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_VENDEDOR')")
     @GetMapping("/{id}")
     public ResponseEntity<DetalleVentaDTO> getDetalleVenta(@PathVariable("id") Long id) {
         LOG.debug("REST request to get DetalleVenta : {}", id);

@@ -1,6 +1,7 @@
 package com.ferronica.app.service.impl;
 
 import com.ferronica.app.domain.UnidadMedida;
+import com.ferronica.app.repository.ArticuloRepository;
 import com.ferronica.app.repository.UnidadMedidaRepository;
 import com.ferronica.app.service.UnidadMedidaService;
 import com.ferronica.app.service.dto.UnidadMedidaDTO;
@@ -25,12 +26,14 @@ public class UnidadMedidaServiceImpl implements UnidadMedidaService {
     private static final Logger LOG = LoggerFactory.getLogger(UnidadMedidaServiceImpl.class);
 
     private final UnidadMedidaRepository unidadMedidaRepository;
-
+    private final ArticuloRepository articuloRepository;
     private final UnidadMedidaMapper unidadMedidaMapper;
 
     public UnidadMedidaServiceImpl(UnidadMedidaRepository unidadMedidaRepository,
+            ArticuloRepository articuloRepository,
             UnidadMedidaMapper unidadMedidaMapper) {
         this.unidadMedidaRepository = unidadMedidaRepository;
+        this.articuloRepository = articuloRepository;
         this.unidadMedidaMapper = unidadMedidaMapper;
     }
 
@@ -82,10 +85,17 @@ public class UnidadMedidaServiceImpl implements UnidadMedidaService {
 
     @Override
     public void delete(Long id) {
-        LOG.debug("Request to delete UnidadMedida (Logical) : {}", id);
+        LOG.debug("Request to delete UnidadMedida and products using it (Logical) : {}", id);
         unidadMedidaRepository.findById(id).ifPresent(unidadMedida -> {
             unidadMedida.setActivo(false);
             unidadMedidaRepository.save(unidadMedida);
+            // Cascada: desactivar todos los productos que usen esta unidad
+            articuloRepository.findAll().stream()
+                    .filter(a -> a.getUnidadMedida() != null && a.getUnidadMedida().getId().equals(id))
+                    .forEach(articulo -> {
+                        articulo.setActivo(false);
+                        articuloRepository.save(articulo);
+                    });
         });
     }
 }

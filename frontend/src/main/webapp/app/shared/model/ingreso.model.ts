@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { IVendedor } from './vendedor.model';
+import { IUsuario } from './usuario.model';
 import { IProveedor } from './proveedor.model';
 import { IDetalleIngreso } from './detalle-ingreso.model';
 
@@ -11,7 +11,7 @@ export interface IIngreso {
   observaciones?: string | null;
   activo?: boolean | null;
   detalles?: IDetalleIngreso[] | null;
-  vendedor?: IVendedor | null;
+  usuario?: IUsuario | null;
   proveedor?: IProveedor | null;
 }
 

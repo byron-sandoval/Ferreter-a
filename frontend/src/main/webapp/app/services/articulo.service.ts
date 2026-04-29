@@ -3,8 +3,11 @@ import { IArticulo } from '../shared/model/articulo.model';
 
 const API_URL = 'api/articulos';
 
-const getAll = (page?: number, size?: number, sort?: string) => {
-  return axios.get<IArticulo[]>(`${API_URL}${page ? `?page=${page}&size=${size}&sort=${sort}` : ''}`);
+const getAll = (params?: any) => {
+  if (!params) {
+    params = { page: 0, size: 1000 };
+  }
+  return axios.get<IArticulo[]>(API_URL, { params });
 };
 
 const getById = (id: number) => {
@@ -27,6 +30,14 @@ const getBajoStock = () => {
   return axios.get<IArticulo[]>(`${API_URL}?existencia.lessThan=existenciaMinima`);
 };
 
+const countByCriteria = (criteria: any) => {
+  const params = new URLSearchParams();
+  Object.keys(criteria).forEach(key => {
+    params.append(key, criteria[key]);
+  });
+  return axios.get<number>(`${API_URL}/count?${params.toString()}`);
+};
+
 export default {
   getAll,
   getById,
@@ -34,4 +45,5 @@ export default {
   update,
   delete: remove,
   getBajoStock,
+  countByCriteria,
 };

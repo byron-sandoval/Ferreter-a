@@ -3,6 +3,8 @@ package com.ferronica.app.service.impl;
 import com.ferronica.app.domain.Ingreso;
 import com.ferronica.app.repository.IngresoRepository;
 import com.ferronica.app.repository.ArticuloRepository;
+import com.ferronica.app.repository.UsuarioRepository;
+import com.ferronica.app.security.SecurityUtils;
 import com.ferronica.app.service.IngresoService;
 import com.ferronica.app.service.dto.IngresoDTO;
 import com.ferronica.app.service.mapper.IngresoMapper;
@@ -28,17 +30,20 @@ public class IngresoServiceImpl implements IngresoService {
 
     private final ArticuloRepository articuloRepository;
 
+    private final UsuarioRepository usuarioRepository;
+
     public IngresoServiceImpl(IngresoRepository ingresoRepository, IngresoMapper ingresoMapper,
-            ArticuloRepository articuloRepository) {
+            ArticuloRepository articuloRepository, UsuarioRepository usuarioRepository) {
         this.ingresoRepository = ingresoRepository;
         this.ingresoMapper = ingresoMapper;
         this.articuloRepository = articuloRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Override
     public IngresoDTO save(IngresoDTO ingresoDTO) {
         LOG.debug("Request to save Ingreso : {}", ingresoDTO);
-        Ingreso ingreso = ingresoMapper.toEntity(ingresoDTO);
+        final Ingreso ingreso = ingresoMapper.toEntity(ingresoDTO);
 
         // Automatización de Fecha
         ingreso.setFecha(java.time.Instant.now());
@@ -48,9 +53,14 @@ public class IngresoServiceImpl implements IngresoService {
             ingreso.setActivo(true);
         }
 
-        ingreso = ingresoRepository.save(ingreso);
+        // Automatización de Usuario por Usuario Autenticado
+        SecurityUtils.getCurrentUserKeycloakId().ifPresent(idKeycloak -> {
+            usuarioRepository.findByIdKeycloak(idKeycloak).ifPresent(ingreso::setUsuario);
+        });
 
-        // Actualizar stock de productos
+        Ingreso savedIngreso = ingresoRepository.save(ingreso);
+
+        // Actualizar stock y revisar márgenes de productos
         if (ingreso.getDetalles() != null && !ingreso.getDetalles().isEmpty()) {
             ingreso.getDetalles().forEach(detalle -> {
                 if (detalle.getArticulo() != null && detalle.getArticulo().getId() != null) {
@@ -59,16 +69,28 @@ public class IngresoServiceImpl implements IngresoService {
                                 : BigDecimal.ZERO;
                         BigDecimal cantidadIngreso = detalle.getCantidad() != null ? detalle.getCantidad()
                                 : BigDecimal.ZERO;
+                        BigDecimal costoNuevo = detalle.getCostoUnitario() != null ? detalle.getCostoUnitario()
+                                : BigDecimal.ZERO;
+                        BigDecimal costoAnterior = articulo.getCosto() != null ? articulo.getCosto()
+                                : BigDecimal.ZERO;
+
+                        // Si el costo sube, guardamos el anterior para mostrarlo en el Dashboard
+                        if (costoNuevo.compareTo(costoAnterior) > 0) {
+                            articulo.setUltimoCosto(costoAnterior); // Aquí guardamos el "Costo Anterior"
+                        }
+
                         articulo.setExistencia(existenciaActual.add(cantidadIngreso));
+                        articulo.setCosto(costoNuevo); // Actualizamos al último costo
                         articuloRepository.save(articulo);
-                        LOG.debug("Stock actualizado para Articulo ID {}: {} + {} = {}",
-                                articulo.getId(), existenciaActual, cantidadIngreso, articulo.getExistencia());
+
+                        LOG.debug("Procesado Articulo ID {}: Stock +{}, Costo {} -> {}",
+                                articulo.getId(), cantidadIngreso, costoAnterior, costoNuevo);
                     });
                 }
             });
         }
 
-        return ingresoMapper.toDto(ingreso);
+        return ingresoMapper.toDto(savedIngreso);
     }
 
     @Override

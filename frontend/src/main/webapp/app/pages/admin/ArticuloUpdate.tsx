@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Button, Row, Col, Form, FormGroup, Label, Input, Card, CardBody, CardHeader, CardTitle, Badge } from 'reactstrap';
+import { Button, Row, Col, Form, FormGroup, Label, Input, Card, CardBody, CardHeader } from 'reactstrap';
 import { useForm, Controller } from 'react-hook-form';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faSave, faImage, faTimes, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { useAppDispatch } from 'app/config/store';
+import { faArrowLeft, faSave, faImage, faTimes, faExclamationTriangle, faBarcode, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { AUTHORITIES } from 'app/config/constants';
 import ArticuloService from 'app/services/articulo.service';
 import CategoriaService from 'app/services/categoria.service';
 import UnidadMedidaService from 'app/services/unidad-medida.service';
+import { uploadArticuloImage, deleteArticuloImage } from 'app/services/supabase.service';
 import { IArticulo } from 'app/shared/model/articulo.model';
 import { ICategoria } from 'app/shared/model/categoria.model';
 import { IUnidadMedida } from 'app/shared/model/unidad-medida.model';
 import { toast } from 'react-toastify';
 
 export const ArticuloUpdate = () => {
+  const isAdmin = useAppSelector(state => state.authentication.account.authorities.includes(AUTHORITIES.ADMIN));
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { id } = useParams<'id'>();
@@ -23,6 +26,10 @@ export const ArticuloUpdate = () => {
   const [unidades, setUnidades] = useState<IUnidadMedida[]>([]);
   const [loadingObj, setLoadingObj] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [originalImagenUrl, setOriginalImagenUrl] = useState<string | null>(null);
+  const [originalPrecio, setOriginalPrecio] = useState<number | null>(null);
 
   const {
     control,
@@ -46,7 +53,6 @@ export const ArticuloUpdate = () => {
   const esPrecioBajo = precioVenta > 0 && costoUnitario > 0 && Number(precioVenta) < Number(costoUnitario);
 
   useEffect(() => {
-    // Cargar catálogos
     CategoriaService.getAll().then(res => setCategorias(res.data));
     UnidadMedidaService.getAll().then(res => setUnidades(res.data));
 
@@ -56,11 +62,13 @@ export const ArticuloUpdate = () => {
         .then(res => {
           const articulo = res.data;
           reset(articulo);
-          if (articulo.imagen && articulo.imagenContentType) {
-            setImagePreview(`data:${articulo.imagenContentType};base64,${articulo.imagen}`);
+          setOriginalPrecio(articulo.precio || 0);
+          if (articulo.imagenUrl) {
+            setImagePreview(articulo.imagenUrl);
+            setOriginalImagenUrl(articulo.imagenUrl);
           }
         })
-        .catch(err => toast.error('Error al cargar el artículo'))
+        .catch(() => toast.error('Error al cargar el artículo'))
         .finally(() => setLoadingObj(false));
     }
   }, [id, isNew, reset]);
@@ -68,37 +76,54 @@ export const ArticuloUpdate = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        // Split metadata from content
-        const contentIndex = base64String.indexOf(',') + 1;
-        const contentType = base64String.substring(5, contentIndex - 8);
-        const content = base64String.substring(contentIndex);
-
-        setValue('imagen', content);
-        setValue('imagenContentType', contentType);
-        setImagePreview(base64String);
-      };
-      reader.readAsDataURL(file);
+      setSelectedFile(file);
+      // Vista previa local inmediata sin subir aún
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
   const clearImage = () => {
-    setValue('imagen', null);
-    setValue('imagenContentType', null);
+    setSelectedFile(null);
     setImagePreview(null);
+    setValue('imagenUrl', null);
   };
 
   const onSubmit = async (data: IArticulo) => {
     try {
-      if (isNew) {
-        await ArticuloService.create(data);
-        toast.success('Articulo creado exitosamente');
-      } else {
-        await ArticuloService.update(data);
-        toast.success('Articulo actualizado exitosamente');
+      let imagenUrlFinal = data.imagenUrl;
+
+      // Si hay un archivo nuevo seleccionado, subirlo a Supabase primero
+      if (selectedFile) {
+        setUploadingImage(true);
+        try {
+          // Si había imagen anterior, eliminarla de Supabase
+          if (originalImagenUrl) {
+            await deleteArticuloImage(originalImagenUrl).catch(() => {
+              // No bloquear si falla la eliminación de la imagen vieja
+            });
+          }
+          imagenUrlFinal = await uploadArticuloImage(selectedFile, data.id ?? `new_${Date.now()}`);
+        } finally {
+          setUploadingImage(false);
+        }
+      } else if (originalImagenUrl && !data.imagenUrl) {
+        // Si el usuario eliminó la imagen cargada previamente sin subir una nueva
+        await deleteArticuloImage(originalImagenUrl).catch(() => {});
+        imagenUrlFinal = null;
       }
+
+      data.imagenUrl = imagenUrlFinal;
+
+      if (isNew) {
+        data.ultimoCosto = data.costo;
+        await ArticuloService.create(data);
+        toast.success('Artículo creado exitosamente');
+      } else {
+        data.ultimoCosto = data.costo;
+        await ArticuloService.update(data);
+        toast.success('Artículo actualizado exitosamente');
+      }
+
       navigate('/admin/articulos');
     } catch (error) {
       console.error(error);
@@ -135,12 +160,25 @@ export const ArticuloUpdate = () => {
                           <Label for="codigo" className="fw-bold">
                             Código *
                           </Label>
-                          <Controller
-                            name="codigo"
-                            control={control}
-                            rules={{ required: 'El código es obligatorio' }}
-                            render={({ field }) => <Input {...field} invalid={!!errors.codigo} />}
-                          />
+                          <div className="input-group">
+                            <span className="input-group-text bg-light text-muted">
+                              <FontAwesomeIcon icon={faBarcode} />
+                            </span>
+                            <Controller
+                              name="codigo"
+                              control={control}
+                              rules={{ required: 'El código es obligatorio' }}
+                              render={({ field }) => (
+                                <Input
+                                  {...field}
+                                  value={field.value || ''}
+                                  invalid={!!errors.codigo}
+                                  readOnly={!isNew}
+                                  className={!isNew ? 'bg-white fw-bold text-dark' : ''}
+                                />
+                              )}
+                            />
+                          </div>
                           {errors.codigo && <div className="invalid-feedback d-block">{errors.codigo.message}</div>}
                         </FormGroup>
                       </Col>
@@ -184,7 +222,7 @@ export const ArticuloUpdate = () => {
                         name="nombre"
                         control={control}
                         rules={{ required: 'El nombre es obligatorio' }}
-                        render={({ field }) => <Input {...field} invalid={!!errors.nombre} />}
+                        render={({ field }) => <Input {...field} value={field.value || ''} invalid={!!errors.nombre} />}
                       />
                       {errors.nombre && <div className="invalid-feedback d-block">{errors.nombre.message}</div>}
                     </FormGroup>
@@ -194,7 +232,7 @@ export const ArticuloUpdate = () => {
                       <Controller
                         name="descripcion"
                         control={control}
-                        render={({ field }) => <Input type="textarea" {...field} rows="3" />}
+                        render={({ field }) => <Input type="textarea" {...field} value={field.value || ''} rows="3" />}
                       />
                     </FormGroup>
 
@@ -205,14 +243,54 @@ export const ArticuloUpdate = () => {
                           <Controller
                             name="precio"
                             control={control}
-                            rules={{ required: true, min: 0 }}
-                            render={({ field }) => <Input type="number" step="0.01" {...field} invalid={esPrecioBajo} />}
+                            rules={{ required: true, min: { value: 0, message: 'El precio no puede ser negativo' } }}
+                            render={({ field }) => (
+                              <Input
+                                type="number"
+                                step="0.01"
+                                {...field}
+                                readOnly={!isAdmin}
+                                className={
+                                  (!!errors.precio || esPrecioBajo ? 'border-danger ' : '') +
+                                  (!isAdmin ? 'bg-light text-muted' : '')
+                                }
+                              />
+                            )}
                           />
+                          {errors.precio && <div className="text-danger small mt-1 d-block">{errors.precio.message}</div>}
                           {esPrecioBajo && (
-                            <div className="text-danger small mt-1 fw-bold">
-                              <FontAwesomeIcon icon={faExclamationTriangle} className="me-1" />
-                              ¡Precio menor al costo! Perderás dinero.
+                            <div
+                              className="animate__animated animate__headShake p-2 mt-2"
+                              style={{
+                                backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                                borderLeft: '4px solid #dc3545',
+                                borderRadius: '4px',
+                                color: '#dc3545',
+                                fontSize: '0.85rem',
+                                fontWeight: 'bold',
+                              }}
+                            >
+                              <FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />
+                              ¡Precio menor al costo!
                             </div>
+                          )}
+                          {!isNew && Number(watch('precio')) !== Number(originalPrecio) && (
+                            <Controller
+                              name="priceChangeReason"
+                              control={control}
+                              render={({ field }) => (
+                                <div className="mt-3 animate__animated animate__fadeIn">
+                                  <Label className="text-info fw-bold small text-uppercase">Motivo (Opcional)</Label>
+                                  <Input
+                                    {...field}
+                                    type="text"
+                                    placeholder="Ej: Aumento de costo de proveedor..."
+                                    className="border-info"
+                                    style={{ backgroundColor: 'rgba(13, 202, 240, 0.05)' }}
+                                  />
+                                </div>
+                              )}
+                            />
                           )}
                         </FormGroup>
                       </Col>
@@ -222,9 +300,17 @@ export const ArticuloUpdate = () => {
                           <Controller
                             name="costo"
                             control={control}
-                            rules={{ required: true, min: 0 }}
-                            render={({ field }) => <Input type="number" step="0.01" {...field} />}
+                            rules={{ required: true, min: { value: 0, message: 'El costo no puede ser negativo' } }}
+                            render={({ field }) => (
+                              <Input 
+                                type="number" 
+                                step="0.01" 
+                                {...field} 
+                                className={errors.costo ? 'border-danger' : ''} 
+                              />
+                            )}
                           />
+                          {errors.costo && <div className="text-danger small mt-1 d-block">{errors.costo.message}</div>}
                         </FormGroup>
                       </Col>
                     </Row>
@@ -233,7 +319,19 @@ export const ArticuloUpdate = () => {
                       <Col md="4">
                         <FormGroup>
                           <Label>Stock Actual</Label>
-                          <Controller name="existencia" control={control} render={({ field }) => <Input type="number" {...field} />} />
+                          <Controller 
+                            name="existencia" 
+                            control={control} 
+                            rules={{ min: { value: 0, message: 'El stock no puede ser negativo' } }}
+                            render={({ field }) => (
+                              <Input 
+                                type="number" 
+                                {...field} 
+                                className={errors.existencia ? 'border-danger' : ''} 
+                              />
+                            )} 
+                          />
+                          {errors.existencia && <div className="text-danger small mt-1 d-block">{errors.existencia.message}</div>}
                         </FormGroup>
                       </Col>
                       <Col md="4">
@@ -242,8 +340,16 @@ export const ArticuloUpdate = () => {
                           <Controller
                             name="existenciaMinima"
                             control={control}
-                            render={({ field }) => <Input type="number" {...field} />}
+                            rules={{ min: { value: 0, message: 'El stock no puede ser negativo' } }}
+                            render={({ field }) => (
+                              <Input 
+                                type="number" 
+                                {...field} 
+                                className={errors.existenciaMinima ? 'border-danger' : ''} 
+                              />
+                            )}
                           />
+                          {errors.existenciaMinima && <div className="text-danger small mt-1 d-block">{errors.existenciaMinima.message}</div>}
                         </FormGroup>
                       </Col>
                       <Col md="4">
@@ -290,12 +396,13 @@ export const ArticuloUpdate = () => {
                         >
                           {imagePreview ? (
                             <>
-                              <img src={imagePreview} alt="Preview" style={{ maxHeight: '100%', maxWidth: '100%' }} />
+                              <img src={imagePreview} alt="Preview" style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }} />
                               <Button
                                 color="danger"
                                 size="sm"
                                 className="position-absolute top-0 end-0 m-1 rounded-circle"
                                 onClick={clearImage}
+                                type="button"
                               >
                                 <FontAwesomeIcon icon={faTimes} />
                               </Button>
@@ -308,9 +415,26 @@ export const ArticuloUpdate = () => {
                           )}
                         </div>
 
+                        {selectedFile && (
+                          <div className="small text-info mb-2">
+                            <FontAwesomeIcon icon={faImage} className="me-1" />
+                            {selectedFile.name}
+                            <div className="text-muted" style={{ fontSize: '0.7rem' }}>
+                              Se subirá al guardar el artículo
+                            </div>
+                          </div>
+                        )}
+
                         <div className="d-grid">
                           <Label className="btn btn-outline-primary btn-sm mb-0">
-                            Subir Imagen <Input type="file" hidden accept="image/*" onChange={handleImageChange} />
+                            {uploadingImage ? (
+                              <>
+                                <FontAwesomeIcon icon={faSpinner} spin className="me-1" /> Subiendo...
+                              </>
+                            ) : (
+                              'Cambiar Imagen'
+                            )}
+                            <Input type="file" hidden accept="image/*" onChange={handleImageChange} disabled={uploadingImage} />
                           </Label>
                         </div>
                       </CardBody>
@@ -335,12 +459,21 @@ export const ArticuloUpdate = () => {
                 <hr className="my-4" />
 
                 <div className="d-flex justify-content-end gap-3">
-                  <Button tag={Link} to="/admin/articulos" color="secondary" outline>
+                  <Button tag={Link} to="/admin/articulos" color="light" className="text-dark border bg-white fw-bold text-uppercase px-4">
                     Cancelar
                   </Button>
-                  <Button color="primary" type="submit" disabled={isSubmitting} className="px-4">
-                    <FontAwesomeIcon icon={faSave} className="me-2" />
-                    {isSubmitting ? 'Guardando...' : 'Guardar Artículo'}
+                  <Button color="primary" type="submit" disabled={isSubmitting || uploadingImage} className="px-4">
+                    {isSubmitting || uploadingImage ? (
+                      <>
+                        <FontAwesomeIcon icon={faSpinner} spin className="me-2" />
+                        {uploadingImage ? 'Subiendo imagen...' : 'Guardando...'}
+                      </>
+                    ) : (
+                      <>
+                        <FontAwesomeIcon icon={faSave} className="me-2" />
+                        Guardar Artículo
+                      </>
+                    )}
                   </Button>
                 </div>
               </Form>

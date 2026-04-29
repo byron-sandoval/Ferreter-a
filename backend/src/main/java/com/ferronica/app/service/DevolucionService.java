@@ -53,4 +53,12 @@ public interface DevolucionService {
      * @param id the id of the entity.
      */
     void delete(Long id);
+
+    /**
+     * Get all devolutions by venta ID.
+     * 
+     * @param ventaId the ID of the venta.
+     * @return the list of entities.
+     */
+    List<DevolucionDTO> findAllByVenta(Long ventaId);
 }

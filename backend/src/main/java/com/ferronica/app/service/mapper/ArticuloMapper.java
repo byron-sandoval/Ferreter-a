@@ -15,6 +15,7 @@ import org.mapstruct.*;
 public interface ArticuloMapper extends EntityMapper<ArticuloDTO, Articulo> {
     @Mapping(target = "categoria", source = "categoria", qualifiedByName = "categoriaId")
     @Mapping(target = "unidadMedida", source = "unidadMedida", qualifiedByName = "unidadMedidaId")
+    @Mapping(target = "ultimoCosto", source = "ultimoCosto")
     ArticuloDTO toDto(Articulo s);
 
     @Named("categoriaId")
@@ -26,5 +27,7 @@ public interface ArticuloMapper extends EntityMapper<ArticuloDTO, Articulo> {
     @Named("unidadMedidaId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "nombre", source = "nombre")
+    @Mapping(target = "simbolo", source = "simbolo")
     UnidadMedidaDTO toDtoUnidadMedidaId(UnidadMedida unidadMedida);
 }

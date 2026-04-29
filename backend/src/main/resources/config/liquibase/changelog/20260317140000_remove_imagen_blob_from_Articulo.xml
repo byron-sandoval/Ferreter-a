@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Eliminación de las columnas antiguas de imagen (BLOB) de la tabla articulo.
+        Las imágenes ahora se almacenan en Supabase Storage y solo se guarda la URL en imagen_url.
+    -->
+    <changeSet id="20260317140000-1" author="ferronica">
+        <dropColumn tableName="articulo" columnName="imagen"/>
+        <dropColumn tableName="articulo" columnName="imagen_content_type"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -4,10 +4,13 @@ import { Card, CardBody, Form, FormGroup, Label, Input, Button, Row, Col } from 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faArrowLeft, faTruck } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
+import { useAppSelector } from 'app/config/store';
+import { AUTHORITIES } from 'app/config/constants';
 import { IProveedor } from 'app/shared/model/proveedor.model';
 import ProveedorService from 'app/services/proveedor.service';
 
 export const ProveedorUpdate = () => {
+  const isAdmin = useAppSelector(state => state.authentication.account.authorities.includes(AUTHORITIES.ADMIN));
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const isNew = !id;
@@ -69,13 +72,13 @@ export const ProveedorUpdate = () => {
           <FontAwesomeIcon icon={faTruck} className="me-2 text-primary" />
           {isNew ? 'Nuevo Proveedor' : 'Editar Proveedor'}
         </h4>
-        <Button color="secondary" size="sm" outline onClick={() => navigate('/admin/proveedores')}>
+        <Button color="black" size="sm" outline onClick={() => navigate('/admin/proveedores')}>
           <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Volver
         </Button>
       </div>
 
       <Row className="justify-content-center">
-        <Col md="8">
+        <Col md="5">
           <Card className="shadow-sm border-0">
             <CardBody>
               <Form onSubmit={handleSubmit}>
@@ -105,6 +108,8 @@ export const ProveedorUpdate = () => {
                     placeholder="Ej: J0310000000000"
                     value={proveedor.ruc || ''}
                     onChange={handleChange}
+                    readOnly={!isAdmin}
+                    className={!isAdmin ? 'bg-light text-muted' : ''}
                   />
                 </FormGroup>
 
@@ -164,13 +169,13 @@ export const ProveedorUpdate = () => {
                   </Label>
                 </FormGroup>
 
-                <div className="d-flex gap-2 mt-4">
-                  <Button color="success" type="submit" className="fw-bold flex-fill">
+                <div className="d-flex gap-2 mt-4 justify-content-end">
+                  <Button color="black" outline onClick={() => navigate('/admin/proveedores')}>
+                    Cancelar
+                  </Button>
+                  <Button color="success" type="submit" className="fw-bold px-4">
                     <FontAwesomeIcon icon={faSave} className="me-2" />
                     {isNew ? 'Crear Proveedor' : 'Guardar Cambios'}
-                  </Button>
-                  <Button color="secondary" outline onClick={() => navigate('/admin/proveedores')}>
-                    Cancelar
                   </Button>
                 </div>
               </Form>

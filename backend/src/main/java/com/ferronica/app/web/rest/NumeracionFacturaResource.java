@@ -157,7 +157,7 @@ public class NumeracionFacturaResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
      *         of numeracionFacturas in body.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_VENDEDOR')")
     @GetMapping("")
     public List<NumeracionFacturaDTO> getAllNumeracionFacturas() {
         LOG.debug("REST request to get all NumeracionFacturas");
@@ -171,7 +171,7 @@ public class NumeracionFacturaResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
      *         the numeracionFacturaDTO, or with status {@code 404 (Not Found)}.
      */
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_BODEGUERO', 'ROLE_VENDEDOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_VENDEDOR')")
     @GetMapping("/{id}")
     public ResponseEntity<NumeracionFacturaDTO> getNumeracionFactura(@PathVariable("id") Long id) {
         LOG.debug("REST request to get NumeracionFactura : {}", id);

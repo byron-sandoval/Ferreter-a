@@ -4,7 +4,7 @@ import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
 
 const BodegueroDashboard = React.lazy(() => import('./BodegueroDashboard'));
 const IngresoList = React.lazy(() => import('./IngresoList'));
-const IngresoUpdate = React.lazy(() => import('./IngresoUpdate'));
+const IngresoNuevaCompra = React.lazy(() => import('./IngresoNuevaCompra'));
 
 const Loadable = ({ children }: { children: React.ReactNode }) => (
   <Suspense
@@ -37,10 +37,10 @@ const BodegueroRoutes = () => (
       }
     />
     <Route
-      path="ingresos/nuevo"
+      path="ingresos/nueva-compra"
       element={
         <Loadable>
-          <IngresoUpdate />
+          <IngresoNuevaCompra />
         </Loadable>
       }
     />

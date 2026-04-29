@@ -55,15 +55,14 @@ public class Articulo implements Serializable {
     @Column(name = "costo", precision = 21, scale = 2, nullable = false)
     private BigDecimal costo;
 
-    @Lob
-    @Column(name = "imagen")
-    private byte[] imagen;
-
-    @Column(name = "imagen_content_type")
-    private String imagenContentType;
+    @Column(name = "imagen_url", length = 500)
+    private String imagenUrl;
 
     @Column(name = "activo")
     private Boolean activo;
+
+    @Column(name = "ultimo_costo", precision = 21, scale = 2)
+    private BigDecimal ultimoCosto;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "padre" }, allowSetters = true)
@@ -178,30 +177,17 @@ public class Articulo implements Serializable {
         this.costo = costo;
     }
 
-    public byte[] getImagen() {
-        return this.imagen;
+    public String getImagenUrl() {
+        return this.imagenUrl;
     }
 
-    public Articulo imagen(byte[] imagen) {
-        this.setImagen(imagen);
+    public Articulo imagenUrl(String imagenUrl) {
+        this.setImagenUrl(imagenUrl);
         return this;
     }
 
-    public void setImagen(byte[] imagen) {
-        this.imagen = imagen;
-    }
-
-    public String getImagenContentType() {
-        return this.imagenContentType;
-    }
-
-    public Articulo imagenContentType(String imagenContentType) {
-        this.imagenContentType = imagenContentType;
-        return this;
-    }
-
-    public void setImagenContentType(String imagenContentType) {
-        this.imagenContentType = imagenContentType;
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
     }
 
     public Boolean getActivo() {
@@ -215,6 +201,14 @@ public class Articulo implements Serializable {
 
     public void setActivo(Boolean activo) {
         this.activo = activo;
+    }
+
+    public BigDecimal getUltimoCosto() {
+        return ultimoCosto;
+    }
+
+    public void setUltimoCosto(BigDecimal ultimoCosto) {
+        this.ultimoCosto = ultimoCosto;
     }
 
     public Categoria getCategoria() {
@@ -243,7 +237,8 @@ public class Articulo implements Serializable {
         return this;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and
+    // setters here
 
     @Override
     public boolean equals(Object o) {
@@ -258,7 +253,8 @@ public class Articulo implements Serializable {
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        // see
+        // https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 
@@ -266,17 +262,16 @@ public class Articulo implements Serializable {
     @Override
     public String toString() {
         return "Articulo{" +
-            "id=" + getId() +
-            ", codigo='" + getCodigo() + "'" +
-            ", nombre='" + getNombre() + "'" +
-            ", descripcion='" + getDescripcion() + "'" +
-            ", existencia=" + getExistencia() +
-            ", existenciaMinima=" + getExistenciaMinima() +
-            ", precio=" + getPrecio() +
-            ", costo=" + getCosto() +
-            ", imagen='" + getImagen() + "'" +
-            ", imagenContentType='" + getImagenContentType() + "'" +
-            ", activo='" + getActivo() + "'" +
-            "}";
+                "id=" + getId() +
+                ", codigo='" + getCodigo() + "'" +
+                ", nombre='" + getNombre() + "'" +
+                ", descripcion='" + getDescripcion() + "'" +
+                ", existencia=" + getExistencia() +
+                ", existenciaMinima=" + getExistenciaMinima() +
+                ", precio=" + getPrecio() +
+                ", costo=" + getCosto() +
+                ", imagenUrl='" + getImagenUrl() + "'" +
+                ", activo='" + getActivo() + "'" +
+                "}";
     }
 }

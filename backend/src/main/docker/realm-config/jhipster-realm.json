@@ -77,8 +77,8 @@
       },
       {
         "id": "1e5c4a6b-2525-4c02-b06d-445856417590",
-        "name": "ROLE_BODEGUERO",
-        "description": "Encargado de Inventario",
+        "name": "ROLE_JEFE_BODEGA",
+        "description": "Jefe de Bodega",
         "composite": false,
         "clientRole": false,
         "containerId": "jhipster",
@@ -2496,26 +2496,25 @@
     {
       "id": "5f2a1b9c-8844-4b12-9c9a-112233445566",
       "createdTimestamp": 1699999999000,
-      "username": "bodeguero",
+      "username": "jefe_bodega",
       "enabled": true,
       "totp": false,
       "emailVerified": true,
-      "firstName": "Bodeguero",
-      "lastName": "User",
+      "firstName": "Jefe",
+      "lastName": "Bodega",
       "email": "bode@gmail.com",
       "credentials": [
         {
           "id": "99887766-5544-3322-1100-aabbccddeeff",
           "type": "password",
-          "createdDate": 1699999999000,
-          "secretData": "{\"value\":\"MbKsMgWPnZyImih8s4SaoCSCq+XIY/c6S9F93sXEidHF1TjPWxCqMkec0+o3860CMLXHt3az61cIJOWI0FW9aw==\",\"salt\":\"fmpBI1r8R1u75hDLMUlwBw==\"}",
-          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\"}"
+          "value": "1234",
+          "temporary": false
         }
       ],
       "disableableCredentialTypes": [],
       "requiredActions": [],
       "realmRoles": [
-        "ROLE_BODEGUERO",
+        "ROLE_JEFE_BODEGA",
         "offline_access",
         "uma_authorization"
       ],
@@ -2544,9 +2543,8 @@
         {
           "id": "aabbccdd-1122-3344-5566-778899001122",
           "type": "password",
-          "createdDate": 1699999999001,
-          "secretData": "{\"value\":\"MbKsMgWPnZyImih8s4SaoCSCq+XIY/c6S9F93sXEidHF1TjPWxCqMkec0+o3860CMLXHt3az61cIJOWI0FW9aw==\",\"salt\":\"fmpBI1r8R1u75hDLMUlwBw==\"}",
-          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\"}"
+          "value": "1234",
+          "temporary": false
         }
       ],
       "disableableCredentialTypes": [],

@@ -9,7 +9,7 @@ export const HistorialPrecioService = {
   },
 
   getByArticulo(articuloId: number) {
-    return axios.get<IHistorialPrecio[]>(`${API_HISTORIAL}?articuloId.equals=${articuloId}`);
+    return axios.get<IHistorialPrecio[]>(`${API_HISTORIAL}?articuloId=${articuloId}`);
   },
 
   get(id: number) {

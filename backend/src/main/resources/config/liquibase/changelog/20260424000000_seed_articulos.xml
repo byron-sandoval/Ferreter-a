@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20260424000000-seed-articulos" author="sandoval">
+
+        <!-- Martillo de Garra -->
+        <insert tableName="articulo">
+            <column name="id" valueNumeric="100"/>
+            <column name="codigo" value="HER-001"/>
+            <column name="nombre" value="Martillo de Garra 16oz"/>
+            <column name="descripcion" value="Martillo de garra de acero con mango de fibra de vidrio, 16 onzas"/>
+            <column name="existencia" valueNumeric="30"/>
+            <column name="existencia_minima" valueNumeric="5"/>
+            <column name="precio" valueNumeric="250.00"/>
+            <column name="costo" valueNumeric="180.00"/>
+            <column name="ultimo_costo" valueNumeric="180.00"/>
+            <column name="activo" valueBoolean="true"/>
+            <column name="categoria_id" valueNumeric="100"/>
+            <column name="unidad_medida_id" valueNumeric="100"/>
+        </insert>
+
+        <!-- Cinta Métrica -->
+        <insert tableName="articulo">
+            <column name="id" valueNumeric="101"/>
+            <column name="codigo" value="HER-002"/>
+            <column name="nombre" value="Cinta Métrica 5m"/>
+            <column name="descripcion" value="Cinta métrica retráctil de 5 metros con cuerpo de ABS"/>
+            <column name="existencia" valueNumeric="20"/>
+            <column name="existencia_minima" valueNumeric="10"/>
+            <column name="precio" valueNumeric="120.00"/>
+            <column name="costo" valueNumeric="80.00"/>
+            <column name="ultimo_costo" valueNumeric="80.00"/>
+            <column name="activo" valueBoolean="true"/>
+            <column name="categoria_id" valueNumeric="100"/>
+            <column name="unidad_medida_id" valueNumeric="100"/>
+        </insert>
+
+        
+        <!-- Pintura (en galones) -->
+        <insert tableName="articulo">
+            <column name="id" valueNumeric="103"/>
+            <column name="codigo" value="CON-002"/>
+            <column name="nombre" value="Pintura Blanca Interior"/>
+            <column name="descripcion" value="Pintura látex de acabado mate para interiores, galón"/>
+            <column name="existencia" valueNumeric="10"/>
+            <column name="existencia_minima" valueNumeric="5"/>
+            <column name="precio" valueNumeric="480.00"/>
+            <column name="costo" valueNumeric="320.00"/>
+            <column name="ultimo_costo" valueNumeric="320.00"/>
+            <column name="activo" valueBoolean="true"/>
+            <column name="categoria_id" valueNumeric="101"/>
+            <column name="unidad_medida_id" valueNumeric="101"/>
+        </insert>
+
+        <!-- Foco LED -->
+        <insert tableName="articulo">
+            <column name="id" valueNumeric="104"/>
+            <column name="codigo" value="ELE-001"/>
+            <column name="nombre" value="Foco LED 9W E27"/>
+            <column name="descripcion" value="Bombilla LED de 9 vatios, base E27, luz blanca fría 6500K"/>
+            <column name="existencia" valueNumeric="50"/>
+            <column name="existencia_minima" valueNumeric="15"/>
+            <column name="precio" valueNumeric="85.00"/>
+            <column name="costo" valueNumeric="50.00"/>
+            <column name="ultimo_costo" valueNumeric="50.00"/>
+            <column name="activo" valueBoolean="true"/>
+            <column name="categoria_id" valueNumeric="102"/>
+            <column name="unidad_medida_id" valueNumeric="100"/>
+        </insert>
+
+    </changeSet>
+</databaseChangeLog>

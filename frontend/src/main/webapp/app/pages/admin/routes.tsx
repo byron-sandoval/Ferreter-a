@@ -11,8 +11,15 @@ const CategoriaList = React.lazy(() => import('./categorias/CategoriaList'));
 const CategoriaUpdate = React.lazy(() => import('./categorias/CategoriaUpdate'));
 const ReportList = React.lazy(() => import('./reportes/ReportList'));
 const ComprasPorProveedor = React.lazy(() => import('./reportes/ComprasPorProveedor'));
+const ReporteGanancias = React.lazy(() => import('./reportes/ReporteGanancias'));
+const ReporteDemanda = React.lazy(() => import('./reportes/ReporteDemanda'));
+const ResumenIngresos = React.lazy(() => import('./reportes/ResumenIngresos'));
+const ReporteImpuestos = React.lazy(() => import('./reportes/ReporteImpuestos'));
 const ConfiguracionEmpresa = React.lazy(() => import('./configuracion/ConfiguracionEmpresa'));
 const GestionUnidadMedida = React.lazy(() => import('./GestionUnidadMedida'));
+const UsuarioList = React.lazy(() => import('./UsuarioList'));
+const UsuarioUpdate = React.lazy(() => import('./UsuarioUpdate'));
+const DevolucionList = React.lazy(() => import('./DevolucionList'));
 
 const Loadable = ({ children }: { children: React.ReactNode }) => (
   <Suspense
@@ -135,7 +142,48 @@ const AdminRoutes = () => (
           </Loadable>
         }
       />
+      <Route
+        path="ganancias"
+        element={
+          <Loadable>
+            <ReporteGanancias />
+          </Loadable>
+        }
+      />
+      <Route
+        path="demanda"
+        element={
+          <Loadable>
+            <ReporteDemanda />
+          </Loadable>
+        }
+      />
+      <Route
+        path="cierre-caja"
+        element={
+          <Loadable>
+            <ResumenIngresos />
+          </Loadable>
+        }
+      />
+      <Route
+        path="impuestos"
+        element={
+          <Loadable>
+            <ReporteImpuestos />
+          </Loadable>
+        }
+      />
     </Route>
+
+    <Route
+      path="devoluciones"
+      element={
+        <Loadable>
+          <DevolucionList />
+        </Loadable>
+      }
+    />
 
     <Route
       path="configuracion"
@@ -154,6 +202,32 @@ const AdminRoutes = () => (
         </Loadable>
       }
     />
+    <Route path="usuarios">
+      <Route
+        index
+        element={
+          <Loadable>
+            <UsuarioList />
+          </Loadable>
+        }
+      />
+      <Route
+        path="new"
+        element={
+          <Loadable>
+            <UsuarioUpdate />
+          </Loadable>
+        }
+      />
+      <Route
+        path=":id/edit"
+        element={
+          <Loadable>
+            <UsuarioUpdate />
+          </Loadable>
+        }
+      />
+    </Route>
   </ErrorBoundaryRoutes>
 );
 

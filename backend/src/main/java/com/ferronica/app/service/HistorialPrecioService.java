@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Service Interface for managing {@link com.ferronica.app.domain.HistorialPrecio}.
+ * Service Interface for managing
+ * {@link com.ferronica.app.domain.HistorialPrecio}.
  */
 public interface HistorialPrecioService {
     /**
@@ -46,6 +47,14 @@ public interface HistorialPrecioService {
      * @return the entity.
      */
     Optional<HistorialPrecioDTO> findOne(Long id);
+
+    /**
+     * Get all the historialPrecios by articulo.
+     *
+     * @param articuloId the id of the articulo.
+     * @return the list of entities.
+     */
+    List<HistorialPrecioDTO> findByArticulo(Long articuloId);
 
     /**
      * Delete the "id" historialPrecio.

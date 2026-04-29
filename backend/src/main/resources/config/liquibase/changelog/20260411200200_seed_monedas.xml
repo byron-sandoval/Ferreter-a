@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20260411200200-seed-monedas" author="sandoval">
+        <insert tableName="moneda">
+            <column name="id" valueNumeric="1"/>
+            <column name="nombre" value="Córdoba"/>
+            <column name="simbolo" value="C$"/>
+            <column name="tipo_cambio" valueNumeric="1.00"/>
+            <column name="activo" valueBoolean="true"/>
+        </insert>
+        <insert tableName="moneda">
+            <column name="id" valueNumeric="2"/>
+            <column name="nombre" value="Dólar"/>
+            <column name="simbolo" value="U$"/>
+            <column name="tipo_cambio" valueNumeric="36.62"/>
+            <column name="activo" valueBoolean="true"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

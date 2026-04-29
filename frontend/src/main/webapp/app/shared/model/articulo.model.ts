@@ -10,11 +10,12 @@ export interface IArticulo {
   existenciaMinima?: number;
   precio?: number;
   costo?: number;
-  imagen?: string | null;
-  imagenContentType?: string | null;
+  imagenUrl?: string | null;
   activo?: boolean | null;
   categoria?: ICategoria | null;
   unidadMedida?: IUnidadMedida | null;
+  priceChangeReason?: string | null;
+  ultimoCosto?: number | null;
 }
 
 export const defaultArticulo: Readonly<IArticulo> = {

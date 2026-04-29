@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink as Link } from 'react-router-dom';
+import { NavLink as Link, useLocation } from 'react-router-dom';
 import { Nav, NavItem, NavLink, Navbar, Container, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import { useAppSelector } from 'app/config/store';
 import { hasAnyAuthority } from 'app/shared/auth/private-route';
@@ -25,13 +25,22 @@ import {
   faChartBar,
   faClock,
   faRulerCombined,
+  faUsers,
+  faUndoAlt,
+  faCalendarAlt,
 } from '@fortawesome/free-solid-svg-icons';
 
 export const TopNavbar = () => {
   const account = useAppSelector(state => state.authentication.account);
   const isAdmin = hasAnyAuthority(account?.authorities || [], [AUTHORITIES.ADMIN]);
   const isVendedor = hasAnyAuthority(account?.authorities || [], [AUTHORITIES.VENDEDOR]);
-  const isBodeguero = hasAnyAuthority(account?.authorities || [], [AUTHORITIES.BODEGUERO]);
+  const isJefeBodega = hasAnyAuthority(account?.authorities || [], [AUTHORITIES.JEFE_BODEGA]);
+  const location = useLocation();
+
+  const isVentasActive =
+    location.pathname === '/vendedor/historial-ventas' ||
+    location.pathname === '/admin/devoluciones' ||
+    location.pathname === '/vendedor/devoluciones';
 
   const [dateStr, setDateStr] = useState('');
   const [timeStr, setTimeStr] = useState('');
@@ -86,16 +95,15 @@ export const TopNavbar = () => {
                 FerroNica
               </h4>
               <small className="text-white-50 d-block" style={{ fontSize: '0.65rem', marginTop: '-2px' }}>
-                {isAdmin ? 'Panel Administrativo' : isBodeguero ? 'Gestión de Almacén' : 'Punto de Venta'}
+                {isAdmin ? 'Panel Administrativo' : isJefeBodega ? 'Jefe de Bodega' : 'Punto de Venta'}
               </small>
             </div>
           </div>
 
           {/* Clock & User Section (Right Corner) */}
           <div className="d-flex align-items-center gap-4">
-            {/* Reloj Dinámico */}
             <div className="d-none d-md-flex align-items-center text-white opacity-75 gap-3 border-end pe-4 border-light border-opacity-10">
-              <FontAwesomeIcon icon={faClock} className="text-info fs-5" />
+              <FontAwesomeIcon icon={faCalendarAlt} className="text-info fs-5" />
               <div className="text-end" style={{ lineHeight: '1.2' }}>
                 <div className="fw-bold small text-capitalize" style={{ fontSize: '0.75rem' }}>
                   {dateStr}
@@ -118,10 +126,10 @@ export const TopNavbar = () => {
                   <FontAwesomeIcon icon={faUserCircle} size="2x" className="text-white-50" />
                 </div>
               </DropdownToggle>
-              <DropdownMenu end className="shadow border-0 mt-2">
-                <DropdownItem header>Sesión iniciada</DropdownItem>
-                <DropdownItem divider />
-                <DropdownItem tag={Link} to="/logout" className="text-danger">
+              <DropdownMenu end className="shadow border-0 mt-0 py-0 overflow-hidden" style={{ minWidth: '140px', borderRadius: '12px' }}>
+                <DropdownItem header className="py-2 text-uppercase fw-bold text-center bg-light" style={{ fontSize: '0.55rem', borderTopLeftRadius: '12px', borderTopRightRadius: '12px', letterSpacing: '0.3px' }}>Sesión iniciada</DropdownItem>
+                <DropdownItem divider className="my-0" />
+                <DropdownItem tag={Link} to="/logout" className="text-danger py-2 text-center" style={{ fontSize: '0.75rem' }}>
                   <FontAwesomeIcon icon={faSignOutAlt} className="me-2" /> Salir del sistema
                 </DropdownItem>
               </DropdownMenu>
@@ -134,7 +142,12 @@ export const TopNavbar = () => {
           <Nav navbar className="flex-row flex-wrap align-items-center no-scrollbar overflow-auto">
             {/* 1. Inicio */}
             <NavItem className="nav-link-item">
-              <NavLink tag={Link} to="/" style={navLinkStyle}>
+              <NavLink
+                tag={Link}
+                to="/"
+                style={navLinkStyle}
+                active={location.pathname === '/' || location.pathname === '/vendedor' || location.pathname === '/bodeguero'}
+              >
                 <FontAwesomeIcon icon={faHome} size="sm" /> Inicio
               </NavLink>
             </NavItem>
@@ -151,14 +164,14 @@ export const TopNavbar = () => {
             {/* 4. Ventas */}
             {(isAdmin || isVendedor) && (
               <NavItem className="nav-link-item">
-                <NavLink tag={Link} to="/vendedor/historial-ventas" style={navLinkStyle}>
+                <NavLink tag={Link} to="/vendedor/historial-ventas" style={navLinkStyle} active={isVentasActive}>
                   <FontAwesomeIcon icon={faHistory} size="sm" /> Ventas
                 </NavLink>
               </NavItem>
             )}
 
             {/* 5. Compras */}
-            {(isAdmin || isBodeguero) && (
+            {(isAdmin || isJefeBodega) && (
               <NavItem className="nav-link-item">
                 <NavLink tag={Link} to="/bodeguero/ingresos" style={navLinkStyle}>
                   <FontAwesomeIcon icon={faFileInvoice} size="sm" /> Compras
@@ -166,17 +179,8 @@ export const TopNavbar = () => {
               </NavItem>
             )}
 
-            {/* 6. Inventario */}
-            {(isAdmin || isVendedor || isBodeguero) && (
-              <NavItem className="nav-link-item">
-                <NavLink tag={Link} to="/vendedor/consulta-inventario" style={navLinkStyle}>
-                  <FontAwesomeIcon icon={faWarehouse} size="sm" /> Inventario
-                </NavLink>
-              </NavItem>
-            )}
-
             {/* 7. Productos */}
-            {(isAdmin || isBodeguero) && (
+            {(isAdmin || isJefeBodega) && (
               <NavItem className="nav-link-item">
                 <NavLink tag={Link} to="/admin/articulos" style={navLinkStyle}>
                   <FontAwesomeIcon icon={faBoxes} size="sm" /> Productos
@@ -203,10 +207,19 @@ export const TopNavbar = () => {
             )}
 
             {/* 10. Proveedores */}
-            {isAdmin && (
+            {(isAdmin || isJefeBodega) && (
               <NavItem className="nav-link-item">
                 <NavLink tag={Link} to="/admin/proveedores" style={navLinkStyle}>
                   <FontAwesomeIcon icon={faTruck} size="sm" /> Proveedores
+                </NavLink>
+              </NavItem>
+            )}
+
+            {/* 14. Usuarios */}
+            {isAdmin && (
+              <NavItem className="nav-link-item">
+                <NavLink tag={Link} to="/admin/usuarios" style={navLinkStyle}>
+                  <FontAwesomeIcon icon={faUsers} size="sm" /> Usuarios
                 </NavLink>
               </NavItem>
             )}
