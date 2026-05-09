@@ -62,15 +62,20 @@ html, body {
 /* LADO DERECHO IMAGEN */
 .right-panel {
     flex: 1;
-    /* Gradiente más claro para que el logo resalte */
-    background: 
-        linear-gradient(135deg, rgba(88, 28, 135, 0.2), rgba(10, 10, 15, 0.4)),
-        url("${url.resourcesPath}/img/ferroN.png"); 
-    background-size: cover;
-    background-position: center;
-    position: relative;
+    background: linear-gradient(135deg, rgba(88, 28, 135, 0.2), rgba(10, 10, 15, 0.4));
     background-color: #1a1625;
-    filter: brightness(1.1) contrast(1.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.dynamic-logo {
+    max-width: 110%;
+    max-height: 110%;
+    object-fit: contain;
+    z-index: 2;
+    filter: drop-shadow(0 15px 25px rgba(0,0,0,0.6));
 }
 
 /* ---------- ESTILO LOGIN ---------- */
@@ -216,10 +221,110 @@ input:focus {
 
     </div>
 
-    <div class="right-panel">
+    <div class="right-panel" id="business-logo-container">
     </div>
 
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+
+        // Algoritmo "Varita Mágica": elimina el fondo comenzando desde las esquinas
+        function removeWhiteBackground(imgElement) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = imgElement.naturalWidth;
+            canvas.height = imgElement.naturalHeight;
+            ctx.drawImage(imgElement, 0, 0);
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            const width = canvas.width;
+            const height = canvas.height;
+            const tolerance = 90; // Tolerancia de color (0=exacto, 255=todo)
+
+            // Obtener el color de la esquina superior izquierda (color de fondo)
+            const bgR = data[0], bgG = data[1], bgB = data[2];
+
+            const visited = new Uint8Array(width * height);
+            const stack = [];
+
+            // Sembrar desde las 4 esquinas
+            const seeds = [
+                0, width - 1,
+                (height - 1) * width, (height - 1) * width + (width - 1)
+            ];
+            seeds.forEach(pos => stack.push(pos));
+
+            function colorMatch(idx) {
+                const r = data[idx * 4], g = data[idx * 4 + 1], b = data[idx * 4 + 2];
+                return Math.abs(r - bgR) + Math.abs(g - bgG) + Math.abs(b - bgB) < tolerance * 3;
+            }
+
+            // Flood fill iterativo
+            while (stack.length > 0) {
+                const pos = stack.pop();
+                if (pos < 0 || pos >= width * height || visited[pos]) continue;
+                if (!colorMatch(pos)) continue;
+
+                visited[pos] = 1;
+                data[pos * 4 + 3] = 0; // Hacer transparente
+
+                stack.push(pos - 1, pos + 1, pos - width, pos + width);
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+            imgElement.onload = null;
+            imgElement.src = canvas.toDataURL();
+            imgElement.style.visibility = 'visible';
+        }
+
+        // Detectar la URL base de la aplicación
+        let baseUrl = '';
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectUri = urlParams.get('redirect_uri');
+
+        if (redirectUri) {
+            baseUrl = new URL(redirectUri).origin;
+        } else {
+            baseUrl = window.location.origin.replace('9080', '9000');
+            if (baseUrl === window.location.origin) {
+                baseUrl = window.location.origin.replace('9080', '8080');
+            }
+        }
+
+        fetch(baseUrl + '/api/public/empresa')
+            .then(response => response.json())
+            .then(data => {
+                if (data.nombre) {
+                    document.querySelectorAll('.title').forEach(t => t.textContent = data.nombre.toUpperCase());
+                }
+                if (data.logo) {
+                    const logoContainer = document.getElementById('business-logo-container');
+                    const logoUrl = 'data:' + data.logoContentType + ';base64,' + data.logo;
+
+                    logoContainer.innerHTML = '';
+                    const img = document.createElement('img');
+                    img.className = 'dynamic-logo';
+                    img.style.visibility = 'hidden';
+
+                    img.onload = function() {
+                        try {
+                            removeWhiteBackground(img);
+                        } catch (e) {
+                            img.style.visibility = 'visible';
+                        }
+                    };
+
+                    img.src = logoUrl;
+                    logoContainer.appendChild(img);
+                }
+            })
+            .catch(error => {
+                console.error('Error cargando info del negocio:', error);
+            });
+    });
+</script>
 </#if>
 
 </@layout.registrationLayout>

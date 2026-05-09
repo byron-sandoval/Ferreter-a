@@ -88,7 +88,8 @@ export const ArticuloList = () => {
       if (aReview && !bReview) return -1;
       if (!aReview && bReview) return 1;
 
-      return 0; // Mantener orden original si ambos son iguales en prioridad
+      // Ordenar por ID descendente (los más nuevos primero)
+      return (b.id || 0) - (a.id || 0);
     });
 
   const indexOfLastItem = currentPage * itemsPerPage;

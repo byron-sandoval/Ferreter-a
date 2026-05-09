@@ -33,10 +33,14 @@ export const Sidebar = () => {
     margin: '4px 0',
   };
 
-  const activeStyle = {
-    backgroundColor: '#18bc9c',
-    color: '#fff',
-  };
+  const [empresa, setEmpresa] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    fetch('/api/public/empresa')
+      .then(res => res.json())
+      .then(data => setEmpresa(data))
+      .catch(err => console.error('Error fetching business info:', err));
+  }, []);
 
   return (
     <div
@@ -53,10 +57,10 @@ export const Sidebar = () => {
     >
       <div className="text-center mb-4 border-bottom pb-3 border-secondary">
         <h4 className="fw-bold mb-0" style={{ color: '#18bc9c' }}>
-          FerroNica
+          {empresa?.nombre || 'FerroNica'}
         </h4>
         <small className="text-muted text-uppercase" style={{ fontSize: '0.7rem', letterSpacing: '1px' }}>
-          Gestión de Inventario
+          {empresa?.eslogan || 'Gestión de Inventario'}
         </small>
       </div>
 

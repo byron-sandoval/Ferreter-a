@@ -239,6 +239,25 @@ export const ArticuloUpdate = () => {
                     <Row>
                       <Col md="6">
                         <FormGroup>
+                          <Label className="text-secondary fw-bold">Costo Unitario (C$) *</Label>
+                          <Controller
+                            name="costo"
+                            control={control}
+                            rules={{ required: true, min: { value: 0, message: 'El costo no puede ser negativo' } }}
+                            render={({ field }) => (
+                              <Input 
+                                type="number" 
+                                step="0.01" 
+                                {...field} 
+                                className={errors.costo ? 'border-danger' : ''} 
+                              />
+                            )}
+                          />
+                          {errors.costo && <div className="text-danger small mt-1 d-block">{errors.costo.message}</div>}
+                        </FormGroup>
+                      </Col>
+                      <Col md="6">
+                        <FormGroup>
                           <Label className={`fw-bold ${esPrecioBajo ? 'text-danger' : 'text-success'}`}>Precio Venta (C$) *</Label>
                           <Controller
                             name="precio"
@@ -292,25 +311,6 @@ export const ArticuloUpdate = () => {
                               )}
                             />
                           )}
-                        </FormGroup>
-                      </Col>
-                      <Col md="6">
-                        <FormGroup>
-                          <Label className="text-secondary fw-bold">Costo Unitario (C$) *</Label>
-                          <Controller
-                            name="costo"
-                            control={control}
-                            rules={{ required: true, min: { value: 0, message: 'El costo no puede ser negativo' } }}
-                            render={({ field }) => (
-                              <Input 
-                                type="number" 
-                                step="0.01" 
-                                {...field} 
-                                className={errors.costo ? 'border-danger' : ''} 
-                              />
-                            )}
-                          />
-                          {errors.costo && <div className="text-danger small mt-1 d-block">{errors.costo.message}</div>}
                         </FormGroup>
                       </Col>
                     </Row>
@@ -462,7 +462,7 @@ export const ArticuloUpdate = () => {
                   <Button tag={Link} to="/admin/articulos" color="light" className="text-dark border bg-white fw-bold text-uppercase px-4">
                     Cancelar
                   </Button>
-                  <Button color="primary" type="submit" disabled={isSubmitting || uploadingImage} className="px-4">
+                  <Button color="primary" type="submit" disabled={isSubmitting || uploadingImage || esPrecioBajo} className="px-4">
                     {isSubmitting || uploadingImage ? (
                       <>
                         <FontAwesomeIcon icon={faSpinner} spin className="me-2" />
