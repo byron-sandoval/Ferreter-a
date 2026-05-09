@@ -71,6 +71,17 @@ export const TopNavbar = () => {
     borderBottom: '1px solid rgba(255,255,255,0.1)',
   };
 
+  const [empresa, setEmpresa] = useState<any>(null);
+
+  useEffect(() => {
+    fetch('/api/public/empresa')
+      .then(res => res.json())
+      .then(data => setEmpresa(data))
+      .catch(err => console.error('Error fetching business info:', err));
+  }, []);
+
+  const logoSrc = empresa?.logo ? `data:${empresa.logoContentType};base64,${empresa.logo}` : null;
+
   return (
     <div className="top-navbar-container shadow-sm w-100 sticky-top" style={navStyle}>
       <header className="w-100">
@@ -81,18 +92,22 @@ export const TopNavbar = () => {
             <Link to="/" className="text-decoration-none">
               <div
                 className="bg-white rounded-circle p-1 d-flex align-items-center justify-content-center shadow-sm"
-                style={{ width: '42px', height: '42px' }}
+                style={{ width: '42px', height: '42px', overflow: 'hidden' }}
               >
-                <span className="text-primary fw-bold" style={{ fontSize: '1.1rem' }}>
-                  FN
-                </span>
+                {logoSrc ? (
+                  <img src={logoSrc} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                ) : (
+                  <span className="text-primary fw-bold" style={{ fontSize: '1.1rem' }}>
+                    {empresa?.nombre ? empresa.nombre.substring(0, 2).toUpperCase() : 'FN'}
+                  </span>
+                )}
               </div>
             </Link>
 
             {/* Site Name */}
             <div className="text-white">
               <h4 className="m-0 fw-bold tracking-tight" style={{ letterSpacing: '1px' }}>
-                FerroNica
+                {empresa?.nombre || 'FerroNica'}
               </h4>
               <small className="text-white-50 d-block" style={{ fontSize: '0.65rem', marginTop: '-2px' }}>
                 {isAdmin ? 'Panel Administrativo' : isJefeBodega ? 'Jefe de Bodega' : 'Punto de Venta'}
